@@ -4,6 +4,7 @@ import com.teachsync.dtos.room.RoomReadDTO;
 import com.teachsync.entities.BaseEntity;
 import com.teachsync.entities.Room;
 import com.teachsync.repositories.RoomRepository;
+import com.teachsync.services.center.CenterService;
 import com.teachsync.utils.enums.DtoOption;
 import com.teachsync.utils.enums.Status;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,7 @@ import java.util.stream.Collectors;
 public class RoomServiceImpl implements RoomService {
     @Autowired
     private RoomRepository roomRepository;
+
 
 
     /* =================================================== CREATE =================================================== */
@@ -43,6 +45,8 @@ public class RoomServiceImpl implements RoomService {
 
         return roomList;
     }
+
+
     @Override
     public Map<Long, String> mapRoomIdRoomNameByIdIn(Collection<Long> idCollection) throws Exception {
         List<Room> roomList = getAllByIdIn(idCollection);

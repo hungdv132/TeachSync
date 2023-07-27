@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Certificate</title>
+    <title>List center</title>
 
     <link rel="stylesheet" href="../../resources/css/bootstrap-5.3.0/bootstrap.css">
     <link rel="stylesheet" href="../../resources/css/certificate_style.css">

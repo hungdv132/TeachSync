@@ -1,5 +1,6 @@
 package com.teachsync.repositories;
 
+
 import com.teachsync.entities.Room;
 import com.teachsync.utils.enums.Status;
 import org.springframework.data.jpa.repository.JpaRepository;

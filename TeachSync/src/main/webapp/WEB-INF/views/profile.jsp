@@ -49,12 +49,12 @@
 
             <div class="row gutters">
               <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
-                <h6 class="mb-2 text-primary">Personal Details</h6>
+                <h6 class="mb-2 text-primary">Thông tin cá nhân</h6>
               </div>
 
               <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
                 <div class="form-group">
-                  <label for="fullName">Full Name</label>
+                  <label for="fullName">Họ và tên</label>
                   <input type="text" class="form-control" id="fullName" name="fullName"
                        value="${sessionScope.user.fullName}">
                 </div>
@@ -70,7 +70,7 @@
 
               <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
                 <div class="form-group">
-                  <label for="phone">Phone</label>
+                  <label for="phone">Số điện thoại</label>
                   <input type="text" class="form-control" id="phone" name="phone"
                        value="${sessionScope.user.phone}">
                 </div>
@@ -79,12 +79,12 @@
 
             <div class="row gutters">
               <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
-                <h6 class="mt-3 mb-2 text-primary">Address</h6>
+                <h6 class="mt-3 mb-2 text-primary">Địa chỉ</h6>
               </div>
 
               <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
                 <div class="form-group">
-                  <label for="address">Address</label>
+                  <label for="address">Địa chỉ</label>
                   <input type="text" class="form-control" id="address" name="address"
                        value="${sessionScope.user.address}">
                 </div>

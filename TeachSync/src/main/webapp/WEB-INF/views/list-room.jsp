@@ -5,13 +5,52 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Certificate</title>
+    <title>List room</title>
 
     <link rel="stylesheet" href="../../resources/css/bootstrap-5.3.0/bootstrap.css">
     <link rel="stylesheet" href="../../resources/css/certificate_style.css">
     <script src="../../resources/js/jquery/jquery-3.6.3.js"></script>
     <script src="../../resources/js/bootstrap-5.3.0/bootstrap.bundle.js"></script>
     <script src="../../resources/js/common.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin-right: 100px;
+            padding: 0;
+        }
+
+        h1 {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .room-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .room {
+            max-width: 200px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .room-image {
+            width: 95%;
+            max-height: 150px;
+            object-fit: cover;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        .room-name {
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body class="container-fluid ts-bg-white-subtle">
 <!-- ================================================== Header ===================================================== -->
@@ -33,6 +72,30 @@
                 </li>
             </ol>
         </nav>
+    </div>
+</div>
+
+
+<h1>Danh sách phòng</h1>
+
+<div class="tag-list">
+    <div class="room-list">
+
+            <div class="room">
+                <a href="/room-detail">
+                <img class="room-image" src="https://baochauelec.com/cdn/images/phong-hoc-1.jpg" alt="Phòng 1">
+                <div class="room-name">101</div>
+                </a>
+            </div>
+
+
+            <div class="room">
+                <a href="/room-detail">
+                <img class="room-image" src="https://baochauelec.com/cdn/images/phong-hoc-1.jpg" alt="Phòng 2">
+                <div class="room-name">102</div>
+                </a>
+            </div>
+
     </div>
 </div>
 <!-- ================================================== Main Body ================================================== -->
