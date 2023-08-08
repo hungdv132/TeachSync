@@ -1,10 +1,16 @@
 package com.teachsync.services.memberHomeworkRecord;
 
+import com.teachsync.dtos.clazzMember.ClazzMemberReadDTO;
+import com.teachsync.dtos.homework.HomeworkReadDTO;
+import com.teachsync.dtos.memberHomeworkRecord.MemberHomeworkRecordCreateDTO;
 import com.teachsync.dtos.memberHomeworkRecord.MemberHomeworkRecordReadDTO;
 import com.teachsync.dtos.user.UserReadDTO;
 import com.teachsync.entities.Homework;
 import com.teachsync.entities.MemberHomeworkRecord;
+import com.teachsync.repositories.HomeworkRepository;
 import com.teachsync.repositories.MemberHomeworkRecordRepository;
+import com.teachsync.services.clazzMember.ClazzMemberService;
+import com.teachsync.services.homework.HomeworkService;
 import com.teachsync.utils.MiscUtil;
 import com.teachsync.utils.enums.DtoOption;
 import com.teachsync.utils.enums.Status;
@@ -16,14 +22,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class MemberHomeworkRecordServiceImpl implements MemberHomeworkRecordService {
     @Autowired
     private MemberHomeworkRecordRepository memberHomeworkRecordRepository;
+
+    @Autowired
+    private ClazzMemberService clazzMemberService;
+    @Autowired
+    private HomeworkService homeworkService;
 
     @Autowired
     private ModelMapper mapper;
@@ -33,20 +42,13 @@ public class MemberHomeworkRecordServiceImpl implements MemberHomeworkRecordServ
 
     @Override
     @Transactional
-    public void add(MemberHomeworkRecordReadDTO memberHomeworkRecordReadDTO, UserReadDTO userDTO) throws Exception {
+    public void add(MemberHomeworkRecordCreateDTO createDTO) throws Exception {
+        // TODO: Check có học lớp này hay không, đã đến giờ/quá hạn nộp bài, trùng lặp...
 
-        MemberHomeworkRecord memberHomeworkRecord = new MemberHomeworkRecord();
-        memberHomeworkRecord.setName("Bài tập - " + MiscUtil.generateRandomName() + " - " + userDTO.getFullName());
-        memberHomeworkRecord.setMemberId(memberHomeworkRecordReadDTO.getMemberId());
-        memberHomeworkRecord.setHomeworkId(memberHomeworkRecordReadDTO.getHomeworkId());
-        memberHomeworkRecord.setSubmission(memberHomeworkRecordReadDTO.getSubmission());//TODO upload file
-        memberHomeworkRecord.setSubmissionLink(memberHomeworkRecordReadDTO.getSubmissionLink());
+        MemberHomeworkRecord record = mapper.map(createDTO, MemberHomeworkRecord.class);
+        /* Dùng mapper tương ứng a.setX( b.getX() ) cho mọi thuộc tính giống tên giống kiểu */
 
-        memberHomeworkRecord.setCreatedBy(userDTO.getId());
-        memberHomeworkRecord.setUpdatedBy(userDTO.getId());
-        memberHomeworkRecord.setStatus(Status.CREATED);
-
-        MemberHomeworkRecord memberHomeworkRecordDB = memberHomeworkRecordRepository.save(memberHomeworkRecord);
+        MemberHomeworkRecord memberHomeworkRecordDB = memberHomeworkRecordRepository.save(record);
         if (ObjectUtils.isEmpty(memberHomeworkRecordDB)) {
             throw new Exception("Lỗi khi nộp bài tập về nhà");
         }
@@ -56,7 +58,10 @@ public class MemberHomeworkRecordServiceImpl implements MemberHomeworkRecordServ
 
     @Override
     public MemberHomeworkRecordReadDTO findById(Long id) throws Exception {
-        MemberHomeworkRecord memberHomeworkRecord = memberHomeworkRecordRepository.findById(id).orElseThrow(() -> new Exception("không tìm thấy bài tập về nhà"));
+        MemberHomeworkRecord memberHomeworkRecord =
+                memberHomeworkRecordRepository
+                        .findById(id)
+                        .orElseThrow(() -> new Exception("không tìm thấy bài tập về nhà"));
         return mapper.map(memberHomeworkRecord, MemberHomeworkRecordReadDTO.class);
     }
 
@@ -81,19 +86,18 @@ public class MemberHomeworkRecordServiceImpl implements MemberHomeworkRecordServ
         MemberHomeworkRecordReadDTO dto = mapper.map(memberHomeworkRecord, MemberHomeworkRecordReadDTO.class);
 
         /* Add dependency */
-        /* TODO:
         if (options != null && !options.isEmpty()) {
-            if (options.contains(DtoOption.FK)) {
-                FkReadDTO fkDTO = fkService.getDTOById(memberHomeworkRecord.getFkId());
-                dto.setFk(fkDTO);
+            if (options.contains(DtoOption.MEMBER)) {
+                ClazzMemberReadDTO memberDTO = clazzMemberService.getDTOById(memberHomeworkRecord.getMemberId(), options);
+                dto.setMember(memberDTO);
             }
 
-            if (options.contains(DtoOption.FK_LIST)) {
-                List<FkReadDTO> fkDTOList = fkService.getAllDTOById(memberHomeworkRecord.getFkId());
-                dto.setFkList(fkDTOList);
-            }
+            /* TODO:
+            if (options.contains(DtoOption.HOMEWORK)) {
+                HomeworkReadDTO homeworkDTO = homeworkService.getDTOById(memberHomeworkRecord.getHomeworkId(), options);
+                dto.setHomework(homeworkDTO);
+            }*/
         }
-        */
 
         return dto;
     }
@@ -103,36 +107,36 @@ public class MemberHomeworkRecordServiceImpl implements MemberHomeworkRecordServ
         List<MemberHomeworkRecordReadDTO> dtoList = new ArrayList<>();
         MemberHomeworkRecordReadDTO dto;
 
-        /* TODO:
-        Map<Long, FkReadDTO> fkIdFkDTOMap = new HashMap<>();
-        Map<Long, List<FkReadDTO>> fkIdFkDTOListMap = new HashMap<>();
+        Map<Long, ClazzMemberReadDTO> memberIdMemberDTOMap = new HashMap<>();
+        Map<Long, HomeworkReadDTO> homeworkIdHomeworkDTOMap = new HashMap<>();
 
         if (options != null && !options.isEmpty()) {
-            Set<Long> fkIdSet = new HashSet<>();
+            Set<Long> memberIdSet = new HashSet<>();
+            Set<Long> homeworkIdSet = new HashSet<>();
 
-            for (MemberHomeworkRecord memberHomeworkRecord : memberHomeworkRecordCollection) {
-                fkIdSet.add(memberHomeworkRecord.getFkId());
+            for (MemberHomeworkRecord record : memberHomeworkRecordCollection) {
+                memberIdSet.add(record.getMemberId());
+                homeworkIdSet.add(record.getHomeworkId());
             }
 
-            if (options.contains(DtoOption.FK)) {
-                fkIdFkDTOMap = fkService.mapIdDTOByIdIn(fkIdSet);
+            if (options.contains(DtoOption.MEMBER)) {
+                memberIdMemberDTOMap = clazzMemberService.mapIdDTOByIdIn(memberIdSet, options);
             }
 
-            if (options.contains(DtoOption.FK_LIST)) {
-                fkIdFkDTOListMap = fkService.mapIdListDTOByIdIn(fkIdSet);
+            /* TODO:
+            if (options.contains(DtoOption.HOMEWORK)) {
+                homeworkIdHomeworkDTOMap = homeworkService.mapIdDTOByIdIn(homeworkIdSet, options);
             }
+            */
         }
-        */
 
-        for (MemberHomeworkRecord memberHomeworkRecord : memberHomeworkRecordCollection) {
-            dto = mapper.map(memberHomeworkRecord, MemberHomeworkRecordReadDTO.class);
+        for (MemberHomeworkRecord record : memberHomeworkRecordCollection) {
+            dto = mapper.map(record, MemberHomeworkRecordReadDTO.class);
 
             /* Add dependency */
-            /*
-            dto.setFk(fkIdFkDTOMap.get(memberHomeworkRecord.getFkId()));
+            dto.setMember(memberIdMemberDTOMap.get(record.getMemberId()));
 
-            dto.setFkList(fkIdFkDTOListMap.get(memberHomeworkRecord.getFkId()));
-            */
+            dto.setHomework(homeworkIdHomeworkDTOMap.get(record.getHomeworkId()));
 
             dtoList.add(dto);
         }

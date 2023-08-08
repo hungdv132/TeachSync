@@ -24,6 +24,9 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
     Page<Course> findAllByIdInAndStatusNot(Collection<Long> idCollection, Status status, Pageable pageable);
     List<Course> findAllByIdInAndStatusNot(Collection<Long> idCollection, Status status);
 
+    /* courseName */
+    List<Course> findAllByCourseNameContainsAndStatusNot(String courseName, Status status);
+
     /* Check duplicate */
     @Query("SELECT case when count(c) > 0 then true else false end " +
             "FROM Course c " +

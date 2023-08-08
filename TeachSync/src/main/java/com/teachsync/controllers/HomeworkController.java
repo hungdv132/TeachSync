@@ -2,12 +2,16 @@ package com.teachsync.controllers;
 
 import com.teachsync.dtos.clazz.ClazzReadDTO;
 import com.teachsync.dtos.homework.HomeworkReadDTO;
+import com.teachsync.dtos.memberHomeworkRecord.MemberHomeworkRecordCreateDTO;
 import com.teachsync.dtos.memberHomeworkRecord.MemberHomeworkRecordReadDTO;
 import com.teachsync.dtos.user.UserReadDTO;
+import com.teachsync.entities.ClazzMember;
 import com.teachsync.services.clazz.ClazzService;
+import com.teachsync.services.clazzMember.ClazzMemberService;
 import com.teachsync.services.homework.HomeworkService;
 import com.teachsync.services.memberHomeworkRecord.MemberHomeworkRecordService;
 import com.teachsync.utils.Constants;
+import com.teachsync.utils.MiscUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.slf4j.Logger;
@@ -20,6 +24,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.nio.file.AccessDeniedException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -35,6 +40,8 @@ public class HomeworkController {
 
     @Autowired
     ClazzService clazzService;
+    @Autowired
+    ClazzMemberService clazzMemberService;
 
     @Autowired
     MemberHomeworkRecordService memberHomeworkRecordService;
@@ -229,7 +236,7 @@ public class HomeworkController {
 
 
     @GetMapping("/record-homework")
-    public String addRecordHomework(HttpSession session, RedirectAttributes redirect, Model model, HttpServletRequest request
+    public String addRecordHomeworkPage(HttpSession session, RedirectAttributes redirect, Model model, HttpServletRequest request
             , @ModelAttribute("mess") String mess) {
         //check login
         if (ObjectUtils.isEmpty(session.getAttribute("user"))) {
@@ -243,9 +250,13 @@ public class HomeworkController {
             return "redirect:/";
         }
 
+        /* TODO: Kiểm tra user này có học lớp này hay không mà cho trang nộp bài (Sử dụng ClazzMember) */
+
         try {
             if (!ObjectUtils.isEmpty(request.getParameter("id"))) {
-                HomeworkReadDTO homeworkReadDTO = homeworkService.findById(Long.parseLong(request.getParameter("id")));
+                HomeworkReadDTO homeworkReadDTO =
+                        homeworkService.findById(Long.parseLong(request.getParameter("id")));
+
                 model.addAttribute("homework", homeworkReadDTO);
             }
             model.addAttribute("mess", mess);
@@ -260,7 +271,11 @@ public class HomeworkController {
     }
 
     @PostMapping("/record-homework")
-    public String addRecordHomeworkPost(HttpSession session, RedirectAttributes redirect, Model model, HttpServletRequest request) {
+    public String addRecordHomework(
+            HttpSession session,
+            RedirectAttributes redirect,
+            Model model,
+            HttpServletRequest request) {
         //check login
         if (ObjectUtils.isEmpty(session.getAttribute("user"))) {
             redirect.addAttribute("mess", "Làm ơn đăng nhập");
@@ -273,19 +288,27 @@ public class HomeworkController {
             redirect.addAttribute("mess", "bạn không đủ quyền");
             return "redirect:/";
         }
-        //ALTER TABLE teachsync.member_homework_record DROP FOREIGN KEY fk_member_homework_record_clazz_member;
-        //FK menberId --> usser
-        //thêm trường name
-        //submission --> data type : longtext;
-        MemberHomeworkRecordReadDTO memberHomeworkRecordReadDTO = new MemberHomeworkRecordReadDTO();
-        memberHomeworkRecordReadDTO.setMemberId(userDTO.getId());
         Long homeworkId = Long.parseLong(request.getParameter("homeworkId"));
-        memberHomeworkRecordReadDTO.setHomeworkId(homeworkId);
-        memberHomeworkRecordReadDTO.setSubmission(request.getParameter("submissionFile"));//TODO upload file
-        memberHomeworkRecordReadDTO.setSubmissionLink(request.getParameter("submissionLink"));
 
+        /* clazzId có trong HomeworkReadDTO, truyền qua input hidden */
+        Long clazzId = Long.parseLong(request.getParameter("clazzId"));
         try {
-            memberHomeworkRecordService.add(memberHomeworkRecordReadDTO, userDTO);
+            MemberHomeworkRecordCreateDTO recordDTO = new MemberHomeworkRecordCreateDTO();
+            recordDTO.setHomeworkId(homeworkId);
+
+            /* Vì sao dùng memberId => vì có ClazzMember mới biết là có học lớp này hay không */
+            ClazzMember member = clazzMemberService.getByClazzIdAndUserId(clazzId, userDTO.getId());
+            if (member == null) {
+                throw new AccessDeniedException("Bạn không phải học sinh của lớp này.");
+            }
+            recordDTO.setMemberId(member.getId());
+
+            recordDTO.setName("Bài tập - " + MiscUtil.generateRandomName() + " - " + userDTO.getFullName());
+
+            recordDTO.setSubmission(request.getParameter("submissionFile"));
+            recordDTO.setSubmissionLink(request.getParameter("submissionLink"));
+
+            memberHomeworkRecordService.add(recordDTO);
         } catch (Exception e) {
             logger.error(e.getMessage());
             e.printStackTrace();

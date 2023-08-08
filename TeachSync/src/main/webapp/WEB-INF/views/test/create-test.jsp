@@ -95,25 +95,28 @@
 <%@ include file="/WEB-INF/fragments/header.jspf" %>
 <h1>Tạo bài test</h1>
 
-<form action="process-question" method="post">
+<form action="/process-question" method="post">
   <label for="question-type">Môn học:</label>
-  <select name="courseName">
-    <c:forEach var="item" items="${lstCourse}">
-      <option value="${item.id}">${item.courseName}</option>
+  <select name="courseId">
+    <c:forEach var="courseDTO" items="${lstCourse}">
+      <option value="${courseDTO.id}">${courseDTO.courseName}</option>
     </c:forEach>
   </select>
+  
   <label for="question-type">Loại kiểm tra:</label>
   <select name="testType">
     <option value="FIFTEEN_MINUTE">15 phút</option>
     <option value="MIDTERM">Giữa kỳ</option>
     <option value="FINAL">Cuối kỳ</option>
   </select>
+  
   <label for="num-questions">Thời gian:</label>
   <input type="number" id="timeLimit" name="timeLimit" min="1" required>
+  
   <label for="question-type">Loại câu hỏi:</label>
   <select id="question-type" name="questionType">
-    <option value="essay">Tự luận</option>
-    <option value="multipleChoice">Trắc nghiệm</option>
+    <option value="ESSAY">Tự luận</option>
+    <option value="MULTIPLE">Trắc nghiệm</option>
   </select>
 
   <label for="num-questions">Số lượng câu hỏi:</label>

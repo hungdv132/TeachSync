@@ -1,5 +1,6 @@
 package com.teachsync.dtos.clazzTest;
 import com.teachsync.dtos.BaseReadDTO;
+import com.teachsync.dtos.test.TestReadDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -17,6 +18,7 @@ import java.time.LocalDateTime;
 public class ClazzTestReadDTO extends BaseReadDTO {
     private Long clazzId;
     private Long testId;
+    private TestReadDTO test;
     private LocalDateTime openFrom;
     private LocalDateTime openTo;
 }

@@ -1,7 +1,7 @@
 package com.teachsync.dtos.question;
 
-import com.teachsync.dtos.BaseReadDTO;
-import com.teachsync.dtos.answer.AnswerReadDTO;
+import com.teachsync.dtos.BaseCreateDTO;
+import com.teachsync.dtos.answer.AnswerCreateDTO;
 import com.teachsync.utils.enums.QuestionType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,11 +17,11 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class QuestionReadDTO extends BaseReadDTO {
+public class QuestionCreateDTO extends BaseCreateDTO {
     private Long testId;
     private QuestionType questionType;
     private String questionDesc;
     private String questionPrompt;
     private Double questionScore;
-    private List<AnswerReadDTO> answerList;
+    private List<AnswerCreateDTO> answerList;
 }

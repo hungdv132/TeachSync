@@ -1,41 +1,80 @@
 package com.teachsync.controllers;
 
+import com.teachsync.dtos.answer.AnswerCreateDTO;
+import com.teachsync.dtos.answer.AnswerReadDTO;
+import com.teachsync.dtos.clazzTest.ClazzTestReadDTO;
+import com.teachsync.dtos.course.CourseReadDTO;
+import com.teachsync.dtos.memberTestRecord.MemberTestRecordReadDTO;
+import com.teachsync.dtos.question.QuestionCreateDTO;
+import com.teachsync.dtos.question.QuestionReadDTO;
+import com.teachsync.dtos.test.TestCreateDTO;
+import com.teachsync.dtos.test.TestReadDTO;
 import com.teachsync.dtos.test.TestScoreDTO;
 import com.teachsync.dtos.user.UserReadDTO;
 import com.teachsync.entities.*;
 import com.teachsync.repositories.*;
+import com.teachsync.services.answer.AnswerService;
+import com.teachsync.services.clazzMember.ClazzMemberService;
+import com.teachsync.services.clazzTest.ClazzTestService;
+import com.teachsync.services.course.CourseService;
+import com.teachsync.services.memberTestRecord.MemberTestRecordService;
+import com.teachsync.services.question.QuestionService;
+import com.teachsync.services.test.TestService;
 import com.teachsync.utils.Constants;
+import com.teachsync.utils.MiscUtil;
 import com.teachsync.utils.enums.QuestionType;
 import com.teachsync.utils.enums.Status;
 import com.teachsync.utils.enums.TestType;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.SessionAttribute;
 
+import java.nio.file.AccessDeniedException;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import static com.teachsync.utils.enums.DtoOption.*;
 
 @Controller
 public class TestController {
-
     @Autowired
     QuestionRepository questionRepository;
     @Autowired
+    private QuestionService questionService;
+    @Autowired
     AnswerRepository answerRepository;
+    @Autowired
+    private AnswerService answerService;
     @Autowired
     CourseRepository courseRepository;
     @Autowired
+    private CourseService courseService;
+    @Autowired
     TestRepository testRepository;
     @Autowired
-    TestRecord2Repository testRecord2Repository;
+    private TestService testService;
     @Autowired
-    TestSessionRepository testSessionRepository;
+    private TestRecordRepository testRecordRepository;
+    @Autowired
+    private MemberTestRecordService memberTestRecordService;
+    @Autowired
+    private MemberTestRecordRepository memberTestRecordRepository;
+    @Autowired
+    private ClazzTestService clazzTestService;
+    @Autowired
+    private ClazzMemberService clazzMemberService;
+
+    @Autowired
+    private MiscUtil miscUtil;
 
     @GetMapping("/create-test")
     public String createTestViews(Model model, HttpSession session) {
@@ -48,86 +87,102 @@ public class TestController {
         return "test/create-test";
     }
 
-
     @PostMapping("/process-question")
-    public String processQuestion(Model model, HttpSession session,
-                                  @RequestParam("courseName") String courseName,
-                                  @RequestParam("testType") TestType testType,
-                                  @RequestParam("timeLimit") int timeLimit,
-                                  @RequestParam("numQuestions") int numQuestions,
-                                  @RequestParam("questionType") String questionType,
-                                  @RequestParam Map<String, String> requestParams) {
-        UserReadDTO user = (UserReadDTO) session.getAttribute("user");
-        if (user == null || !user.getRoleId().equals(Constants.ROLE_ADMIN)) {
+    public String processQuestion(
+            HttpSession session,
+            @RequestParam Long courseId,
+            @RequestParam TestType testType,
+            @RequestParam Integer timeLimit,
+            @RequestParam Integer numQuestions,
+            @RequestParam QuestionType questionType,
+            @RequestParam Map<String, String> requestParams,
+            @SessionAttribute(value = "user", required = false) UserReadDTO userDTO) {
+
+        if (userDTO == null || !userDTO.getRoleId().equals(Constants.ROLE_ADMIN)) {
             return "redirect:/";
         }
-        LocalDateTime currentDate = LocalDateTime.now();
 
-        Test test = new Test();
-        test.setCourseId(Long.parseLong(courseName));
-        test.setTestName(courseRepository.findById(Long.parseLong(courseName)).orElse(null).getCourseName());
-        test.setTestType(testType);
-        test.setNumQuestion(numQuestions);
-        test.setTimeLimit(timeLimit);
-        test.setTestDesc(questionType);
+        try {
+            CourseReadDTO courseDTO = courseService.getDTOById(courseId, List.of(TEST_LIST));
 
-        switch (testType) {
-            case FIFTEEN_MINUTE -> {
-                test.setMinScore(1.0);
-                test.setTestWeight(1);
-            }
+            TestCreateDTO createDTO = new TestCreateDTO();
 
-            case MIDTERM -> {
-                test.setMinScore(1.0);
-                test.setTestWeight(3);
-            }
+            createDTO.setCourseId(courseId);
+            createDTO.setTestName(courseDTO.getCourseAlias().concat(" - test " + courseDTO.getTestList().size()));
+            createDTO.setTestType(testType);
+            createDTO.setTestDesc(courseDTO.getCourseName().concat(" - test " + courseDTO.getTestList().size()));
+            createDTO.setNumQuestion(numQuestions);
+            createDTO.setQuestionType(questionType);
+            createDTO.setTimeLimit(timeLimit);
+            createDTO.setCreatedBy(userDTO.getId());
+            switch (testType) {
+                case FIFTEEN_MINUTE -> {
+                    createDTO.setTimeLimit(15);
+                    createDTO.setMinScore(1.0);
+                    createDTO.setTestWeight(1);
+                }
 
-            case FINAL -> {
-                test.setMinScore(4.0);
-                test.setTestWeight(5);
-            }
-        }
+                case MIDTERM -> {
+                    createDTO.setMinScore(1.0);
+                    createDTO.setTestWeight(3);
+                }
 
-        test.setStatus(Status.CREATED);
-        Test rsTest = testRepository.save(test);
-
-        if (questionType.equals("essay")) {
-            for (int i = 0; i < numQuestions; i++) {
-                Question question = new Question();
-                question.setTestId(rsTest.getId());
-                question.setQuestionDesc(requestParams.get("essayQuestion" + i));
-                question.setQuestionType(QuestionType.ESSAY);
-                question.setStatus(Status.CREATED);
-
-                question.setCreatedAt(currentDate);
-                question.setCreatedBy(user.getId());
-                questionRepository.save(question);
-            }
-
-        } else if (questionType.equals("multipleChoice")) {
-            for (int i = 0; i < numQuestions; i++) {
-                int numAnswer = Integer.parseInt(requestParams.get("numOptions" + i));
-                Question question = new Question();
-                question.setTestId(rsTest.getId());
-                question.setQuestionDesc(requestParams.get("multipleChoiceQuestion" + i));
-                question.setQuestionType(QuestionType.MULTIPLE);
-                question.setStatus(Status.CREATED);
-                question.setCreatedAt(currentDate);
-                question.setCreatedBy(user.getId());
-                Question result = questionRepository.save(question);
-                for (int j = 0; j < numAnswer; j++) {
-                    Answer answer = new Answer();
-                    answer.setQuestionId(result.getId());
-                    answer.setAnswerDesc(requestParams.get("answer" + i + "-" + j));
-                    answer.setIsCorrect(requestParams.get("isCorrect" + i + "-" + j) != null);
-                    answer.setStatus(Status.CREATED);
-                    answer.setCreatedAt(currentDate);
-                    answer.setCreatedBy(user.getId());
-                    answerRepository.save(answer);
+                case FINAL -> {
+                    createDTO.setMinScore(4.0);
+                    createDTO.setTestWeight(5);
                 }
             }
-        }
 
+            switch (questionType) {
+                case ESSAY -> {
+                    List<QuestionCreateDTO> questionCreateDTOList = new ArrayList<>();
+                    for (int i = 0; i < numQuestions; i++) {
+                        QuestionCreateDTO questionCreateDTO = new QuestionCreateDTO();
+                        questionCreateDTO.setQuestionDesc(requestParams.get("essayQuestion" + i));
+
+                        questionCreateDTO.setQuestionType(QuestionType.ESSAY);
+                        questionCreateDTO.setCreatedBy(userDTO.getId());
+                        questionCreateDTO.setQuestionScore(1.0);
+
+                        questionCreateDTOList.add(questionCreateDTO);
+                    }
+                    createDTO.setQuestionList(questionCreateDTOList);
+                }
+
+                case MULTIPLE -> {
+                    List<QuestionCreateDTO> questionCreateDTOList = new ArrayList<>();
+                    for (int i = 0; i < numQuestions; i++) {
+                        QuestionCreateDTO questionCreateDTO = new QuestionCreateDTO();
+                        questionCreateDTO.setQuestionDesc(requestParams.get("multipleChoiceQuestion" + i));
+                        questionCreateDTO.setQuestionType(QuestionType.MULTIPLE);
+                        questionCreateDTO.setCreatedBy(userDTO.getId());
+                        questionCreateDTO.setQuestionScore(1.0);
+
+                        List<AnswerCreateDTO> answerCreateDTOList = new ArrayList<>();
+                        int numAnswer = Integer.parseInt(requestParams.get("numOptions" + i));
+                        boolean isCorrect;
+                        for (int j = 0; j < numAnswer; j++) {
+                            AnswerCreateDTO answerCreateDTO = new AnswerCreateDTO();
+                            answerCreateDTO.setAnswerDesc(requestParams.get("answer" + i + "-" + j));
+                            isCorrect = requestParams.get("isCorrect" + i + "-" + j) != null;
+                            answerCreateDTO.setIsCorrect(isCorrect);
+                            if (isCorrect) {
+                                answerCreateDTO.setAnswerScore(1.0);
+                            } else {
+                                answerCreateDTO.setAnswerScore(0.0);
+                            }
+
+                        }
+                        questionCreateDTO.setAnswerList(answerCreateDTOList);
+                    }
+                    createDTO.setQuestionList(questionCreateDTOList);
+                }
+            }
+
+            testService.createTestByDTO(createDTO);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         // Redirect to a success page or do any other necessary actions
 
@@ -136,78 +191,98 @@ public class TestController {
 
 
     @GetMapping("/edit-test")
-    public String editTestView(Model model, HttpSession session, @RequestParam("id") String idTest) {
-//        UserReadDTO user = (UserReadDTO) session.getAttribute("user");
-//        if (user == null || user.getRoleId() != 1) {
+    public String editTestView(
+            Model model,
+            @RequestParam("id") Long testId,
+            @SessionAttribute(value = "user", required = false) UserReadDTO userDTO) {
+
+//        if (userDTO == null || userDTO.getRoleId().equals(Constants.ROLE_ADMIN)) {
 //            return "redirect:/";
 //        }
 
-        Test test = testRepository.findAllById(Collections.singleton(Long.parseLong(idTest))).get(0);
-        List<Question> lstQuestion = questionRepository.findAllByTestId(test.getId());
-        HashMap<Question, List<Answer>> hm = new HashMap<>();
-        for (Question qs : lstQuestion) {
-            hm.put(qs, answerRepository.findAllByQuestionId(qs.getId()));
+        try {
+            List<CourseReadDTO> courseDTOList = courseService.getAllDTO(null);
+
+            model.addAttribute("courseList", courseDTOList);
+
+            TestReadDTO testDTO = testService.getDTOById(testId, List.of(QUESTION_LIST, ANSWER_LIST));
+
+            model.addAttribute("test", testDTO);
+
+            Map<QuestionReadDTO, List<AnswerReadDTO>> questionAnswerListMap =
+                    testDTO.getQuestionList().stream()
+                            .collect(Collectors.toMap(Function.identity(), QuestionReadDTO::getAnswerList));
+
+            model.addAttribute("questionAnswer", questionAnswerListMap);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        List<Course> lst = courseRepository.findAllByStatusNot(Status.DELETED);
-        model.addAttribute("lstCourse", lst);
 
-        model.addAttribute("test", test);
-
-        model.addAttribute("questionAnswer", hm);
-        System.out.println("size cua hashmap: " + hm.size());
         return "test/edit-test";
-
     }
 
-    @PostMapping("/updateAnswer")
-    public String updateAnswer(Model model, HttpSession session,
-                               @RequestParam("courseName") String courseName,
-                               @RequestParam("idTest") String idTest,
-                               @RequestParam("idQuestion") String idQuestion,
-                               @RequestParam("testType") String testType,
-                               @RequestParam("timeLimit") int timeLimit,
-                               @RequestParam("numQuestions") int numQuestions,
-                               @RequestParam("questionType") String questionType,
-                               @RequestParam Map<String, String> requestParams) {
-//        UserReadDTO user = (UserReadDTO) session.getAttribute("user");
-//        if (user == null || user.getRoleId() != 1) {
+    @PostMapping("/update-answer")
+    public String updateAnswer(
+            Model model,
+            @RequestParam("courseName") String courseName,
+            @RequestParam("idTest") Long idTest,
+            @RequestParam("idQuestion") Long idQuestion,
+            @RequestParam("testType") TestType testType,
+            @RequestParam("timeLimit") Integer timeLimit,
+            @RequestParam("numQuestions") Integer numQuestions,
+            @RequestParam("questionType") String questionType,
+            @RequestParam Map<String, String> requestParams,
+            @SessionAttribute(value = "user", required = false) UserReadDTO userDTO) {
+
+//        if (userDTO == null || userDTO.getRoleId().equals(Constants.ROLE_ADMIN)) {
 //            return "redirect:/";
 //        }
-        LocalDateTime currentDate = LocalDateTime.now();
 
-        Test test = testRepository.findById(Long.parseLong(idTest)).orElse(null);
-        test.setTestName(testType);
-        if (testType.equals("15min")) {
-            test.setMinScore(1.0);
-            test.setTestWeight(1);
-        } else if (testType.equals("midterm")) {
-            test.setMinScore(1.0);
-            test.setTestWeight(3);
-        } else {
-            test.setMinScore(4.0);
-            test.setTestWeight(5);
-        }
-        test.setStatus(Status.UPDATED);
-        test.setTimeLimit(timeLimit);
-        test.setCourseId(Long.parseLong(courseName));
-        testRepository.save(test);
+//        TODO: This function is update answer, not update test, or else rename function
+//        Test test = testRepository.findById(Long.parseLong(idTest)).orElse(null);
+//
+//        test.setTestName(testType);
+//        if (testType.equals("15min")) {
+//            test.setMinScore(1.0);
+//            test.setTestWeight(1);
+//        } else if (testType.equals("midterm")) {
+//            test.setMinScore(1.0);
+//            test.setTestWeight(3);
+//        } else {
+//            test.setMinScore(4.0);
+//            test.setTestWeight(5);
+//        }
+//        test.setStatus(Status.UPDATED);
+//        test.setTimeLimit(timeLimit);
+//        test.setCourseId(Long.parseLong(courseName));
+//        testRepository.save(test);
 
-        Question question = questionRepository.findById(Long.parseLong(idQuestion)).orElse(null);
-        question.setQuestionDesc(requestParams.get("questionAll"));
-
-        if (questionType.equals("multipleChoice")) {
-            answerRepository.deleteAllByQuestionId(question.getId());
-            int numAnswer = Integer.parseInt(requestParams.get("numOfOptions"));
-            for (int i = 1; i < numAnswer; i++) {
-                Answer answer = new Answer();
-                answer.setQuestionId(question.getId());
-                answer.setAnswerDesc(requestParams.get("answer" + i));
-                answer.setIsCorrect(requestParams.get("correctAnswer" + i) != null);
-                answer.setStatus(Status.UPDATED);
-                answer.setCreatedAt(currentDate);
-//                answer.setCreatedBy(user.getId());
-                answerRepository.save(answer);
+        try {
+            Question question = questionService.getById(idQuestion);
+            if (question == null) {
+                throw new IllegalArgumentException("Update error. No Question found with id: " + idQuestion);
             }
+
+            if (questionType.equals("multipleChoice")) {
+                answerService.deleteAllByQuestionId(question.getId());
+
+                int numAnswer = Integer.parseInt(requestParams.get("numOfOptions"));
+
+                List<AnswerCreateDTO> answerCreateDTOList = new ArrayList<>();
+                for (int i = 1; i < numAnswer; i++) {
+                    AnswerCreateDTO answerCreateDTO = new AnswerCreateDTO();
+                    answerCreateDTO.setQuestionId(question.getId());
+                    answerCreateDTO.setAnswerDesc(requestParams.get("answer" + i));
+                    answerCreateDTO.setIsCorrect(requestParams.get("correctAnswer" + i) != null);
+                    answerCreateDTO.setCreatedBy(userDTO.getId());
+
+                    answerCreateDTOList.add(answerCreateDTO);
+                }
+
+                answerService.createBulkAnswerByDTO(answerCreateDTOList);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
         // Redirect to a success page or do any other necessary actions
@@ -216,224 +291,292 @@ public class TestController {
     }
 
     @GetMapping("/tests")
-    public String lstTest(@RequestParam(value = "page", required = false) Integer page, Model model) {
-        if (page == null) {
-            page = 0;
+    public String listTestPage(@RequestParam(value = "page", required = false) Integer page, Model model) {
+        /* Test thuộc về Course, nhưng nếu muốn làm bài thì phải dùng ClazzTest nối tới Clazz và ClazzMember
+        để biết có học lớp môn này không để cho phép làm */
+
+        try {
+            if (page == null || page < 0) {
+                page = 0;
+            }
+            Pageable pageable = miscUtil.makePaging(page, 3, "id", true);
+
+            Page<Test> testPage = testService.getPageAll(pageable);
+
+            model.addAttribute("tests", testPage);
+            model.addAttribute("pageNo", testPage.getPageable().getPageNumber());
+            model.addAttribute("pageTotal", testPage.getTotalPages());
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        if (page < 0) {
-            page = 0;
-        }
-        PageRequest pageable = PageRequest.of(page, 3);
-        Page<Test> tests = testRepository.findAllByOrderByCreatedAtDesc(pageable);
-        model.addAttribute("tests", tests);
-        model.addAttribute("pageNo", tests.getPageable().getPageNumber());
-        model.addAttribute("pageTotal", tests.getTotalPages());
+
         return "test/list-test";
     }
 
-    @GetMapping("/doTheTest")
-    public String doTheTest(Model model, HttpSession session,
-                            @RequestParam("idTest") String idTest,
-                            @RequestParam("classTest") String classTest) {
+    @GetMapping("/searchbycourse")
+    public String searchByCourse(
+            @RequestParam(value = "page", required = false) Integer page,
+            @RequestParam("courseName") String courseName,
+            Model model) {
+        try {
+            if (page == null || page < 0) {
+                page = 0;
+            }
+            Pageable pageable = miscUtil.makePaging(page, 3, "id", true);
 
-        UserReadDTO user = (UserReadDTO) session.getAttribute("user");
-        if (user == null) {
+            List<Course> courseList = courseService.getAllByNameContains(courseName);
+            if (courseList == null) {
+                throw new IllegalArgumentException("No course found with name containing: " + courseName);
+            }
+
+            Set<Long> courseIdSet = courseList.stream().map(BaseEntity::getId).collect(Collectors.toSet());
+
+            Page<Test> testPage = testService.getPageAllByCourseIdIn(pageable, courseIdSet);
+
+            model.addAttribute("tests", testPage);
+            model.addAttribute("pageNo", testPage.getPageable().getPageNumber());
+            model.addAttribute("pageTotal", testPage.getTotalPages());
+            model.addAttribute("searchText", courseName);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return "test/list-test";
+    }
+
+    @GetMapping("/take-test")
+    public String takeTestPage(
+            Model model,
+            @RequestParam("clazzId") Long clazzId,
+            @RequestParam("clazzTestId") Long clazzTestId,
+            @SessionAttribute(value = "user", required = false) UserReadDTO userDTO) {
+
+        if (userDTO == null) {
             return "redirect:/";
         }
 
-        Test test = testRepository.findById(Long.parseLong(idTest)).orElse(null);
-        Date date = new Date();
-        TestSession t = testSessionRepository.findAllByUsernameAndStatusNotAndTestId(user.getUsername(), 0, Long.parseLong(idTest));
-        if (t != null) {
-            return "redirect:/";
+        try {
+            ClazzMember member = clazzMemberService.getByClazzIdAndUserId(clazzId, userDTO.getId());
+            if (member == null) {
+                throw new AccessDeniedException("Bạn không phải là thành viên của lớp học này để làm bài này.");
+            }
+
+            ClazzTestReadDTO clazzTestDTO =
+                    clazzTestService.getDTOById(clazzTestId, List.of(TEST, QUESTION_LIST, ANSWER_LIST));
+            if (!(clazzTestDTO != null && clazzTestDTO.getTest() != null)) {
+                throw new IllegalArgumentException("Không thấy bài test nào với Id: " + clazzTestId);
+            }
+            TestReadDTO testDTO = clazzTestDTO.getTest();
+
+            Map<QuestionReadDTO, List<AnswerReadDTO>> lstQs =
+                    testDTO.getQuestionList().stream()
+                            .collect(Collectors.toMap(Function.identity(), QuestionReadDTO::getAnswerList));
+
+            model.addAttribute("idClazzTest", clazzTestDTO.getId());
+            model.addAttribute("idTest", testDTO.getId());
+            model.addAttribute("idMember", member.getId());
+            model.addAttribute("test", testDTO);
+            model.addAttribute("hmQA", lstQs);
+
+            MemberTestRecord memberTestRecord =
+                    memberTestRecordService.getByMemberIdAndClazzTestId(member.getId(), clazzTestId);
+
+            if (memberTestRecord != null) {
+                /* Đã làm bài, không cho làm nữa */
+                return "redirect:/";
+            }
+
+            /* Bắt đầu làm bài và lưu thời gian làm */
+            memberTestRecord = new MemberTestRecord();
+
+            memberTestRecord.setMemberId(member.getId());
+            memberTestRecord.setClazzTestId(clazzTestDTO.getId());
+            memberTestRecord.setStartAt(LocalDateTime.now());
+            memberTestRecord.setStatus(Status.ONGOING);
+
+            memberTestRecordRepository.save(memberTestRecord);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-
-        HashMap<Question, List<Answer>> lstQs = new HashMap<>();
-        List<Question> lstQ = questionRepository.findAllByTestId(Long.parseLong(idTest));
-
-        for (Question qs : lstQ) {
-            List<Answer> lstA = answerRepository.findAllByQuestionId(qs.getId());
-            lstQs.put(qs, lstA);
-        }
-        model.addAttribute("idTest", idTest);
-        model.addAttribute("test", test);
-        model.addAttribute("hmQA", lstQs);
-        model.addAttribute("classTest", classTest);
-
-        TestSession testSession = new TestSession();
-        testSession.setStartDate(date);
-
-        testSession.setUserId(user.getId());
-        testSession.setUsername(user.getUsername());
-        testSession.setStatus(1L);
-        testSession.setTestId(test.getId());
-        testSession.setSubject(test.getTestName());
-        testSession.setClazz(classTest);
-
-        testSessionRepository.save(testSession);
 
         return "test/dothetest";
     }
 
     @PostMapping("/submitTest")
-    public String submitTest(Model model, HttpSession session,
-                             @RequestParam("idTest") String idTest,
-                             @RequestParam("typeTest") String testType,
-                             @RequestParam("classTest") String classTest,
-                             @RequestParam Map<String, String> requestParams) {
-        System.out.println("Id test la: " + idTest);
-        UserReadDTO user = (UserReadDTO) session.getAttribute("user");
-        Test test = testRepository.findById(Long.parseLong(idTest)).orElse(null);
-        List<Question> lstQ = questionRepository.findAllByTestId(Long.parseLong(idTest));
-        for (Question qs : lstQ) {
-            TestRecord2 testRecord = new TestRecord2();
-            testRecord.setTestId(Long.parseLong(idTest));
-            testRecord.setUserId(user.getId());
-            testRecord.setQuestionId(qs.getId());
-            testRecord.setClazz(classTest);
-            testRecord.setUsername(user.getUsername());
-            if (testType.equals("multipleChoice")) {
-                testRecord.setQuestionType("multipleChoice");
-                Long answerId = Long.parseLong(requestParams.get("question" + qs.getId()));
-                Answer as = answerRepository.findById(answerId).orElse(null);
-                testRecord.setAnswerMCId(as.getId());
-                testRecord.setCorrect(as.getIsCorrect());
-            } else {
-                testRecord.setQuestionType("essay");
-                String essayAnswer = requestParams.get("question" + qs.getId());
-                testRecord.setEssayAnswer(essayAnswer);
-            }
-            testRecord2Repository.save(testRecord);
+    public String submitTest(
+            Model model,
+            @RequestParam("idMember") Long idMember,
+            @RequestParam("idTest") Long idTest,
+            @RequestParam("idClazzTest") Long idClazzTest,
+            @RequestParam("questionType") QuestionType questionType,
+            @RequestParam Map<String, String> requestParams,
+            @SessionAttribute(value = "user", required = false) UserReadDTO userDTO) {
+        try {
+            TestReadDTO testDTO = testService.getDTOById(idTest, List.of(QUESTION_LIST, ANSWER_LIST));
 
+            List<QuestionReadDTO> questionDTOList = testDTO.getQuestionList();
+
+            MemberTestRecord memberTestRecord =
+                    memberTestRecordService.getByMemberIdAndClazzTestId(idMember, idClazzTest);
+
+            List<TestRecord> testRecordList = new ArrayList<>();
+            TestRecord testRecord;
+            for (QuestionReadDTO questionDTO : questionDTOList) {
+                testRecord = new TestRecord();
+                testRecord.setMemberTestRecordId(memberTestRecord.getId());
+
+                switch (questionType) {
+                    case MULTIPLE -> {
+                        Long answerId = Long.parseLong(requestParams.get("question" + questionDTO.getId()));
+                        Answer as = answerService.getById(answerId);
+                        testRecord.setAnswerId(as.getId());
+                        testRecord.setScore(as.getAnswerScore());
+                    }
+
+                    case  ESSAY -> {
+                        String essayAnswer = requestParams.get("question" + questionDTO.getId());
+                        testRecord.setAnswerTxt(essayAnswer);
+                    }
+                }
+
+                testRecordList.add(testRecord);
+            }
+            testRecordList = testRecordRepository.saveAll(testRecordList);
+
+            if (questionType == QuestionType.MULTIPLE) {
+                Double totalScore = 0.0;
+                for (QuestionReadDTO questionDTO : questionDTOList) {
+                    totalScore += questionDTO.getQuestionScore();
+                }
+
+                Double earnedScore = 0.0;
+                for (TestRecord tR : testRecordList) {
+                    earnedScore += tR.getScore();
+                }
+
+                Double finalScore = (earnedScore / totalScore ) * 10.0;
+                memberTestRecord.setScore(finalScore);
+            }
+
+            memberTestRecord.setSubmitAt(LocalDateTime.now());
+            memberTestRecord.setStatus(Status.DONE);
+            memberTestRecord.setUpdatedAt(LocalDateTime.now());
+            memberTestRecord.setUpdatedBy(userDTO.getId());
+
+            memberTestRecordRepository.save(memberTestRecord);
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+
         return "redirect:/";
     }
 
+    @GetMapping("/test-session")
+    public String listTestSession(@RequestParam(value = "page", required = false) Integer page, Model model, HttpSession session) {
+        if (page == null || page < 0) {
+            page = 0;
+        }
+        Pageable pageable = miscUtil.makePaging(page, 3, "StartAt", false);
+        try {
+            Page<MemberTestRecordReadDTO> mTRDTO =
+                    memberTestRecordService.getPageAllDTO(pageable, List.of(MEMBER, USER, CLAZZ, COURSE_SEMESTER, COURSE_NAME));
 
-    @GetMapping("/searchbycourse")
-    public String searchByCourse(@RequestParam(value = "page", required = false) Integer page, @RequestParam("searchText") String name, Model model) {
-        if (page == null) {
-            page = 0;
+            model.addAttribute("testSessions", mTRDTO.getContent());
+            model.addAttribute("pageNo", mTRDTO.getPageable().getPageNumber());
+            model.addAttribute("pageTotal", mTRDTO.getTotalPages());
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        if (page < 0) {
-            page = 0;
-        }
-        PageRequest pageable = PageRequest.of(page, 3);
-        Page<Test> tests = testRepository.findByTestNameContainingOrderByCreatedAtDesc(name, pageable);
-        model.addAttribute("tests", tests);
-        model.addAttribute("pageNo", tests.getPageable().getPageNumber());
-        model.addAttribute("pageTotal", tests.getTotalPages());
-        model.addAttribute("searchText", name);
-        return "test/list-test-search";
-    }
 
-    @GetMapping("/test-sessison")
-    public String lstTestSession(@RequestParam(value = "page", required = false) Integer page, Model model, HttpSession session) {
-        if (page == null) {
-            page = 0;
-        }
-        if (page < 0) {
-            page = 0;
-        }
-        PageRequest pageable = PageRequest.of(page, 3);
-        Page<TestSession> tests = testSessionRepository.findAllByOrderByStartDateDesc(pageable);
-        model.addAttribute("tests", tests);
-        model.addAttribute("pageNo", tests.getPageable().getPageNumber());
-        model.addAttribute("pageTotal", tests.getTotalPages());
         return "test/list-test-session";
     }
 
     @GetMapping("/search-test-session")
-    public String searchTestSession(@RequestParam(value = "page", required = false) Integer page, @RequestParam("searchText") String name, @RequestParam("searchType") String searchType, Model model) {
-        if (page == null) {
-            page = 0;
-        }
-        if (page < 0) {
-            page = 0;
-        }
-        PageRequest pageable = PageRequest.of(page, 3);
-        Page<TestSession> tests;
-        if (searchType.equals("class")) {
-            tests = testSessionRepository.findAllByClazzContainingOrderByStartDateDesc(pageable, name);
-        } else if (searchType.equals("subject")) {
-            tests = testSessionRepository.findAllBySubjectContainingOrderByStartDateDesc(pageable, name);
-        } else {
-            tests = testSessionRepository.findAllByUsernameContainingOrderByStartDate(pageable, name);
-        }
-
-        model.addAttribute("tests", tests);
-        model.addAttribute("pageNo", tests.getPageable().getPageNumber());
-        model.addAttribute("pageTotal", tests.getTotalPages());
-        model.addAttribute("searchText", name);
-        model.addAttribute("searchType", searchType);
+    public String searchTestSession(
+            @RequestParam(value = "page", required = false) Integer page,
+            @RequestParam("searchText") String name,
+            @RequestParam("searchType") String searchType,
+            Model model) {
+//        if (page == null || page < 0) {
+//            page = 0;
+//        }
+//
+//        PageRequest pageable = PageRequest.of(page, 3);
+//
+//        Page<TestSession> tests;
+//        if (searchType.equals("class")) {
+//            tests = testSessionRepository.findAllByClazzContainingOrderByStartDateDesc(pageable, name);
+//        } else if (searchType.equals("subject")) {
+//            tests = testSessionRepository.findAllBySubjectContainingOrderByStartDateDesc(pageable, name);
+//        } else {
+//            tests = testSessionRepository.findAllByUsernameContainingOrderByStartDate(pageable, name);
+//        }
+//
+//        model.addAttribute("tests", tests);
+//        model.addAttribute("pageNo", tests.getPageable().getPageNumber());
+//        model.addAttribute("pageTotal", tests.getTotalPages());
+//        model.addAttribute("searchText", name);
+//        model.addAttribute("searchType", searchType);
         return "test/list-test-search";
     }
 
-    @GetMapping("/update-test-sessison")
-    public String updateTestSession(Model model, HttpSession session, @RequestParam("idSession") String idSession, @RequestParam("newStatus") String newStatus) {
-        UserReadDTO user = (UserReadDTO) session.getAttribute("user");
-        Date date = new Date();
-        TestSession testSession = testSessionRepository.findById(Long.parseLong(idSession)).orElse(null);
-        testSession.setStatus(Long.parseLong(newStatus));
-        testSession.setUpdateDate(date);
-        testSession.setUserUpdate(user.getUsername());
-
-        testSessionRepository.save(testSession);
-
-        PageRequest pageable = PageRequest.of(0, 3);
-        Page<TestSession> tests = testSessionRepository.findAllByOrderByStartDateDesc(pageable);
-        model.addAttribute("tests", tests);
-        model.addAttribute("pageNo", tests.getPageable().getPageNumber());
-        model.addAttribute("pageTotal", tests.getTotalPages());
+    @GetMapping("/update-test-session")
+    public String updateTestSession(
+            Model model,
+            HttpSession session,
+            @RequestParam("idSession") String idSession,
+            @RequestParam("newStatus") String newStatus,
+            @SessionAttribute(value = "user", required = false) UserReadDTO userDTO) {
+//        UserReadDTO user = (UserReadDTO) session.getAttribute("user");
+//
+//        Date date = new Date();
+//
+//        TestSession testSession = testSessionRepository.findById(Long.parseLong(idSession)).orElse(null);
+//
+//        testSession.setStatus(Long.parseLong(newStatus));
+//        testSession.setUpdateDate(date);
+//        testSession.setUserUpdate(user.getUsername());
+//
+//        testSessionRepository.save(testSession);
+//
+//        PageRequest pageable = PageRequest.of(0, 3);
+//
+//        Page<TestSession> tests = testSessionRepository.findAllByOrderByStartDateDesc(pageable);
+//
+//        model.addAttribute("tests", tests);
+//        model.addAttribute("pageNo", tests.getPageable().getPageNumber());
+//        model.addAttribute("pageTotal", tests.getTotalPages());
+//
         return "test/list-test-session";
     }
 
     @GetMapping("/test-score")
-    public String lstTestSession(Model model, HttpSession session,
-                                 @RequestParam("class") String classTest,
-                                 @RequestParam("idTest") String idTest) {
+    public String testScore(
+            Model model,
+            HttpSession session,
+            @RequestParam("idClazz") Long idClazz,
+            @RequestParam("idTest") Long idTest) {
+        try {
+            ClazzTestReadDTO clazzTestDTO =
+                    clazzTestService.getDTOByClazzIdAndTestId(idClazz, idTest, List.of(TEST));
 
-        Test test = testRepository.findById(Long.parseLong(idTest)).orElse(null);
+            List<MemberTestRecordReadDTO> memberTestRecordDTOList =
+                    memberTestRecordService.getAllDTOByClazzTestId(
+                            clazzTestDTO.getId(),
+                            List.of(MEMBER, USER));
 
-        List<TestScoreDTO> lstReturn = new ArrayList<>();
-        List<TestRecord2> lst = testRecord2Repository.findAllByClazzAndTestId(classTest, Long.parseLong(idTest));
-        List<Long> lstUser = new ArrayList<>();
-        for (TestRecord2 t2 : lst) {
-            if (!lstUser.contains(t2.getUserId())) {
-                lstUser.add(t2.getUserId());
+            if (clazzTestDTO.getTest().getQuestionType() == QuestionType.MULTIPLE) {
+                model.addAttribute("testType", "multipleChoice");
+            } else {
+                model.addAttribute("testType", "essay");
             }
+
+            model.addAttribute("test", clazzTestDTO.getTest());
+            model.addAttribute("memberTestRecordList", memberTestRecordDTOList);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        System.out.println("Danh sách người dùng:" + lstUser);
-        if (test.getTestDesc().equals("multipleChoice")) {
-            for (Long user : lstUser) {
-                TestScoreDTO testScoreDTO = new TestScoreDTO();
-                List<TestRecord2> result = testRecord2Repository.findAllByClazzAndTestIdAndUserId(classTest, Long.parseLong(idTest), user);
-                System.out.println("Số lượng câu hỏi tìm thấy: "+result.size());
-                int trueAnswer = 0;
-                for (TestRecord2 rc : result) {
-                    if (rc.isCorrect()) {
-                        trueAnswer++;
-                    }
-                }
-                testScoreDTO.setUserTest(result.get(0).getUsername());
-                testScoreDTO.setType("Trắc nghiệm");
-                testScoreDTO.setScore(trueAnswer + "/" + result.size());
-                lstReturn.add(testScoreDTO);
-
-            }
-            model.addAttribute("testType", "multipleChoice");
-
-        } else {
-            for (Long user : lstUser) {
-                TestScoreDTO testScoreDTO = new TestScoreDTO();
-                List<TestRecord2> result = testRecord2Repository.findAllByClazzAndTestIdAndUserId(classTest, Long.parseLong(idTest), user);
-                testScoreDTO.setUserTest(result.get(0).getUsername());
-                testScoreDTO.setType("Tự luận");
-                lstReturn.add(testScoreDTO);
-            }
-            model.addAttribute("testType", "essay");
-        }
-        model.addAttribute("testScore", lstReturn);
 
         return "test/testscore-class";
     }
