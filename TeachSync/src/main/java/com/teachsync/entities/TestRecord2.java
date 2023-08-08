@@ -23,8 +23,17 @@ public class TestRecord2 {
     @Column(name = "userId", nullable = false)
     private Long userId;
 
+    @Column(name = "username")
+    private String username;
+
+    @Column(name = "class")
+    private String clazz;
+
     @Column(name = "questionId", nullable = false)
     private Long questionId;
+
+    @Column(name = "questionType")
+    private String questionType;
 
     @Column(name = "essayAnswer")
     private String essayAnswer;

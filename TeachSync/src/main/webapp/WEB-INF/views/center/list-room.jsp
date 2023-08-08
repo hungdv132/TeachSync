@@ -88,18 +88,6 @@
             <img class="room-image" src="https://baochauelec.com/cdn/images/phong-hoc-1.jpg" alt="Phòng 2">
             <div class="room-name">102</div>
         </div>
-        <div class="room">
-            <img class="room-image" src=https://baochauelec.com/cdn/images/phong-hoc-1.jpg" alt="Phòng 3">
-            <div class="room-name">103</div>
-        </div>
-        <div class="room">
-            <img class="room-image" src=https://baochauelec.com/cdn/images/phong-hoc-1.jpg" alt="Phòng 3">
-            <div class="room-name">104</div>
-        </div>
-        <div class="room">
-            <img class="room-image" src=https://baochauelec.com/cdn/images/phong-hoc-1.jpg" alt="Phòng 3">
-            <div class="room-name">105</div>
-        </div>
 
     </div>
 </div>

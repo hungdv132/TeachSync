@@ -1,5 +1,6 @@
 package com.teachsync.controllers;
 
+import com.teachsync.dtos.test.TestScoreDTO;
 import com.teachsync.dtos.user.UserReadDTO;
 import com.teachsync.entities.*;
 import com.teachsync.repositories.*;
@@ -18,10 +19,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Controller
 public class TestController {
@@ -36,6 +34,8 @@ public class TestController {
     TestRepository testRepository;
     @Autowired
     TestRecord2Repository testRecord2Repository;
+    @Autowired
+    TestSessionRepository testSessionRepository;
 
     @GetMapping("/create-test")
     public String createTestViews(Model model, HttpSession session) {
@@ -216,9 +216,13 @@ public class TestController {
     }
 
     @GetMapping("/tests")
-    public String lstTest(@RequestParam(value = "page", required = false) Integer page, Model model){
-        if (page == null) { page = 0; }
-        if(page < 0) { page = 0; }
+    public String lstTest(@RequestParam(value = "page", required = false) Integer page, Model model) {
+        if (page == null) {
+            page = 0;
+        }
+        if (page < 0) {
+            page = 0;
+        }
         PageRequest pageable = PageRequest.of(page, 3);
         Page<Test> tests = testRepository.findAllByOrderByCreatedAtDesc(pageable);
         model.addAttribute("tests", tests);
@@ -229,9 +233,20 @@ public class TestController {
 
     @GetMapping("/doTheTest")
     public String doTheTest(Model model, HttpSession session,
-                            @RequestParam("idTest") String idTest) {
-        Test test = testRepository.findById(Long.parseLong(idTest)).orElse(null);
+                            @RequestParam("idTest") String idTest,
+                            @RequestParam("classTest") String classTest) {
 
+        UserReadDTO user = (UserReadDTO) session.getAttribute("user");
+        if (user == null) {
+            return "redirect:/";
+        }
+
+        Test test = testRepository.findById(Long.parseLong(idTest)).orElse(null);
+        Date date = new Date();
+        TestSession t = testSessionRepository.findAllByUsernameAndStatusNotAndTestId(user.getUsername(), 0, Long.parseLong(idTest));
+        if (t != null) {
+            return "redirect:/";
+        }
 
         HashMap<Question, List<Answer>> lstQs = new HashMap<>();
         List<Question> lstQ = questionRepository.findAllByTestId(Long.parseLong(idTest));
@@ -243,6 +258,19 @@ public class TestController {
         model.addAttribute("idTest", idTest);
         model.addAttribute("test", test);
         model.addAttribute("hmQA", lstQs);
+        model.addAttribute("classTest", classTest);
+
+        TestSession testSession = new TestSession();
+        testSession.setStartDate(date);
+
+        testSession.setUserId(user.getId());
+        testSession.setUsername(user.getUsername());
+        testSession.setStatus(1L);
+        testSession.setTestId(test.getId());
+        testSession.setSubject(test.getTestName());
+        testSession.setClazz(classTest);
+
+        testSessionRepository.save(testSession);
 
         return "test/dothetest";
     }
@@ -251,6 +279,7 @@ public class TestController {
     public String submitTest(Model model, HttpSession session,
                              @RequestParam("idTest") String idTest,
                              @RequestParam("typeTest") String testType,
+                             @RequestParam("classTest") String classTest,
                              @RequestParam Map<String, String> requestParams) {
         System.out.println("Id test la: " + idTest);
         UserReadDTO user = (UserReadDTO) session.getAttribute("user");
@@ -261,12 +290,16 @@ public class TestController {
             testRecord.setTestId(Long.parseLong(idTest));
             testRecord.setUserId(user.getId());
             testRecord.setQuestionId(qs.getId());
+            testRecord.setClazz(classTest);
+            testRecord.setUsername(user.getUsername());
             if (testType.equals("multipleChoice")) {
+                testRecord.setQuestionType("multipleChoice");
                 Long answerId = Long.parseLong(requestParams.get("question" + qs.getId()));
                 Answer as = answerRepository.findById(answerId).orElse(null);
                 testRecord.setAnswerMCId(as.getId());
                 testRecord.setCorrect(as.getIsCorrect());
             } else {
+                testRecord.setQuestionType("essay");
                 String essayAnswer = requestParams.get("question" + qs.getId());
                 testRecord.setEssayAnswer(essayAnswer);
             }
@@ -278,9 +311,13 @@ public class TestController {
 
 
     @GetMapping("/searchbycourse")
-    public String searchByCourse(@RequestParam(value = "page", required = false) Integer page, @RequestParam("searchText") String name, Model model){
-        if (page == null) { page = 0; }
-        if(page < 0) { page = 0; }
+    public String searchByCourse(@RequestParam(value = "page", required = false) Integer page, @RequestParam("searchText") String name, Model model) {
+        if (page == null) {
+            page = 0;
+        }
+        if (page < 0) {
+            page = 0;
+        }
         PageRequest pageable = PageRequest.of(page, 3);
         Page<Test> tests = testRepository.findByTestNameContainingOrderByCreatedAtDesc(name, pageable);
         model.addAttribute("tests", tests);
@@ -289,4 +326,117 @@ public class TestController {
         model.addAttribute("searchText", name);
         return "test/list-test-search";
     }
+
+    @GetMapping("/test-sessison")
+    public String lstTestSession(@RequestParam(value = "page", required = false) Integer page, Model model, HttpSession session) {
+        if (page == null) {
+            page = 0;
+        }
+        if (page < 0) {
+            page = 0;
+        }
+        PageRequest pageable = PageRequest.of(page, 3);
+        Page<TestSession> tests = testSessionRepository.findAllByOrderByStartDateDesc(pageable);
+        model.addAttribute("tests", tests);
+        model.addAttribute("pageNo", tests.getPageable().getPageNumber());
+        model.addAttribute("pageTotal", tests.getTotalPages());
+        return "test/list-test-session";
+    }
+
+    @GetMapping("/search-test-session")
+    public String searchTestSession(@RequestParam(value = "page", required = false) Integer page, @RequestParam("searchText") String name, @RequestParam("searchType") String searchType, Model model) {
+        if (page == null) {
+            page = 0;
+        }
+        if (page < 0) {
+            page = 0;
+        }
+        PageRequest pageable = PageRequest.of(page, 3);
+        Page<TestSession> tests;
+        if (searchType.equals("class")) {
+            tests = testSessionRepository.findAllByClazzContainingOrderByStartDateDesc(pageable, name);
+        } else if (searchType.equals("subject")) {
+            tests = testSessionRepository.findAllBySubjectContainingOrderByStartDateDesc(pageable, name);
+        } else {
+            tests = testSessionRepository.findAllByUsernameContainingOrderByStartDate(pageable, name);
+        }
+
+        model.addAttribute("tests", tests);
+        model.addAttribute("pageNo", tests.getPageable().getPageNumber());
+        model.addAttribute("pageTotal", tests.getTotalPages());
+        model.addAttribute("searchText", name);
+        model.addAttribute("searchType", searchType);
+        return "test/list-test-search";
+    }
+
+    @GetMapping("/update-test-sessison")
+    public String updateTestSession(Model model, HttpSession session, @RequestParam("idSession") String idSession, @RequestParam("newStatus") String newStatus) {
+        UserReadDTO user = (UserReadDTO) session.getAttribute("user");
+        Date date = new Date();
+        TestSession testSession = testSessionRepository.findById(Long.parseLong(idSession)).orElse(null);
+        testSession.setStatus(Long.parseLong(newStatus));
+        testSession.setUpdateDate(date);
+        testSession.setUserUpdate(user.getUsername());
+
+        testSessionRepository.save(testSession);
+
+        PageRequest pageable = PageRequest.of(0, 3);
+        Page<TestSession> tests = testSessionRepository.findAllByOrderByStartDateDesc(pageable);
+        model.addAttribute("tests", tests);
+        model.addAttribute("pageNo", tests.getPageable().getPageNumber());
+        model.addAttribute("pageTotal", tests.getTotalPages());
+        return "test/list-test-session";
+    }
+
+    @GetMapping("/test-score")
+    public String lstTestSession(Model model, HttpSession session,
+                                 @RequestParam("class") String classTest,
+                                 @RequestParam("idTest") String idTest) {
+
+        Test test = testRepository.findById(Long.parseLong(idTest)).orElse(null);
+
+        List<TestScoreDTO> lstReturn = new ArrayList<>();
+        List<TestRecord2> lst = testRecord2Repository.findAllByClazzAndTestId(classTest, Long.parseLong(idTest));
+        List<Long> lstUser = new ArrayList<>();
+        for (TestRecord2 t2 : lst) {
+            if (!lstUser.contains(t2.getUserId())) {
+                lstUser.add(t2.getUserId());
+            }
+        }
+        System.out.println("Danh sách người dùng:" + lstUser);
+        if (test.getTestDesc().equals("multipleChoice")) {
+            for (Long user : lstUser) {
+                TestScoreDTO testScoreDTO = new TestScoreDTO();
+                List<TestRecord2> result = testRecord2Repository.findAllByClazzAndTestIdAndUserId(classTest, Long.parseLong(idTest), user);
+                System.out.println("Số lượng câu hỏi tìm thấy: "+result.size());
+                int trueAnswer = 0;
+                for (TestRecord2 rc : result) {
+                    if (rc.isCorrect()) {
+                        trueAnswer++;
+                    }
+                }
+                testScoreDTO.setUserTest(result.get(0).getUsername());
+                testScoreDTO.setType("Trắc nghiệm");
+                testScoreDTO.setScore(trueAnswer + "/" + result.size());
+                lstReturn.add(testScoreDTO);
+
+            }
+            model.addAttribute("testType", "multipleChoice");
+
+        } else {
+            for (Long user : lstUser) {
+                TestScoreDTO testScoreDTO = new TestScoreDTO();
+                List<TestRecord2> result = testRecord2Repository.findAllByClazzAndTestIdAndUserId(classTest, Long.parseLong(idTest), user);
+                testScoreDTO.setUserTest(result.get(0).getUsername());
+                testScoreDTO.setType("Tự luận");
+                lstReturn.add(testScoreDTO);
+            }
+            model.addAttribute("testType", "essay");
+        }
+        model.addAttribute("testScore", lstReturn);
+
+        return "test/testscore-class";
+    }
+
+
 }

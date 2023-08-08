@@ -191,7 +191,7 @@
                 <li><a class="dropdown-item ts-txt-hover-blue" href="/course">Khoá học</a></li>
                 <li><a class="dropdown-item ts-txt-hover-blue" href="/semester">Học kỳ</a></li>
                 <li><a class="dropdown-item ts-txt-hover-blue" href="/certificate">Bằng cấp</a></li>
-                <li><a class="dropdown-item ts-txt-hover-blue" href="/test">Bài thi</a></li>
+                <li><a class="dropdown-item ts-txt-hover-blue" href="/tests">Bài thi</a></li>
                 <li><a class="dropdown-item ts-txt-hover-blue" href="/material">Tài liệu</a></li>
               </ul>
             </li>
@@ -214,7 +214,7 @@
               </a>
               <ul class="dropdown-menu">
                 <li><a class="dropdown-item ts-txt-hover-blue" href="/user?type=teacher">Nhân viên</a></li>
-                <li><a class="dropdown-item ts-txt-hover-blue" href="/user">Tài khoản</a></li>
+                <li><a class="dropdown-item ts-txt-hover-blue" href="/lst-user">Tài khoản</a></li>
                 <li><a class="dropdown-item ts-txt-hover-blue" href="/request">Đơn xin</a></li>
                 <li><a class="dropdown-item ts-txt-hover-blue" href="/application/list">Duyệt đơn tuyển dụng</a></li>
                 <li><a class="dropdown-item ts-txt-hover-blue" href="/recruitment-campaign/list">Chiến dịch tuyển dụng</a></li>

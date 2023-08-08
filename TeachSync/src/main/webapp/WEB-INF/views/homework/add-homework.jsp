@@ -76,7 +76,7 @@
                 <c:if test="${homework.homeworkContent != null || homework.homeworkContent == ''}">
                     <br/>
                     <a href="${homework.homeworkContent}" target="_blank">
-                        <button  type="button" class="btn btn-primary">Xem</button>
+                        <button type="button" class="btn btn-primary">Xem</button>
                     </a>
                 </c:if>
             </c:if>
@@ -84,7 +84,7 @@
                 <c:if test="${homework.homeworkContent != null || homework.homeworkContent == ''}">
                     <br/>
                     <a href="${homework.homeworkContent}" target="_blank">
-                        <button  type="button" class="btn btn-primary">Xem</button>
+                        <button type="button" class="btn btn-primary">Xem</button>
                     </a>
                 </c:if>
                 <input type="file" value="${homework.homeworkContent}" name="homeworkContent" class="form-control"
@@ -98,14 +98,14 @@
                 <c:if test="${homework.homeworkDoc != null || homework.homeworkDoc == ''}">
                     <br/>
                     <a href="${homework.homeworkDoc}" target="_blank">
-                        <button  type="button" class="btn btn-primary">Xem</button>
+                        <button type="button" class="btn btn-primary">Xem</button>
                     </a>
                 </c:if>
             </c:if>
             <c:if test="${option == 'edit' || option == 'add'}">
                 <c:if test="${homework.homeworkDoc != null || homework.homeworkDoc == ''}">
                     <br/>
-                    <a href="${homework.homeworkDoc}" target="_blank" >
+                    <a href="${homework.homeworkDoc}" target="_blank">
                         <button type="button" class="btn btn-primary">Xem</button>
                     </a>
                 </c:if>
@@ -113,7 +113,7 @@
                        placeholder="đính kèm link">
             </c:if>
         </div>
-    
+
         <div class="form-group">
             <label>Ngày mở</label>
             <c:if test="${option == 'detail'}">
@@ -125,7 +125,7 @@
                        placeholder="Ngày mở nộp bài tập">
             </c:if>
         </div>
-    
+
         <div class="form-group">
             <label>Hạn nộp</label>
             <c:if test="${option == 'detail'}">
@@ -141,6 +141,18 @@
         <br>
         <c:if test="${option == 'edit' || option == 'add'}">
             <button type="submit" class="btn btn-primary">Submit</button>
+        </c:if>
+        <p>Danh sách bài tập đã nộp</p>
+        <c:forEach items="${homework.memberHomeworkRecordList}" var="homeworkRecord">
+            <a href="detail-record-homework?id=${homeworkRecord.id}&homeworkId=${homework.id}" >${homeworkRecord.name}</a>
+            <a href="delete-record-homework?id=${homeworkRecord.id}&homeworkId=${homework.id}" ><button type="button" class="btn btn-danger">Xóa</button></a>
+            <br/>
+        </c:forEach>
+        <br/>
+        <c:if test="${option == 'detail' && sessionScope.user.roleId == 1}">
+            <a href="record-homework?id=${homework.id}">
+                <button type="button" class="btn btn-primary">Nộp bài tập về nhà</button>
+            </a>
         </c:if>
         <br><br>
     </form>

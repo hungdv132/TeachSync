@@ -1,14 +1,20 @@
 package com.teachsync.services.memberHomeworkRecord;
 
 import com.teachsync.dtos.memberHomeworkRecord.MemberHomeworkRecordReadDTO;
+import com.teachsync.dtos.user.UserReadDTO;
+import com.teachsync.entities.Homework;
 import com.teachsync.entities.MemberHomeworkRecord;
 import com.teachsync.repositories.MemberHomeworkRecordRepository;
+import com.teachsync.utils.MiscUtil;
 import com.teachsync.utils.enums.DtoOption;
+import com.teachsync.utils.enums.Status;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -25,15 +31,49 @@ public class MemberHomeworkRecordServiceImpl implements MemberHomeworkRecordServ
 
     /* =================================================== CREATE =================================================== */
 
+    @Override
+    @Transactional
+    public void add(MemberHomeworkRecordReadDTO memberHomeworkRecordReadDTO, UserReadDTO userDTO) throws Exception {
+
+        MemberHomeworkRecord memberHomeworkRecord = new MemberHomeworkRecord();
+        memberHomeworkRecord.setName("Bài tập - " + MiscUtil.generateRandomName() + " - " + userDTO.getFullName());
+        memberHomeworkRecord.setMemberId(memberHomeworkRecordReadDTO.getMemberId());
+        memberHomeworkRecord.setHomeworkId(memberHomeworkRecordReadDTO.getHomeworkId());
+        memberHomeworkRecord.setSubmission(memberHomeworkRecordReadDTO.getSubmission());//TODO upload file
+        memberHomeworkRecord.setSubmissionLink(memberHomeworkRecordReadDTO.getSubmissionLink());
+
+        memberHomeworkRecord.setCreatedBy(userDTO.getId());
+        memberHomeworkRecord.setUpdatedBy(userDTO.getId());
+        memberHomeworkRecord.setStatus(Status.CREATED);
+
+        MemberHomeworkRecord memberHomeworkRecordDB = memberHomeworkRecordRepository.save(memberHomeworkRecord);
+        if (ObjectUtils.isEmpty(memberHomeworkRecordDB)) {
+            throw new Exception("Lỗi khi nộp bài tập về nhà");
+        }
+    }
 
     /* =================================================== READ ===================================================== */
 
+    @Override
+    public MemberHomeworkRecordReadDTO findById(Long id) throws Exception {
+        MemberHomeworkRecord memberHomeworkRecord = memberHomeworkRecordRepository.findById(id).orElseThrow(() -> new Exception("không tìm thấy bài tập về nhà"));
+        return mapper.map(memberHomeworkRecord, MemberHomeworkRecordReadDTO.class);
+    }
 
     /* =================================================== UPDATE =================================================== */
 
 
     /* =================================================== DELETE =================================================== */
 
+    @Override
+    public void delete(Long id) throws Exception {
+        MemberHomeworkRecord memberHomeworkRecord = memberHomeworkRecordRepository.findById(id).orElseThrow(() -> new Exception("không tìm thấy bài tập về nhà"));
+        memberHomeworkRecord.setStatus(Status.DELETED);
+        MemberHomeworkRecord memberHomeworkRecordDB = memberHomeworkRecordRepository.save(memberHomeworkRecord);
+        if (ObjectUtils.isEmpty(memberHomeworkRecordDB)) {
+            throw new Exception("Lỗi khi xóa record bài tập về nhà");
+        }
+    }
 
     /* =================================================== WRAPPER ================================================== */
     @Override

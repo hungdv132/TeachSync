@@ -1,11 +1,14 @@
 package com.teachsync.services.homework;
 
 import com.teachsync.dtos.homework.HomeworkReadDTO;
+import com.teachsync.dtos.memberHomeworkRecord.MemberHomeworkRecordReadDTO;
 import com.teachsync.dtos.user.UserReadDTO;
 import com.teachsync.entities.Clazz;
 import com.teachsync.entities.Homework;
+import com.teachsync.entities.MemberHomeworkRecord;
 import com.teachsync.repositories.ClazzRepository;
 import com.teachsync.repositories.HomeworkRepository;
+import com.teachsync.repositories.MemberHomeworkRecordRepository;
 import com.teachsync.utils.Constants;
 import com.teachsync.utils.MiscUtil;
 import com.teachsync.utils.enums.Status;
@@ -37,6 +40,9 @@ public class HomeworkServiceImpl implements HomeworkService {
 
     @Autowired
     ClazzRepository clazzRepository;
+
+    @Autowired
+    private MemberHomeworkRecordRepository memberHomeworkRecordRepository;
 
     @Override
     public Page<HomeworkReadDTO> getPageAll(Pageable paging, UserReadDTO userDTO) throws Exception {
@@ -77,6 +83,29 @@ public class HomeworkServiceImpl implements HomeworkService {
         HomeworkReadDTO homeworkReadDTO = mapper.map(homework, HomeworkReadDTO.class);
         Clazz clazz = clazzRepository.findById(homeworkReadDTO.getClazzId()).orElseThrow(() -> new Exception("không tìm lớp học"));
         homeworkReadDTO.setClazzName(clazz.getClazzName());
+        List<MemberHomeworkRecord> memberHomeworkRecordList = memberHomeworkRecordRepository.findAllByStatusNot(Status.DELETED);
+        List<MemberHomeworkRecordReadDTO> homeworkRecordReadDTOList = new ArrayList<>();
+        for (MemberHomeworkRecord memberHomeworkRecord : memberHomeworkRecordList) {
+            MemberHomeworkRecordReadDTO memberHomeworkRecordReadDTO = mapper.map(memberHomeworkRecord, MemberHomeworkRecordReadDTO.class);
+            homeworkRecordReadDTOList.add(memberHomeworkRecordReadDTO);
+        }
+        homeworkReadDTO.setMemberHomeworkRecordList(homeworkRecordReadDTOList);
+        return homeworkReadDTO;
+    }
+
+    @Override
+    public HomeworkReadDTO findById(Long id, UserReadDTO userDTO) throws Exception {
+        Homework homework = homeworkRepository.findById(id).orElseThrow(() -> new Exception("không tìm bài tập về nhà"));
+        HomeworkReadDTO homeworkReadDTO = mapper.map(homework, HomeworkReadDTO.class);
+        Clazz clazz = clazzRepository.findById(homeworkReadDTO.getClazzId()).orElseThrow(() -> new Exception("không tìm lớp học"));
+        homeworkReadDTO.setClazzName(clazz.getClazzName());
+        List<MemberHomeworkRecord> memberHomeworkRecordList = memberHomeworkRecordRepository.findAllByStatusNotAndMemberId(Status.DELETED, userDTO.getId());
+        List<MemberHomeworkRecordReadDTO> homeworkRecordReadDTOList = new ArrayList<>();
+        for (MemberHomeworkRecord memberHomeworkRecord : memberHomeworkRecordList) {
+            MemberHomeworkRecordReadDTO memberHomeworkRecordReadDTO = mapper.map(memberHomeworkRecord, MemberHomeworkRecordReadDTO.class);
+            homeworkRecordReadDTOList.add(memberHomeworkRecordReadDTO);
+        }
+        homeworkReadDTO.setMemberHomeworkRecordList(homeworkRecordReadDTOList);
         return homeworkReadDTO;
     }
 
@@ -90,7 +119,6 @@ public class HomeworkServiceImpl implements HomeworkService {
         homework.setHomeworkDesc(homeworkReadDTO.getHomeworkDesc());
         homework.setHomeworkDoc(homeworkReadDTO.getHomeworkDoc());
         homework.setHomeworkContent(null);//TODO : upload file
-        homework.setHomeworkDoc(null);//TODO : upload file
         //homework.setHomeworkDocLink(homeworkReadDTO.getHomeworkDocLink());
         homework.setDeadline(homeworkReadDTO.getDeadline());
         homework.setOpenAt(homeworkReadDTO.getOpenAt());
@@ -114,7 +142,6 @@ public class HomeworkServiceImpl implements HomeworkService {
         homework.setHomeworkDesc(homeworkReadDTO.getHomeworkDesc());
         homework.setHomeworkDoc(homeworkReadDTO.getHomeworkDoc());
         homework.setHomeworkContent(null);//TODO : upload file
-        homework.setHomeworkDoc(null);//TODO : upload file
         //homework.setHomeworkDocLink(homeworkReadDTO.getHomeworkDocLink());
         homework.setDeadline(homeworkReadDTO.getDeadline());
         homework.setOpenAt(homeworkReadDTO.getOpenAt());

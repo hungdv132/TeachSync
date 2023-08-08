@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
@@ -36,7 +37,7 @@ public class CenterController {
             centerList = centerList.stream().peek(centerReadDTO ->
             {centerReadDTO.setAddress(addressIdAddressMap.get(centerReadDTO.getAddressId()));}).collect(Collectors.toList());
 
-            model.addAttribute("listCenter",centerList);
+            model.addAttribute("centerList",centerList);
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -65,6 +66,23 @@ public class CenterController {
         }
 
         return "center/center-detail";
+    }
+
+    @PostMapping("edit-center")
+    public String editCenter(Model model,
+                             @RequestParam Long id){
+        try{
+            CenterReadDTO centerReadDTO = centerService.getDTOById(id,null);
+            Address address = addressService.getById(centerReadDTO.getAddressId());
+            centerReadDTO.setAddress(address);
+            model.addAttribute("address",address);
+            model.addAttribute("center",centerReadDTO);
+
+
+        }catch (Exception e){
+
+        }
+        return "edit-center";
     }
 
 }

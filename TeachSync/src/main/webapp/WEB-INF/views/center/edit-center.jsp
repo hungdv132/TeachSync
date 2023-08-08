@@ -63,27 +63,6 @@
 
 <!-- ================================================== Main Body ================================================== -->
 <!-- ================================================== Breadcrumb ================================================= -->
-<div class="row ts-bg-white border ts-border-teal rounded-3 mx-2 mb-3">
-    <div class="col">
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb ts-txt-sm ts-txt-bold my-2">
-                <li class="breadcrumb-item">
-                    <a href="/index">
-                        <i class="bi-house-door"></i>&nbsp;Trang chủ
-                    </a>
-                </li>
-                <li class="breadcrumb-item" aria-current="page">
-                    <a href="/center">
-                        Trung tâm
-                    </a>
-                </li>
-                <li class="breadcrumb-item active" aria-current="page">
-                    TeachSync Doi Can
-                </li>
-            </ol>
-        </nav>
-    </div>
-</div>
 
 
 <!-- ================================================== Breadcrumb ================================================= -->
@@ -92,13 +71,15 @@
 <div class="detail-container">
     <img src="https://amore-architecture.vn/wp-content/uploads/2021/12/TTTA-GCE-tp-HCM-1.jpg" id="centerImage">
     <div class="info-container">
-        <h2 id="centerName">${center.centerName}</h2>
-        <p id="functionInfo">Chuyên môn: ${center.centerType}</p>
-        <p id="centerAddress">Địa chỉ: ${address.addressString}</p>
-        <p id="centerSize">Số phòng: ${center.centerSize} phòng</p>
-        <br>
-        <br>
-        <br>
+        <label>Tên trung tâm:</label>
+        <input type="text" id="centerName" value="${center.centerName}">
+        <label>Chuyên môn:</label>
+        <input type="text" id="functionInfo" value="${center.centerType}">
+        <label>Địa chỉ:</label>
+        <input type="text" id="centerAddress" value="${address.addressString}">
+        <label>Số phòng:</label>
+        <input type="text" id="centerSize" value="${center.centerSize}">
+
         <br>
         <br>
         <br>
@@ -109,10 +90,9 @@
         <br>
         <br>
 
-        <a href="edit-center?id=${center.id}">
+        <a>
             <button type="submit" id="submit">Chỉnh sửa</button>
         </a>
-
     </div>
 </div>
 

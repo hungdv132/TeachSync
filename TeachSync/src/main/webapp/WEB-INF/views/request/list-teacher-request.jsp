@@ -42,7 +42,7 @@
         <c:forEach var="teacherQuest" items="${teacherQuestList}">
             <tr>
                 <th scope="row">${teacherQuest.id}</th>
-                <td>${teacherQuest.applicant.username}</td>
+                <td><a href="detail-application?id=${teacherQuest.applicationDetail.id}" >${teacherQuest.applicant.username}</a></td>
                 <td>${teacherQuest.applicant.fullName}</td>
                 <td>${teacherQuest.applicationDetail.detailLink}</td>
                 <td>${teacherQuest.applicationDetail.detailNote}</td>

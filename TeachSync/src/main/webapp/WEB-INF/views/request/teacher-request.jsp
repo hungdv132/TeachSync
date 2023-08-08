@@ -15,6 +15,42 @@
     <script src="../../../resources/js/jquery/jquery-3.6.3.js"></script>
     <script src="../../../resources/js/bootstrap-5.3.0/bootstrap.bundle.js"></script>
     <script src="../../../resources/js/common.js"></script>
+    <!-- Import the SDKs you need -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+
+    <script src="../../../resources/js/firebase.js"></script>
+
+    <script src="../../../resources/js/common.js"></script>
+
+    <script>
+        $(document).ready(function () {
+
+            // Gán sự kiện 'change' cho input type="file"
+            document.getElementById('detailNote').addEventListener('change', handleFileUpload);
+
+            // Hàm xử lý khi người dùng chọn file
+            async function handleFileUpload(event) {
+                const file = event.target.files[0]; // Lấy file từ sự kiện
+
+                if (!file) {
+                    return;
+                }
+
+                try {
+                    // Gọi function uploadFileToFirebaseAndGetURL để upload file và nhận URL
+                    const url = await uploadFileToFirebaseAndGetURL(file);
+
+                    // Gán URL vào input type="text"
+                    document.getElementById('detailNoteFile').value = url;
+                } catch (error) {
+                    console.error('Error uploading file:', error);
+                    // Xử lý lỗi nếu cần
+                }
+            }
+
+        });
+    </script>
     <script>
         $(document).ready(function () {
             $('#ckHoSo').click(function () {
@@ -57,14 +93,16 @@
                             <br>
                             <div class="form-group">
                                 <label>Tải lên hồ sơ của bạn : </label>
-                                <input type="file" name="campaignImg" class="form-control"
-                                       value="${campaign.campaignImg}">
+                                <input type="file" name="detailNote" class="form-control"  id="detailNote"
+                                       value="">
+                                <input type="text" name="detailNoteFile" hidden id="detailNoteFile">
+
                             </div>
                             <br>
                             <p>Bạn đã có hồ sơ <input type="checkbox" id="ckHoSo"></p>
                             <div class="form-group" id="divHoSo" style="display: none;">
                                 <p>Nhập link hồ sơ</p>
-                                <input type="text" class="form-control" placeholder="nhập hồ sơ" name="contentLink">
+                                <input type="text" class="form-control" placeholder="nhập hồ sơ" name="detailLink">
                             </div>
                             <br><br>
                             <button type="submit" class="btn btn-success">Ứng Tuyển</button>

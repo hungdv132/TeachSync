@@ -1343,6 +1343,38 @@ CREATE TABLE IF NOT EXISTS `teachsync`.`application_detail`
     ENGINE = InnoDB;
 
 
+CREATE TABLE `testrecord` (
+                              `id` bigint NOT NULL AUTO_INCREMENT,
+                              `testId` bigint NOT NULL,
+                              `userId` bigint NOT NULL,
+                              `username` varchar(45) DEFAULT NULL,
+                              `class` varchar(45) DEFAULT NULL,
+                              `questionId` bigint NOT NULL,
+                              `questionType` varchar(45) DEFAULT NULL,
+                              `essayAnswer` varchar(4000) DEFAULT NULL,
+                              `answerMCId` bigint DEFAULT NULL,
+                              `correct` bit(1) DEFAULT NULL,
+                              PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=31 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+CREATE TABLE `test_session` (
+                                `id` bigint NOT NULL AUTO_INCREMENT,
+                                `userid` bigint NOT NULL,
+                                `username` varchar(100) NOT NULL,
+                                `testid` bigint DEFAULT NULL,
+                                `subject` varchar(200) DEFAULT NULL,
+                                `class` varchar(45) DEFAULT NULL,
+                                `start_date` datetime DEFAULT NULL,
+                                `submit_date` datetime DEFAULT NULL,
+                                `status` bigint NOT NULL,
+                                `update_date` datetime DEFAULT NULL,
+                                `user_update` varchar(200) DEFAULT NULL,
+                                PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+
 SET SQL_MODE = @OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS = @OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS = @OLD_UNIQUE_CHECKS;
