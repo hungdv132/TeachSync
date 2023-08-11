@@ -3,6 +3,7 @@ package com.teachsync.services.center;
 import com.teachsync.dtos.BaseReadDTO;
 import com.teachsync.dtos.address.AddressCreateDTO;
 import com.teachsync.dtos.address.AddressReadDTO;
+import com.teachsync.dtos.center.CenterCreateDTO;
 import com.teachsync.dtos.center.CenterReadDTO;
 import com.teachsync.dtos.center.CenterUpdateDTO;
 import com.teachsync.dtos.room.RoomReadDTO;
@@ -42,6 +43,28 @@ public class CenterServiceImpl implements CenterService {
 
 
     /* =================================================== CREATE =================================================== */
+    @Override
+    public Center createCenter(Center center) throws Exception {
+        /* Validate input */
+
+        /* Check FK */
+        /* No FK */
+
+        /* Insert to DB */
+        center = centerRepository.saveAndFlush(center);
+
+        return center;
+    }
+    @Override
+    public CenterReadDTO createCenterByDTO(CenterCreateDTO createDTO) throws Exception {
+        Center center = mapper.map(createDTO,Center.class);
+
+        center = updateCenter(center);
+
+        /* create dependencies */
+
+        return wrapDTO(center,List.of(DtoOption.ROOM_LIST));
+    }
 
 
     /* =================================================== READ ===================================================== */
@@ -125,8 +148,6 @@ public class CenterServiceImpl implements CenterService {
     }
 
 
-
-
     /* =================================================== UPDATE =================================================== */
     @Override
     public Center updateCenter(Center center) throws Exception {
@@ -137,26 +158,26 @@ public class CenterServiceImpl implements CenterService {
         center.setCreatedAt(oldCenter.getCreatedAt());
         center.setCreatedBy(oldCenter.getCreatedBy());
 
-        //validate input
+        /* Validate input */
 
-        //check fk
+        /* Check FK */
+        /* No FK */
 
-        //khong co khoa ngoai
-
-        //update to DB
+        /* Update to DB */
         center = centerRepository.saveAndFlush(center);
-        return center;
 
+        return center;
     }
 
     @Override
-    public CenterReadDTO updateCenterByDTO(CenterUpdateDTO centerUpdateDTO) throws Exception {
-        Center center = mapper.map(centerUpdateDTO,Center.class);
+    public CenterReadDTO updateCenterByDTO(CenterUpdateDTO updateDTO) throws Exception {
+        Center center = mapper.map(updateDTO,Center.class);
+
         center = updateCenter(center);
 
-        //create dependencies
+        /* create dependencies */
 
-        //update dependencies
+        /* update dependencies */
 
         return wrapDTO(center,List.of(DtoOption.ROOM_LIST));
     }
