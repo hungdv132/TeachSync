@@ -20,6 +20,7 @@ public interface MemberHomeworkRecordService {
 
     /* =================================================== UPDATE =================================================== */
 
+    void updateScore(Long id,UserReadDTO userReadDTO , double score) throws Exception;
 
     /* =================================================== DELETE =================================================== */
 

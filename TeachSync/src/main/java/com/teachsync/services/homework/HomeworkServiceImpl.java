@@ -4,8 +4,10 @@ import com.teachsync.dtos.homework.HomeworkReadDTO;
 import com.teachsync.dtos.memberHomeworkRecord.MemberHomeworkRecordReadDTO;
 import com.teachsync.dtos.user.UserReadDTO;
 import com.teachsync.entities.Clazz;
+import com.teachsync.entities.ClazzMember;
 import com.teachsync.entities.Homework;
 import com.teachsync.entities.MemberHomeworkRecord;
+import com.teachsync.repositories.ClazzMemberRepository;
 import com.teachsync.repositories.ClazzRepository;
 import com.teachsync.repositories.HomeworkRepository;
 import com.teachsync.repositories.MemberHomeworkRecordRepository;
@@ -42,6 +44,9 @@ public class HomeworkServiceImpl implements HomeworkService {
     ClazzRepository clazzRepository;
 
     @Autowired
+    ClazzMemberRepository clazzMemberRepository;
+
+    @Autowired
     private MemberHomeworkRecordRepository memberHomeworkRecordRepository;
 
     @Override
@@ -60,8 +65,12 @@ public class HomeworkServiceImpl implements HomeworkService {
 
             //check student to show
             if (!userDTO.getRoleId().equals(Constants.ROLE_ADMIN) && !userDTO.getRoleId().equals(Constants.ROLE_TEACHER)) {
-                if (!ObjectUtils.isEmpty(homeworkReadDTO.getOpenAt()) && homeworkReadDTO.getOpenAt().isBefore(LocalDateTime.now())) {
-                    homeworkDtoList.add(homeworkReadDTO);
+                //kiểm tra xem học sinh có thuộc bài tập này không
+                ClazzMember clazzMember = clazzMemberRepository.findByClazzIdAndUserIdAndStatusNot(clazz.getId(), userDTO.getId(), Status.DELETED).orElse(null);
+                if (!ObjectUtils.isEmpty(clazzMember)) {
+                    if (!ObjectUtils.isEmpty(homeworkReadDTO.getOpenAt()) && homeworkReadDTO.getOpenAt().isBefore(LocalDateTime.now())) {
+                        homeworkDtoList.add(homeworkReadDTO);
+                    }
                 }
             } else {
                 homeworkDtoList.add(homeworkReadDTO);
@@ -99,7 +108,7 @@ public class HomeworkServiceImpl implements HomeworkService {
         HomeworkReadDTO homeworkReadDTO = mapper.map(homework, HomeworkReadDTO.class);
         Clazz clazz = clazzRepository.findById(homeworkReadDTO.getClazzId()).orElseThrow(() -> new Exception("không tìm lớp học"));
         homeworkReadDTO.setClazzName(clazz.getClazzName());
-        List<MemberHomeworkRecord> memberHomeworkRecordList = memberHomeworkRecordRepository.findAllByStatusNotAndMemberId(Status.DELETED, userDTO.getId());
+        List<MemberHomeworkRecord> memberHomeworkRecordList = memberHomeworkRecordRepository.findAllByStatusNotAndAndCreatedBy(Status.DELETED, userDTO.getId());
         List<MemberHomeworkRecordReadDTO> homeworkRecordReadDTOList = new ArrayList<>();
         for (MemberHomeworkRecord memberHomeworkRecord : memberHomeworkRecordList) {
             MemberHomeworkRecordReadDTO memberHomeworkRecordReadDTO = mapper.map(memberHomeworkRecord, MemberHomeworkRecordReadDTO.class);
