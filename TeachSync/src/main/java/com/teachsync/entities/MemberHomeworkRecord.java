@@ -20,11 +20,8 @@ public class MemberHomeworkRecord extends BaseEntity {
     @Column(name = "homeworkId", nullable = false)
     private Long homeworkId;
 
-    @Column(name = "name", nullable = true)
-    private String name;
-
     @Column(name = "submission", nullable = true)
-    private String submission;
+    private byte[] submission;
 
     @Lob
     @Column(name = "submissionLink", nullable = true, length = -1)

@@ -20,13 +20,11 @@ public interface AddressService {
     /* =================================================== READ ===================================================== */
     /* id */
     Address getById(Long id) throws Exception;
-    AddressReadDTO getDTOById(Long id, Collection<DtoOption> options) throws Exception;
+    AddressReadDTO getDTOById(Long id) throws Exception;
 
     List<Address> getAllByIdIn(Collection<Long> idCollection) throws Exception;
-    List<AddressReadDTO> getAllDTOByIdIn(
-            Collection<Long> idCollection, Collection<DtoOption> options) throws Exception;
-    Map<Long, AddressReadDTO> mapIdDTOByIdIn(
-            Collection<Long> idCollection, Collection<DtoOption> options) throws Exception;
+    Map<Long, Address> mapIdAddressByIdIn(Collection<Long> idCollection) throws Exception;
+    List<AddressReadDTO> getAllDTOByIdIn(Collection<Long> idCollection) throws Exception;
 
 
     /* =================================================== UPDATE =================================================== */

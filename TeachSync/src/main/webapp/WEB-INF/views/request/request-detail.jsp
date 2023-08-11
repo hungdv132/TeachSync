@@ -69,54 +69,54 @@
       <h4>Khóa học: <c:out value="${course.courseName}"/></h4>
       <h5>Học kỳ:</h5>
 
-      <c:forEach var="courseSemesterClazzList" items="${scheduleClazzListMap}">
+      <c:forEach var="scheduleClazzList" items="${scheduleClazzListMap}">
 
         <div class="col card">
           <div class="card-header">
             <h6 class="card-title mb-0">
-              Kỳ: <c:out value="${courseSemesterClazzList.key.scheduleAlias}"/><br/>
-              Cơ sở: <c:out value="${courseSemesterClazzList.key.centerName}"/><br/>
-              Từ: <c:out value="${courseSemesterClazzList.key.startDate}"/><br/>
-              Đến: <c:out value="${courseSemesterClazzList.key.endDate}"/><br/>
+              Kỳ: <c:out value="${scheduleClazzList.key.scheduleAlias}"/><br/>
+              Cơ sở: <c:out value="${scheduleClazzList.key.centerName}"/><br/>
+              Từ: <c:out value="${scheduleClazzList.key.startDate}"/><br/>
+              Đến: <c:out value="${scheduleClazzList.key.endDate}"/><br/>
             </h6>
           </div>
 
           <div class="card-body row flex-row flex-nowrap overflow-scroll">
-            <c:forEach var="clazzDTO" items="${courseSemesterClazzList.value}">
+            <c:forEach var="clazz" items="${scheduleClazzList.value}">
               <div class="col-4">
                 <div class="card">
                   <c:url var="enrollLink" value="enroll">
-                    <c:param name="clazzId" value="${clazzDTO.id}"/>
+                    <c:param name="clazzId" value="${clazz.id}"/>
                   </c:url>
                   <form action="${enrollLink}" method="post">
                     <div class="card-header">
                       <h6 class="card-subtitle">
-                        Lớp: <c:out value="${clazzDTO.clazzName}"/>
+                        Lớp: <c:out value="${clazz.clazzName}"/>
                       </h6>
                     </div>
 
                     <c:set var="memberCount" value="0"/>
-                    <c:if test="${clazzDTO.memberList ne null}">
-                      <c:set var="memberCount" value="${clazzDTO.memberList.size()}"/>
+                    <c:if test="${clazz.memberList ne null}">
+                      <c:set var="memberCount" value="${clazz.memberList.size()}"/>
                     </c:if>
 
                     <div class="card-body">
                       <p class="card-text">
-                        Lịch học: <c:out value="${clazzDTO.clazzSchedule.scheduleType}"/><br/>
-                        Slot: <c:out value="${clazzDTO.clazzSchedule.slot}"/><br/>
-                        Từ: <c:out value="${clazzDTO.clazzSchedule.sessionStart}"/>&nbsp;
-                        Đến: <c:out value="${clazzDTO.clazzSchedule.sessionEnd}"/><br/>
-  
-                        Thành viên: <c:out value="${memberCount}"/> &sol; <c:out value="${clazzDTO.clazzSize}"/>
+                        Lịch học: <c:out value="${clazz.clazzSchedule.scheduleType}"/><br/>
+                        Slot: <c:out value="${clazz.clazzSchedule.slot}"/><br/>
+                        Từ: <c:out value="${clazz.clazzSchedule.sessionStart}"/>&nbsp;
+                        Đến: <c:out value="${clazz.clazzSchedule.sessionEnd}"/><br/>
+
+                        Thành viên: <c:out value="${memberCount}"/> &sol; <c:out value="${clazz.clazzSize}"/>
                       </p>
                     </div>
 
                     <div class="card-footer">
                       <c:choose>
-                        <c:when test="${memberCount lt clazzDTO.clazzSize}">
+                        <c:when test="${memberCount lt clazz.clazzSize}">
                           <button type="submit" class="btn btn-primary w-100" >Đăng ký</button>
                         </c:when>
-                        <c:when test="${memberCount ge clazzDTO.clazzSize}">
+                        <c:when test="${memberCount ge clazz.clazzSize}">
                           <button type="submit" class="btn btn-primary w-100" disabled="disabled">Đăng ký</button>
                           <span class="ts-txt-orange">Lớp học đã đầy</span>
                         </c:when>

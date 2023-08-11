@@ -2,7 +2,6 @@ package com.teachsync.services.courseSemester;
 
 import com.teachsync.dtos.BaseReadDTO;
 import com.teachsync.dtos.center.CenterReadDTO;
-import com.teachsync.dtos.course.CourseReadDTO;
 import com.teachsync.dtos.courseSemester.CourseSemesterReadDTO;
 import com.teachsync.dtos.semester.SemesterReadDTO;
 import com.teachsync.entities.BaseEntity;
@@ -150,6 +149,21 @@ public class CourseSemesterServiceImpl implements CourseSemesterService {
     }
 
     @Override
+    public List<CourseSemester> getAllLatestByCourseId(
+            Long courseId, Collection<Long> semesterIdCollection) throws Exception {
+        List<CourseSemester> courseSemesterPage =
+                courseSemesterRepository.findAllByCourseIdAndSemesterIdInAndStatusNot(
+                        courseId,
+                        semesterIdCollection,
+                        Status.DELETED);
+
+        if (courseSemesterPage.isEmpty()) {
+            return null;
+        }
+
+        return courseSemesterPage;
+    }
+    @Override
     public List<CourseSemesterReadDTO> getAllLatestDTOByCourseId(
             Long courseId, Collection<DtoOption> options) throws Exception {
         List<Semester> semesterList = /* Sau 10 ngày để còn có hạn học sinh đăng ký */
@@ -159,7 +173,7 @@ public class CourseSemesterServiceImpl implements CourseSemesterService {
                         .map(BaseEntity::getId)
                         .collect(Collectors.toSet());
         
-        List<CourseSemester> courseSemesterList = getAllByCourseIdAndSemesterIdIn(courseId, semesterIdSet);
+        List<CourseSemester> courseSemesterList = getAllLatestByCourseId(courseId, semesterIdSet);
 
         if (courseSemesterList == null) {
             return null;
@@ -179,46 +193,6 @@ public class CourseSemesterServiceImpl implements CourseSemesterService {
         return latestDTOList.stream()
                 .collect(Collectors.toMap(BaseReadDTO::getId, Function.identity()));
     }
-    /* courseId, semesterId */
-    @Override
-    public List<CourseSemester> getAllByCourseIdAndSemesterIdIn(
-            Long courseId, Collection<Long> semesterIdCollection) throws Exception {
-        List<CourseSemester> courseSemesterPage =
-                courseSemesterRepository
-                        .findAllByCourseIdAndSemesterIdInAndStatusNot(courseId, semesterIdCollection, Status.DELETED);
-
-        if (courseSemesterPage.isEmpty()) {
-            return null;
-        }
-
-        return courseSemesterPage;
-    }
-    @Override
-    public Map<Long, String> mapIdSemesterIdCenterIdStringByCourseIdAndSemesterIdIn(
-            Long courseId, Collection<Long> semesterIdCollection) throws Exception {
-        List<CourseSemester> courseSemesterList = getAllByCourseIdAndSemesterIdIn(courseId, semesterIdCollection);
-
-        if (courseSemesterList == null) {
-            return new HashMap<>();
-        }
-
-        return courseSemesterList.stream()
-                .collect(Collectors.toMap(
-                        BaseEntity::getId,
-                        cS -> cS.getSemesterId().toString().concat(cS.getCenterId().toString())));
-    }
-    @Override
-    public List<CourseSemesterReadDTO> getAllDTOByCourseIdAndSemesterIdIn(
-            Long courseId, Collection<Long> semesterIdCollection, Collection<DtoOption> options) throws Exception {
-        List<CourseSemester> courseSemesterList = getAllByCourseIdAndSemesterIdIn(courseId, semesterIdCollection);
-
-        if (courseSemesterList == null) {
-            return null;
-        }
-
-        return wrapListDTO(courseSemesterList, options);
-    }
-
 
     /* semesterId */
     @Override
@@ -343,10 +317,6 @@ public class CourseSemesterServiceImpl implements CourseSemesterService {
 
         /* Add Dependency */
         if (options != null && !options.isEmpty()) {
-            if (options.contains(DtoOption.COURSE)) {
-                CourseReadDTO courseDTO = courseService.getDTOById(dto.getCourseId(), options);
-                dto.setCourse(courseDTO);
-            }
             if (options.contains(DtoOption.COURSE_NAME)) {
                 Course course = courseService.getById(dto.getCourseId());
                 dto.setCourseName(course.getCourseName());
@@ -405,7 +375,7 @@ public class CourseSemesterServiceImpl implements CourseSemesterService {
             }
     
             if (options.contains(DtoOption.SEMESTER)) {
-                semesterIdSemesterDTOMap = semesterService.mapIdDTOByIdIn(SemesterIdSet, options);
+                semesterIdSemesterDTOMap = semesterService.mapSemesterIdSemesterDTOByIdIn(SemesterIdSet, options);
             }
         }
 

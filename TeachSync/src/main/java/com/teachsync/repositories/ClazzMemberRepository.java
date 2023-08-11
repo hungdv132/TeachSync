@@ -7,28 +7,20 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface ClazzMemberRepository extends JpaRepository<ClazzMember, Long> {
-
-    /* id */
-    Optional<ClazzMember> findByIdAndStatusNot(Long id, Status status);
-    List<ClazzMember> findAllByIdInAndStatusNot(Collection<Long> idCollection, Status status);
 
 
     /* clazzId */
     List<ClazzMember> findAllByClazzIdAndStatusNot(Long clazzId, Status status);
 
-
     List<ClazzMember> findAllByClazzIdInAndStatusNot(Collection<Long> clazzIdCollection, Status status);
 
 
     /* userId */
-    List<ClazzMember> findAllByUserIdAndStatusNot(Long userId, Status status);
-    List<ClazzMember> findAllByUserIdInAndStatusNot(Collection<Long> userIdCollection, Status status);
+    List<ClazzMember> findAllByUserIdAndStatusNot(Long clazzId, Status status);
+    List<ClazzMember> findAllByUserIdInAndStatusNot(Collection<Long> clazzIdCollection, Status status);
 
-    /* clazzId & userId */
-    Optional<ClazzMember> findByClazzIdAndUserIdAndStatusNot(Long clazzId, Long userId, Status status);
 
 }

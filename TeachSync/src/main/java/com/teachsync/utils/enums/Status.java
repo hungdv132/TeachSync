@@ -11,9 +11,6 @@ public enum Status {
     OPENED("OPENED"),
     CLOSED("CLOSED"),
 
-    ALLOWED_REDO("ALLOWED_REDO"),
-    SUSPENDED("SUSPENDED"),
-
     CREATED("CREATED"),
     UPDATED("UPDATED"),
     DELETED("DELETED");
