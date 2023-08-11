@@ -17,15 +17,16 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.SessionAttribute;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static com.teachsync.utils.enums.DtoOption.CURRENT_PRICE;
 
 @Controller
 public class SemesterController {
@@ -94,6 +95,21 @@ public class SemesterController {
         }
         
         return "semester/list-semester";
+    }
+
+    @GetMapping("/api/semester-detail")
+    @ResponseBody
+    public Map<String, Object> getSemesterDetail(
+            @RequestParam Long semesterId) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            SemesterReadDTO semesterDTO = semesterService.getDTOById(semesterId, null);
+            response.put("semester", semesterDTO);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return response;
     }
 
 }

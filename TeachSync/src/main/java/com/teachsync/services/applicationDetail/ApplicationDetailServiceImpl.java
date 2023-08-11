@@ -89,6 +89,13 @@ public class ApplicationDetailServiceImpl implements ApplicationDetailService {
     }
 
     /* =================================================== READ ===================================================== */
+
+    @Override
+    public ApplicationDetailReadDTO getById(Long id) throws Exception {
+        ApplicationDetail applicationDetail = applicationDetailRepository.findById(id).orElseThrow(() -> new Exception("không tìm đơn của ứng viên"));
+        return mapper.map(applicationDetail, ApplicationDetailReadDTO.class);
+    }
+
     /* applicationId */
     @Override
     public List<ApplicationDetail> getAllByApplicationId(Long applicationId) throws Exception {

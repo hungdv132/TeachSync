@@ -80,24 +80,24 @@
           </div>
           
           <div class="card-body d-flex">
-            <c:set var="currentPrice" value="${course.currentPrice}"/>
-            <c:set var="isPromotion" value="${currentPrice.isPromotion}"/>
+            <c:set var="currentPriceDTO" value="${course.currentPrice}"/>
+            <c:set var="isPromotion" value="${currentPriceDTO.isPromotion}"/>
             <h5 class="card-subtitle">
               <c:if test="${!isPromotion}">
-                <c:out value="${currentPrice.price}"/> ₫
+                <c:out value="${currentPriceDTO.price}"/> ₫
               </c:if>
               
               <c:if test="${isPromotion}">
-                <span class="ts-txt-orange ts-txt-bold"><c:out value="${currentPrice.finalPrice}"/>&nbsp;₫</span>
+                <span class="ts-txt-orange ts-txt-bold"><c:out value="${currentPriceDTO.finalPrice}"/>&nbsp;₫</span>
                 <br/>
                 <span class="ts-txt-grey ts-txt-light ts-txt-sm ts-txt-italic ts-txt-line-through">
-                  &nbsp;<c:out value="${currentPrice.price}"/>&nbsp;₫
+                  &nbsp;<c:out value="${currentPriceDTO.price}"/>&nbsp;₫
                 </span>
                 <span class="ts-txt-orange ts-txt-sm">
-                  &nbsp;-<c:out value="${currentPrice.promotionAmount}"/>
+                  &nbsp;-<c:out value="${currentPriceDTO.promotionAmount}"/>
                   <c:choose>
-                    <c:when test="${currentPrice.promotionType eq 'PERCENT'}">%</c:when>
-                    <c:when test="${currentPrice.promotionType eq 'AMOUNT'}">₫</c:when>
+                    <c:when test="${currentPriceDTO.promotionType eq 'PERCENT'}">%</c:when>
+                    <c:when test="${currentPriceDTO.promotionType eq 'AMOUNT'}">₫</c:when>
                   </c:choose>
                 </span>
               </c:if>

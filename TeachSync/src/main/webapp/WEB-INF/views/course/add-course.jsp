@@ -15,48 +15,12 @@
   <script src="../../../resources/js/jquery/jquery-3.6.3.js"></script>
   <script src="../../../resources/js/bootstrap-5.3.0/bootstrap.bundle.js"></script>
   
+  <!-- Import the SDKs you need -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+  <script src="../../../resources/js/firebase.js"></script>
   
   <script src="../../../resources/js/common.js"></script>
-<%--  --%>
-<%--  <script async defer src="https://apis.google.com/js/api.js"></script>--%>
-<%--  <script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>--%>
-<%--  <script>--%>
-<%--      /* Connect Google drive */--%>
-<%--      const API_KEY = "AIzaSyBoVUpjio98ajYIrax1Rp0hioMAjY59_QY";--%>
-<%--      const CLIENT_ID = "490835666546-kn477psnku3nthmr0ksukvmfsjsejvfp.apps.googleusercontent.com"--%>
-<%--      const SCOPES = "https://www.googleapis.com/auth/drive.file";--%>
-
-<%--      gapi.auth.authorize(--%>
-<%--          {--%>
-<%--              'client_id': CLIENT_ID,--%>
-<%--              'scope': SCOPES.join(' '),--%>
-<%--              'immediate': true--%>
-<%--          }, handleAuthResult);--%>
-<%--      --%>
-<%--      const fileToUpload = inputUpload.files[0];--%>
-
-<%--      let metadata = {--%>
-<%--          name: fileToUpload.name,--%>
-<%--          mimeType: fileToUpload.type,--%>
-<%--          parents: ["12fIaBrK9FxNMWvQrISzfZd7wku8d2TMx"]--%>
-<%--      };--%>
-
-<%--      let formData = new FormData();--%>
-<%--      formData.append( "metadata", new Blob( [JSON.stringify( metadata )], {type: "application/json"} ));--%>
-<%--      formData.append( "file", fileToUpload );--%>
-
-<%--      fetch( "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart", {--%>
-<%--          method: "POST",--%>
-<%--          headers: new Headers({ "Authorization": "Bearer " + gapi.auth.getToken().access_token }),--%>
-<%--          body: formData--%>
-<%--      }).then( function( response ){--%>
-<%--          return response.json();--%>
-<%--      }).then( function( value ){--%>
-<%--          console.log( value );--%>
-<%--      });--%>
-
-<%--  </script>--%>
-  
 </head>
 <body class="container-fluid ts-bg-white-subtle">
 <!-- ================================================== Header ===================================================== -->
@@ -91,9 +55,7 @@
 
 <!-- ================================================== Main Body ================================================== -->
 <div class="row ts-bg-white d-flex justify-content-center border ts-border-teal rounded-3 pt-3 mx-2 mb-3">
-  <form onsubmit="return addCourse()" class="col-12 d-flex justify-content-center px-5 mb-3">
-  
-  
+  <form onsubmit="addCourse(event)" class="col-12 d-flex justify-content-center px-5 mb-3">
     <div class="row">
   
       <h4>Thêm khóa học</h4>
@@ -101,14 +63,15 @@
   
       <!-- Course Img -->
       <div class="col-sm-12 col-md-3 mb-3">
-        <label class="w-100">
+        <label class="w-100 mb-1">
           Ảnh khóa học: <br/>
           <img src="../../../resources/img/no-img.jpg" alt="courseImg" id="imgCourseImg"
                class="rounded-2 border ts-border-blue w-100 h-auto mb-3">
           <br/>
-          <input type="file" name="img" id="txtImg" class="w-100"
-                  accept="image/*" onchange="updateImgFromInput('txtImg', 'imgCourseImg')">
+          <input type="file" name="img" id="fileImg" class="w-100"
+                  accept="image/*" onchange="updateImgFromInput('fileImg', 'imgCourseImg', 0.75)">
         </label>
+        <p class="ts-txt-italic ts-txt-sm mb-0">*Tối đa 0.75 MB</p>
       </div>
   
       <!-- Course detail -->
@@ -235,22 +198,24 @@
 <!-- ================================================== Footer ===================================================== -->
 <%@ include file="/WEB-INF/fragments/footer.jspf" %>
 <!-- ================================================== Footer ===================================================== -->
-</body>
+
+
+<!-- ================================================== Script ===================================================== -->
 <script>
     var mess = '${mess}'
     if (mess != '') {
         alert(mess);
     }
-    
+
     function updateInputPromotionAmountMax() {
         $("#txtPromotionAmount").attr({
             'max': $("#txtPrice").val(),
             'placeholder' : '0 - ' + $("#txtPrice").val()});
     }
-    
+
     function changeInputPromotionAmountSpec() {
         let txtPromotionAmount = $("#txtPromotionAmount");
-        
+
         switch ($("#selPromotionType").val()) {
             case 'AMOUNT':
                 let price = $("#txtPrice").val();
@@ -262,7 +227,7 @@
                         'placeholder' : '0 - ' + price})
                     .val('100');
                 break;
-                
+
             case 'PERCENT':
                 txtPromotionAmount
                     .attr({
@@ -273,38 +238,40 @@
                     .val('0.01');
                 break;
         }
-        
+
         calculateFinalPrice();
     }
-    
+
     function calculateFinalPrice() {
         let price = $("#txtPrice").val();
         let promotionAmount = $("#txtPromotionAmount").val();
         let finalPrice = 0;
-        
+
         switch ($("#selPromotionType").val()) {
             case 'AMOUNT':
                 finalPrice = price - promotionAmount;
                 break;
 
             case 'PERCENT':
-                finalPrice = price - (price * (promotionAmount/100));
+                finalPrice = price - (price * (promotionAmount / 100));
+                let roundedFinalPrice = Math.round(finalPrice);
+                finalPrice = Math.ceil(roundedFinalPrice / 100) * 100;
                 break;
         }
-        
+
         $("#txtFinalPrice").val(finalPrice);
     }
-    
+
     function togglePromotion() {
         let promotionAmount = $("#txtPromotionAmount");
-        
+
         if ($("#chkIsPromotion").is(":checked")) {
             showById("divPromotionAmount");
             showById("lblPromotionFinal");
             showById("lblPromotionDesc");
 
             promotionAmount.attr("required", true);
-            
+
             calculateFinalPrice();
         } else {
             hideById("divPromotionAmount");
@@ -314,10 +281,16 @@
             promotionAmount.attr("required", false);
         }
     }
-
-    function addCourse() {
-        let priceCreateDTO = {};
+    
+    async function addCourse(event) {
+        event.preventDefault();
         
+        let file = $('#fileImg').prop("files")[0];
+
+        let imgURL = await uploadImageFileToFirebaseAndGetURL(file);
+
+        let priceCreateDTO = {};
+
         if ($("#chkIsPromotion").is(":checked")) {
             priceCreateDTO = {
                 "price": $("#txtPrice").val(),
@@ -331,13 +304,11 @@
                 "price": $("#txtPrice").val(),
             }
         }
-        
-        let img = $("#imgCourseImg").attr("src");
-        
+
         let createDTO = {
             "courseName": $("#txtName").val(),
             "courseAlias": $("#txtAlias").val(),
-            "courseImg": img,
+            "courseImg": imgURL,
             "courseDesc": $("#txtDesc").val(),
             "numSession": $("#txtNumSession").val(),
             "minScore": $("#txtMinScore").val(),
@@ -357,9 +328,10 @@
                 }
             }
         })
-        
+
         return false;
     }
-  
 </script>
+<!-- ================================================== Script ===================================================== -->
+</body>
 </html>

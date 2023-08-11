@@ -1,12 +1,15 @@
 package com.teachsync.dtos.homework;
 
 import com.teachsync.dtos.BaseReadDTO;
+import com.teachsync.dtos.clazz.ClazzReadDTO;
+import com.teachsync.dtos.memberHomeworkRecord.MemberHomeworkRecordReadDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -15,6 +18,8 @@ import java.time.LocalDateTime;
 public class HomeworkReadDTO extends BaseReadDTO {
 
     private Long clazzId;
+    private String clazzName;
+    private ClazzReadDTO clazz;
 
     private String homeworkName;
 
@@ -28,6 +33,6 @@ public class HomeworkReadDTO extends BaseReadDTO {
 
     private LocalDateTime openAt;
 
-    private String clazzName;
+    private List<MemberHomeworkRecordReadDTO> memberHomeworkRecordList;
 
 }

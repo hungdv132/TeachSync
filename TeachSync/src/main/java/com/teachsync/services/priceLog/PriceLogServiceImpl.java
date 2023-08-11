@@ -7,13 +7,18 @@ import com.teachsync.entities.PriceLog;
 import com.teachsync.repositories.PriceLogRepository;
 import com.teachsync.utils.MiscUtil;
 import com.teachsync.utils.enums.Status;
+import org.modelmapper.AbstractConverter;
+import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.PropertyMap;
+import org.modelmapper.spi.MappingContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.text.DecimalFormat;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Function;
@@ -248,24 +253,51 @@ public class PriceLogServiceImpl implements PriceLogService {
     /* =================================================== WRAPPER ================================================== */
     @Override
     public PriceLogReadDTO wrapDTO(PriceLog priceLog) throws Exception {
+        mapper.typeMap(PriceLog.class, PriceLogReadDTO.class)
+                .addMappings(mapping -> {
+                    mapping.skip(PriceLogReadDTO::setPrice);
+                    mapping.skip(PriceLogReadDTO::setPromotionAmount);
+                });
+
         PriceLogReadDTO dto = mapper.map(priceLog, PriceLogReadDTO.class);
+
+        DecimalFormat moneyFormat = new DecimalFormat("#,###");
+        dto.setPrice(moneyFormat.format(priceLog.getPrice()));
 
         Double finalPrice = priceLog.getPrice();
 
         if (priceLog.getIsPromotion()) {
-            finalPrice = switch (priceLog.getPromotionType()) {
-                case AMOUNT -> priceLog.getPrice() - priceLog.getPromotionAmount();
-                case PERCENT -> priceLog.getPrice() * ((100.0 - priceLog.getPromotionAmount()) / 100.0);
-            };
+            switch (priceLog.getPromotionType()) {
+                case AMOUNT -> {
+                    finalPrice = priceLog.getPrice() - priceLog.getPromotionAmount();
+                    dto.setPromotionAmount(moneyFormat.format(priceLog.getPromotionAmount()));
+                }
+                case PERCENT -> {
+                    finalPrice = priceLog.getPrice() * ((100.0 - priceLog.getPromotionAmount()) / 100.0);
+                    long roundedFinalPrice = Math.round(finalPrice); /* Bỏ số lẻ */
+                    finalPrice = ((roundedFinalPrice + 99) / 100) * 100.0; /* Nâng lên hàng trăm */
+
+                    DecimalFormat percentFormat = new DecimalFormat("#,###.##");
+                    dto.setPromotionAmount(percentFormat.format(priceLog.getPromotionAmount()));
+                }
+            }
         }
 
-        dto.setFinalPrice(finalPrice);
+        dto.setFinalPrice(moneyFormat.format(finalPrice));
         
         return dto;
     }
 
     @Override
     public List<PriceLogReadDTO> wrapListDTO(Collection<PriceLog> priceLogCollection) throws Exception {
+        mapper.typeMap(PriceLog.class, PriceLogReadDTO.class)
+                .addMappings(mapping -> {
+                    mapping.skip(PriceLogReadDTO::setPrice);
+                    mapping.skip(PriceLogReadDTO::setPromotionAmount);
+                });
+        DecimalFormat moneyFormat = new DecimalFormat("#,###");
+        DecimalFormat percentFormat = new DecimalFormat("#,###.##");
+
         List<PriceLogReadDTO> dtoList = new ArrayList<>();
 
         PriceLogReadDTO dto;
@@ -277,13 +309,22 @@ public class PriceLogServiceImpl implements PriceLogService {
             finalPrice = priceLog.getPrice();
 
             if (priceLog.getIsPromotion()) {
-                finalPrice = switch (priceLog.getPromotionType()) {
-                    case AMOUNT -> priceLog.getPrice() - priceLog.getPromotionAmount();
-                    case PERCENT -> priceLog.getPrice() * ((100.0 - priceLog.getPromotionAmount()) / 100.0);
-                };
+                switch (priceLog.getPromotionType()) {
+                    case AMOUNT -> {
+                        finalPrice = priceLog.getPrice() - priceLog.getPromotionAmount();
+                        dto.setPromotionAmount(moneyFormat.format(priceLog.getPromotionAmount()));
+                    }
+                    case PERCENT -> {
+                        finalPrice = priceLog.getPrice() * ((100.0 - priceLog.getPromotionAmount()) / 100.0);
+                        long roundedFinalPrice = Math.round(finalPrice); /* Bỏ số lẻ */
+                        finalPrice = ((roundedFinalPrice + 99) / 100) * 100.0; /* Nâng lên hàng trăm */
+
+                        dto.setPromotionAmount(percentFormat.format(priceLog.getPromotionAmount()));
+                    }
+                }
             }
 
-            dto.setFinalPrice(finalPrice);
+            dto.setFinalPrice(moneyFormat.format(finalPrice));
 
             dtoList.add(dto);
         }
