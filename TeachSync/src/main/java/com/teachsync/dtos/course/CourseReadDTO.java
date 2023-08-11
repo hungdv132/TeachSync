@@ -2,6 +2,7 @@ package com.teachsync.dtos.course;
 
 import com.teachsync.dtos.BaseReadDTO;
 import com.teachsync.dtos.priceLog.PriceLogReadDTO;
+import com.teachsync.dtos.test.TestReadDTO;
 import com.teachsync.entities.Clazz;
 import com.teachsync.entities.Material;
 import com.teachsync.entities.Test;
@@ -25,6 +26,8 @@ public class CourseReadDTO extends BaseReadDTO {
 
     private String courseDesc;
 
+    private Integer numSession;
+
     private Double minScore;
 
     private Double minAttendant;
@@ -32,9 +35,9 @@ public class CourseReadDTO extends BaseReadDTO {
     private List<Clazz> clazzList;
 
     private List<Material> materialList;
-    private List<Test> testList;
+    private List<TestReadDTO> testList;
 
-//    private List<PriceLog> priceLogList;
+    private List<PriceLogReadDTO> priceLog;
     private PriceLogReadDTO currentPrice;
 }
 

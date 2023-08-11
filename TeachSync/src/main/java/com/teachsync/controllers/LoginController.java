@@ -34,12 +34,12 @@ public class LoginController {
             return "redirect:/index";
         }
 
-        return "login";
+        return "login/login";
     }
 
 
     @PostMapping(value = "/sign-in", consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody /* Trả về String để href thêm lần nữa */
+    @ResponseBody
     public Map<String, Object> login(
             @RequestBody UserLoginDTO loginDTO,
             HttpSession session,
@@ -77,7 +77,7 @@ public class LoginController {
 
     @GetMapping("/sign-up")
     public String signup(Model model) {
-        return "signup";
+        return "login/signup";
     }
 
     @PostMapping(value = "/sign-up", consumes = MediaType.APPLICATION_JSON_VALUE)

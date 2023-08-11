@@ -1,5 +1,6 @@
 package com.teachsync.services.address;
 
+
 import com.teachsync.dtos.BaseReadDTO;
 import com.teachsync.dtos.address.AddressCreateDTO;
 import com.teachsync.dtos.address.AddressReadDTO;
@@ -44,12 +45,10 @@ public class AddressServiceImpl implements AddressService {
         Address address = mapper.map(addressCreateDTO, Address.class);
         ArrayList<LocationUnit> unitList = new ArrayList<>();
         LocationUnit locationUnit = locationUnitRepository.findByIdAndStatusNot(address.getUnitId(), Status.DELETED).orElse(null);
-
         while (locationUnit.getParentId() != null){
             unitList.add(locationUnit);
             locationUnit = locationUnitRepository.findByIdAndStatusNot(locationUnit.getParentId(), Status.DELETED).orElse(null);
         }
-
         StringBuilder addressString = new StringBuilder(address.getAddressNo() + " " + address.getStreet());
 
         for (LocationUnit unit: unitList) {
@@ -66,15 +65,19 @@ public class AddressServiceImpl implements AddressService {
     /* id */
     @Override
     public Address getById(Long id) throws Exception {
-        return addressRepository.findByIdAndStatusNot(id, Status.DELETED).orElse(null);
+        return addressRepository
+                .findByIdAndStatusNot(id, Status.DELETED)
+                .orElse(null);
     }
     @Override
     public AddressReadDTO getDTOById(Long id, Collection<DtoOption> options) throws Exception {
-        Address addresses = getById(id);
-        if(addresses == null){
+        Address address = getById(id);
+
+        if (address == null) {
             return null;
         }
-        return wrapDTO(addresses, null);
+
+        return wrapDTO(address, options);
     }
 
     @Override
@@ -86,21 +89,26 @@ public class AddressServiceImpl implements AddressService {
         return addressesList;
     }
     @Override
-    public List<AddressReadDTO> getAllDTOByIdIn(Collection<Long> idCollection, Collection<DtoOption> options) throws Exception {
-        List<Address> addressesList = getAllByIdIn(idCollection);
-        if(addressesList == null){
+    public List<AddressReadDTO> getAllDTOByIdIn(
+            Collection<Long> idCollection, Collection<DtoOption> options) throws Exception {
+        List<Address> addressList = getAllByIdIn(idCollection);
+
+        if (addressList == null) {
             return null;
         }
-        return wrapListDTO(addressesList, null);
+
+        return wrapListDTO(addressList, options);
     }
     @Override
-    public Map<Long, AddressReadDTO> mapIdDTOByIdIn(Collection<Long> idCollection, Collection<DtoOption> options) throws Exception {
+    public Map<Long, AddressReadDTO> mapIdDTOByIdIn(
+            Collection<Long> idCollection, Collection<DtoOption> options) throws Exception {
         List<AddressReadDTO> addressDTOList = getAllDTOByIdIn(idCollection, options);
+
         if (addressDTOList == null) {
             return new HashMap<>();
         }
-        return addressDTOList.stream()
-                .collect(Collectors.toMap(BaseReadDTO::getId, Function.identity()));
+
+        return addressDTOList.stream().collect(Collectors.toMap(BaseReadDTO::getId, Function.identity()));
     }
 
 

@@ -13,15 +13,14 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+/**
+ * DTO for {@link com.teachsync.entities.Material}
+ */
 @EqualsAndHashCode(callSuper = true)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class MaterialUpdateDTO extends BaseUpdateDTO {
-    @NotNull
-    @Positive
-    private Long courseId;
-
     @NotBlank
     @Size(min = 1, max = 45)
     private String materialName;
@@ -36,5 +35,5 @@ public class MaterialUpdateDTO extends BaseUpdateDTO {
 
     private MaterialType materialType;
 
-    private Status status = Status.UPDATED;
+    private Boolean isFree = false;
 }

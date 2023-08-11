@@ -3,13 +3,18 @@ package com.teachsync.services.course;
 import com.teachsync.dtos.BaseReadDTO;
 import com.teachsync.dtos.course.CourseCreateDTO;
 import com.teachsync.dtos.course.CourseReadDTO;
+import com.teachsync.dtos.course.CourseUpdateDTO;
+import com.teachsync.dtos.priceLog.PriceLogCreateDTO;
 import com.teachsync.dtos.priceLog.PriceLogReadDTO;
+import com.teachsync.dtos.priceLog.PriceLogUpdateDTO;
+import com.teachsync.dtos.test.TestReadDTO;
 import com.teachsync.entities.BaseEntity;
 import com.teachsync.entities.Course;
 import com.teachsync.entities.PriceLog;
 import com.teachsync.repositories.CourseRepository;
 import com.teachsync.repositories.PriceLogRepository;
 import com.teachsync.services.priceLog.PriceLogService;
+import com.teachsync.services.test.TestService;
 import com.teachsync.utils.MiscUtil;
 import com.teachsync.utils.enums.DtoOption;
 import com.teachsync.utils.enums.Status;
@@ -20,7 +25,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.ObjectUtils;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -34,6 +38,8 @@ public class CourseServiceImpl implements CourseService {
 
     @Autowired
     private PriceLogService priceLogService;
+    @Autowired
+    private TestService testService;
 
     @Autowired
     private PriceLogRepository priceLogRepository;
@@ -46,41 +52,43 @@ public class CourseServiceImpl implements CourseService {
 
     /* =================================================== CREATE =================================================== */
     @Override
-    @Transactional
-    public CourseReadDTO addCourse(CourseCreateDTO courseDTO, Long userId) throws Exception {
-        Course course = new Course();
+    public Course createCourse(Course course) throws Exception {
+        /* Validate input */
+        /* TODO: valid ImgLink, ... */
 
-        course.setCourseName(courseDTO.getCourseName());
-        //TODO : process upload file
-        course.setCourseImg(courseDTO.getCourseImg());
-        course.setCourseDesc(courseDTO.getCourseDesc());
-        course.setMinScore(courseDTO.getMinScore());
-        course.setMinAttendant(courseDTO.getMinAttendant());
-        course.setStatus(courseDTO.getStatus());
-        course.setCreatedBy(userId);
-        Course courseDb = courseRepository.save(course);
-        if (ObjectUtils.isEmpty(courseDb)) {
-            throw new Exception("Tạo khóa học thất bại");
+        /* Check FK */
+        /* No FK */
+
+        /* Check duplicate */
+        if (courseRepository
+                .existsByCourseNameOrCourseAliasAndStatusNot(
+                        course.getCourseName(),
+                        course.getCourseAlias(),
+                        Status.DELETED)) {
+            throw new IllegalArgumentException(
+                    "Already exists Course with Name: " + course.getCourseName()
+                            + " or with Alias: " + course.getCourseAlias());
         }
 
-        //add price
-        PriceLog priceLog = new PriceLog();
-        priceLog.setCourseId(courseDb.getId());
-        priceLog.setPrice(courseDTO.getPrice());
-        priceLog.setStatus(Status.CREATED);
-        priceLog.setPromotionAmount(0.0);
-        priceLog.setIsPromotion(false);
-        priceLog.setValidFrom(LocalDateTime.now());
-        priceLog.setValidTo(LocalDateTime.now());
-        priceLog.setCreatedBy(userId);
-        priceLog.setUpdatedBy(userId);
+        /* Save to DB */
+        course = courseRepository.save(course);
 
-        PriceLog priceLogDb = priceLogRepository.save(priceLog);
-        if (ObjectUtils.isEmpty(priceLogDb)) {
-            throw new Exception("Tạo giá của khóa học thất bại");
-        }
-        return mapper.map(courseDb, CourseReadDTO.class);
+        return course;
     }
+    @Override
+    public CourseReadDTO createCourseByDTO(CourseCreateDTO createDTO) throws Exception {
+        Course course = mapper.map(createDTO, Course.class);
+
+        course = createCourse(course);
+
+        /* Create dependency */
+        PriceLogCreateDTO priceLogCreateDTO = createDTO.getPrice();
+        priceLogCreateDTO.setCourseId(course.getId());
+        priceLogService.createPriceLogByDTO(priceLogCreateDTO);
+
+        return wrapDTO(course, null);
+    }
+
 
     /* =================================================== READ ===================================================== */
     @Override
@@ -190,16 +198,15 @@ public class CourseServiceImpl implements CourseService {
                 .findByIdAndStatusNot(id, Status.DELETED)
                 .orElse(null);
     }
-
     @Override
-    public CourseReadDTO getDTOById(Long id) throws Exception {
+    public CourseReadDTO getDTOById(Long id, Collection<DtoOption> options) throws Exception {
         Course course = getById(id);
 
         if (course == null) {
             return null;
         }
 
-        return wrapDTO(course);
+        return wrapDTO(course, options);
     }
 
     @Override
@@ -239,7 +246,7 @@ public class CourseServiceImpl implements CourseService {
     public Map<Long, String> mapCourseIdCourseNameByIdIn(Collection<Long> courseIdCollection) throws Exception {
         List<Course> courseList = getAllByIdIn(courseIdCollection);
 
-        if (courseList.isEmpty()) {
+        if (courseList == null) {
             return new HashMap<>(); }
 
         return courseList.stream()
@@ -249,59 +256,116 @@ public class CourseServiceImpl implements CourseService {
     public Map<Long, String> mapCourseIdCourseAliasByIdIn(Collection<Long> courseIdCollection) throws Exception {
         List<Course> courseList = getAllByIdIn(courseIdCollection);
 
-        if (courseList.isEmpty()) {
-            return new HashMap<>(); }
+        if (courseList == null) {
+            return new HashMap<>();
+        }
 
         return courseList.stream()
                 .collect(Collectors.toMap(BaseEntity::getId, Course::getCourseAlias));
     }
+    @Override
+    public List<CourseReadDTO> getAllDTOByIdIn(
+            Collection<Long> courseIdCollection, Collection<DtoOption> options) throws Exception {
+        List<Course> courseList = getAllByIdIn(courseIdCollection);
+
+        if (courseList == null) {
+            return null; }
+
+        return wrapListDTO(courseList, options);
+    }
+    @Override
+    public Map<Long, CourseReadDTO> mapIdDTOByIdIn(
+            Collection<Long> courseIdCollection, Collection<DtoOption> options) throws Exception {
+        List<CourseReadDTO> courseDTOList = getAllDTOByIdIn(courseIdCollection, options);
+
+        if (courseDTOList == null) {
+            return new HashMap<>();
+        }
+
+        return courseDTOList.stream()
+                .collect(Collectors.toMap(BaseReadDTO::getId, Function.identity()));
+    }
+
+    /* courseName */
+    @Override
+    public List<Course> getAllByNameContains(String courseName) throws Exception {
+        List<Course> courseList =
+                courseRepository.findAllByCourseNameContainsAndStatusNot(courseName, Status.DELETED);
+
+        if (courseList.isEmpty()) {
+            return null;
+        }
+
+        return courseList;
+    }
+    @Override
+    public List<CourseReadDTO> getAllDTOByNameContains(String courseName, Collection<DtoOption> options) throws Exception {
+        List<Course> courseList = getAllByNameContains(courseName);
+
+        if (courseList == null) {
+            return null; }
+
+        return wrapListDTO(courseList, options);
+    }
 
 
     /* =================================================== UPDATE =================================================== */
-
     @Override
-    @Transactional
-    public CourseReadDTO editCourse(CourseReadDTO courseReadDTO, Long userId) throws Exception {
-        Course course = courseRepository.findById(courseReadDTO.getId()).orElseThrow(() -> new Exception("không tìm thấy khóa học"));
+    public Course updateCourse(Course course) throws Exception {
+        /* Check exists */
+        Course oldCourse = getById(course.getId());
+        if (Objects.isNull(oldCourse)) {
+            throw new IllegalArgumentException(
+                    "No Course found with id: " + course.getId());
+        }
+        course.setCreatedAt(oldCourse.getCreatedAt());
+        course.setCreatedBy(oldCourse.getCreatedBy());
 
-        course.setCourseName(courseReadDTO.getCourseName());
-        //TODO : process upload file
-        course.setCourseImg(courseReadDTO.getCourseImg());
-        course.setCourseDesc(courseReadDTO.getCourseDesc());
-        course.setMinScore(courseReadDTO.getMinScore());
-        course.setMinAttendant(courseReadDTO.getMinAttendant());
-        course.setStatus(Status.UPDATED);
-        course.setUpdatedBy(userId);
-        Course courseDb = courseRepository.save(course);
-        if (ObjectUtils.isEmpty(courseDb)) {
-            throw new Exception("Cập nhật khóa học thất bại");
+        /* Validate input */
+        /* TODO: valid ImgLink, ... */
+
+        /* Check FK */
+        /* No FK */
+
+        /* Check duplicate */
+        if (courseRepository
+                .existsByIdNotAndCourseNameOrCourseAliasAndStatusNot(
+                        course.getId(),
+                        course.getCourseName(),
+                        course.getCourseAlias(),
+                        Status.DELETED)) {
+            throw new IllegalArgumentException(
+                    "Already exists Course with Name: " + course.getCourseName()
+                            + " or with Alias: " + course.getCourseAlias());
         }
 
-        //add price
-        PriceLog priceLog = priceLogRepository.findByCourseIdAndValidBetweenAndStatusNot(
-                course.getId(), LocalDateTime.now(), Status.DELETED)
-                .orElseThrow(() -> new Exception("không tìm thấy giá"));
-        priceLog.setPrice(courseReadDTO.getCurrentPrice().getPrice());
-        priceLog.setStatus(Status.UPDATED);
-        if (!ObjectUtils.isEmpty(courseReadDTO.getCurrentPrice().getPromotionAmount()) && courseReadDTO.getCurrentPrice().getPromotionAmount() > 0) {
-            priceLog.setPromotionAmount(courseReadDTO.getCurrentPrice().getPromotionAmount());
-            priceLog.setPromotionType(courseReadDTO.getCurrentPrice().getPromotionType());
-            priceLog.setPromotionDesc(courseReadDTO.getCurrentPrice().getPromotionDesc());
-            priceLog.setIsPromotion(true);
-        }
-        priceLog.setValidFrom(LocalDateTime.now());
-        priceLog.setValidTo(LocalDateTime.now());
-        priceLog.setUpdatedBy(userId);
+        /* Save to DB */
+        course = courseRepository.save(course);
 
-        PriceLog priceLogDb = priceLogRepository.save(priceLog);
-        if (ObjectUtils.isEmpty(priceLogDb)) {
-            throw new Exception("Sửa giá tiền của khóa học thất bại");
-        }
-        return mapper.map(courseDb, CourseReadDTO.class);
+        return course;
     }
+    @Override
+    public CourseReadDTO updateCourseByDTO(CourseUpdateDTO updateDTO) throws Exception {
+        Course course = mapper.map(updateDTO, Course.class);
+
+        course = updateCourse(course);
+
+        /* Update dependency */
+        /* Close old price */
+        PriceLogReadDTO oldPrice = priceLogService.getLatestDTOByCourseId(course.getId());
+        oldPrice.setValidTo(LocalDateTime.now());
+        priceLogService.updatePriceLogByDTO(mapper.map(oldPrice, PriceLogUpdateDTO.class));
+
+        /* Create dependency */
+        PriceLogCreateDTO priceLogCreateDTO = updateDTO.getPrice();
+        priceLogCreateDTO.setCourseId(course.getId());
+        priceLogService.createPriceLogByDTO(priceLogCreateDTO);
+
+        return wrapDTO(course, null);
+    }
+    
 
     /* =================================================== DELETE =================================================== */
-
     @Override
     @Transactional
     public void deleteCourse(Long Id, Long userId) throws Exception {
@@ -317,6 +381,7 @@ public class CourseServiceImpl implements CourseService {
         courseRepository.save(course);
 
     }
+
 
     /* =================================================== WRAPPER ================================================== */
     @Override
@@ -398,7 +463,7 @@ public class CourseServiceImpl implements CourseService {
 
 //        Map<Long, List<ClazzReadDTO>> courseIdClazzDTOListMap = new HashMap<>();
 //        Map<Long, List<MaterialReadDTO>> courseIdMaterialDTOListMap = new HashMap<>();
-//        Map<Long, List<TestReadDTO>> courseIdTestDTOListMap = new HashMap<>();
+        Map<Long, List<TestReadDTO>> courseIdTestDTOListMap = new HashMap<>();
         Map<Long, PriceLogReadDTO> courseIdLatestPriceLogMap = new HashMap<>();
 
         if (options != null && !options.isEmpty()) {
@@ -417,12 +482,13 @@ public class CourseServiceImpl implements CourseService {
             }
 
             if (options.contains(DtoOption.TEST_LIST)) {
-//                dto.setTestList();
+                courseIdTestDTOListMap =
+                        testService.mapCourseIdListDTOByCourseIdIn(courseIdSet, options);
             }
 
             if (options.contains(DtoOption.CURRENT_PRICE)) {
                 courseIdLatestPriceLogMap =
-                        priceLogService.mapCourseIdLatestDTOByCourseIdIn(courseIdSet);
+                        priceLogService.mapCourseIdCurrentPriceDTOByCourseIdIn(courseIdSet);
             }
         }
 
@@ -433,7 +499,7 @@ public class CourseServiceImpl implements CourseService {
             /* Add Dependency */
 //            dto.setClazzList();
 //            dto.setMaterialList();
-//            dto.setTestList();
+            dto.setTestList(courseIdTestDTOListMap.get(course.getId()));
 
             dto.setCurrentPrice(courseIdLatestPriceLogMap.get(course.getId()));
 

@@ -27,6 +27,7 @@ public interface UserService {
     UserReadDTO getDTOById(Long id, Collection<DtoOption> options) throws Exception;
 
     List<User> getAllByIdIn(Collection<Long> idCollection) throws Exception;
+    Map<Long, String> mapIdFullNameByIdIn(Collection<Long> idCollection) throws Exception;
     List<UserReadDTO> getAllDTOByIdIn(Collection<Long> idCollection, Collection<DtoOption> options) throws Exception;
     Map<Long, UserReadDTO> mapIdDTOByIdIn(Collection<Long> idCollection, Collection<DtoOption> options) throws Exception;
 

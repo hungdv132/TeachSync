@@ -79,6 +79,11 @@ public class RoomServiceImpl implements RoomService {
                 .collect(Collectors.toMap(BaseEntity::getId, Room::getRoomName));
     }
 
+    @Override
+    public List<RoomReadDTO> getAllDTOByCenterId(Collection<Long> idCollection, Collection<DtoOption> options) {
+        return null;
+    }
+
 
     /* =================================================== UPDATE =================================================== */
 

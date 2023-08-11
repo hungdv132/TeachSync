@@ -20,6 +20,9 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.time.LocalDateTime;
+import java.util.Date;
+
 @Controller
 public class NewsController {
     @Autowired
@@ -37,9 +40,9 @@ public class NewsController {
     @GetMapping("/create-news")
     public String createNews(Model model, HttpSession session) {
         UserReadDTO user = (UserReadDTO) session.getAttribute("user");
-        if (user == null || user.getRoleId() != 1) {
+        if (user == null || user.getRoleId() != 4) {
             return "redirect:/";
-        } else return "create-news";
+        } else return "news/create-news";
     }
 
     @PostMapping("/submitcreatenews")
@@ -49,7 +52,7 @@ public class NewsController {
                                    @RequestParam String content) {
 
         UserReadDTO user = (UserReadDTO) session.getAttribute("user");
-        if (user == null || user.getRoleId() != 1) {
+        if (user == null || user.getRoleId() != 4) {
             return "redirect:/";
         }
         System.out.println("user id = " + user.getId());
@@ -57,7 +60,11 @@ public class NewsController {
         User user1 = userRepository.findById(user.getId()).orElse(null);
 
         News news = new News(user1.getId(), title, null, content, description);
+        LocalDateTime date = LocalDateTime.now();
         news.setStatus(Status.CREATED);
+        news.setCreatedAt(date);
+        news.setCreatedBy(user.getId());
+
 
         newsRepository.save(news);
         return "redirect:/";
@@ -69,7 +76,7 @@ public class NewsController {
                            @RequestParam String id) {
 
         UserReadDTO user = (UserReadDTO) session.getAttribute("user");
-        if (user == null || user.getRoleId() != 1) {
+        if (user == null || user.getRoleId() != 4) {
             return "redirect:/";
         }
         System.out.println("user id = " + user.getId());
@@ -77,7 +84,7 @@ public class NewsController {
 
         News news = newsRepository.findAllById(Long.parseLong(id));
         model.addAttribute("news", news);
-        return "edit-news";
+        return "news/edit-news";
     }
 
     @PostMapping("/submiteditnews")
@@ -88,7 +95,7 @@ public class NewsController {
                                  @RequestParam String content) {
 
         UserReadDTO user = (UserReadDTO) session.getAttribute("user");
-        if (user == null || user.getRoleId() != 1) {
+        if (user == null || user.getRoleId() != 4) {
             return "redirect:/";
         }
         System.out.println("user id = " + user.getId());
@@ -98,6 +105,7 @@ public class NewsController {
         News news = new News(user1.getId(), title, null, content, description);
         news.setId(Long.parseLong(idNews));
         news.setStatus(Status.UPDATED);
+        news.setUpdatedBy(user.getId());
 
         newsRepository.save(news);
         return "redirect:/";
@@ -123,7 +131,7 @@ public class NewsController {
         }
         model.addAttribute("mess", mess);
 
-        return "list-news";
+        return "news/list-news";
     }
 
     @GetMapping("/news-detail")
@@ -145,7 +153,7 @@ public class NewsController {
             model.addAttribute("errorMsg", "Server error, please try again later");
         }
 
-        return "news-detail";
+        return "news/news-detail";
     }
 
 }

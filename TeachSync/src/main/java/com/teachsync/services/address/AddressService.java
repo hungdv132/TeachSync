@@ -23,12 +23,15 @@ public interface AddressService {
     AddressReadDTO getDTOById(Long id, Collection<DtoOption> options) throws Exception;
 
     List<Address> getAllByIdIn(Collection<Long> idCollection) throws Exception;
-    List<AddressReadDTO> getAllDTOByIdIn(Collection<Long> idCollection, Collection<DtoOption> options) throws Exception;
-    Map<Long, AddressReadDTO> mapIdDTOByIdIn(Collection<Long> idCollection, Collection<DtoOption> options) throws Exception;
+    List<AddressReadDTO> getAllDTOByIdIn(
+            Collection<Long> idCollection, Collection<DtoOption> options) throws Exception;
+    Map<Long, AddressReadDTO> mapIdDTOByIdIn(
+            Collection<Long> idCollection, Collection<DtoOption> options) throws Exception;
 
 
     /* =================================================== UPDATE =================================================== */
     Address updateAddress(Address address) throws Exception;
+
     AddressReadDTO updateAddressByDTO(AddressUpdateDTO addressUpdateDTO) throws Exception;
 
 

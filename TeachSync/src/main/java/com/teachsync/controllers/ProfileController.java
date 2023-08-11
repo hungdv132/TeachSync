@@ -42,7 +42,7 @@ public class ProfileController {
 //            model.addAttribute("errorMsg", "Server error, try again later");
 //        }
 
-        return "profile";
+        return "profile/profile";
     }
 
     @PostMapping("/profile")
@@ -71,6 +71,6 @@ public class ProfileController {
             e.printStackTrace();
         }
 
-        return "profile";
+        return "profile/profile";
     }
 }

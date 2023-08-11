@@ -41,7 +41,6 @@ public class ClazzScheduleServiceImpl implements ClazzScheduleService {
 
     /* =================================================== READ ===================================================== */
     /* clazzId */
-
     @Override
     public ClazzSchedule getByClazzId(Long clazzId) throws Exception {
         return clazzScheduleRepository
@@ -112,7 +111,7 @@ public class ClazzScheduleServiceImpl implements ClazzScheduleService {
 
             if (options.contains(DtoOption.ROOM_NAME)) {
                 Room room = roomService.getById(dto.getRoomId());
-                dto.setClazzName(room.getRoomName());
+                dto.setRoomName(room.getRoomName());
             }
         }
 

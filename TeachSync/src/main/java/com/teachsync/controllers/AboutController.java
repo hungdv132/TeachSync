@@ -17,6 +17,6 @@ public class AboutController {
 
     @GetMapping("/view-job")
     public String viewJob() {
-        return "view-job";
+        return "campaign/view-job";
     }
 }

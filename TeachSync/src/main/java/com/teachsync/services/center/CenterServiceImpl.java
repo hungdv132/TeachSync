@@ -4,7 +4,6 @@ import com.teachsync.dtos.BaseReadDTO;
 import com.teachsync.dtos.address.AddressCreateDTO;
 import com.teachsync.dtos.address.AddressReadDTO;
 import com.teachsync.dtos.center.CenterReadDTO;
-import com.teachsync.dtos.center.CenterUpdateDTO;
 import com.teachsync.dtos.room.RoomReadDTO;
 import com.teachsync.entities.Center;
 import com.teachsync.repositories.CenterRepository;
@@ -125,41 +124,8 @@ public class CenterServiceImpl implements CenterService {
     }
 
 
-
-
     /* =================================================== UPDATE =================================================== */
-    @Override
-    public Center updateCenter(Center center) throws Exception {
-        Center oldCenter = getById(center.getId());
-        if(oldCenter == null){
-            throw new IllegalArgumentException("Loi update - khong tim thay center id");
-        }
-        center.setCreatedAt(oldCenter.getCreatedAt());
-        center.setCreatedBy(oldCenter.getCreatedBy());
 
-        //validate input
-
-        //check fk
-
-        //khong co khoa ngoai
-
-        //update to DB
-        center = centerRepository.saveAndFlush(center);
-        return center;
-
-    }
-
-    @Override
-    public CenterReadDTO updateCenterByDTO(CenterUpdateDTO centerUpdateDTO) throws Exception {
-        Center center = mapper.map(centerUpdateDTO,Center.class);
-        center = updateCenter(center);
-
-        //create dependencies
-
-        //update dependencies
-
-        return wrapDTO(center,List.of(DtoOption.ROOM_LIST));
-    }
 
     /* =================================================== DELETE =================================================== */
 
@@ -170,18 +136,24 @@ public class CenterServiceImpl implements CenterService {
         CenterReadDTO dto = mapper.map(center, CenterReadDTO.class);
     
         if (options != null && !options.isEmpty()) {
+            if (options.contains(DtoOption.ADDRESS)) {
+                AddressReadDTO addressDTO = addressService.getDTOById(center.getAddressId(), options);
+                dto.setAddress(addressDTO);
+            }
+
             if (options.contains(DtoOption.ROOM_LIST)) {
-                List<RoomReadDTO> roomList = roomService.getAllDTOByCenterId(center.getId(), options);
+
+                List<RoomReadDTO> roomList = roomService.getAllDTOByCenterId(Collections.singleton(center.getId()), options);
                 dto.setRoomList(roomList);
             }
-            
+
             if (options.contains(DtoOption.STAFF_LIST)) {
                 /* TODO: */
             }
 
             if (options.contains(DtoOption.ADDRESS)) {
-                AddressReadDTO addressReadDTO = addressService.getDTOById(center.getAddressId(), options);
-                dto.setAddress(addressReadDTO);
+//                AddressReadDTO addressReadDTO = addressService.getDTOById(center.getAddressId());
+//                dto.setAddress(addressReadDTO);
             }
         }
         
@@ -193,9 +165,9 @@ public class CenterServiceImpl implements CenterService {
     
         CenterReadDTO dto;
 
-        Map<Long, List<RoomReadDTO>> centerIdRoomListMap = new HashMap<>();
-//        Map<Long, List<CenterStaffReadDTO>> centerIdStaffListMap = new HashMap<>();
         Map<Long, AddressReadDTO> addressIdAddressDTOMap = new HashMap<>();
+//        Map<Long, List<RoomReadDTO>> centerIdRoomDTOListMap = new HashMap<>();
+//        Map<Long, List<CenterStaffReadDTO>> centerIdStaffDTOListMap = new HashMap<>();
     
         if (options != null && !options.isEmpty()) {
             Set<Long> centerIdSet = new HashSet<>();
@@ -205,17 +177,19 @@ public class CenterServiceImpl implements CenterService {
                 centerIdSet.add(center.getId());
                 addressIdSet.add(center.getAddressId());
             }
-        
-            if (options.contains(DtoOption.ROOM_LIST)) {
-//                centerIdRoomListMap = roomService.mapCenterIdListRoomDTOByCenterIdIn(centerIdSet, options);
-            }
-    
-            if (options.contains(DtoOption.STAFF_LIST)) {
-                /* TODO: */
-            }
 
             if (options.contains(DtoOption.ADDRESS)) {
                 addressIdAddressDTOMap = addressService.mapIdDTOByIdIn(addressIdSet, options);
+            }
+        
+            if (options.contains(DtoOption.ROOM_LIST)) {
+                /* TODO:
+                centerIdRoomListMap =
+                        roomService.mapCenterIdListRoomDTOByCenterIdIn(centerIdSet, options);*/
+            }
+
+            if (options.contains(DtoOption.STAFF_LIST)) {
+                /* TODO: */
             }
         }
     
@@ -223,11 +197,11 @@ public class CenterServiceImpl implements CenterService {
             dto = mapper.map(center, CenterReadDTO.class);
         
             /* Add Dependency */
-//            dto.setRoomList(centerIdRoomListMap.get(center.getId()));
-
-//            dto.setStaffList(centerIdStaffListMap.get(center.getId()));
-
             dto.setAddress(addressIdAddressDTOMap.get(center.getAddressId()));
+
+//            dto.setRoomList(centerIdRoomListMap.get(center.getId()));
+        
+//            dto.setStaffList(centerIdStaffListMap.get(center.getId()));
         
             dtoList.add(dto);
         }

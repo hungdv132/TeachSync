@@ -33,7 +33,7 @@ public class ForgotPasswordController {
 
     @GetMapping("/forgot_password")
     public String showForgotPasswordForm() {
-        return "forgot-password";
+        return "login/forgot-password";
     }
 
     @PostMapping("/forgot_password")
@@ -55,7 +55,7 @@ public class ForgotPasswordController {
             model.addAttribute("error", ex.getMessage());
         }
 
-        return "forgot-password";
+        return "login/forgot-password";
     }
 
     public void sendEmail(String recipientEmail, String link)
@@ -91,10 +91,10 @@ public class ForgotPasswordController {
 
         if (user == null) {
             model.addAttribute("message", "Invalid Token");
-            return "message";
+            return "login/message";
         }
 
-        return "reset-password";
+        return "login/reset-password";
     }
 
     @PostMapping("/reset_password")
@@ -109,7 +109,7 @@ public class ForgotPasswordController {
 
             if (user == null) {
                 model.addAttribute("message", "Invalid Token");
-                return "message";
+                return "login/message";
             } else {
                 userService.updatePassword(user, password);
 
@@ -120,6 +120,6 @@ public class ForgotPasswordController {
         }
 
 
-        return "message";
+        return "login/message";
     }
 }

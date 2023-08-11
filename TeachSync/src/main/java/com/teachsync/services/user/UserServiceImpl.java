@@ -6,6 +6,7 @@ import com.teachsync.dtos.role.RoleReadDTO;
 import com.teachsync.dtos.user.UserCreateDTO;
 import com.teachsync.dtos.user.UserReadDTO;
 import com.teachsync.dtos.user.UserUpdateDTO;
+import com.teachsync.entities.BaseEntity;
 import com.teachsync.entities.Role;
 import com.teachsync.entities.User;
 import com.teachsync.repositories.UserRepository;
@@ -156,6 +157,17 @@ public class UserServiceImpl implements UserService {
         }
 
         return userList;
+    }
+    @Override
+    public Map<Long, String> mapIdFullNameByIdIn(Collection<Long> idCollection) throws Exception {
+        List<User> userList = getAllByIdIn(idCollection);
+
+        if (userList == null) {
+            return new HashMap<>();
+        }
+
+        return userList.stream()
+                .collect(Collectors.toMap(BaseEntity::getId, User::getFullName));
     }
     @Override
     public List<UserReadDTO> getAllDTOByIdIn(Collection<Long> idCollection, Collection<DtoOption> options) throws Exception {

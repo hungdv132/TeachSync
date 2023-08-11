@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class CertificateController {
     @GetMapping("/certificate")
     public String certificate() {
-        return "list-certificate";
+        return "certificate/list-certificate";
     }
 
     @GetMapping("/add-certificate")
@@ -17,6 +17,6 @@ public class CertificateController {
 
     @GetMapping("/certificate-detail")
     public String certificateDetail() {
-        return "certificate-detail";
+        return "certificate/certificate-detail";
     }
 }

@@ -1,6 +1,8 @@
 package com.teachsync.services.priceLog;
 
+import com.teachsync.dtos.priceLog.PriceLogCreateDTO;
 import com.teachsync.dtos.priceLog.PriceLogReadDTO;
+import com.teachsync.dtos.priceLog.PriceLogUpdateDTO;
 import com.teachsync.entities.PriceLog;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -11,7 +13,8 @@ import java.util.Map;
 
 public interface PriceLogService {
     /* =================================================== CREATE =================================================== */
-
+    PriceLog createPriceLog(PriceLog price) throws Exception;
+    PriceLogReadDTO createPriceLogByDTO(PriceLogCreateDTO createDTO) throws Exception;
 
 
     /* =================================================== READ ===================================================== */
@@ -29,9 +32,9 @@ public interface PriceLogService {
     PriceLog getLatestByCourseId(Long courseId) throws Exception;
     PriceLogReadDTO getLatestDTOByCourseId(Long courseId) throws Exception;
 
-    List<PriceLog> getAllLatestByCourseIdIn(Collection<Long> courseIdCollection) throws Exception;
-    List<PriceLogReadDTO> getAllLatestDTOByCourseIdIn(Collection<Long> courseIdCollection) throws Exception;
-    Map<Long, PriceLogReadDTO> mapCourseIdLatestDTOByCourseIdIn(Collection<Long> courseIdCollection) throws Exception;
+    List<PriceLog> getAllCurrentByCourseIdIn(Collection<Long> courseIdCollection) throws Exception;
+    List<PriceLogReadDTO> getAllCurrentDTOByCourseIdIn(Collection<Long> courseIdCollection) throws Exception;
+    Map<Long, PriceLogReadDTO> mapCourseIdCurrentPriceDTOByCourseIdIn(Collection<Long> courseIdCollection) throws Exception;
 
     List<PriceLog> getAllByCourseId(Long courseId) throws Exception;
     List<PriceLogReadDTO> getAllDTOByCourseId(Long courseId) throws Exception;
@@ -39,7 +42,8 @@ public interface PriceLogService {
 
 
     /* =================================================== UPDATE =================================================== */
-
+    PriceLog updatePriceLog(PriceLog price) throws Exception;
+    PriceLogReadDTO updatePriceLogByDTO(PriceLogUpdateDTO updateDTO) throws Exception;
 
 
     /* =================================================== DELETE =================================================== */

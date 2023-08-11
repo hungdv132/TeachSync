@@ -152,11 +152,14 @@ values (1, 1, 'Class 1 Ielts 101', null, 15, 'CREATED'),
        (10, 2, 'Class 2 Eng gr 2', null, 30, 'CREATED'),
 
        (13, 2, 'Class 1 Eng gr 3', null, 25, 'CREATED'),
-       (14, 2, 'Class 2 Eng gr 3', null, 25, 'CREATED');
+       (14, 2, 'Class 2 Eng gr 3', null, 25, 'CREATED'),
+
+       (12, 2, 'Class 1 Eng gr 2', null, 25, 'CREATED');
 
 insert into clazz_schedule(clazzId, roomId, scheduleType, startDate, endDate, slot, sessionStart, sessionEnd, status)
 values (1, 1, 'MON_WED_FRI', '2023-06-10', '2023-08-10', 1, '07:00:00', '08:30:00', 'CREATED'),
-       (2, 3, 'TUE_THU_SAT', '2023-06-10', '2023-08-10', 3, '10:30:00', '12:00:00', 'CREATED');
+       (2, 3, 'TUE_THU_SAT', '2023-06-10', '2023-08-10', 3, '10:30:00', '12:00:00', 'CREATED'),
+       (9, 3, 'TUE_THU_SAT', '2023-09-15', '2023-12-15', 3, '10:30:00', '12:00:00', 'CREATED');
 
 insert into session(roomId, scheduleId, staffId, slot, sessionStart, sessionEnd, status)
 values (1, 1, 1, 1, '2023-06-12 07:00:00', '2023-06-12 08:30:00', 'CREATED'),
@@ -171,3 +174,30 @@ values (1, 1, 1, 1, '2023-06-12 07:00:00', '2023-06-12 08:30:00', 'CREATED'),
        (1, 1, 1, 1, '2023-07-03 07:00:00', '2023-07-03 08:30:00', 'CREATED'),
        (1, 1, 1, 1, '2023-07-05 07:00:00', '2023-07-05 08:30:00', 'CREATED'),
        (1, 1, 1, 1, '2023-07-07 07:00:00', '2023-07-07 08:30:00', 'CREATED');
+
+insert into material(materialName, materialImg, materialLink, materialContent, materialType, isFree, status)
+values ('Report1 template', '',
+        'https://docs.google.com/document/d/1sfaOcv4sjc06r8QTElLPZroI6qcTINiS/edit?usp=drive_link&ouid=104632562605721525408&rtpof=true&sd=true',
+        null, 'WORD', true, 'CREATED'),
+       ('Report2 template', '',
+        'https://docs.google.com/document/d/1E2Y6yXyRXhPe2td95RDszVZ8xY7WKdIg/edit?usp=drive_link&ouid=104632562605721525408&rtpof=true&sd=true',
+        null, 'WORD', true, 'CREATED'),
+       ('Report3 template', '',
+        'https://docs.google.com/spreadsheets/d/17m8myHDMoVnW8hF4TVp6q-VVZWq1SO1J/edit?usp=drive_link&ouid=104632562605721525408&rtpof=true&sd=true',
+        null, 'EXCEL', false, 'CREATED'),
+       ('Report4 template', '',
+        'https://docs.google.com/document/d/1bW8_eQIYvOIz3chOa20IqxjwrwVAnmJ1/edit?usp=drive_link&ouid=104632562605721525408&rtpof=true&sd=true',
+        null, 'WORD', false, 'CREATED');
+
+insert into course_material(courseId, materialId, status)
+values (1, 1, 'CREATED'),
+       (1, 2, 'CREATED'),
+       (1, 3, 'CREATED'),
+       (1, 4, 'CREATED'),
+
+       (2, 1, 'CREATED'),
+       (2, 2, 'CREATED'),
+       (2, 4, 'CREATED'),
+
+       (3, 3, 'CREATED'),
+       (3, 4, 'CREATED');

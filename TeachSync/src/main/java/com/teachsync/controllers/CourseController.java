@@ -1,7 +1,9 @@
 package com.teachsync.controllers;
 
+import com.teachsync.dtos.clazz.ClazzReadDTO;
 import com.teachsync.dtos.course.CourseCreateDTO;
 import com.teachsync.dtos.course.CourseReadDTO;
+import com.teachsync.dtos.course.CourseUpdateDTO;
 import com.teachsync.dtos.courseSemester.CourseSemesterReadDTO;
 import com.teachsync.dtos.priceLog.PriceLogReadDTO;
 import com.teachsync.dtos.user.UserReadDTO;
@@ -10,6 +12,7 @@ import com.teachsync.services.course.CourseService;
 import com.teachsync.services.courseSemester.CourseSemesterService;
 import com.teachsync.utils.Constants;
 import com.teachsync.utils.MiscUtil;
+import com.teachsync.utils.enums.DtoOption;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,25 +23,84 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
-import static com.teachsync.utils.Constants.ROLE_ADMIN;
-import static com.teachsync.utils.enums.PromotionType.AMOUNT;
-import static com.teachsync.utils.enums.PromotionType.PERCENT;
+import static com.teachsync.utils.Constants.*;
+import static com.teachsync.utils.enums.PromotionType.*;
+import static com.teachsync.utils.enums.DtoOption.*;
 
 @Controller
 public class CourseController {
     @Autowired
     private CourseService courseService;
+
     @Autowired
     private CourseSemesterService courseSemesterService;
 
     @Autowired
     private MiscUtil miscUtil;
 
+
+    /* =================================================== CREATE =================================================== */
+    @GetMapping("/add-course")
+    public String addCoursePage(
+            RedirectAttributes redirect,
+            @SessionAttribute(value = "user", required = false) UserReadDTO userDTO) {
+//        if (Objects.isNull(userDTO)) {
+//            redirect.addAttribute("mess", "Làm ơn đăng nhập");
+//            return "redirect:/index";
+//        }
+//
+//        if (!userDTO.getRoleId().equals(ROLE_ADMIN)) {
+//            redirect.addAttribute("mess", "Bạn không đủ quyền");
+//            return "redirect:/index";
+//        }
+
+        return "course/add-course";
+    }
+
+    @PostMapping("/add-course")
+    @ResponseBody
+    public Map<String, Object> addCourse(
+            Model model,
+            @RequestBody CourseCreateDTO createDTO,
+            RedirectAttributes redirect,
+            @SessionAttribute(value = "user", required = false) UserReadDTO userDTO) {
+        Map<String, Object> response = new HashMap<>();
+
+        CourseReadDTO courseDTO = null;
+
+        if (Objects.isNull(userDTO)) {
+            redirect.addAttribute("mess", "Làm ơn đăng nhập");
+            response.put("view", "/index");
+            return response;
+        }
+
+        if (!userDTO.getRoleId().equals(ROLE_ADMIN)) {
+            redirect.addAttribute("mess", "Bạn không đủ quyền");
+            response.put("view", "/index");
+            return response;
+        }
+
+        try {
+            createDTO.setCreatedBy(userDTO.getId());
+            courseDTO = courseService.createCourseByDTO(createDTO);
+        } catch (Exception e) {
+            model.addAttribute("mess", "Lỗi : " + e.getMessage());
+            response.put("mess", "Lỗi : " + e.getMessage());
+            response.put("view", "/add-course");
+            return response;
+        }
+
+        redirect.addAttribute("mess", "Tạo mới khóa học thành công");
+        response.put("view", "/course-detail?id=" + courseDTO.getId());
+        return response;
+    }
+
+
+    /* =================================================== READ ===================================================== */
     @GetMapping("/course")
-    public String course(
+    public String courseListPage(
             Model model,
             @ModelAttribute("mess") String mess,
             @SessionAttribute(name = "user", required = false) UserReadDTO userDTO) {
@@ -73,158 +135,132 @@ public class CourseController {
         }
         model.addAttribute("mess", mess);
 
-        return "list-course";
+        return "course/list-course";
     }
 
     @GetMapping("/course-detail")
-    public String getDetailById(
-            @RequestParam(name = "id") Long courseId,
+    public String courseDetailPageById(
             Model model,
+            @RequestParam(name = "id") Long courseId,
             @SessionAttribute(name = "user", required = false) UserReadDTO userDTO) {
         try {
-            CourseReadDTO course = courseService.getDTOById(courseId);
+            List<DtoOption> options = List.of(CURRENT_PRICE);
 
-            if (course == null) {
-                /* Not found by Id */
+            if (Objects.nonNull(userDTO)) {
+                /* TODO: lấy bài thi, tài liệu, kỳ học, lớp học */
+                if (List.of(ROLE_STUDENT, ROLE_PARENTS).contains(userDTO.getRoleId())) {
+                    options = List.of(MATERIAL_LIST, CURRENT_PRICE);
+
+                } else if (userDTO.getRoleId().equals(ROLE_TEACHER)) {
+                    options = List.of(MATERIAL_LIST, TEST_LIST, CURRENT_PRICE);
+
+                } else if (userDTO.getRoleId().equals(ROLE_ADMIN)) {
+                    options = List.of(MATERIAL_LIST, TEST_LIST, CLAZZ_LIST, CURRENT_PRICE);
+                }
+            }
+
+            CourseReadDTO courseDTO = courseService.getDTOById(courseId, options);
+
+            if (courseDTO == null) {
+                /* Not found by id */
                 return "redirect:/course";
             }
 
             List<CourseSemesterReadDTO> courseSemesterList =
                     courseSemesterService.getAllLatestDTOByCourseId(courseId, null);
 
-            model.addAttribute("course", course);
+            model.addAttribute("course", courseDTO);
             model.addAttribute(
                     "hasLatestSchedule",
                     (courseSemesterList != null && !courseSemesterList.isEmpty()));
 
-            if (userDTO != null && userDTO.getRoleId().equals(ROLE_ADMIN)) {
-                /* TODO: lấy bài thi, tài liệu, kỳ học, lớp học */
-            }
         } catch (Exception e) {
             e.printStackTrace();
             model.addAttribute("errorMsg", "Server error, please try again later");
         }
 
-        return "course-detail";
+        return "course/course-detail";
     }
 
-    @GetMapping("/add-course")
-    public String addCourse(HttpServletRequest request, RedirectAttributes redirect) {
-        HttpSession session = request.getSession();
 
-        UserReadDTO userDTO = (UserReadDTO) session.getAttribute("user");
-
-        if (ObjectUtils.isEmpty(userDTO)) {
-            redirect.addAttribute("mess", "Làm ơn đăng nhập");
-            return "redirect:/";
-        }
-
-        if (!userDTO.getRoleId().equals(ROLE_ADMIN)) {
-            redirect.addAttribute("mess", "Bạn không đủ quyền");
-            return "redirect:/";
-        }
-
-        return "add-course";
-    }
-
-    @PostMapping("/add-course")
-    public String addCourse(Model model, HttpServletRequest request, RedirectAttributes redirect) {
-        HttpSession session = request.getSession();
-        if (ObjectUtils.isEmpty(session.getAttribute("user"))) {
-            redirect.addAttribute("mess", "Làm ơn đăng nhập");
-            return "redirect:/";
-        }
-        UserReadDTO userDTO = (UserReadDTO) session.getAttribute("user");
-        if (!userDTO.getRoleId().equals(ROLE_ADMIN)) {
-            redirect.addAttribute("mess", "Bạn không đủ quyền");
-            return "redirect:/";
-        }
-
-
-        /* Thay = modelAttr or json (RequestBody) */
-        CourseCreateDTO courseDTO = new CourseCreateDTO();
-        courseDTO.setCourseName(request.getParameter("name"));
-        //TODO : process upload file
-        courseDTO.setCourseImg("https://th.bing.com/th/id/OIP.R7Wj-CVruj2Gcx-MmaxmZAHaKe?pid=ImgDet&rs=1");
-        courseDTO.setCourseDesc(request.getParameter("desc"));
-        courseDTO.setMinScore(Double.parseDouble(request.getParameter("score")));
-        courseDTO.setMinAttendant(Double.parseDouble(request.getParameter("attendant")));
-        courseDTO.setPrice(Double.parseDouble(request.getParameter("price")));
-
+    @GetMapping("/api/course-detail")
+    @ResponseBody
+    public Map<String, Object> getCourseDetail(
+            @RequestParam Long courseId) {
+        Map<String, Object> response = new HashMap<>();
         try {
-            courseService.addCourse(courseDTO, userDTO.getId());
+            CourseReadDTO courseDTO = courseService.getDTOById(courseId, List.of(CURRENT_PRICE));
+            response.put("course", courseDTO);
         } catch (Exception e) {
-            model.addAttribute("mess", "Lỗi : " + e.getMessage());
-            return "add-course";
+            e.printStackTrace();
         }
 
-        redirect.addAttribute("mess", "Tạo mới khóa học thành công");
-        return "redirect:/course";
+        return response;
     }
 
+    /* =================================================== UPDATE =================================================== */
     @GetMapping("/edit-course")
-    public String editCourse(Model model, HttpServletRequest request, RedirectAttributes redirect) throws Exception {
-        HttpSession session = request.getSession();
-        if (ObjectUtils.isEmpty(session.getAttribute("user"))) {
+    public String editCoursePageById(
+            Model model,
+            RedirectAttributes redirect,
+            @RequestParam(name = "id") Long courseId,
+            @SessionAttribute(name = "user", required = false) UserReadDTO userDTO) throws Exception {
+        if (Objects.isNull(userDTO)) {
             redirect.addAttribute("mess", "Làm ơn đăng nhập");
-            return "redirect:/";
+            return "redirect:/index";
         }
-        UserReadDTO userDTO = (UserReadDTO) session.getAttribute("user");
+
         if (!userDTO.getRoleId().equals(ROLE_ADMIN)) {
             redirect.addAttribute("mess", "Bạn không đủ quyền");
-            return "redirect:/";
+            return "redirect:/index";
         }
 
-        Long Id = Long.parseLong(request.getParameter("id"));
-        CourseReadDTO course = courseService.getDTOById(Id);
-        model.addAttribute("course", course);
+        CourseReadDTO courseDTO = courseService.getDTOById(courseId, List.of(CURRENT_PRICE));
 
-        return "edit-course";
+        model.addAttribute("course", courseDTO);
+
+        return "course/edit-course";
     }
 
-    @PostMapping("/edit-course")
-    public String editCoursePost(Model model, HttpServletRequest request, RedirectAttributes redirect) {
-        HttpSession session = request.getSession();
-        if (ObjectUtils.isEmpty(session.getAttribute("user"))) {
+    @PutMapping("/edit-course")
+    @ResponseBody
+    public Map<String, Object> editCourse(
+            Model model,
+            @RequestBody CourseUpdateDTO updateDTO,
+            RedirectAttributes redirect,
+            @SessionAttribute(value = "user", required = false) UserReadDTO userDTO) {
+        Map<String, Object> response = new HashMap<>();
+
+        CourseReadDTO courseDTO = null;
+
+        if (Objects.isNull(userDTO)) {
             redirect.addAttribute("mess", "Làm ơn đăng nhập");
-            return "redirect:/";
+            response.put("view", "/index");
+            return response;
         }
-        UserReadDTO userDTO = (UserReadDTO) session.getAttribute("user");
+
         if (!userDTO.getRoleId().equals(ROLE_ADMIN)) {
             redirect.addAttribute("mess", "Bạn không đủ quyền");
-            return "redirect:/";
+            response.put("view", "/index");
+            return response;
         }
-
-        CourseReadDTO courseReadDTO = new CourseReadDTO();
-        courseReadDTO.setId(Long.parseLong(request.getParameter("id")));
-        courseReadDTO.setCourseName(request.getParameter("name"));
-        //TODO : process upload file
-        courseReadDTO.setCourseImg("https://th.bing.com/th/id/OIP.R7Wj-CVruj2Gcx-MmaxmZAHaKe?pid=ImgDet&rs=1");
-        courseReadDTO.setCourseDesc(request.getParameter("desc"));
-        courseReadDTO.setMinScore(Double.parseDouble(request.getParameter("score")));
-        courseReadDTO.setMinAttendant(Double.parseDouble(request.getParameter("attendant")));
-        PriceLogReadDTO currentPrice = new PriceLogReadDTO();
-        currentPrice.setPrice(Double.parseDouble(request.getParameter("price")));
-        currentPrice.setPromotionAmount(!ObjectUtils.isEmpty(request.getParameter("promotionAmount")) ? Double.parseDouble(request.getParameter("promotionAmount")) : 0.0);
-        if (request.getParameter("promotionType").equals("PERCENT")) {
-            currentPrice.setPromotionType(PERCENT);
-        } else {
-            currentPrice.setPromotionType(AMOUNT);
-        }
-        currentPrice.setPromotionDesc(request.getParameter("promotionDesc"));
-        courseReadDTO.setCurrentPrice(currentPrice);
 
         try {
-            courseService.editCourse(courseReadDTO, userDTO.getId());
+            updateDTO.setUpdatedBy(userDTO.getId());
+            courseDTO = courseService.updateCourseByDTO(updateDTO);
         } catch (Exception e) {
             model.addAttribute("mess", "Lỗi : " + e.getMessage());
-            return "edit-course";
+            response.put("view", "/edit-course");
+            return response;
         }
 
         redirect.addAttribute("mess", "Sửa khóa học thành công");
-        return "redirect:/course";
+        response.put("view", "/course-detail?id=" + courseDTO.getId());
+        return response;
     }
 
+
+    /* =================================================== DELETE =================================================== */
     @GetMapping("/delete-course")
     public String deleteCourse(Model model, HttpServletRequest request, RedirectAttributes redirect) {
         HttpSession session = request.getSession();

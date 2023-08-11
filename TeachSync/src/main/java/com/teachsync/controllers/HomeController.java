@@ -1,10 +1,14 @@
 package com.teachsync.controllers;
 
+import com.teachsync.dtos.user.UserReadDTO;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.SessionAttribute;
+
+import java.util.Objects;
 
 @Controller
 public class HomeController {
@@ -12,12 +16,14 @@ public class HomeController {
 
     @GetMapping("/")
     public String home(
-            HttpSession session,
             Model model,
+            @SessionAttribute(value = "user", required = false) UserReadDTO userDTO,
             @ModelAttribute("mess") String mess) {
         model.addAttribute("mess", mess);
 
-        
+        if (Objects.isNull(userDTO)) {
+
+        }
 
         return "index";
     }

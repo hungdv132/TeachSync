@@ -16,13 +16,34 @@ public enum DtoOption {
     /** Clazz, Course */
     TEST_LIST,
 
-    /** ClazzSchedule */
+    /** MemberTestRecord */
+    CLAZZ_TEST,
+
+    /** ClazzTest */
+    TEST,
+
+    /** Test */
+    QUESTION_LIST,
+
+    /** Question */
+    ANSWER_LIST,
+
+    /** ClazzSchedule, ClazzMember */
     CLAZZ_NAME,
     /** ClazzSchedule */
     ROOM_NAME,
 
-    /** ClazzMember, Staff */
+    /** ClazzMember */
+    CLAZZ,
+    /** ClazzMember, Staff, CampaignApplication */
     USER,
+    /** ClazzMember, Staff */
+    USER_FULL_NAME,
+
+    /** MemberHomeWorkRecord */
+    MEMBER,
+    /** MemberHomeWorkRecord */
+    HOMEWORK,
 
     /** User */
     ROLE,
@@ -41,12 +62,25 @@ public enum DtoOption {
     /** Course */
     CURRENT_PRICE,
 
+    /** Material */
+    COURSE_LIST,
+
+    /** CourseSemester */
+    COURSE,
     /** CourseSemester */
     COURSE_NAME,
     /** CourseSemester */
     COURSE_ALIAS,
-    /** CourseSemester, Staff */
+    /** CourseSemester, Staff, RecruitmentCampaign */
     CENTER,
     /** CourseSemester */
-    SEMESTER;
+    SEMESTER,
+
+    /** RecruitmentCampaign */
+    APPLICATION_LIST,
+
+    /** CampaignApplication */
+    CAMPAIGN,
+    /** CampaignApplication */
+    APPLICATION_DETAIL_LIST;
 }

@@ -25,6 +25,8 @@ public interface RoomService {
 
     Map<Long, String> mapRoomIdRoomNameByIdIn(Collection<Long> idCollection) throws Exception;
 
+    List<RoomReadDTO> getAllDTOByCenterId(Collection<Long> idCollection, Collection<DtoOption> options);
+
     
     /* =================================================== UPDATE =================================================== */
 

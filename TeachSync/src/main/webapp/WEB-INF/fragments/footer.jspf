@@ -27,7 +27,7 @@
         <p class="ps-1 my-1">
           <a href="contact">Liên hệ</a></p>
         <p class="ps-1 mt-1 mb-0">
-          <a href="view-job">Tuyển Dụng</a></p>
+          <a href="application/view-job">Tuyển Dụng</a></p>
       </div>
 
       <!-- Support -->

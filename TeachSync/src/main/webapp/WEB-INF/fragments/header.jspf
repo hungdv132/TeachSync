@@ -97,10 +97,14 @@
             </li>
 
             <!-- Request -->
-            <li class="nav-item">
-              <a href="/request" class="nav-link ts-txt-hover-blue">
+            <li class="nav-item dropdown">
+              <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                 <i class="bi-envelope-paper"></i>&nbsp;Đơn xin
               </a>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item ts-txt-hover-blue" href="/request/list">Đơn xin</a></li>
+                <li><a class="dropdown-item ts-txt-hover-blue" href="/application/list">Tuyển dụng</a></li>
+              </ul>
             </li>
 
             <!-- Material -->
@@ -191,7 +195,7 @@
                 <li><a class="dropdown-item ts-txt-hover-blue" href="/course">Khoá học</a></li>
                 <li><a class="dropdown-item ts-txt-hover-blue" href="/semester">Học kỳ</a></li>
                 <li><a class="dropdown-item ts-txt-hover-blue" href="/certificate">Bằng cấp</a></li>
-                <li><a class="dropdown-item ts-txt-hover-blue" href="/test">Bài thi</a></li>
+                <li><a class="dropdown-item ts-txt-hover-blue" href="/tests">Bài thi</a></li>
                 <li><a class="dropdown-item ts-txt-hover-blue" href="/material">Tài liệu</a></li>
               </ul>
             </li>
@@ -214,9 +218,10 @@
               </a>
               <ul class="dropdown-menu">
                 <li><a class="dropdown-item ts-txt-hover-blue" href="/user?type=teacher">Nhân viên</a></li>
-                <li><a class="dropdown-item ts-txt-hover-blue" href="/user">Tài khoản</a></li>
+                <li><a class="dropdown-item ts-txt-hover-blue" href="/lst-user">Tài khoản</a></li>
                 <li><a class="dropdown-item ts-txt-hover-blue" href="/request">Đơn xin</a></li>
-                <li><a class="dropdown-item ts-txt-hover-blue" href="/teacher-request/list">Tuyển dụng</a></li>
+                <li><a class="dropdown-item ts-txt-hover-blue" href="/application/list">Duyệt đơn tuyển dụng</a></li>
+                <li><a class="dropdown-item ts-txt-hover-blue" href="/recruitment-campaign/list">Chiến dịch tuyển dụng</a></li>
               </ul>
             </li>
 

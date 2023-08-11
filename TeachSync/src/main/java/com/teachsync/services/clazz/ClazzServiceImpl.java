@@ -1,5 +1,6 @@
 package com.teachsync.services.clazz;
 
+import com.teachsync.dtos.BaseReadDTO;
 import com.teachsync.dtos.clazz.ClazzCreateDTO;
 import com.teachsync.dtos.clazz.ClazzReadDTO;
 import com.teachsync.dtos.clazz.ClazzUpdateDTO;
@@ -31,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -191,8 +193,7 @@ public class ClazzServiceImpl implements ClazzService {
     }
 
     @Override
-    public List<Clazz> getAllByIdIn(
-            Collection<Long> idCollection) throws Exception {
+    public List<Clazz> getAllByIdIn(Collection<Long> idCollection) throws Exception {
         List<Clazz> clazzList =
                 clazzRepository.findAllByIdInAndStatusNot(idCollection, Status.DELETED);
 
@@ -212,13 +213,59 @@ public class ClazzServiceImpl implements ClazzService {
         return roomList.stream()
                 .collect(Collectors.toMap(BaseEntity::getId, Clazz::getClazzName));
     }
+    @Override
+    public List<ClazzReadDTO> getAllDTOByIdIn(
+            Collection<Long> idCollection, Collection<DtoOption> options) throws Exception {
+        List<Clazz> clazzList = getAllByIdIn(idCollection);
+
+        if (clazzList == null) {
+            return null;
+        }
+
+        return wrapListDTO(clazzList, options);
+    }
+    @Override
+    public Map<Long, ClazzReadDTO> mapIdDTOByIdIn(
+            Collection<Long> idCollection, Collection<DtoOption> options) throws Exception {
+        List<ClazzReadDTO> clazzDTOList = getAllDTOByIdIn(idCollection, options);
+
+        if (clazzDTOList == null) {
+            return new HashMap<>();
+        }
+
+        return clazzDTOList.stream()
+                .collect(Collectors.toMap(BaseReadDTO::getId, Function.identity()));
+    }
 
     /* courseSemesterId */
     @Override
-    public List<Clazz> getAllByCourseSemesterIdIn(
-            Collection<Long> scheduleIdCollection) throws Exception {
+    public List<Clazz> getAllByCourseSemesterId(Long courseSemesterId) throws Exception {
         List<Clazz> clazzList =
-                clazzRepository.findAllByCourseSemesterIdInAndStatusNot(scheduleIdCollection, Status.DELETED);
+                clazzRepository.findAllByCourseSemesterIdAndStatusNot(courseSemesterId, Status.DELETED);
+
+        if (clazzList.isEmpty()) {
+            return null;
+        }
+
+        return clazzList;
+    }
+    @Override
+    public List<ClazzReadDTO> getAllDTOByCourseSemesterId(
+            Long courseSemesterId, Collection<DtoOption> options) throws Exception {
+        List<Clazz> clazzList = getAllByCourseSemesterId(courseSemesterId);
+
+        if (clazzList == null) {
+            return null;
+        }
+
+        return wrapListDTO(clazzList, options);
+    }
+
+    @Override
+    public List<Clazz> getAllByCourseSemesterIdIn(
+            Collection<Long> courseSemesterIdCollection) throws Exception {
+        List<Clazz> clazzList =
+                clazzRepository.findAllByCourseSemesterIdInAndStatusNot(courseSemesterIdCollection, Status.DELETED);
 
         if (clazzList.isEmpty()) {
             return null;
@@ -228,8 +275,8 @@ public class ClazzServiceImpl implements ClazzService {
     }
     @Override
     public List<ClazzReadDTO> getAllDTOByCourseSemesterIdIn(
-            Collection<Long> scheduleIdCollection, Collection<DtoOption> options) throws Exception {
-        List<Clazz> clazzList = getAllByCourseSemesterIdIn(scheduleIdCollection);
+            Collection<Long> courseSemesterIdCollection, Collection<DtoOption> options) throws Exception {
+        List<Clazz> clazzList = getAllByCourseSemesterIdIn(courseSemesterIdCollection);
 
         if (clazzList == null) {
             return null;

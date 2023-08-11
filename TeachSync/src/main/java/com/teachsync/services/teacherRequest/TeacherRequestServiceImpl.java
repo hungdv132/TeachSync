@@ -98,20 +98,6 @@ public class TeacherRequestServiceImpl implements TeacherRequestService {
         return null;
     }
 
-    @Transactional
-    @Override
-    public void changeStatus(Long Id, String operation) throws Exception {
-        Request teacherRequest = requestRepository.findById(Id).orElseThrow(() -> new Exception("không tìm thấy yêu cầu"));
-        if (operation.equals("approve")) {
-            User user = userRepository.findById(teacherRequest.getRequesterId()).orElseThrow(() -> new Exception("không tìm thấy tài khoản"));
-            user.setRoleId(Constants.ROLE_TEACHER);
-            userRepository.save(user);
 
-        }
-        teacherRequest.setStatus(Status.DELETED);
-        Request requestDB = requestRepository.save(teacherRequest);
-        if(ObjectUtils.isEmpty(requestDB)){
-            throw new Exception("Lỗi khi hủy yêu cầu");
-        }
-    }
+
 }
