@@ -48,8 +48,8 @@
                         <c:if test="${option == 'edit' || option == 'add'}">
                             <select name="clazzId" required
                                     class="btn btn-secondary dropdown-toggle">
-                                <c:forEach items="${clazzList}" var="clazz">
-                                    <option value="${clazz.id}"> ${clazz.clazzName}</option>
+                                <c:forEach items="${clazzList}" var="clazzDTO">
+                                    <option value="${clazzDTO.id}"> ${clazzDTO.clazzName}</option>
                                 </c:forEach>
                             </select>
                         </c:if>

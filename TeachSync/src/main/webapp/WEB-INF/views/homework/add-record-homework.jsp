@@ -73,6 +73,9 @@
         <input type="hidden" name="homeworkId" value="${homework.id}">
         <input type="hidden" name="clazzId" value="${homework.clazzId}">
         <div class="form-group">
+            <label>Số điểm chấm : ${homeworkRecord.score}</label>
+        </div>
+        <div class="form-group">
             <label>Tên Bài tập</label>
             <input type="text" name="name"
                    value="${homework.homeworkName}"
@@ -120,15 +123,31 @@
         </div>
         <br>
         <c:if test="${option eq 'detail' }">
-            <button disabled type="submit" class="btn btn-primary">Submit</button>
+            <button hidden type="submit" class="btn btn-primary">Submit</button>
         </c:if>
         <c:if test="${option eq 'add' }">
             <button type="submit" class="btn btn-primary">Submit</button>
         </c:if>
 
-        <br/>
-        <br/>
     </form>
+
+    <c:if test="${isTeacher}">
+        <form action="/homework/update-score-record-homework" method="post">
+            <input type="hidden" name="homeworkId" value="${homework.id}">
+            <input type="hidden" name="recordHomeworkId" value="${homeworkRecord.id}">
+            <div class="form-group">
+                <label>Số điểm chấm</label>
+                <input type="number" name="score"
+                       value="${homeworkRecord.score}"
+                       class="form-control" placeholder="Nhập điểm chấm">
+            </div>
+            <br>
+            <button type="submit" class="btn btn-primary">Chấm</button>
+        </form>
+        <br>
+    </c:if>
+    <br/>
+    <br/>
 
 
 </div>

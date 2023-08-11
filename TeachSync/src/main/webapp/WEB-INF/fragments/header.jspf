@@ -97,10 +97,14 @@
             </li>
 
             <!-- Request -->
-            <li class="nav-item">
-              <a href="/application/list" class="nav-link ts-txt-hover-blue">
+            <li class="nav-item dropdown">
+              <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                 <i class="bi-envelope-paper"></i>&nbsp;Đơn xin
               </a>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item ts-txt-hover-blue" href="/request/list">Đơn xin</a></li>
+                <li><a class="dropdown-item ts-txt-hover-blue" href="/application/list">Tuyển dụng</a></li>
+              </ul>
             </li>
 
             <!-- Material -->

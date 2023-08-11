@@ -24,6 +24,7 @@ public interface SemesterService {
 
     List<Semester> getAllByStartDateAfter(LocalDate date) throws Exception;
     List<SemesterReadDTO> getAllDTOByStartDateAfter(LocalDate date, Collection<DtoOption> options) throws Exception;
+    Map<Long, SemesterReadDTO> mapIdDTOByStartDateAfter(LocalDate date, Collection<DtoOption> options) throws Exception;
     
     
     /* id */
@@ -33,7 +34,7 @@ public interface SemesterService {
     List<Semester> getAllByIdIn(Collection<Long> idCollection) throws Exception;
     List<SemesterReadDTO> getAllDTOByIdIn(
             Collection<Long> idCollection, Collection<DtoOption> options) throws Exception;
-    Map<Long, SemesterReadDTO> mapSemesterIdSemesterDTOByIdIn(
+    Map<Long, SemesterReadDTO> mapIdDTOByIdIn(
             Collection<Long> idCollection, Collection<DtoOption> options) throws Exception;
 
 

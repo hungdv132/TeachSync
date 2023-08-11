@@ -307,6 +307,7 @@ public class HomeworkController {
 
             recordDTO.setSubmission(request.getParameter("submissionFile"));
             recordDTO.setSubmissionLink(request.getParameter("submissionLink"));
+            recordDTO.setCreatedBy(userDTO.getId());
 
             memberHomeworkRecordService.add(recordDTO);
         } catch (Exception e) {
@@ -368,6 +369,35 @@ public class HomeworkController {
 
         }
         redirect.addAttribute("mess", "Xóa thành công ");
+        return "redirect:/homework/detail-homework?id=" + homeworkId;
+    }
+
+    @PostMapping("/update-score-record-homework")
+    public String updateScoreRecordHomework(HttpSession session, RedirectAttributes redirect, Model model, HttpServletRequest request
+            , @ModelAttribute("mess") String mess) {
+        //check login
+        if (ObjectUtils.isEmpty(session.getAttribute("user"))) {
+            redirect.addAttribute("mess", "Làm ơn đăng nhập");
+            return "redirect:/";
+        }
+        UserReadDTO userDTO = (UserReadDTO) session.getAttribute("user");
+        if (!userDTO.getRoleId().equals(Constants.ROLE_TEACHER)) {
+            redirect.addAttribute("mess", "bạn không đủ quyền");
+            return "redirect:/";
+        }
+        Long homeworkId = Long.parseLong(request.getParameter("homeworkId"));
+        Long recordHomeworkId = Long.parseLong(request.getParameter("recordHomeworkId"));
+        Double score = Double.parseDouble(request.getParameter("score"));
+        try {
+            memberHomeworkRecordService.updateScore(recordHomeworkId, userDTO, score);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            e.printStackTrace();
+            redirect.addAttribute("mess", "lỗi : " + e.getMessage());
+            return "redirect:/homework/detail-homework?id=" + homeworkId;
+
+        }
+        redirect.addAttribute("mess", "Chấm điểm thành công ");
         return "redirect:/homework/detail-homework?id=" + homeworkId;
     }
 }

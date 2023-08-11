@@ -66,6 +66,8 @@ public enum DtoOption {
     COURSE_LIST,
 
     /** CourseSemester */
+    COURSE,
+    /** CourseSemester */
     COURSE_NAME,
     /** CourseSemester */
     COURSE_ALIAS,

@@ -39,9 +39,25 @@ function copyToClipboard(id) {
     setTimeout(function() { $("#alert").remove(); }, fadeTime);
 }
 
-/** For single file input type <b>image/*</b> */
-function updateImgFromInput(inputId, imgId) {
-    let file = $("#"+inputId).prop("files")[0];
+/** For single file input type <b>image/*</b>
+ * @param inputId the id of the file input tag
+ * @param imgId the id of the img tag
+ * @param fileSizeLimit calculate in MegaByte (Firebase standard 1 MB = 1,048,576 Bytes)
+ */
+function updateImgFromInput(inputId, imgId, fileSizeLimit) {
+    /* Không dùng JQuery vì lỗi setCustomValidity() */
+    let fileInput = document.getElementById(inputId);
+    let file = fileInput.files[0];
+
+    if (fileSizeLimit != null) {
+        let bytes = 1048576 * fileSizeLimit;
+        if (file.size > bytes) {
+            /* File quá cỡ */
+            fileInput.setCustomValidity("File too big. Max " + fileSizeLimit + " MB.");
+            fileInput.reportValidity();
+            return;
+        }
+    }
 
     let reader = new FileReader();
     reader.onload = function (e) {

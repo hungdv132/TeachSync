@@ -67,6 +67,21 @@ public class MemberHomeworkRecordServiceImpl implements MemberHomeworkRecordServ
 
     /* =================================================== UPDATE =================================================== */
 
+    @Override
+    public void updateScore(Long id,UserReadDTO userReadDTO , double score) throws Exception {
+        MemberHomeworkRecord memberHomeworkRecord =
+                memberHomeworkRecordRepository
+                        .findById(id)
+                        .orElseThrow(() -> new Exception("không tìm thấy bài tập về nhà"));
+
+        memberHomeworkRecord.setUpdatedBy(userReadDTO.getId());
+        memberHomeworkRecord.setScore(score);
+
+        MemberHomeworkRecord memberHomeworkRecordDB = memberHomeworkRecordRepository.save(memberHomeworkRecord);
+        if (ObjectUtils.isEmpty(memberHomeworkRecordDB)) {
+            throw new Exception("Lỗi khi chấm điểm bài tập về nhà");
+        }
+    }
 
     /* =================================================== DELETE =================================================== */
 

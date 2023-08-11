@@ -924,6 +924,7 @@ CREATE TABLE IF NOT EXISTS `teachsync`.`member_homework_record`
     `id`             BIGINT      NOT NULL AUTO_INCREMENT,
     `memberId`       BIGINT      NOT NULL COMMENT 'Ai làm',
     `homeworkId`     BIGINT      NOT NULL COMMENT 'Bài gì',
+    `name`           VARCHAR(45) NULL DEFAULT NULL,
     `submission`     LONGTEXT    NULL DEFAULT NULL,
     `submissionLink` LONGTEXT    NULL DEFAULT NULL COMMENT 'Link to file',
     `score`          FLOAT       NULL DEFAULT NULL COMMENT 'Nhiêu điểm. (Max = 10.00) (Chỉ được update = teacher)',

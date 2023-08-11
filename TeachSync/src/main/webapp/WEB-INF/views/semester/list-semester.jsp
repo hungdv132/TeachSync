@@ -73,18 +73,18 @@
       <!-- Semester Tab -->
       <ul class="nav nav-tabs align-items-center" id="semesterTab" role="tablist">
         <c:forEach var="semesterIdSemesterDTO" items="${semesterIdSemesterDTOMap}" varStatus="counter">
-          <c:set var="semesterId" value="${semesterIdSemesterDTO.key.toString()}"/>
+          <c:set var="semesterIdString" value="${semesterIdSemesterDTO.key.toString()}"/>
           <li class="nav-item" role="presentation">
-            <button type="button" class="nav-link" id="${semesterId}-se-tab"
-                    data-bs-toggle="tab" data-bs-target="#${semesterId}-se-tab-pane" role="tab"
-                    aria-controls="${semesterId}-se-tab-pane" aria-selected="false">
+            <button type="button" class="nav-link" id="${semesterIdString}-se-tab"
+                    data-bs-toggle="tab" data-bs-target="#${semesterIdString}-se-tab-pane" role="tab"
+                    aria-controls="${semesterIdString}-se-tab-pane" aria-selected="false">
               <c:out value="${semesterIdSemesterDTO.value.semesterAlias}"/>
             </button>
           </li>
         
           <c:if test="${counter.first}">
             <script id="script1">
-                $("#${semesterId}-se-tab").addClass("active").attr("aria-selected", "true");
+                $("#${semesterIdString}-se-tab").addClass("active").attr("aria-selected", "true");
                 $("#script1").remove(); /* Xóa thẻ <script> sau khi xong */
             </script>
           </c:if>
@@ -97,8 +97,8 @@
         <c:forEach var="semesterIdSemesterDTO" items="${semesterIdSemesterDTOMap}" varStatus="counter">
           <c:set var="semesterId" value="${semesterIdSemesterDTO.key.toString()}"/>
           
-          <div class="tab-pane fade" id="${semesterId}-se-tab-pane"
-               role="tabpanel" aria-labelledby="${semesterId}-se-tab" tabindex="0">
+          <div class="tab-pane fade" id="${semesterIdString}-se-tab-pane"
+               role="tabpanel" aria-labelledby="${semesterIdString}-se-tab" tabindex="0">
   
             <div class="">
               <p>Mã: <c:out value="${semesterIdSemesterDTO.value.semesterAlias}"/>&nbsp;&nbsp;&nbsp;
@@ -108,21 +108,21 @@
             </div>
   
             <!-- Center Tab -->
-            <ul class="nav nav-tabs" id="semesterTab${semesterId}" role="tablist">
+            <ul class="nav nav-tabs" id="semesterTab${semesterIdString}" role="tablist">
               <c:forEach var="centerIdCenterDTO" items="${centerIdCenterDTOMap}" varStatus="counter2">
                 <c:set var="centerId" value="${centerIdCenterDTO.key.toString()}"/>
               
                 <li class="nav-item" role="presentation">
-                  <button type="button" class="nav-link" id="${semesterId}-se-${centerId}-ce-tab"
-                          data-bs-toggle="tab" data-bs-target="#${semesterId}-se-${centerId}-ce-tab-pane" role="tab"
-                          aria-controls="${semesterId}-se-${centerId}-ce-tab-pane" aria-selected="true">
+                  <button type="button" class="nav-link" id="${semesterIdString}-se-${centerId}-ce-tab"
+                          data-bs-toggle="tab" data-bs-target="#${semesterIdString}-se-${centerId}-ce-tab-pane" role="tab"
+                          aria-controls="${semesterIdString}-se-${centerId}-ce-tab-pane" aria-selected="true">
                     <c:out value="${centerIdCenterDTO.value.centerName}"/>
                   </button>
                 </li>
                 
                 <c:if test="${counter2.first}">
                   <script id="script2">
-                      $("#${semesterId}-se-${centerId}-ce-tab").addClass("active").attr("aria-selected", "true");
+                      $("#${semesterIdString}-se-${centerId}-ce-tab").addClass("active").attr("aria-selected", "true");
                       $("#script2").remove(); /* Xóa thẻ <script> sau khi xong */
                   </script>
                 </c:if>
@@ -131,8 +131,8 @@
             </ul>
 
             <!-- Center TabPane -->
-            <div class="tab-content border rounded-bottom-3 p-3" id="semesterTab${semesterId}Content">
-              <c:forEach var="centerIdCenterDTO" items="${centerIdCenterDTOMap}" varStatus="counter3">
+            <div class="tab-content border rounded-bottom-3 p-3" id="semesterTab${semesterIdString}Content">
+              <c:forEach var="centerIdCenterDTO" items="${centerIdCenterDTOMap}" varStatus="counter2">
                 <c:set var="centerId" value="${centerIdCenterDTO.key.toString()}"/>
                 
 <%--                <div class="">--%>
@@ -140,24 +140,24 @@
 <%--                  <p>Địa chỉ: <c:out value="${centerIdCenterDTO.value.addressId}"/></p>--%>
 <%--                </div>--%>
                 
-                <div class="tab-pane fade" id="${semesterId}-se-${centerId}-ce-tab-pane" role="tabpanel"
-                     aria-labelledby="${semesterId}-se-${centerId}-ce-tab" tabindex="0">
+                <div class="tab-pane fade" id="${semesterIdString}-se-${centerId}-ce-tab-pane" role="tabpanel"
+                     aria-labelledby="${semesterIdString}-se-${centerId}-ce-tab" tabindex="0">
                   <div class="row px-2">
                     <c:forEach var="courseIdCourseDTO" items="${courseIdCourseDTOMap}" varStatus="counter4">
                       <c:set var="courseId" value="${courseIdCourseDTO.key.toString()}"/>
                       <div class="col-2 py-2">
                         <input type="checkbox" name="courseId"
-                               id="${semesterId}-se-${centerId}-ce-${courseId}-co"
+                               id="${semesterIdString}-se-${centerId}-ce-${courseId}-co"
                                value="${courseIdCourseDTO.value.id}" disabled="disabled">
       
-                        <c:if test="${distributionMap.get(Long.parseLong(semesterId)) ne null}">
-                          <c:if test="${distributionMap.get(Long.parseLong(semesterId))
+                        <c:if test="${distributionMap.get(Long.parseLong(semesterIdString)) ne null}">
+                          <c:if test="${distributionMap.get(Long.parseLong(semesterIdString))
                                                         .get(Long.parseLong(centerId)) ne null}">
-                            <c:if test="${distributionMap.get(Long.parseLong(semesterId))
+                            <c:if test="${distributionMap.get(Long.parseLong(semesterIdString))
                                                           .get(Long.parseLong(centerId))
                                                           .contains(Long.parseLong(courseId))}">
                               <script id="script3">
-                                  $("#${semesterId}-se-${centerId}-ce-${courseId}-co").prop("checked", true);
+                                  $("#${semesterIdString}-se-${centerId}-ce-${courseId}-co").prop("checked", true);
                                   $("#script3").remove(); /* Xóa thẻ <script> sau khi xong */
                               </script>
                             </c:if>
@@ -170,32 +170,32 @@
                     
                     <div class="col-12 my-2"></div>
                     
-                    <div id="${semesterId}-se-${centerId}-ce-tab-pane-btn-edit" class="btn btn-warning col-2"
-                            onclick="openEditCourseSemester('${semesterId}-se-${centerId}-ce-tab-pane',
-                                '${semesterId}-se-${centerId}-ce-tab-pane-btn-edit',
-                                '${semesterId}-se-${centerId}-ce-tab-pane-btn-cancel',
-                                '${semesterId}-se-${centerId}-ce-tab-pane-btn-save')">
+                    <div id="${semesterIdString}-se-${centerId}-ce-tab-pane-btn-edit" class="btn btn-warning col-2"
+                         onclick="openEditCourseSemester('${semesterIdString}-se-${centerId}-ce-tab-pane',
+                                '${semesterIdString}-se-${centerId}-ce-tab-pane-btn-edit',
+                                '${semesterIdString}-se-${centerId}-ce-tab-pane-btn-cancel',
+                                '${semesterIdString}-se-${centerId}-ce-tab-pane-btn-save')">
                       Chỉnh sửa
                     </div>
   
-                    <div id="${semesterId}-se-${centerId}-ce-tab-pane-btn-cancel" class="btn btn-danger col-2 visually-hidden"
-                            onclick="cancelEditCourseSemester('${semesterId}-se-${centerId}-ce-tab-pane',
-                                '${semesterId}-se-${centerId}-ce-tab-pane-btn-edit',
-                                '${semesterId}-se-${centerId}-ce-tab-pane-btn-cancel',
-                                '${semesterId}-se-${centerId}-ce-tab-pane-btn-save')">
+                    <div id="${semesterIdString}-se-${centerId}-ce-tab-pane-btn-cancel" class="btn btn-danger col-2 visually-hidden"
+                         onclick="cancelEditCourseSemester('${semesterIdString}-se-${centerId}-ce-tab-pane',
+                                '${semesterIdString}-se-${centerId}-ce-tab-pane-btn-edit',
+                                '${semesterIdString}-se-${centerId}-ce-tab-pane-btn-cancel',
+                                '${semesterIdString}-se-${centerId}-ce-tab-pane-btn-save')">
                       Hủy
                     </div>
   
-                    <div id="${semesterId}-se-${centerId}-ce-tab-pane-btn-save" class="btn btn-primary col-2 visually-hidden ms-2"
-                            onclick="sendRequestEditCourseSemester('${semesterId}-se-${centerId}-ce-tab-pane')">
+                    <div id="${semesterIdString}-se-${centerId}-ce-tab-pane-btn-save" class="btn btn-primary col-2 visually-hidden ms-2"
+                         onclick="sendRequestEditCourseSemester('${semesterIdString}-se-${centerId}-ce-tab-pane')">
                       Lưu
                     </div>
                   </div>
                 </div>
   
-                <c:if test="${counter3.first}">
+                <c:if test="${counter2.first}">
                   <script id="script4">
-                      $("#${semesterId}-se-${centerId}-ce-tab-pane").addClass("show active");
+                      $("#${semesterIdString}-se-${centerId}-ce-tab-pane").addClass("show active");
                       $("#script4").remove(); /* Xóa thẻ <script> sau khi xong */
                   </script>
                 </c:if>
@@ -207,7 +207,7 @@
           
           <c:if test="${counter.first}">
             <script id="script5">
-                $("#${semesterId}-se-tab-pane").addClass("show active");
+                $("#${semesterIdString}-se-tab-pane").addClass("show active");
                 $("#script5").remove(); /* Xóa thẻ <script> sau khi xong */
             </script>
           </c:if>
@@ -252,7 +252,7 @@
   }
 
   function sendRequestEditCourseSemester(divId) {
-      let semesterId = Number(${semesterId});
+      let semesterId = Number(${semesterIdString});
       let centerId = Number(${centerId});
 
       let courseIdList = $("#"+divId+" input[type=checkbox]:checked").val();

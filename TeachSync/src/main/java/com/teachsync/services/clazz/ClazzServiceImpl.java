@@ -239,10 +239,33 @@ public class ClazzServiceImpl implements ClazzService {
 
     /* courseSemesterId */
     @Override
-    public List<Clazz> getAllByCourseSemesterIdIn(
-            Collection<Long> scheduleIdCollection) throws Exception {
+    public List<Clazz> getAllByCourseSemesterId(Long courseSemesterId) throws Exception {
         List<Clazz> clazzList =
-                clazzRepository.findAllByCourseSemesterIdInAndStatusNot(scheduleIdCollection, Status.DELETED);
+                clazzRepository.findAllByCourseSemesterIdAndStatusNot(courseSemesterId, Status.DELETED);
+
+        if (clazzList.isEmpty()) {
+            return null;
+        }
+
+        return clazzList;
+    }
+    @Override
+    public List<ClazzReadDTO> getAllDTOByCourseSemesterId(
+            Long courseSemesterId, Collection<DtoOption> options) throws Exception {
+        List<Clazz> clazzList = getAllByCourseSemesterId(courseSemesterId);
+
+        if (clazzList == null) {
+            return null;
+        }
+
+        return wrapListDTO(clazzList, options);
+    }
+
+    @Override
+    public List<Clazz> getAllByCourseSemesterIdIn(
+            Collection<Long> courseSemesterIdCollection) throws Exception {
+        List<Clazz> clazzList =
+                clazzRepository.findAllByCourseSemesterIdInAndStatusNot(courseSemesterIdCollection, Status.DELETED);
 
         if (clazzList.isEmpty()) {
             return null;
@@ -252,8 +275,8 @@ public class ClazzServiceImpl implements ClazzService {
     }
     @Override
     public List<ClazzReadDTO> getAllDTOByCourseSemesterIdIn(
-            Collection<Long> scheduleIdCollection, Collection<DtoOption> options) throws Exception {
-        List<Clazz> clazzList = getAllByCourseSemesterIdIn(scheduleIdCollection);
+            Collection<Long> courseSemesterIdCollection, Collection<DtoOption> options) throws Exception {
+        List<Clazz> clazzList = getAllByCourseSemesterIdIn(courseSemesterIdCollection);
 
         if (clazzList == null) {
             return null;

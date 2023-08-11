@@ -15,5 +15,5 @@ public interface MemberHomeworkRecordRepository extends JpaRepository<MemberHome
 
     List<MemberHomeworkRecord> findAllByStatusNot(Status status);
 
-    List<MemberHomeworkRecord> findAllByStatusNotAndMemberId(Status status,Long memberId);
+    List<MemberHomeworkRecord> findAllByStatusNotAndAndCreatedBy(Status status,Long memberId);
 }
