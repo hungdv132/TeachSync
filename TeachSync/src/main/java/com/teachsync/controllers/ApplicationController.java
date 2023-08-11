@@ -52,9 +52,9 @@ public class ApplicationController {
         UserReadDTO userDto = (UserReadDTO) session.getAttribute("user");
         Page<CampaignApplicationReadDTO> dtoPage = new PageImpl<>(new ArrayList<>());
         if (userDto.getRoleId().equals(Constants.ROLE_ADMIN)) {
-            dtoPage = campaignApplicationService.getAllDTO(null, List.of(DtoOption.APPLICATION_LIST, DtoOption.USER));
+            dtoPage = campaignApplicationService.getAllDTO(null, List.of(DtoOption.APPLICATION_DETAIL_LIST, DtoOption.USER));
         } else {
-            dtoPage = campaignApplicationService.getAllPageDTOByUserId(null, userDto.getId(), List.of(DtoOption.APPLICATION_LIST, DtoOption.USER));
+            dtoPage = campaignApplicationService.getAllPageDTOByUserId(null, userDto.getId(), List.of(DtoOption.APPLICATION_DETAIL_LIST, DtoOption.USER));
         }
 
         if (dtoPage != null) {
@@ -147,7 +147,7 @@ public class ApplicationController {
             }
         }
         applicationDetailReadDTO.setDetailLink(request.getParameter("detailLink"));
-        applicationDetailReadDTO.setDetailNote(null);//TODO:upload file
+        applicationDetailReadDTO.setDetailNote(request.getParameter("detailNoteFile"));//TODO:upload file
         Long campaignId = Long.parseLong(request.getParameter("campaignId"));
 
         try {
@@ -196,5 +196,29 @@ public class ApplicationController {
         }
         redirect.addAttribute("mess", mess + " yêu cầu tuyển dụng giáo viên thành công");
         return "redirect:/application/list";
+    }
+
+    @GetMapping("/detail-application")
+    public String detailApplication(Model model, HttpServletRequest request, RedirectAttributes redirect) {
+        HttpSession session = request.getSession();
+        if (ObjectUtils.isEmpty(session.getAttribute("user"))) {
+            redirect.addAttribute("mess", "Làm ơn đăng nhập");
+            return "redirect:/";
+        }
+        UserReadDTO userDto = (UserReadDTO) session.getAttribute("user");
+
+        Long Id = Long.parseLong(request.getParameter("id"));
+
+        try {
+            ApplicationDetailReadDTO applicationDetailReadDTO = applicationDetailService.getById(Id);
+            model.addAttribute("applicationDetail", applicationDetailReadDTO);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            e.printStackTrace();
+            redirect.addAttribute("mess", e.getMessage());
+            return "redirect:/application/list";
+
+        }
+        return "request/application-detail";
     }
 }

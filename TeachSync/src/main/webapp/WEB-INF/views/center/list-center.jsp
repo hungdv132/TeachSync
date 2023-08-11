@@ -68,12 +68,12 @@
     </div>
 </div>
 <div class="center-list">
-<c:forEach var="item" items="${centerList}">
+<c:forEach var="courseDTO" items="${centerList}">
 
-    <a href="/center-detail?id=${item.id}">
+    <a href="/center-detail?id=${courseDTO.id}">
         <div class="center-item">
-            <h2 value="${item.id}">${item.centerName}</h2>
-            <p>Địa chỉ: ${item.address.addressString}</p>
+            <h2 value="${courseDTO.id}">${courseDTO.centerName}</h2>
+            <p>Địa chỉ: ${courseDTO.address.addressString}</p>
             <img src="https://amore-architecture.vn/wp-content/uploads/2021/12/TTTA-GCE-tp-HCM-1.jpg" width="300px"  height="400px" >
         </div>
     </a>

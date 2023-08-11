@@ -31,12 +31,18 @@ public interface CourseSemesterService {
     List<CourseSemesterReadDTO> getAllDTOByCourseId(
             Long courseId, Collection<DtoOption> options) throws Exception;
 
-    List<CourseSemester> getAllLatestByCourseId(
-            Long courseId, Collection<Long> semesterIdCollection) throws Exception;
     List<CourseSemesterReadDTO> getAllLatestDTOByCourseId(
             Long courseId, Collection<DtoOption> options) throws Exception;
     Map<Long, CourseSemesterReadDTO> mapIdLatestDTOByCourseId(
             Long courseId, Collection<DtoOption> options) throws Exception;
+
+    /* courseId, semesterId */
+    List<CourseSemester> getAllByCourseIdAndSemesterIdIn(
+            Long courseId, Collection<Long> semesterIdCollection) throws Exception;
+    Map<Long, String> mapIdSemesterIdCenterIdStringByCourseIdAndSemesterIdIn(
+            Long courseId, Collection<Long> semesterIdCollection) throws Exception;
+    List<CourseSemesterReadDTO> getAllDTOByCourseIdAndSemesterIdIn(
+            Long courseId, Collection<Long> semesterIdCollection, Collection<DtoOption> options) throws Exception;
 
     /* semesterId */
     List<CourseSemester> getAllBySemesterId(Long semesterId) throws Exception;

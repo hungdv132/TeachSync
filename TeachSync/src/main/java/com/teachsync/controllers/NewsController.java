@@ -20,6 +20,9 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.time.LocalDateTime;
+import java.util.Date;
+
 @Controller
 public class NewsController {
     @Autowired
@@ -57,7 +60,11 @@ public class NewsController {
         User user1 = userRepository.findById(user.getId()).orElse(null);
 
         News news = new News(user1.getId(), title, null, content, description);
+        LocalDateTime date = LocalDateTime.now();
         news.setStatus(Status.CREATED);
+        news.setCreatedAt(date);
+        news.setCreatedBy(user.getId());
+
 
         newsRepository.save(news);
         return "redirect:/";
@@ -98,6 +105,7 @@ public class NewsController {
         News news = new News(user1.getId(), title, null, content, description);
         news.setId(Long.parseLong(idNews));
         news.setStatus(Status.UPDATED);
+        news.setUpdatedBy(user.getId());
 
         newsRepository.save(news);
         return "redirect:/";

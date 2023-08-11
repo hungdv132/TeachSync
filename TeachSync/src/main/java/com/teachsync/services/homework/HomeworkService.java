@@ -11,6 +11,8 @@ public interface HomeworkService {
 
     HomeworkReadDTO findById(Long id) throws Exception;
 
+    HomeworkReadDTO findById(Long id,UserReadDTO userDTO) throws Exception;
+
     void addHomework(HomeworkReadDTO homeworkReadDTO, UserReadDTO userDTO) throws Exception;
 
     void editHomework(HomeworkReadDTO homeworkReadDTO ,UserReadDTO userDTO) throws Exception;
