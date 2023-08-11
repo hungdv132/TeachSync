@@ -30,8 +30,8 @@ public interface CenterService {
 
     
     /* =================================================== UPDATE =================================================== */
-
-
+    Center updateCenter(Center center) throws Exception;
+    CenterReadDTO updateCenterDTO(Center center) throws Exception;
     /* =================================================== DELETE =================================================== */
     
     

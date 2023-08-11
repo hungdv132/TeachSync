@@ -1,5 +1,6 @@
 package com.teachsync.repositories;
 
+
 import com.teachsync.entities.Room;
 import com.teachsync.utils.enums.Status;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,4 +16,6 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
     /* id */
     Optional<Room> findByIdAndStatusNot(Long id, Status status);
     List<Room> findAllByIdInAndStatusNot(Collection<Long> idCollection, Status status);
+
+    List<Room> getAllByCenterIdAndStatusNot(Long centerId, Status status);
 }

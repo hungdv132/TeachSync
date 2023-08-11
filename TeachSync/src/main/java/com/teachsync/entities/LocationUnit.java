@@ -14,9 +14,6 @@ import lombok.Setter;
 @Entity
 @Table(name = "location_unit")
 public class LocationUnit extends BaseEntity {
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "parentId", nullable = true, insertable = false, updatable = false)
-    private LocationUnit locationUnit;
     @Column(name = "parentId", nullable = true)
     private Long parentId;
 

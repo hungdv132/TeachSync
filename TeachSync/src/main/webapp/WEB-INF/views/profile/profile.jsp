@@ -84,7 +84,7 @@
 
               <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
                 <div class="form-group">
-                  <label for="address">Address</label>
+                  <label for="address">Địa chỉ</label>
                   <input type="text" class="form-control" id="address" name="address"
                        value="${sessionScope.user.address}">
                 </div>

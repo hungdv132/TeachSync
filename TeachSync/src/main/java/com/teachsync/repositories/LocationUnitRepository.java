@@ -18,4 +18,7 @@ public interface LocationUnitRepository extends JpaRepository<LocationUnit, Long
 
     /* parentId (id) */
     List<LocationUnit> findAllByParentIdAndStatusNot(Long parentId, Status status);
+
+    /* level */
+    List<LocationUnit> findAllByLevelAndStatusNot(Integer level, Status status);
 }

@@ -1,5 +1,6 @@
 package com.teachsync.services.room;
 
+import com.teachsync.dtos.center.CenterReadDTO;
 import com.teachsync.dtos.room.RoomReadDTO;
 import com.teachsync.entities.Room;
 import com.teachsync.utils.enums.DtoOption;
@@ -18,6 +19,10 @@ public interface RoomService {
     Room getById(Long id) throws Exception;
 
     List<Room> getAllByIdIn(Collection<Long> idCollection) throws Exception;
+
+    List<Room> getAllByCenterId(Long id) throws Exception;
+    List<RoomReadDTO> getAllDTOByCenterId(Long id, Collection<DtoOption> options) throws Exception;
+
     Map<Long, String> mapRoomIdRoomNameByIdIn(Collection<Long> idCollection) throws Exception;
 
     List<RoomReadDTO> getAllDTOByCenterId(Collection<Long> idCollection, Collection<DtoOption> options);
