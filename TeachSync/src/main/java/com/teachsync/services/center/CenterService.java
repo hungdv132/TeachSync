@@ -1,7 +1,6 @@
 package com.teachsync.services.center;
 
 import com.teachsync.dtos.center.CenterReadDTO;
-import com.teachsync.dtos.center.CenterUpdateDTO;
 import com.teachsync.entities.Center;
 import com.teachsync.utils.enums.DtoOption;
 import org.springframework.data.domain.Page;
@@ -32,7 +31,7 @@ public interface CenterService {
     
     /* =================================================== UPDATE =================================================== */
     Center updateCenter(Center center) throws Exception;
-    CenterReadDTO updateCenterByDTO(CenterUpdateDTO center) throws Exception;
+    CenterReadDTO updateCenterDTO(Center center) throws Exception;
     /* =================================================== DELETE =================================================== */
     
     
