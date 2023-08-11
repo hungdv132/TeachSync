@@ -41,18 +41,18 @@
     </tr>
     </thead>
     <tbody>
-    <c:forEach var="clazz" items="${clazzList}">
+    <c:forEach var="clazzDTO" items="${clazzList}">
       <tr>
-        <th scope="row">${clazz.id}</th>
-        <td><a style="font-weight: bold;" href="/clazz-detail?id=${clazz.id}">${clazz.clazzName}</a></td>
-        <td>${clazz.courseSemester.courseAlias} - ${clazz.courseSemester.courseName}</td>
-        <td>${clazz.courseSemester.semester.semesterAlias}</td>
+        <th scope="row">${clazzDTO.id}</th>
+        <td><a style="font-weight: bold;" href="/clazz-detail?id=${clazzDTO.id}">${clazzDTO.clazzName}</a></td>
+        <td>${clazzDTO.courseSemester.courseAlias} - ${clazzDTO.courseSemester.courseName}</td>
+        <td>${clazzDTO.courseSemester.semester.semesterAlias}</td>
         <c:if test="${isAdmin}">
           <td>
-            <a href="/add-clazz?id=${clazz.id}&option=edit">
+            <a href="/add-clazz?id=${clazzDTO.id}&option=edit">
               <button type="button" class="btn btn-success">Sửa</button>
             </a>
-            <a href="/delete-clazz?id=${clazz.id}">
+            <a href="/delete-clazz?id=${clazzDTO.id}">
               <button type="button" class="btn btn-danger">Xóa</button>
             </a>
           </td>

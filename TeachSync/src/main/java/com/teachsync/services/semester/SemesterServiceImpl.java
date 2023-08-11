@@ -77,6 +77,7 @@ public class SemesterServiceImpl implements SemesterService {
         return wrapListDTO(semesterList, options);
     }
 
+    /* startDate */
     @Override
     public List<Semester> getAllByStartDateAfter(LocalDate date) throws Exception {
         List<Semester> semesterList =
@@ -95,6 +96,17 @@ public class SemesterServiceImpl implements SemesterService {
             return null; }
 
         return wrapListDTO(semesterList, options);
+    }
+    @Override
+    public Map<Long, SemesterReadDTO> mapIdDTOByStartDateAfter(LocalDate date, Collection<DtoOption> options) throws Exception {
+        List<SemesterReadDTO> semesterDTOList = getAllDTOByStartDateAfter(date,options);
+
+        if (semesterDTOList == null) {
+            return new HashMap<>();
+        }
+
+        return semesterDTOList.stream()
+                .collect(Collectors.toMap(BaseReadDTO::getId, Function.identity()));
     }
 
     /* id */
@@ -135,7 +147,7 @@ public class SemesterServiceImpl implements SemesterService {
         return wrapListDTO(semesterList, options);
     }
     @Override
-    public Map<Long, SemesterReadDTO> mapSemesterIdSemesterDTOByIdIn(
+    public Map<Long, SemesterReadDTO> mapIdDTOByIdIn(
             Collection<Long> idCollection, Collection<DtoOption> options) throws Exception {
         List<SemesterReadDTO> semesterDTOList = getAllDTOByIdIn(idCollection, options);
         

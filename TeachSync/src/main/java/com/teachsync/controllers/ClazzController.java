@@ -8,6 +8,7 @@ import com.teachsync.dtos.course.CourseReadDTO;
 import com.teachsync.dtos.semester.SemesterReadDTO;
 import com.teachsync.dtos.staff.StaffReadDTO;
 import com.teachsync.dtos.user.UserReadDTO;
+import com.teachsync.entities.CourseSemester;
 import com.teachsync.services.center.CenterService;
 import com.teachsync.services.clazz.ClazzService;
 import com.teachsync.services.course.CourseService;
@@ -15,7 +16,6 @@ import com.teachsync.services.courseSemester.CourseSemesterService;
 import com.teachsync.services.semester.SemesterService;
 import com.teachsync.services.staff.StaffService;
 import com.teachsync.utils.Constants;
-import com.teachsync.utils.enums.DtoOption;
 import jakarta.servlet.http.HttpServletRequest;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +32,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+
+import static com.teachsync.utils.enums.DtoOption.*;
 
 @Controller
 public class ClazzController {
@@ -52,6 +54,48 @@ public class ClazzController {
     @Autowired
     private ModelMapper mapper;
 
+    @GetMapping("/api/clazz")
+    @ResponseBody
+    public Map<String, Object> getClazzList(
+            @RequestParam Long courseId,
+            @RequestParam Long semesterId,
+            @RequestParam Long centerId) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            CourseSemester courseSemester =
+                    courseSemesterService.getByCourseIdAndSemesterIdAndCenterId(courseId, semesterId, centerId);
+
+            if (courseSemester == null) {
+                response.put("clazzList", null);
+                return response;
+            }
+
+            List<ClazzReadDTO> clazzDTOList =
+                    clazzService.getAllDTOByCourseSemesterId(courseSemester.getId(), null);
+            response.put("clazzList", clazzDTOList);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return response;
+    }
+
+    @GetMapping("/api/clazz-detail")
+    @ResponseBody
+    public Map<String, Object> getClazzDetail(
+            @RequestParam Long clazzId) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            ClazzReadDTO clazzDTO =
+                    clazzService.getDTOById(clazzId, List.of(MEMBER_LIST, STAFF, USER, CLAZZ_SCHEDULE, ROOM_NAME));
+            response.put("clazz", clazzDTO);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return response;
+    }
+    
     @GetMapping("/clazz")
     public String clazzListPage(
             Model model,
@@ -60,11 +104,7 @@ public class ClazzController {
             Page<ClazzReadDTO> dtoPage =
                     clazzService.getPageDTOAll(
                             null,
-                            List.of(DtoOption.COURSE_SEMESTER,
-                                    DtoOption.SEMESTER,
-                                    DtoOption.COURSE_NAME,
-                                    DtoOption.COURSE_ALIAS,
-                                    DtoOption.CENTER));
+                            List.of(COURSE_SEMESTER, SEMESTER, COURSE_NAME, COURSE_ALIAS, CENTER));
 
             if (dtoPage != null) {
                 model.addAttribute("clazzList", dtoPage.getContent());
@@ -87,13 +127,7 @@ public class ClazzController {
             ClazzReadDTO clazzDTO =
                     clazzService.getDTOById(
                             clazzId,
-                            List.of(DtoOption.STAFF,
-                                    DtoOption.USER,
-                                    DtoOption.COURSE_SEMESTER,
-                                    DtoOption.SEMESTER,
-                                    DtoOption.COURSE_NAME,
-                                    DtoOption.COURSE_ALIAS,
-                                    DtoOption.CENTER));
+                            List.of(STAFF, USER, COURSE_SEMESTER, SEMESTER, COURSE_NAME, COURSE_ALIAS, CENTER));
 
             model.addAttribute("clazz", clazzDTO);
         } catch (Exception e) {
@@ -115,9 +149,7 @@ public class ClazzController {
             if (Objects.nonNull(clazzId)) {
                 clazzReadDTO =
                         clazzService.getDTOById(clazzId, 
-                                List.of(DtoOption.COURSE_SEMESTER,
-                                        DtoOption.STAFF, 
-                                        DtoOption.USER));
+                                List.of(COURSE_SEMESTER, STAFF, USER));
                 
                 model.addAttribute("clazz", clazzReadDTO);
             }
@@ -147,10 +179,10 @@ public class ClazzController {
             if (option.equals("add")) {
                 /* Suy ra từ Center đầu tiên trong list */
                 staffDTOList =
-                        staffService.getAllDTOByCenterId(centerDTOList.get(0).getId(), List.of(DtoOption.USER));
+                        staffService.getAllDTOByCenterId(centerDTOList.get(0).getId(), List.of(USER));
             } else {
                 staffDTOList =
-                        staffService.getAllDTOByCenterId(clazzReadDTO.getCourseSemester().getCenterId(), List.of(DtoOption.USER));
+                        staffService.getAllDTOByCenterId(clazzReadDTO.getCourseSemester().getCenterId(), List.of(USER));
             }
             model.addAttribute("staffList", staffDTOList);
 
@@ -171,7 +203,7 @@ public class ClazzController {
         Map<String, Object> response = new HashMap<>();
         try {
             List<StaffReadDTO> staffDTOList =
-                    staffService.getAllDTOByCenterId(centerId, List.of(DtoOption.USER));
+                    staffService.getAllDTOByCenterId(centerId, List.of(USER));
             response.put("staffList", staffDTOList);
         } catch (Exception e) {
             e.printStackTrace();

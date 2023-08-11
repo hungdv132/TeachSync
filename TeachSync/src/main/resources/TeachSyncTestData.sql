@@ -152,11 +152,14 @@ values (1, 1, 'Class 1 Ielts 101', null, 15, 'CREATED'),
        (10, 2, 'Class 2 Eng gr 2', null, 30, 'CREATED'),
 
        (13, 2, 'Class 1 Eng gr 3', null, 25, 'CREATED'),
-       (14, 2, 'Class 2 Eng gr 3', null, 25, 'CREATED');
+       (14, 2, 'Class 2 Eng gr 3', null, 25, 'CREATED'),
+
+       (12, 2, 'Class 1 Eng gr 2', null, 25, 'CREATED');
 
 insert into clazz_schedule(clazzId, roomId, scheduleType, startDate, endDate, slot, sessionStart, sessionEnd, status)
 values (1, 1, 'MON_WED_FRI', '2023-06-10', '2023-08-10', 1, '07:00:00', '08:30:00', 'CREATED'),
-       (2, 3, 'TUE_THU_SAT', '2023-06-10', '2023-08-10', 3, '10:30:00', '12:00:00', 'CREATED');
+       (2, 3, 'TUE_THU_SAT', '2023-06-10', '2023-08-10', 3, '10:30:00', '12:00:00', 'CREATED'),
+       (9, 3, 'TUE_THU_SAT', '2023-09-15', '2023-12-15', 3, '10:30:00', '12:00:00', 'CREATED');
 
 insert into session(roomId, scheduleId, staffId, slot, sessionStart, sessionEnd, status)
 values (1, 1, 1, 1, '2023-06-12 07:00:00', '2023-06-12 08:30:00', 'CREATED'),
