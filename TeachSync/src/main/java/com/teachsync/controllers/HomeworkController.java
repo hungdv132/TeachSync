@@ -307,7 +307,6 @@ public class HomeworkController {
 
             recordDTO.setSubmission(request.getParameter("submissionFile"));
             recordDTO.setSubmissionLink(request.getParameter("submissionLink"));
-
             recordDTO.setCreatedBy(userDTO.getId());
 
             memberHomeworkRecordService.add(recordDTO);
