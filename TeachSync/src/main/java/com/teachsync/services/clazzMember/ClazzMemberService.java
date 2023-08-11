@@ -14,6 +14,14 @@ public interface ClazzMemberService {
     
 
     /* =================================================== READ ===================================================== */
+    /* id */
+    ClazzMember getById(Long id) throws Exception;
+    ClazzMemberReadDTO getDTOById(Long id, Collection<DtoOption> options) throws Exception;
+
+    List<ClazzMember> getAllByIdIn(Collection<Long> idCollection) throws Exception;
+    List<ClazzMemberReadDTO> getAllDTOByIdIn(Collection<Long> idCollection, Collection<DtoOption> options) throws Exception;
+    Map<Long, ClazzMemberReadDTO> mapIdDTOByIdIn(Collection<Long> idCollection, Collection<DtoOption> options) throws Exception;
+
     /* clazzId */
     List<ClazzMember> getAllByClazzId(Long clazzId) throws Exception;
 
@@ -25,6 +33,8 @@ public interface ClazzMemberService {
 
     List<ClazzMember> getAllByUserIdIn(Collection<Long> userIdCollection) throws Exception;
 
+    /* clazzId & userId */
+    ClazzMember getByClazzIdAndUserId(Long clazzId, Long userId) throws Exception;
 
     /* =================================================== UPDATE =================================================== */
 

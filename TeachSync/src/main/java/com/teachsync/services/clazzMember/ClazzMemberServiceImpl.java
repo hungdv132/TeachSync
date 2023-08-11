@@ -1,5 +1,6 @@
 package com.teachsync.services.clazzMember;
 
+import com.teachsync.dtos.BaseReadDTO;
 import com.teachsync.dtos.clazz.ClazzReadDTO;
 import com.teachsync.dtos.clazzMember.ClazzMemberReadDTO;
 import com.teachsync.dtos.user.UserReadDTO;
@@ -19,6 +20,8 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 public class ClazzMemberServiceImpl implements ClazzMemberService {
@@ -40,6 +43,56 @@ public class ClazzMemberServiceImpl implements ClazzMemberService {
 
 
     /* =================================================== READ ===================================================== */
+    /* id */
+    @Override
+    public ClazzMember getById(Long id) throws Exception {
+        return clazzMemberRepository
+                .findByIdAndStatusNot(id, Status.DELETED)
+                .orElse(null);
+    }
+    @Override
+    public ClazzMemberReadDTO getDTOById(Long id, Collection<DtoOption> options) throws Exception {
+        ClazzMember member = getById(id);
+
+        if (member == null) {
+            return null;
+        }
+
+        return wrapDTO(member, options);
+    }
+
+    @Override
+    public List<ClazzMember> getAllByIdIn(Collection<Long> idCollection) throws Exception {
+        List<ClazzMember> memberList = clazzMemberRepository.findAllByIdInAndStatusNot(idCollection, Status.DELETED);
+
+        if (memberList.isEmpty()) {
+            return null;
+        }
+
+        return memberList;
+    }
+    @Override
+    public List<ClazzMemberReadDTO> getAllDTOByIdIn(Collection<Long> idCollection, Collection<DtoOption> options) throws Exception {
+        List<ClazzMember> memberList = getAllByIdIn(idCollection);
+
+        if (memberList == null) {
+            return null;
+        }
+
+        return wrapListDTO(memberList, options);
+    }
+    @Override
+    public Map<Long, ClazzMemberReadDTO> mapIdDTOByIdIn(Collection<Long> idCollection, Collection<DtoOption> options) throws Exception {
+        List<ClazzMemberReadDTO> memberDTOList = getAllDTOByIdIn(idCollection, options);
+
+        if (memberDTOList == null) {
+            return new HashMap<>();
+        }
+
+        return memberDTOList.stream()
+                .collect(Collectors.toMap(BaseReadDTO::getId, Function.identity()));
+    }
+
     /* clazzId */
     @Override
     public List<ClazzMember> getAllByClazzId(Long clazzId) throws Exception {
@@ -97,6 +150,14 @@ public class ClazzMemberServiceImpl implements ClazzMemberService {
     @Override
     public List<ClazzMember> getAllByUserIdIn(Collection<Long> userIdCollection) throws Exception {
         return null;
+    }
+
+    /* clazzId & userId */
+    @Override
+    public ClazzMember getByClazzIdAndUserId(Long clazzId, Long userId) throws Exception {
+        return clazzMemberRepository
+                .findByClazzIdAndUserIdAndStatusNot(clazzId, userId, Status.DELETED)
+                .orElse(null);
     }
 
 

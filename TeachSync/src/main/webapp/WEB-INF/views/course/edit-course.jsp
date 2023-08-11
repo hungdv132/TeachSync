@@ -14,6 +14,12 @@
   
   <script src="../../../resources/js/jquery/jquery-3.6.3.js"></script>
   <script src="../../../resources/js/bootstrap-5.3.0/bootstrap.bundle.js"></script>
+  
+  <!-- Import the SDKs you need -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+  <script src="../../../resources/js/firebase.js"></script>
+  
   <script src="../../../resources/js/common.js"></script>
 </head>
 <body class="container-fluid ts-bg-white-subtle">
@@ -57,7 +63,7 @@
 
 <!-- ================================================== Main Body ================================================== -->
 <div class="row ts-bg-white d-flex justify-content-center border ts-border-teal rounded-3 pt-3 mx-2 mb-3">
-    <form onsubmit="return editCourse()" class="col-12 d-flex justify-content-center px-5 mb-3">
+    <form onsubmit="editCourse(event)" class="col-12 d-flex justify-content-center px-5 mb-3">
       
       
       <div class="row">
@@ -73,7 +79,7 @@
                  class="rounded-2 border ts-border-blue w-100 h-auto mb-3">
             <br/>
             <input type="file" name="img" id="txtImg" class="w-100"
-                   accept="image/*" onchange="updateImgFromInput('txtImg', 'imgCourseImg')">
+                   accept="image/*" onchange="updateImgFromInput('txtImg', 'imgCourseImg', 0.75)">
           </label>
         </div>
         
@@ -296,7 +302,13 @@
         }
     }
 
-    function editCourse() {
+    async function editCourse(event) {
+        event.preventDefault();
+
+        let file = $('#fileImg').prop("files")[0];
+
+        let imgURL = await uploadImageFileToFirebaseAndGetURL(file);
+        
         let priceCreateDTO = {};
 
         if ($("#chkIsPromotion").is(":checked")) {
@@ -313,13 +325,11 @@
             }
         }
 
-        let img = $("#imgCourseImg").attr("src");
-
         let createDTO = {
             "id": ${course.id},
             "courseName": $("#txtName").val(),
             "courseAlias": $("#txtAlias").val(),
-            "courseImg": img,
+            "courseImg": imgURL,
             "courseDesc": $("#txtDesc").val(),
             "numSession": $("#txtNumSession").val(),
             "minScore": $("#txtMinScore").val(),

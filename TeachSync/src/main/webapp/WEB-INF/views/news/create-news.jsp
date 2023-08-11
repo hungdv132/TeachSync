@@ -12,7 +12,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>News Detail</title>
+  <title>Thêm bài báo mới</title>
 
   <link rel="stylesheet" href="../../../resources/css/bootstrap-5.3.0/bootstrap.css">
 
