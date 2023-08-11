@@ -1,5 +1,6 @@
 package com.teachsync.repositories;
 
+import com.teachsync.entities.Clazz;
 import com.teachsync.entities.ClazzSchedule;
 import com.teachsync.utils.enums.Status;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,6 +12,10 @@ import java.util.Optional;
 
 @Repository
 public interface ClazzScheduleRepository extends JpaRepository<ClazzSchedule, Long> {
+
+    /* id */
+    Optional<ClazzSchedule> findByIdAndStatusNot(long id, Status status);
+    List<ClazzSchedule> findAllByIdInAndStatusNot(Collection<Long> idCollection, Status status);
 
     /* clazzId */
     Optional<ClazzSchedule> findByClazzIdAndStatusNot(Long clazzId, Status status);

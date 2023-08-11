@@ -27,9 +27,9 @@
         <input name="id" hidden value="${material.id}">
         <div class="form-group">
             <label>Tên khóa học</label>
-            <select name="name" class="form-control">
-                <c:forEach items="${course.courseName}" var="c">
-                    <option value="${c.id}">${c.courseName}</option>
+            <select name="courseId">
+                <c:forEach items="${courseList}" var="course">
+                    <option value="${course.id}"> ${course.courseName}</option>
                 </c:forEach>
             </select>
         </div>
@@ -60,6 +60,19 @@
             <img src="${material.materialImg}" width="30%" height="30%">
             <input type="file" name="image"
                    class="form-control">
+        </div>
+
+        <div class="form-group">
+            <label>Kiểu tài liệu</label>
+            <input type="text" name="type"
+                   class="form-control">
+        </div>
+
+        <div class="form-group">
+            <label>
+                Tài liệu free
+                <input type="checkbox" name="free" value="yes">
+            </label>
         </div>
 
         <div class="form-group">

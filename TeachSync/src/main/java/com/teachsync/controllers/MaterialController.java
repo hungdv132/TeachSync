@@ -1,11 +1,13 @@
 package com.teachsync.controllers;
 
+import com.teachsync.dtos.course.CourseReadDTO;
 import com.teachsync.dtos.material.MaterialCreateDTO;
 import com.teachsync.dtos.material.MaterialReadDTO;
 import com.teachsync.dtos.material.MaterialUpdateDTO;
 import com.teachsync.dtos.user.UserReadDTO;
 import com.teachsync.repositories.MaterialRepository;
 import com.teachsync.repositories.UserRepository;
+import com.teachsync.services.course.CourseService;
 import com.teachsync.utils.MiscUtil;
 import com.teachsync.utils.enums.DtoOption;
 import com.teachsync.utils.enums.MaterialType;
@@ -39,10 +41,50 @@ public class MaterialController {
     private MaterialService materialService;
 
     @Autowired
+    private CourseService courseService;
+
+    @Autowired
     private MiscUtil miscUtil;
 
+    @GetMapping("/material")
+    public String material(
+            Model model,
+            @RequestParam(required = false) Integer pageNo,
+            @ModelAttribute("mess") String mess,
+            @SessionAttribute(name = "user", required = false) UserReadDTO userDTO) {
+
+        try {
+            Page<MaterialReadDTO> dtoPage;
+            Pageable pageable = null;
+            if (pageNo != null) {
+                pageable = miscUtil.makePaging(pageNo, 10, "id", true);
+            }
+
+            if (Objects.isNull(userDTO) || userDTO.getRoleId().equals(ROLE_STUDENT)) {
+                dtoPage = materialService.getPageAllDTOByIsFree(true, pageable, null);
+            } else {
+                dtoPage = materialService.getPageAllDTO(pageable, List.of(DtoOption.COURSE_LIST));
+            }
+
+            if (dtoPage != null) {
+                model.addAttribute("materialList", dtoPage.getContent());
+                model.addAttribute("pageNo", dtoPage.getPageable().getPageNumber());
+                model.addAttribute("pageTotal", dtoPage.getTotalPages());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            model.addAttribute("errorMsg", "Server error, please try again later");
+        }
+        model.addAttribute("mess", mess);
+
+        return "material/list-material";
+    }
+
+    /* =================================================== CREATE =================================================== */
     @GetMapping("/create-material")
-    public String createMaterial(HttpServletRequest request, RedirectAttributes redirect) {
+    public String createMaterial(
+            HttpServletRequest request,
+            RedirectAttributes redirect) {
         HttpSession session = request.getSession();
 
         UserReadDTO userDTO = (UserReadDTO) session.getAttribute("user");
@@ -60,7 +102,7 @@ public class MaterialController {
     }
 
     @PostMapping("/create-material")
-    public String submitCreateMaterial(Model model, HttpServletRequest request, RedirectAttributes redirect) {
+    public String submitCreateMaterial(Model model, HttpServletRequest request, RedirectAttributes redirect) throws Exception {
 
         HttpSession session = request.getSession();
         if (ObjectUtils.isEmpty(session.getAttribute("user"))) {
@@ -72,6 +114,10 @@ public class MaterialController {
             redirect.addAttribute("mess", "Bạn không đủ quyền");
             return "redirect:/";
         }
+
+        /* List Course (môn nào) */
+        List<CourseReadDTO> courseDTOList = courseService.getAllDTO(null);
+        model.addAttribute("courseList", courseDTOList);
 
         /* Thay = modelAttr or json (RequestBody) */
         MaterialCreateDTO createDTO = new MaterialCreateDTO();
@@ -117,7 +163,7 @@ public class MaterialController {
     }
 
     @PostMapping("/edit-material")
-    public String submitEditMaterial(Model model, HttpServletRequest request, RedirectAttributes redirect ) {
+    public String submitEditMaterial(Model model, HttpServletRequest request, RedirectAttributes redirect ) throws Exception {
         HttpSession session = request.getSession();
         if (ObjectUtils.isEmpty(session.getAttribute("user"))) {
             redirect.addAttribute("mess", "Làm ơn đăng nhập");
@@ -128,6 +174,10 @@ public class MaterialController {
             redirect.addAttribute("mess", "Bạn không đủ quyền");
             return "redirect:/";
         }
+        /* List Course (môn nào) */
+        List<CourseReadDTO> courseDTOList = courseService.getAllDTO(null);
+        model.addAttribute("courseList", courseDTOList);
+
         MaterialUpdateDTO updateDTO = new MaterialUpdateDTO();
         updateDTO.setId(Long.parseLong(request.getParameter("id")));
         updateDTO.setMaterialName(request.getParameter("name"));
@@ -145,42 +195,31 @@ public class MaterialController {
             return "material/edit-material";
         }
 
-        redirect.addAttribute("mess", "Sửa khóa học thành công");
+        redirect.addAttribute("mess", "Sửa tài liệu thành công");
 
         return "redirect:/material";
     }
 
-
-    @GetMapping("/material")
-    public String material(
-            Model model,
-            @RequestParam(required = false) Integer pageNo,
-            @ModelAttribute("mess") String mess,
-            @SessionAttribute(name = "user", required = false) UserReadDTO userDTO) {
-
+    @GetMapping("/delete-material")
+    public String deleteMaterial(Model model, HttpServletRequest request, RedirectAttributes redirect) {
+        HttpSession session = request.getSession();
+        if (ObjectUtils.isEmpty(session.getAttribute("user"))) {
+            redirect.addAttribute("mess", "Làm ơn đăng nhập");
+            return "redirect:/";
+        }
+        UserReadDTO userDTO = (UserReadDTO) session.getAttribute("user");
+        if (!userDTO.getRoleId().equals(ROLE_ADMIN)) {
+            redirect.addAttribute("mess", "Bạn không đủ quyền");
+            return "redirect:/";
+        }
+        Long Id = Long.parseLong(request.getParameter("id"));
         try {
-            Page<MaterialReadDTO> dtoPage;
-            Pageable pageable = null;
-            if (pageNo != null) {
-                pageable = miscUtil.makePaging(pageNo, 10, "id", true);
-            }
-
-            if (Objects.isNull(userDTO) || userDTO.getRoleId().equals(ROLE_STUDENT)) {
-                dtoPage = materialService.getPageAllDTOByIsFree(true, pageable, null);
-            } else {
-                dtoPage = materialService.getPageAllDTO(pageable, List.of(DtoOption.COURSE_LIST));
-            }
-
-            if (dtoPage != null) {
-                model.addAttribute("materialList", dtoPage.getContent());
-                model.addAttribute("pageNo", dtoPage.getPageable().getPageNumber());
-                model.addAttribute("pageTotal", dtoPage.getTotalPages());
-            }
+            materialService.deleteMaterial(Id);
         } catch (Exception e) {
             e.printStackTrace();
             model.addAttribute("errorMsg", "Server error, please try again later");
         }
-        model.addAttribute("mess", mess);
+        model.addAttribute("mess", "Xóa tài liệu thành công");
 
         return "material/list-material";
     }
@@ -204,6 +243,7 @@ public class MaterialController {
             e.printStackTrace();
             model.addAttribute("errorMsg", "Server error, please try again later");
         }
+
 
         return "material/material-detail";
     }

@@ -92,7 +92,7 @@
                                     <p class="card-text">
                                         Type:
                                         <c:out value="${material.materialType}"/>
-
+                                        <br/>
                                         Link:
                                         <a href="${material.materialLink}">
                                             <c:out value="${material.materialLink}"/>
@@ -133,17 +133,17 @@
                                     <div class="card-body">
                                         <p class="card-text">
                                             IsFree: <c:out value="${material.isFree}"/>
-
+                                            <br/>
                                             BelongTo:
                                             <c:forEach var="course" items="${material.courseList}">
                                                 <a href="/course-detail?id=${course.id}">
                                                     <c:out value="${course.courseAlias}"/>&nbsp;
                                                 </a>
                                             </c:forEach>
-
+                                            <br/>
                                             Type:
                                             <c:out value="${material.materialType}"/>
-
+                                            <br/>
                                             Link:
                                             <a href="${material.materialLink}">
                                                 <c:out value="${material.materialLink}"/>

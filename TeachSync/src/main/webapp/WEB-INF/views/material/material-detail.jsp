@@ -36,7 +36,7 @@
                     </a>
                 </li>
                 <li class="breadcrumb-item" aria-current="page">
-                    <a href="/news">
+                    <a href="/material">
                         Tài liệu
                     </a>
                 </li>
@@ -84,7 +84,13 @@
 
                     <div class="card-body">
                         <p class="card-text">
-                            <c:out value="${material.materialContent}"/>
+                            Type:
+                            <c:out value="${material.materialType}"/>
+                            <br/>
+                            Link:
+                            <a href="${material.materialLink}">
+                                <c:out value="${material.materialLink}"/>
+                            </a>
                         </p>
                     </div>
 
