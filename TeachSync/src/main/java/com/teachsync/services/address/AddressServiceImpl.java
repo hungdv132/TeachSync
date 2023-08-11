@@ -10,6 +10,7 @@ import com.teachsync.entities.BaseEntity;
 import com.teachsync.entities.LocationUnit;
 import com.teachsync.repositories.AddressRepository;
 import com.teachsync.repositories.LocationUnitRepository;
+import com.teachsync.services.locationUnit.LocationUnitService;
 import com.teachsync.utils.enums.DtoOption;
 import com.teachsync.utils.enums.Status;
 import org.modelmapper.ModelMapper;
@@ -28,7 +29,7 @@ public class AddressServiceImpl implements AddressService {
     private AddressRepository addressRepository;
 
     @Autowired
-    private LocationUnitRepository locationUnitRepository;
+    private LocationUnitService locationUnitService;
 
     @Autowired
     private ModelMapper mapper;
@@ -37,26 +38,33 @@ public class AddressServiceImpl implements AddressService {
     /* =================================================== CREATE =================================================== */
     @Override
     public Address createAddress(Address address) throws Exception {
-        //TODO: Kiểm tra khóa ngoại, chính tả,..
+        /* Validate input */
+        //TODO: Kiểm tra chính tả,...
+
+        /* Check FK */
+        //TODO: Kiểm tra khóa ngoại (locationUnit)
+
+        /* Insert to DB */
+
         return addressRepository.saveAndFlush(address);
     }
     @Override
     public AddressReadDTO createAddressByDTO(AddressCreateDTO addressCreateDTO) throws Exception {
         Address address = mapper.map(addressCreateDTO, Address.class);
-        ArrayList<LocationUnit> unitList = new ArrayList<>();
-        LocationUnit locationUnit = locationUnitRepository.findByIdAndStatusNot(address.getUnitId(), Status.DELETED).orElse(null);
-        while (locationUnit.getParentId() != null){
-            unitList.add(locationUnit);
-            locationUnit = locationUnitRepository.findByIdAndStatusNot(locationUnit.getParentId(), Status.DELETED).orElse(null);
-        }
+
         StringBuilder addressString = new StringBuilder(address.getAddressNo() + " " + address.getStreet());
 
-        for (LocationUnit unit: unitList) {
-            addressString.append(", ").append(unit.getUnitAlias());
+        Map<Integer, LocationUnit> levelUnitMap =
+                locationUnitService.mapLevelUnitByBottomChildId(address.getUnitId(), null);
+
+        for (int i = 3; i >= 0; i--) {
+            addressString.append(", ").append(levelUnitMap.get(i).getUnitAlias());
         }
 
         address.setAddressString(addressString.toString());
+
         address = createAddress(address);
+
         return mapper.map(address, AddressReadDTO.class);
     }
 

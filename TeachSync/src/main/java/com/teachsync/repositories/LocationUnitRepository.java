@@ -5,6 +5,7 @@ import com.teachsync.utils.enums.Status;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,6 +15,7 @@ public interface LocationUnitRepository extends JpaRepository<LocationUnit, Long
 
     /* id */
     Optional<LocationUnit> findByIdAndStatusNot(Long id, Status status);
+    List<LocationUnit> findAllByIdInAndStatusNot(Collection<Long> idCollection, Status status);
 
 
     /* parentId (id) */
