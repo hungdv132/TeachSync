@@ -1,6 +1,11 @@
 package com.teachsync.services.clazzSchedule;
 
+import com.teachsync.dtos.clazz.ClazzReadDTO;
+import com.teachsync.dtos.clazz.ClazzUpdateDTO;
+import com.teachsync.dtos.clazzSchedule.ClazzScheduleCreateDTO;
 import com.teachsync.dtos.clazzSchedule.ClazzScheduleReadDTO;
+import com.teachsync.dtos.clazzSchedule.ClazzScheduleUpdateDTO;
+import com.teachsync.entities.Clazz;
 import com.teachsync.entities.ClazzSchedule;
 import com.teachsync.utils.enums.DtoOption;
 import org.springframework.data.domain.Page;
@@ -11,9 +16,19 @@ import java.util.Map;
 
 public interface ClazzScheduleService {
     /* =================================================== CREATE =================================================== */
-    
+    String addClazzSchedule(ClazzScheduleCreateDTO createDTO);
+
+    ClazzSchedule createClazzSchedule(ClazzSchedule clazzSchedule) throws Exception;
+    ClazzScheduleReadDTO createClazzScheduleByDTO(ClazzScheduleCreateDTO createDTO) throws Exception;
     
     /* =================================================== READ ===================================================== */
+    /* id */
+    ClazzSchedule getById(Long id) throws Exception;
+    @Deprecated
+    ClazzScheduleReadDTO getDTOById(Long id) throws Exception;
+    ClazzScheduleReadDTO getDTOById(Long id, Collection<DtoOption> options) throws Exception;
+
+
     /* clazzId */
     ClazzSchedule getByClazzId(Long clazzId) throws Exception;
     ClazzScheduleReadDTO getDTOByClazzId(Long clazzId, Collection<DtoOption> options) throws Exception;
@@ -26,10 +41,13 @@ public interface ClazzScheduleService {
             Collection<Long> clazzIdCollection, Collection<DtoOption> options) throws Exception;
 
     /* =================================================== UPDATE =================================================== */
+    String editClazzSchedule(ClazzScheduleUpdateDTO updateDTO);
 
+    ClazzSchedule updateClazzSchedule(ClazzSchedule clazzSchedule) throws Exception;
+    ClazzScheduleReadDTO updateClazzScheduleByDTO(ClazzScheduleUpdateDTO updateDTO) throws Exception;
 
     /* =================================================== DELETE =================================================== */
-
+    String deleteClazzSchedule(Long Id);
 
     /* =================================================== WRAPPER ================================================== */
     ClazzScheduleReadDTO wrapDTO(ClazzSchedule clazzSchedule, Collection<DtoOption> options) throws Exception;
