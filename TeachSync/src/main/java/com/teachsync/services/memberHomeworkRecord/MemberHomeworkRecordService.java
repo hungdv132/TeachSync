@@ -1,5 +1,6 @@
 package com.teachsync.services.memberHomeworkRecord;
 
+import com.teachsync.dtos.memberHomeworkRecord.MemberHomeworkRecordCreateDTO;
 import com.teachsync.dtos.memberHomeworkRecord.MemberHomeworkRecordReadDTO;
 import com.teachsync.dtos.user.UserReadDTO;
 import com.teachsync.entities.MemberHomeworkRecord;
@@ -11,7 +12,7 @@ import java.util.List;
 
 public interface MemberHomeworkRecordService {
     /* =================================================== CREATE =================================================== */
-    void add(MemberHomeworkRecordReadDTO memberHomeworkRecordReadDTO, UserReadDTO userDTO) throws Exception;
+    void add(MemberHomeworkRecordCreateDTO createDTO) throws Exception;
 
     /* =================================================== READ ===================================================== */
 

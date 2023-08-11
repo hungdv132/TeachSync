@@ -5,6 +5,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -18,6 +20,12 @@ public class MemberTestRecord extends BaseEntity {
 
     @Column(name = "clazzTestId", nullable = false)
     private Long clazzTestId;
+
+    @Column(name = "startAt", nullable = false)
+    private LocalDateTime startAt;
+
+    @Column(name = "submitAt")
+    private LocalDateTime submitAt;
 
     @Column(name = "score", nullable = true, precision = 0)
     private Double score;

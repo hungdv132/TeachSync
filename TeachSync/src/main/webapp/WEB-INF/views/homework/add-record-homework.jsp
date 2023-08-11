@@ -71,6 +71,7 @@
 <div class="row ts-bg-white border ts-border-teal rounded-3 pt-3 mx-2 mb-3">
     <form action="/homework/record-homework" method="post">
         <input type="hidden" name="homeworkId" value="${homework.id}">
+        <input type="hidden" name="clazzId" value="${homework.clazzId}">
         <div class="form-group">
             <label>Tên Bài tập</label>
             <input type="text" name="name"

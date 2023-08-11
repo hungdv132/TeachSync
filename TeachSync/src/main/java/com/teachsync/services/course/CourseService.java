@@ -46,6 +46,10 @@ public interface CourseService {
     Map<Long, CourseReadDTO> mapIdDTOByIdIn(
             Collection<Long> courseIdCollection, Collection<DtoOption> options) throws Exception;
 
+    /* courseName */
+    List<Course> getAllByNameContains(String courseName) throws Exception;
+    List<CourseReadDTO> getAllDTOByNameContains(String courseName, Collection<DtoOption> options) throws Exception;
+
 
     /* =================================================== UPDATE =================================================== */
     Course updateCourse(Course course) throws Exception;

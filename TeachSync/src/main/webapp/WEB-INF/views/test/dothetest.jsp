@@ -1,3 +1,4 @@
+<%@ page import="com.teachsync.utils.enums.QuestionType" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
@@ -55,11 +56,12 @@
 
 <p>Thời gian còn lại: <span id="timer"></span></p>
 <c:choose>
-    <c:when test="${test.testDesc eq 'multipleChoice'}">
-        <form action="submitTest" method="post">
+    <c:when test="${test.questionType eq QuestionType.MULTIPLE}">
+        <form action="/submitTest" method="post">
+            <input type="hidden" name="idClazzTest" value="${idClazzTest}" >
+            <input type="hidden" name="idMember" value="${idMember}" >
             <input type="hidden" name="idTest" value="${idTest}" >
-            <input type="hidden" name="typeTest" value="${test.testDesc}" >
-            <input type="hidden" name="classTest" value="${classTest}" >
+            <input type="hidden" name="questionType" value="${test.questionType}" >
 
             <c:forEach var="entry" items="${hmQA}">
                 <div class="question">
@@ -77,10 +79,11 @@
         </form>
     </c:when>
     <c:otherwise>
-        <form id="myForm" action="submitTest" method="post">
+        <form id="myForm" action="/submitTest" method="post">
+            <input type="hidden" name="idClazzTest" value="${idClazzTest}" >
+            <input type="hidden" name="idMember" value="${idMember}" >
             <input type="hidden" name="idTest" value="${idTest}" >
-            <input type="hidden" name="typeTest" value="${test.testDesc}" >
-            <input type="hidden" name="classTest" value="${classTest}" >
+            <input type="hidden" name="questionType" value="${test.questionType}" >
 
             <c:forEach var="entry" items="${hmQA}">
                 <div class="question">

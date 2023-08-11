@@ -1,6 +1,9 @@
 package com.teachsync.dtos.test;
 import com.teachsync.dtos.BaseReadDTO;
+import com.teachsync.dtos.BaseUpdateDTO;
+import com.teachsync.dtos.question.QuestionCreateDTO;
 import com.teachsync.dtos.question.QuestionReadDTO;
+import com.teachsync.dtos.question.QuestionUpdateDTO;
 import com.teachsync.utils.enums.QuestionType;
 import com.teachsync.utils.enums.TestType;
 import lombok.AllArgsConstructor;
@@ -17,7 +20,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class TestReadDTO extends BaseReadDTO {
+public class TestUpdateDTO extends BaseUpdateDTO {
     private Long courseId;
     private String testName;
     private TestType testType;
@@ -30,5 +33,6 @@ public class TestReadDTO extends BaseReadDTO {
     private Integer testWeight;
     private Double totalScore;
 
-    private List<QuestionReadDTO> questionList;
+    private List<QuestionCreateDTO> newQuestionList;
+    private List<QuestionUpdateDTO> updatedQuestionList;
 }
