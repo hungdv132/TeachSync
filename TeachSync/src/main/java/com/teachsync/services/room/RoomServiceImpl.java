@@ -1,5 +1,6 @@
 package com.teachsync.services.room;
 
+import com.teachsync.dtos.center.CenterReadDTO;
 import com.teachsync.dtos.room.RoomReadDTO;
 import com.teachsync.entities.BaseEntity;
 import com.teachsync.entities.Room;
@@ -7,19 +8,21 @@ import com.teachsync.repositories.RoomRepository;
 import com.teachsync.services.center.CenterService;
 import com.teachsync.utils.enums.DtoOption;
 import com.teachsync.utils.enums.Status;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 public class RoomServiceImpl implements RoomService {
     @Autowired
     private RoomRepository roomRepository;
+
+    @Autowired
+    private ModelMapper mapper;
 
 
 
@@ -44,6 +47,24 @@ public class RoomServiceImpl implements RoomService {
             return null; }
 
         return roomList;
+    }
+
+    @Override
+    public List<Room> getAllByCenterId(Long id) throws Exception {
+        List<Room> roomList = roomRepository.getAllByCenterIdAndStatusNot(id, Status.DELETED);
+        if(roomList.isEmpty()){
+            return null;
+        }
+        return roomList;
+    }
+
+    @Override
+    public List<RoomReadDTO> getAllDTOByCenterId(Long id, Collection<DtoOption> options) throws Exception {
+        List<Room> roomList = getAllByCenterId(id);
+        if (roomList.isEmpty()){
+            return null;
+        }
+        return wrapListDTO(roomList,options);
     }
 
 
@@ -72,7 +93,27 @@ public class RoomServiceImpl implements RoomService {
     }
     @Override
     public List<RoomReadDTO> wrapListDTO(Collection<Room> roomCollection, Collection<DtoOption> options) throws Exception {
-        return null;
+        List<RoomReadDTO> dtoList = new ArrayList<>();
+        RoomReadDTO dto;
+        Map<Long, CenterReadDTO> centerIdCenterDTOMap = new HashMap<>();
+        if (options != null && !options.isEmpty()){
+            Set<Long> centerIdSet = new HashSet<>();
+
+            for (Room room: roomCollection){
+                centerIdSet.add(room.getCenterId());
+            }
+
+            if (options.contains(DtoOption.CENTER)) {
+                /* TODO: */
+            }
+        }
+
+        for (Room room: roomCollection){
+            dto = mapper.map(room, RoomReadDTO.class);
+            dto.setCenter(centerIdCenterDTOMap.get(room.getCenterId()));
+            dtoList.add(dto);
+        }
+        return dtoList;
     }
     @Override
     public Page<RoomReadDTO> wrapPageDTO(Page<Room> roomPage, Collection<DtoOption> options) throws Exception {

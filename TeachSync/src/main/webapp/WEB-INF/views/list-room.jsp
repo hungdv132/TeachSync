@@ -80,22 +80,14 @@
 
 <div class="tag-list">
     <div class="room-list">
-
+        <c:forEach var="item" items="${roomList}">
             <div class="room">
                 <a href="/room-detail">
                 <img class="room-image" src="https://baochauelec.com/cdn/images/phong-hoc-1.jpg" alt="Phòng 1">
-                <div class="room-name">101</div>
+                <div class="room-name">Phòng ${item.roomName}</div>
                 </a>
             </div>
-
-
-            <div class="room">
-                <a href="/room-detail">
-                <img class="room-image" src="https://baochauelec.com/cdn/images/phong-hoc-1.jpg" alt="Phòng 2">
-                <div class="room-name">102</div>
-                </a>
-            </div>
-
+        </c:forEach>
     </div>
 </div>
 <!-- ================================================== Main Body ================================================== -->

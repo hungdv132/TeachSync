@@ -20,6 +20,8 @@ public interface RoomService {
 
     List<Room> getAllByIdIn(Collection<Long> idCollection) throws Exception;
 
+    List<Room> getAllByCenterId(Long id) throws Exception;
+    List<RoomReadDTO> getAllDTOByCenterId(Long id, Collection<DtoOption> options) throws Exception;
 
     Map<Long, String> mapRoomIdRoomNameByIdIn(Collection<Long> idCollection) throws Exception;
 

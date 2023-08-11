@@ -192,15 +192,18 @@ public class CenterServiceImpl implements CenterService {
         List<CenterReadDTO> dtoList = new ArrayList<>();
     
         CenterReadDTO dto;
-    
+
         Map<Long, List<RoomReadDTO>> centerIdRoomListMap = new HashMap<>();
 //        Map<Long, List<CenterStaffReadDTO>> centerIdStaffListMap = new HashMap<>();
+        Map<Long, AddressReadDTO> addressIdAddressDTOMap = new HashMap<>();
     
         if (options != null && !options.isEmpty()) {
             Set<Long> centerIdSet = new HashSet<>();
+            Set<Long> addressIdSet = new HashSet<>();
         
             for (Center center : centerCollection) {
                 centerIdSet.add(center.getId());
+                addressIdSet.add(center.getAddressId());
             }
         
             if (options.contains(DtoOption.ROOM_LIST)) {
@@ -210,6 +213,10 @@ public class CenterServiceImpl implements CenterService {
             if (options.contains(DtoOption.STAFF_LIST)) {
                 /* TODO: */
             }
+
+            if (options.contains(DtoOption.ADDRESS)) {
+                addressIdAddressDTOMap = addressService.mapIdDTOByIdIn(addressIdSet, options);
+            }
         }
     
         for (Center center : centerCollection) {
@@ -217,8 +224,10 @@ public class CenterServiceImpl implements CenterService {
         
             /* Add Dependency */
 //            dto.setRoomList(centerIdRoomListMap.get(center.getId()));
-        
+
 //            dto.setStaffList(centerIdStaffListMap.get(center.getId()));
+
+            dto.setAddress(addressIdAddressDTOMap.get(center.getAddressId()));
         
             dtoList.add(dto);
         }
