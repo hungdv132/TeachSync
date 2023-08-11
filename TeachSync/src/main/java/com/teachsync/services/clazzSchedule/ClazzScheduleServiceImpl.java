@@ -111,7 +111,7 @@ public class ClazzScheduleServiceImpl implements ClazzScheduleService {
 
             if (options.contains(DtoOption.ROOM_NAME)) {
                 Room room = roomService.getById(dto.getRoomId());
-                dto.setRoomName(room.getRoomName());
+                dto.setClazzName(room.getRoomName());
             }
         }
 

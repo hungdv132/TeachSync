@@ -137,8 +137,7 @@ public class CenterServiceImpl implements CenterService {
     
         if (options != null && !options.isEmpty()) {
             if (options.contains(DtoOption.ADDRESS)) {
-                AddressReadDTO addressDTO = addressService.getDTOById(center.getAddressId(), options);
-                dto.setAddress(addressDTO);
+                /* TODO: */
             }
 
             if (options.contains(DtoOption.ROOM_LIST)) {
@@ -164,22 +163,19 @@ public class CenterServiceImpl implements CenterService {
         List<CenterReadDTO> dtoList = new ArrayList<>();
     
         CenterReadDTO dto;
-
-        Map<Long, AddressReadDTO> addressIdAddressDTOMap = new HashMap<>();
-//        Map<Long, List<RoomReadDTO>> centerIdRoomDTOListMap = new HashMap<>();
-//        Map<Long, List<CenterStaffReadDTO>> centerIdStaffDTOListMap = new HashMap<>();
+    
+//        Map<Long, List<RoomReadDTO>> centerIdRoomListMap = new HashMap<>();
+//        Map<Long, List<CenterStaffReadDTO>> centerIdStaffListMap = new HashMap<>();
     
         if (options != null && !options.isEmpty()) {
             Set<Long> centerIdSet = new HashSet<>();
-            Set<Long> addressIdSet = new HashSet<>();
         
             for (Center center : centerCollection) {
                 centerIdSet.add(center.getId());
-                addressIdSet.add(center.getAddressId());
             }
 
             if (options.contains(DtoOption.ADDRESS)) {
-                addressIdAddressDTOMap = addressService.mapIdDTOByIdIn(addressIdSet, options);
+                /* TODO: */
             }
         
             if (options.contains(DtoOption.ROOM_LIST)) {
@@ -197,8 +193,6 @@ public class CenterServiceImpl implements CenterService {
             dto = mapper.map(center, CenterReadDTO.class);
         
             /* Add Dependency */
-            dto.setAddress(addressIdAddressDTOMap.get(center.getAddressId()));
-
 //            dto.setRoomList(centerIdRoomListMap.get(center.getId()));
         
 //            dto.setStaffList(centerIdStaffListMap.get(center.getId()));

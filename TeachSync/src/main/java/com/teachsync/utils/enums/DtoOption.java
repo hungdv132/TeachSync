@@ -16,18 +16,6 @@ public enum DtoOption {
     /** Clazz, Course */
     TEST_LIST,
 
-    /** MemberTestRecord */
-    CLAZZ_TEST,
-
-    /** ClazzTest */
-    TEST,
-
-    /** Test */
-    QUESTION_LIST,
-
-    /** Question */
-    ANSWER_LIST,
-
     /** ClazzSchedule, ClazzMember */
     CLAZZ_NAME,
     /** ClazzSchedule */
@@ -39,11 +27,6 @@ public enum DtoOption {
     USER,
     /** ClazzMember, Staff */
     USER_FULL_NAME,
-
-    /** MemberHomeWorkRecord */
-    MEMBER,
-    /** MemberHomeWorkRecord */
-    HOMEWORK,
 
     /** User */
     ROLE,
@@ -65,8 +48,6 @@ public enum DtoOption {
     /** Material */
     COURSE_LIST,
 
-    /** CourseSemester */
-    COURSE,
     /** CourseSemester */
     COURSE_NAME,
     /** CourseSemester */

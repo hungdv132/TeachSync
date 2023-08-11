@@ -17,8 +17,6 @@ public interface ApplicationDetailService {
     void add(ApplicationDetailReadDTO applicationDetailReadDTO, UserReadDTO userDTO,Long campaignId) throws Exception;
 
     /* =================================================== READ ===================================================== */
-
-    ApplicationDetailReadDTO getById(Long id) throws Exception;
     /* applicationId */
     List<ApplicationDetail> getAllByApplicationId(Long applicationId) throws Exception;
     List<ApplicationDetailReadDTO> getAllDTOByApplicationId(

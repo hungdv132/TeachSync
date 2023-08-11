@@ -1,6 +1,5 @@
 package com.teachsync.entities;
 
-import com.teachsync.utils.enums.QuestionType;
 import com.teachsync.utils.enums.TestType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -39,9 +38,6 @@ public class Test extends BaseEntity {
 
     @Column(name = "numQuestion", nullable = false)
     private Integer numQuestion;
-
-    @Column(name = "questionType", nullable = false)
-    private QuestionType questionType;
 
     @Column(name = "minScore", nullable = false, precision = 0)
     private Double minScore;

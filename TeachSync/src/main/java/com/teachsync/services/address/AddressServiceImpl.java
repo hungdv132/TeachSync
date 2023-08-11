@@ -1,7 +1,6 @@
 package com.teachsync.services.address;
 
 
-import com.teachsync.dtos.BaseReadDTO;
 import com.teachsync.dtos.address.AddressCreateDTO;
 import com.teachsync.dtos.address.AddressReadDTO;
 import com.teachsync.dtos.address.AddressUpdateDTO;
@@ -65,19 +64,11 @@ public class AddressServiceImpl implements AddressService {
     /* id */
     @Override
     public Address getById(Long id) throws Exception {
-        return addressRepository
-                .findByIdAndStatusNot(id, Status.DELETED)
-                .orElse(null);
+        return addressRepository.findByIdAndStatusNot(id, Status.DELETED).orElse(null);
     }
     @Override
-    public AddressReadDTO getDTOById(Long id, Collection<DtoOption> options) throws Exception {
-        Address address = getById(id);
-
-        if (address == null) {
-            return null;
-        }
-
-        return wrapDTO(address, options);
+    public AddressReadDTO getDTOById(Long id) throws Exception {
+        return null;
     }
 
     @Override
@@ -89,26 +80,16 @@ public class AddressServiceImpl implements AddressService {
         return addressesList;
     }
     @Override
-    public List<AddressReadDTO> getAllDTOByIdIn(
-            Collection<Long> idCollection, Collection<DtoOption> options) throws Exception {
+    public Map<Long, Address> mapIdAddressByIdIn(Collection<Long> idCollection) throws Exception {
         List<Address> addressList = getAllByIdIn(idCollection);
-
         if (addressList == null) {
-            return null;
-        }
-
-        return wrapListDTO(addressList, options);
-    }
-    @Override
-    public Map<Long, AddressReadDTO> mapIdDTOByIdIn(
-            Collection<Long> idCollection, Collection<DtoOption> options) throws Exception {
-        List<AddressReadDTO> addressDTOList = getAllDTOByIdIn(idCollection, options);
-
-        if (addressDTOList == null) {
             return new HashMap<>();
         }
-
-        return addressDTOList.stream().collect(Collectors.toMap(BaseReadDTO::getId, Function.identity()));
+        return addressList.stream().collect(Collectors.toMap(BaseEntity::getId, Function.identity()));
+    }
+    @Override
+    public List<AddressReadDTO> getAllDTOByIdIn(Collection<Long> idCollection) throws Exception {
+        return null;
     }
 
 

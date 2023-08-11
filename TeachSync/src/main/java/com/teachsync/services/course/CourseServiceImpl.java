@@ -7,14 +7,12 @@ import com.teachsync.dtos.course.CourseUpdateDTO;
 import com.teachsync.dtos.priceLog.PriceLogCreateDTO;
 import com.teachsync.dtos.priceLog.PriceLogReadDTO;
 import com.teachsync.dtos.priceLog.PriceLogUpdateDTO;
-import com.teachsync.dtos.test.TestReadDTO;
 import com.teachsync.entities.BaseEntity;
 import com.teachsync.entities.Course;
 import com.teachsync.entities.PriceLog;
 import com.teachsync.repositories.CourseRepository;
 import com.teachsync.repositories.PriceLogRepository;
 import com.teachsync.services.priceLog.PriceLogService;
-import com.teachsync.services.test.TestService;
 import com.teachsync.utils.MiscUtil;
 import com.teachsync.utils.enums.DtoOption;
 import com.teachsync.utils.enums.Status;
@@ -25,6 +23,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -38,8 +37,6 @@ public class CourseServiceImpl implements CourseService {
 
     @Autowired
     private PriceLogService priceLogService;
-    @Autowired
-    private TestService testService;
 
     @Autowired
     private PriceLogRepository priceLogRepository;
@@ -271,7 +268,7 @@ public class CourseServiceImpl implements CourseService {
         if (courseList == null) {
             return null; }
 
-        return wrapListDTO(courseList, options);
+        return wrapListDTO(courseList);
     }
     @Override
     public Map<Long, CourseReadDTO> mapIdDTOByIdIn(
@@ -284,28 +281,6 @@ public class CourseServiceImpl implements CourseService {
 
         return courseDTOList.stream()
                 .collect(Collectors.toMap(BaseReadDTO::getId, Function.identity()));
-    }
-
-    /* courseName */
-    @Override
-    public List<Course> getAllByNameContains(String courseName) throws Exception {
-        List<Course> courseList =
-                courseRepository.findAllByCourseNameContainsAndStatusNot(courseName, Status.DELETED);
-
-        if (courseList.isEmpty()) {
-            return null;
-        }
-
-        return courseList;
-    }
-    @Override
-    public List<CourseReadDTO> getAllDTOByNameContains(String courseName, Collection<DtoOption> options) throws Exception {
-        List<Course> courseList = getAllByNameContains(courseName);
-
-        if (courseList == null) {
-            return null; }
-
-        return wrapListDTO(courseList, options);
     }
 
 
@@ -463,7 +438,7 @@ public class CourseServiceImpl implements CourseService {
 
 //        Map<Long, List<ClazzReadDTO>> courseIdClazzDTOListMap = new HashMap<>();
 //        Map<Long, List<MaterialReadDTO>> courseIdMaterialDTOListMap = new HashMap<>();
-        Map<Long, List<TestReadDTO>> courseIdTestDTOListMap = new HashMap<>();
+//        Map<Long, List<TestReadDTO>> courseIdTestDTOListMap = new HashMap<>();
         Map<Long, PriceLogReadDTO> courseIdLatestPriceLogMap = new HashMap<>();
 
         if (options != null && !options.isEmpty()) {
@@ -482,8 +457,7 @@ public class CourseServiceImpl implements CourseService {
             }
 
             if (options.contains(DtoOption.TEST_LIST)) {
-                courseIdTestDTOListMap =
-                        testService.mapCourseIdListDTOByCourseIdIn(courseIdSet, options);
+//                dto.setTestList();
             }
 
             if (options.contains(DtoOption.CURRENT_PRICE)) {
@@ -499,7 +473,7 @@ public class CourseServiceImpl implements CourseService {
             /* Add Dependency */
 //            dto.setClazzList();
 //            dto.setMaterialList();
-            dto.setTestList(courseIdTestDTOListMap.get(course.getId()));
+//            dto.setTestList();
 
             dto.setCurrentPrice(courseIdLatestPriceLogMap.get(course.getId()));
 
