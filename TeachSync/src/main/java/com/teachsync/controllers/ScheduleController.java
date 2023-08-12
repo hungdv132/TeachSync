@@ -53,7 +53,7 @@ public class ScheduleController {
     private MiscUtil miscUtil;
 
 
-    @GetMapping("/schedule")
+    @GetMapping("/schedule-clazz")
     public String courseListPage(
             Model model,
             @ModelAttribute("mess") String mess,
