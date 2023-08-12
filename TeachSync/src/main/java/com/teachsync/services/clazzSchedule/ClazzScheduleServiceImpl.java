@@ -1,6 +1,5 @@
 package com.teachsync.services.clazzSchedule;
 
-import com.teachsync.dtos.clazz.ClazzReadDTO;
 import com.teachsync.dtos.clazzSchedule.ClazzScheduleCreateDTO;
 import com.teachsync.dtos.clazzSchedule.ClazzScheduleReadDTO;
 import com.teachsync.dtos.clazzSchedule.ClazzScheduleUpdateDTO;
@@ -12,6 +11,7 @@ import com.teachsync.repositories.ClazzScheduleRepository;
 import com.teachsync.repositories.RoomRepository;
 import com.teachsync.services.clazz.ClazzService;
 import com.teachsync.services.room.RoomService;
+import com.teachsync.utils.MiscUtil;
 import com.teachsync.utils.enums.DtoOption;
 import com.teachsync.utils.enums.Status;
 import org.modelmapper.ModelMapper;
@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
@@ -49,6 +50,9 @@ public class ClazzScheduleServiceImpl implements ClazzScheduleService {
 
     @Autowired
     private ModelMapper mapper;
+
+    @Autowired
+    private MiscUtil miscUtil;
 
     private Logger logger = LoggerFactory.getLogger(ClazzScheduleServiceImpl.class);
 
@@ -108,7 +112,46 @@ public class ClazzScheduleServiceImpl implements ClazzScheduleService {
 
 
 
+
     /* =================================================== READ ===================================================== */
+    @Override
+    public Page<ClazzSchedule> getPageAll(Pageable paging) throws Exception {
+        if (paging == null) {
+            paging = miscUtil.defaultPaging();
+        }
+
+        Page<ClazzSchedule> clazzSchedulePage =
+                clazzScheduleRepository.findAllByStatusNot(Status.DELETED, paging);
+
+        if (clazzSchedulePage.isEmpty()) {
+            return null;
+        }
+
+        return clazzSchedulePage;
+    }
+
+    @Override
+    public Page<ClazzScheduleReadDTO> getPageDTOAll(Pageable paging) throws Exception {
+        Page<ClazzSchedule> clazzSchedulePage = getPageAll(paging);
+
+        if (clazzSchedulePage == null) {
+            return null;
+        }
+
+        return wrapPageDTO(clazzSchedulePage, null);
+    }
+
+    @Override
+    public Page<ClazzScheduleReadDTO> getPageDTOAll(Pageable paging, Collection<DtoOption> options) throws Exception {
+        Page<ClazzSchedule> clazzSchedulePage = getPageAll(paging);
+
+        if (clazzSchedulePage == null) {
+            return null;
+        }
+
+        return wrapPageDTO(clazzSchedulePage, options);
+    }
+
     /*id*/
     @Override
     public ClazzSchedule getById(Long id) throws Exception {

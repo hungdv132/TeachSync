@@ -1,14 +1,12 @@
 package com.teachsync.services.clazzSchedule;
 
-import com.teachsync.dtos.clazz.ClazzReadDTO;
-import com.teachsync.dtos.clazz.ClazzUpdateDTO;
 import com.teachsync.dtos.clazzSchedule.ClazzScheduleCreateDTO;
 import com.teachsync.dtos.clazzSchedule.ClazzScheduleReadDTO;
 import com.teachsync.dtos.clazzSchedule.ClazzScheduleUpdateDTO;
-import com.teachsync.entities.Clazz;
 import com.teachsync.entities.ClazzSchedule;
 import com.teachsync.utils.enums.DtoOption;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.Collection;
 import java.util.List;
@@ -22,6 +20,12 @@ public interface ClazzScheduleService {
     ClazzScheduleReadDTO createClazzScheduleByDTO(ClazzScheduleCreateDTO createDTO) throws Exception;
     
     /* =================================================== READ ===================================================== */
+    Page<ClazzSchedule> getPageAll(Pageable paging) throws Exception;
+    @Deprecated
+    Page<ClazzScheduleReadDTO> getPageDTOAll(Pageable paging) throws Exception;
+    Page<ClazzScheduleReadDTO> getPageDTOAll(Pageable paging, Collection<DtoOption> options) throws Exception;
+
+
     /* id */
     ClazzSchedule getById(Long id) throws Exception;
     @Deprecated

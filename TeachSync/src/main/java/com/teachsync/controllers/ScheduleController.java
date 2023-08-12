@@ -1,16 +1,11 @@
 package com.teachsync.controllers;
 
 
-import com.teachsync.dtos.clazz.ClazzCreateDTO;
-import com.teachsync.dtos.clazz.ClazzReadDTO;
-import com.teachsync.dtos.clazz.ClazzUpdateDTO;
 import com.teachsync.dtos.clazzSchedule.ClazzScheduleCreateDTO;
 import com.teachsync.dtos.clazzSchedule.ClazzScheduleReadDTO;
 import com.teachsync.dtos.clazzSchedule.ClazzScheduleUpdateDTO;
-import com.teachsync.dtos.room.RoomReadDTO;
 import com.teachsync.dtos.user.UserReadDTO;
 
-import com.teachsync.entities.ClazzSchedule;
 import com.teachsync.entities.Room;
 import com.teachsync.services.clazz.ClazzService;
 import com.teachsync.services.clazzSchedule.ClazzScheduleService;
@@ -36,6 +31,8 @@ import java.util.Map;
 import java.util.Objects;
 
 import static com.teachsync.utils.Constants.ROLE_ADMIN;
+import static com.teachsync.utils.enums.DtoOption.CLAZZ_NAME;
+import static com.teachsync.utils.enums.DtoOption.ROOM_NAME;
 
 @Controller
 public class ScheduleController {
@@ -59,15 +56,18 @@ public class ScheduleController {
             @ModelAttribute("mess") String mess,
             @SessionAttribute(name = "user", required = false) UserReadDTO userDTO) {
         try {
-            //Page<ClazzScheduleReadDTO> dtoPage;
+            Page<ClazzScheduleReadDTO> dtoPage;
             if (userDTO.getRoleId().equals(Constants.ROLE_STUDENT) || userDTO.getRoleId().equals(Constants.ROLE_TEACHER)) {
                 /* All schedule */
-                //dtoPage = clazzScheduleService.getAllDTOByClazzIdIn();
-//                if (dtoPage != null) {
-//                    model.addAttribute("scheduleList", dtoPage.getContent());
-//                    model.addAttribute("pageNo", dtoPage.getPageable().getPageNumber());
-//                    model.addAttribute("pageTotal", dtoPage.getTotalPages());
-//                }
+                dtoPage = clazzScheduleService.getPageDTOAll(
+                        null,
+                        List.of(CLAZZ_NAME, ROOM_NAME)
+                );
+                if (dtoPage != null) {
+                    model.addAttribute("scheduleList", dtoPage.getContent());
+                    model.addAttribute("pageNo", dtoPage.getPageable().getPageNumber());
+                    model.addAttribute("pageTotal", dtoPage.getTotalPages());
+                }
 
             }
         } catch (Exception e) {
