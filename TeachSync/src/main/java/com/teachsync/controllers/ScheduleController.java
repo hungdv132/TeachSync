@@ -57,7 +57,9 @@ public class ScheduleController {
             @SessionAttribute(name = "user", required = false) UserReadDTO userDTO) {
         try {
             Page<ClazzScheduleReadDTO> dtoPage;
-            if (userDTO.getRoleId().equals(Constants.ROLE_STUDENT) || userDTO.getRoleId().equals(Constants.ROLE_TEACHER)) {
+            if (userDTO.getRoleId().equals(Constants.ROLE_STUDENT)
+                    || userDTO.getRoleId().equals(Constants.ROLE_TEACHER)
+                    || userDTO.getRoleId().equals(Constants.ROLE_ADMIN)) {
                 /* All schedule */
                 dtoPage = clazzScheduleService.getPageDTOAll(
                         null,
