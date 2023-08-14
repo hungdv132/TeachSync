@@ -108,9 +108,10 @@ public class TestController {
             TestCreateDTO createDTO = new TestCreateDTO();
 
             createDTO.setCourseId(courseId);
-            createDTO.setTestName(courseDTO.getCourseAlias().concat(" - test " + courseDTO.getTestList().size()));
+//            createDTO.setTestName(courseDTO.getCourseAlias().concat(" - test " + courseDTO.getTestList().size()));
+            createDTO.setTestName(courseRepository.findById(courseId).orElse(null).getCourseName());
             createDTO.setTestType(testType);
-            createDTO.setTestDesc(courseDTO.getCourseName().concat(" - test " + courseDTO.getTestList().size()));
+            createDTO.setTestDesc(questionType.getStringValue());
             createDTO.setNumQuestion(numQuestions);
             createDTO.setQuestionType(questionType);
             createDTO.setTimeLimit(timeLimit);
@@ -171,10 +172,12 @@ public class TestController {
                             } else {
                                 answerCreateDTO.setAnswerScore(0.0);
                             }
-
+                            answerCreateDTOList.add(answerCreateDTO);
                         }
                         questionCreateDTO.setAnswerList(answerCreateDTOList);
+                        questionCreateDTOList.add(questionCreateDTO);
                     }
+
                     createDTO.setQuestionList(questionCreateDTOList);
                 }
             }

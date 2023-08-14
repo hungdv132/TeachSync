@@ -12,7 +12,9 @@ import com.teachsync.entities.Question;
 import com.teachsync.repositories.QuestionRepository;
 import com.teachsync.services.answer.AnswerService;
 import com.teachsync.utils.enums.DtoOption;
+import com.teachsync.utils.enums.QuestionType;
 import com.teachsync.utils.enums.Status;
+import com.teachsync.utils.enums.TestType;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -44,6 +46,7 @@ public class QuestionServiceImpl implements QuestionService {
 
         return questionRepository.saveAndFlush(question);
     }
+
     @Override
     public QuestionReadDTO createQuestionByDTO(QuestionCreateDTO createDTO) throws Exception {
         Question question = mapper.map(createDTO, Question.class);
@@ -60,7 +63,8 @@ public class QuestionServiceImpl implements QuestionService {
                     answerCreateDTOList.stream()
                             .peek(dto -> {
                                 dto.setQuestionId(questionId);
-                                dto.setCreatedBy(createdBy); })
+                                dto.setCreatedBy(createdBy);
+                            })
                             .collect(Collectors.toList());
 
             answerService.createBulkAnswerByDTO(answerCreateDTOList);
@@ -77,34 +81,39 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public List<QuestionReadDTO> createBulkQuestionByDTO(Collection<QuestionCreateDTO> createDTOCollection) throws Exception {
+    public List<QuestionReadDTO> createBulkQuestionByDTO(Collection<QuestionCreateDTO> createDTOCollection, String questionType) throws Exception {
         List<Question> questionList = new ArrayList<>();
         List<AnswerCreateDTO> answerCreateDTOList = new ArrayList<>();
 
         for (QuestionCreateDTO createDTO : createDTOCollection) {
             questionList.add(mapper.map(createDTO, Question.class));
-            answerCreateDTOList.addAll(createDTO.getAnswerList());
+            if (!questionType.equals("ESSAY")) {
+                answerCreateDTOList.addAll(createDTO.getAnswerList());
+            }
         }
 
         questionList = createBulkQuestion(questionList);
 
-        /* Create dependency */
-        if (!answerCreateDTOList.isEmpty()) {
-            /* Về lý thuyết luôn phải có nhưng vẫn phải tránh null exception */
+        if (!questionType.equals("ESSAY")) {
 
-            answerCreateDTOList = new ArrayList<>();
-            List<AnswerCreateDTO> tmpAnswerCreateDTOList;
+            /* Create dependency */
+            if (!answerCreateDTOList.isEmpty()) {
+                /* Về lý thuyết luôn phải có nhưng vẫn phải tránh null exception */
 
-            for (Question question : questionList) {
-                for (QuestionCreateDTO createDTO : createDTOCollection) {
-                    if (question.equalCreateDTO(createDTO)) {
-                        tmpAnswerCreateDTOList = createDTO.getAnswerList();
-                        tmpAnswerCreateDTOList =
-                                tmpAnswerCreateDTOList
-                                        .stream().peek(dto -> dto.setQuestionId(question.getId()))
-                                        .collect(Collectors.toList());
+                answerCreateDTOList = new ArrayList<>();
+                List<AnswerCreateDTO> tmpAnswerCreateDTOList;
 
-                        answerCreateDTOList.addAll(tmpAnswerCreateDTOList);
+                for (Question question : questionList) {
+                    for (QuestionCreateDTO createDTO : createDTOCollection) {
+                        if (question.equalCreateDTO(createDTO)) {
+                            tmpAnswerCreateDTOList = createDTO.getAnswerList();
+                            tmpAnswerCreateDTOList =
+                                    tmpAnswerCreateDTOList
+                                            .stream().peek(dto -> dto.setQuestionId(question.getId()))
+                                            .collect(Collectors.toList());
+
+                            answerCreateDTOList.addAll(tmpAnswerCreateDTOList);
+                        }
                     }
                 }
             }
@@ -123,35 +132,37 @@ public class QuestionServiceImpl implements QuestionService {
                 .findByIdAndStatusNot(id, Status.DELETED)
                 .orElse(null);
     }
+
     @Override
     public QuestionReadDTO getDTOById(Long id, Collection<DtoOption> options) throws Exception {
         Question question = getById(id);
-        
+
         if (question == null) {
             return null;
         }
-        
+
         return wrapDTO(question, options);
     }
 
     @Override
     public List<Question> getAllByIdIn(Collection<Long> idCollection) throws Exception {
-        List<Question> questionList = 
+        List<Question> questionList =
                 questionRepository.findAllByIdInAndStatusNot(idCollection, Status.DELETED);
-        
-        if(questionList.isEmpty()){
+
+        if (questionList.isEmpty()) {
             return null;
         }
 
         return questionList;
     }
+
     @Override
     public List<QuestionReadDTO> getAllDTOByIdIn(
             Collection<Long> idCollection, Collection<DtoOption> options) throws Exception {
         List<Question> questionList =
                 questionRepository.findAllByIdInAndStatusNot(idCollection, Status.DELETED);
 
-        if(questionList == null){
+        if (questionList == null) {
             return null;
         }
 
@@ -164,17 +175,18 @@ public class QuestionServiceImpl implements QuestionService {
         List<Question> questionList =
                 questionRepository.findAllByTestIdAndStatusNot(testId, Status.DELETED);
 
-        if(questionList.isEmpty()){
+        if (questionList.isEmpty()) {
             return null;
         }
 
         return questionList;
     }
+
     @Override
     public List<QuestionReadDTO> getAllDTOByTestId(Long testId, Collection<DtoOption> options) throws Exception {
         List<Question> questionList = getAllByTestId(testId);
 
-        if(questionList == null){
+        if (questionList == null) {
             return null;
         }
 
@@ -186,23 +198,25 @@ public class QuestionServiceImpl implements QuestionService {
         List<Question> questionList =
                 questionRepository.findAllByTestIdInAndStatusNot(testIdCollection, Status.DELETED);
 
-        if(questionList.isEmpty()){
+        if (questionList.isEmpty()) {
             return null;
         }
 
         return questionList;
     }
+
     @Override
     public List<QuestionReadDTO> getAllDTOByTestIdIn(
             Collection<Long> testIdCollection, Collection<DtoOption> options) throws Exception {
         List<Question> questionList = getAllByTestIdIn(testIdCollection);
 
-        if(questionList == null){
+        if (questionList == null) {
             return null;
         }
 
         return wrapListDTO(questionList, options);
     }
+
     @Override
     public Map<Long, List<QuestionReadDTO>> mapTestIdListDTOByTestIdIn(
             Collection<Long> testIdCollection, Collection<DtoOption> options) throws Exception {
@@ -247,6 +261,7 @@ public class QuestionServiceImpl implements QuestionService {
 
         return questionRepository.saveAndFlush(question);
     }
+
     @Override
     public QuestionReadDTO updateQuestionByDTO(QuestionUpdateDTO updateDTO) throws Exception {
         Question question = mapper.map(updateDTO, Question.class);
@@ -300,6 +315,7 @@ public class QuestionServiceImpl implements QuestionService {
 
         return questionRepository.saveAllAndFlush(idQuestionMap.values());
     }
+
     @Override
     public List<QuestionReadDTO> updateBulkQuestionByDTO(Collection<QuestionUpdateDTO> updateDTOCollection) throws Exception {
         List<Question> questionList = new ArrayList<>();
@@ -332,8 +348,8 @@ public class QuestionServiceImpl implements QuestionService {
 
         return wrapListDTO(questionList, List.of(ANSWER_LIST));
     }
-    
-    
+
+
     /* =================================================== DELETE =================================================== */
 
 
