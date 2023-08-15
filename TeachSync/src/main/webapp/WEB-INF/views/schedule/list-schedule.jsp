@@ -23,11 +23,6 @@
 
 <!-- ================================================== Main Body ================================================== -->
 <div class="row ts-bg-white border ts-border-teal rounded-3 pt-3 mx-2 mb-3">
-    <c:if test="${isAdmin}">
-        <a href="add-schedule?option=add">
-            <button type="button" class="btn btn-primary">Thêm mới class schedule</button>
-        </a>
-    </c:if>
     <table class="table">
         <thead class="thead-dark">
         <tr>
@@ -37,27 +32,59 @@
             <th scope="col">Kiểu lịch học</th>
             <th scope="col">Thời gian bắt đầu</th>
             <th scope="col">Thời gian kết thúc</th>
-            <th scope="col">Slot</th>
+            <th scope="col">Tiết</th>
+
             <c:if test="${isAdmin}">
                 <th scope="col">Chức năng</th>
             </c:if>
         </tr>
         </thead>
-        <tbody>
-        <c:forEach var="clazzScheduleDTO" items="${clazzScheduleList}">
-            <tr>
-                <th scope="row">${clazzDTO.id}</th>
 
-                <c:if test="${isAdmin}">
-                    <td>
-                        <a href="/add-schedule?id=${clazzScheduleDTO.id}&option=edit">
-                            <button type="button" class="btn btn-success">Sửa</button>
-                        </a>
-                        <a href="/delete-schedule?id=${clazzScheduleDTO.id}">
-                            <button type="button" class="btn btn-danger">Xóa</button>
-                        </a>
-                    </td>
+        <tbody>
+        <c:forEach var="clazz" items="${clazzList}">
+            <tr>
+                <th scope="row">${clazz.id}</th>
+                <c:set var="clazzSchedule" value="${clazz.clazzSchedule}"/>
+
+                <c:if test="${not empty clazzSchedule}">
+                    <td>${clazz.clazzName}</td>
+                    <td>${clazzSchedule.roomName}</td>
+                    <td>${clazzSchedule.scheduleType.stringValueVie}</td>
+                    <td>${clazzSchedule.startDate}</td>
+                    <td>${clazzSchedule.endDate}</td>
+                    <td>${clazzSchedule.slot}</td>
+
+                    <c:if test="${isAdmin}">
+                        <td>
+                            <a href="/edit-schedule?id=${clazz.id}">
+                                <button type="button" class="btn btn-warning">Sửa</button>
+                            </a>
+                            <a href="/delete-schedule?id=${clazz.id}">
+                                <button type="button" class="btn btn-danger">Xóa</button>
+                            </a>
+                        </td>
+                    </c:if>
                 </c:if>
+
+                <c:if test="${empty clazzSchedule}">
+                    <td>${clazz.clazzName}</td>
+                    <td>Chưa</td>
+                    <td>Chưa</td>
+                    <td>Chưa</td>
+                    <td>Chưa</td>
+                    <td>Chưa</td>
+
+                    <c:if test="${isAdmin}">
+                        <td>
+                            <a href="/add-schedule?id=${clazz.id}">
+                                <button type="button" class="btn btn-success">Thêm</button>
+                            </a>
+                        </td>
+                    </c:if>
+                </c:if>
+
+
+
             </tr>
         </c:forEach>
         </tbody>
