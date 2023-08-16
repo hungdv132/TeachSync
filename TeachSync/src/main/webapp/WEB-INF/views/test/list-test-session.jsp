@@ -72,7 +72,7 @@
               <c:forEach items="${testSessions}" var="testSession">
                 <tr>
                   <td>
-                      ${testSession.id}
+                      ${testSession.memberId}
                   </td>
                   <td>
                       ${testSession.member.user.fullName}

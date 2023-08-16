@@ -7,6 +7,7 @@ import com.teachsync.dtos.course.CourseReadDTO;
 import com.teachsync.dtos.memberTestRecord.MemberTestRecordReadDTO;
 import com.teachsync.dtos.question.QuestionCreateDTO;
 import com.teachsync.dtos.question.QuestionReadDTO;
+import com.teachsync.dtos.test.MarkTestDTO;
 import com.teachsync.dtos.test.TestCreateDTO;
 import com.teachsync.dtos.test.TestReadDTO;
 import com.teachsync.dtos.test.TestScoreDTO;
@@ -431,12 +432,14 @@ public class TestController {
                     case MULTIPLE -> {
                         Long answerId = Long.parseLong(requestParams.get("question" + questionDTO.getId()));
                         Answer as = answerService.getById(answerId);
+                        testRecord.setQuestionId(questionDTO.getId());
                         testRecord.setAnswerId(as.getId());
                         testRecord.setScore(as.getAnswerScore());
                     }
 
                     case ESSAY -> {
                         String essayAnswer = requestParams.get("question" + questionDTO.getId());
+                        testRecord.setQuestionId(questionDTO.getId());
                         testRecord.setAnswerTxt(essayAnswer);
                     }
                 }
@@ -581,6 +584,51 @@ public class TestController {
         }
 
         return "test/testscore-class";
+    }
+
+    @GetMapping("/mark-essay")
+    public String markEssay(Model model,
+                            HttpSession session,
+                            @RequestParam("memberTestRecordId") Long memberTestRecordId) {
+
+        MemberTestRecord mtr = memberTestRecordRepository.findAllByIdAndStatus(memberTestRecordId, Status.DONE).orElse(null);
+        List<TestRecord> testRecords = testRecordRepository.findAllByMemberTestRecordId(memberTestRecordId);
+        List<MarkTestDTO> markTestDTOS = new ArrayList<>();
+        for (TestRecord testRecord : testRecords) {
+            Question question = questionRepository.findAllById(testRecord.getQuestionId()).orElse(null);
+            markTestDTOS.add(new MarkTestDTO(question.getQuestionDesc(), testRecord.getAnswerTxt(), testRecord.getId()));
+        }
+        model.addAttribute("markTestDTOS", markTestDTOS);
+        model.addAttribute("memberTestRecordId", memberTestRecordId);
+        return "test/mark-essay";
+    }
+
+    @PostMapping("/mark")
+    public String mark(
+            Model model,
+            @RequestParam("memberTestRecordId") Long memberTestRecordId,
+            @RequestParam Map<String, String> requestParams,
+            @SessionAttribute(value = "user", required = false) UserReadDTO userDTO) throws Exception {
+
+        MemberTestRecord memberTestRecord = memberTestRecordRepository.findAllByIdAndStatus(memberTestRecordId, Status.DONE).orElse(null);
+        ClazzTest clazzTest = clazzTestService.getById(memberTestRecord.getClazzTestId());
+        List<TestRecord> testRecords = testRecordRepository.findAllByMemberTestRecordId(memberTestRecordId);
+        List<Question> questions = questionRepository.findAllByTestIdAndStatusNot(clazzTest.getTestId(), Status.DELETED);
+
+        double totalScore = 0;
+        double maxScore = 0;
+        for (Question qs : questions) {
+            maxScore = maxScore + qs.getQuestionScore();
+        }
+        for (TestRecord testRecord : testRecords) {
+            Double score = Double.parseDouble(requestParams.get("scores[" + testRecord.getId() + "]"));
+            testRecord.setScore(score);
+            totalScore = totalScore + score;
+            testRecordRepository.save(testRecord);
+        }
+        memberTestRecord.setScore((totalScore / maxScore)*10);
+        memberTestRecordRepository.save(memberTestRecord);
+        return "redirect:/";
     }
 
 

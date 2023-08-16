@@ -17,6 +17,9 @@ public class TestRecord extends BaseEntity {
     @Column(name = "memberTestRecordId", nullable = false)
     private Long memberTestRecordId;
 
+    @Column(name = "questionId", nullable = false)
+    private Long questionId;
+
     @Column(name = "answerId", nullable = false)
     private Long answerId;
 
