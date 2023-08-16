@@ -1,13 +1,15 @@
 package com.teachsync.utils.enums;
 
-public enum CenterType {
-    ENGLISH("ENGLISH", "English", "Tiếng Anh");
+public enum Gender {
+    MALE("ENGLISH", "Male", "Nam"),
+    FEMALE("FEMALE", "Female", "Nữ"),
+    OTHER("OTHER", "Other", "Khác");
 
     private final String stringValue;
     private final String stringValueEng;
     private final String stringValueVie;
 
-    CenterType(String stringValue, String stringValueEng, String stringValueVie) {
+    Gender(String stringValue, String stringValueEng, String stringValueVie) {
         this.stringValue = stringValue;
         this.stringValueEng = stringValueEng;
         this.stringValueVie = stringValueVie;

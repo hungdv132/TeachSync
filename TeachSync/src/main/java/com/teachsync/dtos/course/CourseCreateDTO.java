@@ -2,10 +2,10 @@ package com.teachsync.dtos.course;
 
 import com.teachsync.dtos.BaseCreateDTO;
 import com.teachsync.dtos.priceLog.PriceLogCreateDTO;
-import com.teachsync.dtos.priceLog.PriceLogReadDTO;
-import com.teachsync.utils.enums.PromotionType;
 import jakarta.persistence.Lob;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

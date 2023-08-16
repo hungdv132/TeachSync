@@ -5,8 +5,6 @@ import com.teachsync.dtos.campaignApplication.CampaignApplicationReadDTO;
 import com.teachsync.dtos.recruitmentCampaign.RecruitmentCampaignReadDTO;
 import com.teachsync.dtos.user.UserReadDTO;
 import com.teachsync.entities.CampaignApplication;
-import com.teachsync.entities.RecruitmentCampaign;
-import com.teachsync.entities.Request;
 import com.teachsync.entities.User;
 import com.teachsync.repositories.CampaignApplicationRepository;
 import com.teachsync.repositories.UserRepository;

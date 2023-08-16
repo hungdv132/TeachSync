@@ -7,7 +7,6 @@ import com.teachsync.entities.Request;
 import com.teachsync.entities.User;
 import com.teachsync.repositories.RequestRepository;
 import com.teachsync.repositories.UserRepository;
-import com.teachsync.utils.Constants;
 import com.teachsync.utils.MiscUtil;
 import com.teachsync.utils.enums.RequestType;
 import com.teachsync.utils.enums.Status;

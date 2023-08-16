@@ -10,7 +10,6 @@ import com.teachsync.dtos.question.QuestionReadDTO;
 import com.teachsync.dtos.test.MarkTestDTO;
 import com.teachsync.dtos.test.TestCreateDTO;
 import com.teachsync.dtos.test.TestReadDTO;
-import com.teachsync.dtos.test.TestScoreDTO;
 import com.teachsync.dtos.user.UserReadDTO;
 import com.teachsync.entities.*;
 import com.teachsync.repositories.*;
@@ -40,7 +39,10 @@ import org.springframework.web.bind.annotation.SessionAttribute;
 
 import java.nio.file.AccessDeniedException;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 

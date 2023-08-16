@@ -5,6 +5,7 @@ import com.teachsync.dtos.address.AddressReadDTO;
 import com.teachsync.dtos.role.RoleReadDTO;
 import com.teachsync.entities.Request;
 import com.teachsync.entities.User;
+import com.teachsync.utils.enums.Gender;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -20,24 +21,29 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserReadDTO extends BaseReadDTO {
+    private String username;
+
+    /* NEVER SHOW PASSWORD */
+
     private Long roleId;
     private RoleReadDTO role;
 
     private String userAvatar;
 
-    private Long parentId;
-
-    private String username;
-
-    /* NEVER SHOW PASSWORD */
+    private String about;
 
     private String fullName;
+
+    private Gender gender;
 
     private String email;
 
     private String phone;
 
+    private Long addressId;
     private AddressReadDTO address;
+
+    private Long parentId;
 
     private List<Request> requestMadeList;
 

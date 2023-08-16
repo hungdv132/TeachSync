@@ -1,15 +1,14 @@
 package com.teachsync.dtos.user;
 
 import com.teachsync.dtos.BaseCreateDTO;
-import com.teachsync.utils.enums.Status;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.Size;
+import com.teachsync.utils.enums.Gender;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 /**
  * DTO for {@link com.teachsync.entities.User}
@@ -19,48 +18,45 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserCreateDTO extends BaseCreateDTO {
-    @Positive
-    private Long roleId;
-
-    @Positive
-    private Long parentId;
-
     @NotBlank
     @Size(min = 4, max = 45)
     private String username;
 
     @NotBlank
-    @Size(min = 1, max = 255)
+    @Size(min = 1, max = 45)
     private String password;
+
+    @Positive
+    private Long roleId;
+
+    private String userAvatar;
+
+    private String about;
 
     @NotBlank
     @Size(min = 1, max = 255)
     private String fullName;
 
+    private Gender gender = Gender.OTHER;
+
     @Email
     @Size(min = 5, max = 255)
     private String email;
 
-//    @Pattern(regexp = "^\\\\d{10}$")
+    @Pattern(regexp = "\\b\\d{10}\\b")
     @Size(min = 10, max = 10)
     private String phone;
 
-    @Size(min = 5, max = 255)
-    private String address;
-
-    private Status status = Status.CREATED;
+    @Positive
+    private Long addressId;
 
     @Email
     @Size(min = 5, max = 255)
     private String parentEmail;
 
+    @Positive
+    private Long parentId;
 
-    /** For Student signup */
-    public UserCreateDTO(String username, String password, String email, String fullName) {
-        this.username = username;
-        this.password = password;
-        this.fullName = fullName;
-        this.email = email;
-        this.roleId = 1L;
-    }
+    @Size(min = 1)
+    private List<Long> childList;
 }

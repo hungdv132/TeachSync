@@ -1,7 +1,6 @@
 package com.teachsync.entities;
 
 import com.teachsync.dtos.question.QuestionCreateDTO;
-import com.teachsync.dtos.question.QuestionReadDTO;
 import com.teachsync.utils.enums.QuestionType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

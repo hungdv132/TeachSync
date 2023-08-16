@@ -14,7 +14,7 @@ import java.util.Map;
 public interface AddressService {
     /* =================================================== CREATE =================================================== */
     Address createAddress(Address address) throws Exception;
-    AddressReadDTO createAddressByDTO(AddressCreateDTO addressCreateDTO) throws Exception;
+    AddressReadDTO createAddressByDTO(AddressCreateDTO createDTO) throws Exception;
 
 
     /* =================================================== READ ===================================================== */
@@ -32,7 +32,7 @@ public interface AddressService {
     /* =================================================== UPDATE =================================================== */
     Address updateAddress(Address address) throws Exception;
 
-    AddressReadDTO updateAddressByDTO(AddressUpdateDTO addressUpdateDTO) throws Exception;
+    AddressReadDTO updateAddressByDTO(AddressUpdateDTO updateDTO) throws Exception;
 
 
     /* =================================================== DELETE =================================================== */

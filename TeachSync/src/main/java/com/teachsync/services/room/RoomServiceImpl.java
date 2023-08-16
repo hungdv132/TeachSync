@@ -5,7 +5,6 @@ import com.teachsync.dtos.room.RoomReadDTO;
 import com.teachsync.entities.BaseEntity;
 import com.teachsync.entities.Room;
 import com.teachsync.repositories.RoomRepository;
-import com.teachsync.services.center.CenterService;
 import com.teachsync.utils.enums.DtoOption;
 import com.teachsync.utils.enums.Status;
 import org.modelmapper.ModelMapper;

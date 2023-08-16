@@ -1,5 +1,6 @@
 package com.teachsync.entities;
 
+import com.teachsync.utils.enums.Gender;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Lob;
@@ -28,8 +29,14 @@ public class User extends BaseEntity {
     @Column(name = "userAvatar", nullable = true, length = -1)
     private String userAvatar;
 
+    @Column(name = "about", nullable = true, length = 255)
+    private String about;
+
     @Column(name = "fullName", nullable = false, length = 255)
     private String fullName;
+
+    @Column(name = "gender", nullable = false, length = 45)
+    private Gender gender = Gender.OTHER;
 
     @Email
     @Column(name = "email", nullable = false, length = 255)

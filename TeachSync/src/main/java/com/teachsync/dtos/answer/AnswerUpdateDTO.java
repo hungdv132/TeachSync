@@ -1,6 +1,5 @@
 package com.teachsync.dtos.answer;
 
-import com.teachsync.dtos.BaseCreateDTO;
 import com.teachsync.dtos.BaseUpdateDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;

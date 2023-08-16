@@ -1,9 +1,7 @@
 package com.teachsync.controllers;
 
-import com.teachsync.entities.Test;
 import com.teachsync.entities.User;
 import com.teachsync.repositories.UserRepository;
-import com.teachsync.services.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

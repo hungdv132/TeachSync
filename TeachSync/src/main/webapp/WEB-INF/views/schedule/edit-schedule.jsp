@@ -8,7 +8,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Thêm lịch học</title>
+    <title>Chỉnh lịch học</title>
 
     <link rel="stylesheet" href="../../../resources/css/bootstrap-5.3.0/bootstrap.css">
     <link rel="stylesheet" href="../../../resources/css/teachsync_style.css">
@@ -25,7 +25,7 @@
 
 <!-- ================================================== Main Body ================================================== -->
 <div class="row ts-bg-white border ts-border-teal rounded-3 pt-3 mx-2 mb-3">
-    <form action="/add-schedule" method="post">
+    <form action="/edit-schedule" method="post">
 
         <div class="row mb-3">
             <div class="col-12">
@@ -60,30 +60,34 @@
                 </select>
             </label>
         </div>
+
         <div class="form-group">
             <label>Thời gian bắt đầu</label>
             <input type="date" class="form-control" min="${semester.startDate}" max="${semester.endDate}"
-                   id="dateStart" name="startDate" placeholder="${semester.startDate}" required>
+                   id="dateStart" name="startDate" placeholder="${semester.startDate}" required
+                   value="${schedule.startDate}">
         </div>
 
         <div class="form-group">
             <label>Thời gian kết thúc</label>
             <input type="date" class="form-control" min="${semester.startDate}" max="${semester.endDate}"
-                   id="dateEnd" name="endDate" required placeholder="${semester.endDate}">
+                   id="dateEnd" name="endDate" placeholder="${semester.endDate}" required
+                   value="${schedule.endDate}">
         </div>
 
         <div class="form-group mb-3">
             <label>Tiết:
                 <input type="number" min="1" max="8" class="ms-3" placeholder="Nhập tiết"
-                       id="txtSlot"  name="slot" onchange="updateSessionTime()">
+                       id="txtSlot" name="slot" onchange="updateSessionTime()" value="${schedule.slot}">
             </label>
-            <p>Thời gian: <span id="txtSlotStart"></span> - <span id="txtSlotEnd"></span>
+            <p>Thời gian: <span id="txtSlotStart">${schedule.sessionStart}</span> - <span id="txtSlotEnd">${schedule.sessionEnd}</span>
             </p>
 
-            <input type="hidden" id="txtSessionStart" name="sessionStart">
-            <input type="hidden" id="txtSessionEnd" name="sessionEnd">
+            <input type="hidden" id="txtSessionStart" name="sessionStart" value="${schedule.sessionStart}">
+            <input type="hidden" id="txtSessionEnd" name="sessionEnd" value="${schedule.sessionEnd}">
         </div>
 
+        <input type="hidden" name="id" value="${schedule.id}">
         <br>
 
         <button type="submit" class="btn btn-primary">Submit</button>
@@ -95,6 +99,12 @@
 <%@ include file="/WEB-INF/fragments/footer.jspf" %>
 <!-- ================================================== Footer ===================================================== -->
 
+<script id="script1">
+    $("#selRoomId").val(${schedule.roomId});
+    $("#selScheduleType").val('${schedule.scheduleType}');
+    $("#script1").remove();
+
+</script>
 <script>
     const slotStartTime = {
         "1": "07:00",

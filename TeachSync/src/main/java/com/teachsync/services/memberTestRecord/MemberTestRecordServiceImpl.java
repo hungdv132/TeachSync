@@ -3,7 +3,6 @@ package com.teachsync.services.memberTestRecord;
 import com.teachsync.dtos.clazzMember.ClazzMemberReadDTO;
 import com.teachsync.dtos.clazzTest.ClazzTestReadDTO;
 import com.teachsync.dtos.memberTestRecord.MemberTestRecordReadDTO;
-import com.teachsync.entities.ClazzMember;
 import com.teachsync.entities.MemberTestRecord;
 import com.teachsync.repositories.MemberTestRecordRepository;
 import com.teachsync.services.clazzMember.ClazzMemberService;

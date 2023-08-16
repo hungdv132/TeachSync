@@ -62,31 +62,6 @@ public class ClazzServiceImpl implements ClazzService {
 
     /* =================================================== CREATE =================================================== */
     @Override
-    @Transactional
-    public String addClazz(ClazzCreateDTO createDTO) {
-        try {
-            Clazz clazz = mapper.map(createDTO, Clazz.class);
-            clazz.setClazzSize(15); /* TODO: replace with dynamic, not yet code on controller */
-
-            /* TODO: replace courseId with courseSemesterId (hoc ky cua khoa hoc) */
-            Optional<CourseSemester> schedule =
-                    courseSemesterRepository
-                            .findFirstByCourseIdAndStatusNot(createDTO.getCourseId(), Status.DELETED);
-
-            CourseSemester courseSemester = schedule.orElse(null);
-
-            clazz.setCourseSemesterId(courseSemester.getId());
-
-            clazzRepository.saveAndFlush(clazz);
-
-            return "success";
-        } catch (Exception e) {
-            logger.error("Error when addClazz  : " + e.getMessage());
-            return "error";
-        }
-    }
-
-    @Override
     public Clazz createClazz(Clazz clazz) throws Exception {
         /* Validate input */
         /* TODO: */
@@ -312,37 +287,15 @@ public class ClazzServiceImpl implements ClazzService {
 
     /* =================================================== UPDATE =================================================== */
     @Override
-    @Transactional
-    public String editClazz(ClazzUpdateDTO updateDTO) {
-        try {
-            Clazz clazz = clazzRepository.findById(updateDTO.getId()).orElse(null);
-
-            if(ObjectUtils.isEmpty(clazz)){
-                throw new Exception();
-            }
-
-            clazz = mapper.map(updateDTO, Clazz.class);
-            clazz.setClazzSize(15); /* TODO: replace with dynamic */
-
-            /* TODO: replace courseId with courseSemesterId (hoc ky cua khoa hoc) */
-            Optional<CourseSemester> schedule =
-                    courseSemesterRepository
-                            .findFirstByCourseIdAndStatusNot(updateDTO.getCourseId(), Status.DELETED);
-
-            CourseSemester courseSemester = schedule.orElse(null);
-
-            clazz.setCourseSemesterId(courseSemester.getId());
-
-            clazzRepository.saveAndFlush(clazz);
-            return "success";
-        } catch (Exception e) {
-            logger.error("Error when EditClazzRoom  : " + e.getMessage());
-            return "error";
-        }
-    }
-
-    @Override
     public Clazz updateClazz(Clazz clazz) throws Exception {
+        /* Check exist */
+        Clazz oldClazz = getById(clazz.getId());
+        if (oldClazz == null) {
+            throw new IllegalArgumentException("Update error. No Clazz found with id: " + clazz.getId());
+        }
+        clazz.setCreatedBy(oldClazz.getCreatedBy());
+        clazz.setCreatedAt(oldClazz.getCreatedAt());
+
         /* Validate input */
         /* TODO: */
 

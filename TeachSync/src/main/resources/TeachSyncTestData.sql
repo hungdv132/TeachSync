@@ -1,8 +1,10 @@
 use teachsync;
 
+/* Level 0 */
 insert into location_unit(parentId, level, unitName, unitAlias, unitType, status)
-values (null, 0, 'Vietnam', 'VN', 'COUNTRY', 'CREATED');
+values (null, 0, 'Việt Nam', 'VN', 'COUNTRY', 'CREATED');
 
+/* Level 1 */
 insert into location_unit(parentId, level, unitName, unitAlias, unitType, status)
 values
     /* A */
@@ -98,6 +100,7 @@ values
     /* Y */
     (1, 1, 'Yên Bái', 'Yên Bái', 'MUNICIPALITY', 'DELETED');
 
+/* Level 2 */
 insert into location_unit(parentId, level, unitName, unitAlias, unitType, status)
 values
     /* An Giang */
@@ -388,23 +391,23 @@ values
     (25, 2, 'Quận Tây Hồ', 'Q.Tây Hồ', 'DISTRICT', 'CREATED'),
     (25, 2, 'Quận Thanh Xuân', 'Q.Thanh Xuân', 'DISTRICT', 'CREATED'),
     (25, 2, 'Thị xã Sơn Tây', 'TX.Sơn Tây', 'DISTRICT', 'CREATED'),
-    (25, 2, 'Huyện Ba Vì', 'H.Ba Vì', 'DISTRICT', 'CREATED'),
-    (25, 2, 'Huyện Chương Mỹ', 'H.Chương Mỹ', 'DISTRICT', 'CREATED'),
-    (25, 2, 'Huyện Đan Phượng', 'H.Đan Phượng', 'DISTRICT', 'CREATED'),
-    (25, 2, 'Huyện Đông Anh', 'H.Đông Anh', 'DISTRICT', 'CREATED'),
-    (25, 2, 'Huyện Gia Lâm', 'H.Gia Lâm', 'DISTRICT', 'CREATED'),
-    (25, 2, 'Huyện Hoài Đức', 'H.Hoài Đức', 'DISTRICT', 'CREATED'),
-    (25, 2, 'Huyện Mê Linh', 'H.Mê Linh', 'DISTRICT', 'CREATED'),
-    (25, 2, 'Huyện Mỹ Đức', 'H.Mỹ Đức', 'DISTRICT', 'CREATED'),
-    (25, 2, 'Huyện Phú Xuyên', 'H.Phú Xuyên', 'DISTRICT', 'CREATED'),
-    (25, 2, 'Huyện Phúc Thọ', 'H.Phúc Thọ', 'DISTRICT', 'CREATED'),
-    (25, 2, 'Huyện Quốc Oai', 'H.Quốc Oai', 'DISTRICT', 'CREATED'),
-    (25, 2, 'Huyện Sóc Sơn', 'H.Sóc Sơn', 'DISTRICT', 'CREATED'),
-    (25, 2, 'Huyện Thạch Thất', 'H.Thạch Thất', 'DISTRICT', 'CREATED'),
-    (25, 2, 'Huyện Thanh Oai', 'H.Thanh Oai', 'DISTRICT', 'CREATED'),
-    (25, 2, 'Huyện Thanh Trì', 'H.Thanh Trì', 'DISTRICT', 'CREATED'),
-    (25, 2, 'Huyện Thường Tín', 'H.Thường Tín', 'DISTRICT', 'CREATED'),
-    (25, 2, 'Huyện Ứng Hòa', 'H.Ứng Hòa', 'DISTRICT', 'CREATED'),
+    (25, 2, 'Huyện Ba Vì', 'H.Ba Vì', 'DISTRICT', 'DELETED'),
+    (25, 2, 'Huyện Chương Mỹ', 'H.Chương Mỹ', 'DISTRICT', 'DELETED'),
+    (25, 2, 'Huyện Đan Phượng', 'H.Đan Phượng', 'DISTRICT', 'DELETED'),
+    (25, 2, 'Huyện Đông Anh', 'H.Đông Anh', 'DISTRICT', 'DELETED'),
+    (25, 2, 'Huyện Gia Lâm', 'H.Gia Lâm', 'DISTRICT', 'DELETED'),
+    (25, 2, 'Huyện Hoài Đức', 'H.Hoài Đức', 'DISTRICT', 'DELETED'),
+    (25, 2, 'Huyện Mê Linh', 'H.Mê Linh', 'DISTRICT', 'DELETED'),
+    (25, 2, 'Huyện Mỹ Đức', 'H.Mỹ Đức', 'DISTRICT', 'DELETED'),
+    (25, 2, 'Huyện Phú Xuyên', 'H.Phú Xuyên', 'DISTRICT', 'DELETED'),
+    (25, 2, 'Huyện Phúc Thọ', 'H.Phúc Thọ', 'DISTRICT', 'DELETED'),
+    (25, 2, 'Huyện Quốc Oai', 'H.Quốc Oai', 'DISTRICT', 'DELETED'),
+    (25, 2, 'Huyện Sóc Sơn', 'H.Sóc Sơn', 'DISTRICT', 'DELETED'),
+    (25, 2, 'Huyện Thạch Thất', 'H.Thạch Thất', 'DISTRICT', 'DELETED'),
+    (25, 2, 'Huyện Thanh Oai', 'H.Thanh Oai', 'DISTRICT', 'DELETED'),
+    (25, 2, 'Huyện Thanh Trì', 'H.Thanh Trì', 'DISTRICT', 'DELETED'),
+    (25, 2, 'Huyện Thường Tín', 'H.Thường Tín', 'DISTRICT', 'DELETED'),
+    (25, 2, 'Huyện Ứng Hòa', 'H.Ứng Hòa', 'DISTRICT', 'DELETED'),
 
     /* Hà Tĩnh */
     (26, 2, 'Huyện ', 'H.', 'DISTRICT', 'CREATED'),
@@ -871,11 +874,11 @@ values
     (59, 2, 'Quận Tân Bình', 'Q.Tân Bình', 'DISTRICT', 'CREATED'),
     (59, 2, 'Quận Tân Phú', 'Q.Tân Phú', 'DISTRICT', 'CREATED'),
     (59, 2, 'Thành phố Thủ Đức', 'TP.Thủ Đức', 'DISTRICT', 'CREATED'),
-    (59, 2, 'Huyện Bình Chánh', 'H.Bình Chánh', 'DISTRICT', 'CREATED'),
-    (59, 2, 'Huyện Cần Giờ', 'H.Cần Giờ', 'DISTRICT', 'CREATED'),
-    (59, 2, 'Huyện Củ Chi', 'H.Củ Chi', 'DISTRICT', 'CREATED'),
-    (59, 2, 'Huyện Hóc Môn', 'H.Hóc Môn', 'DISTRICT', 'CREATED'),
-    (59, 2, 'Huyện Nhà Bè', 'H.Nhà Bè', 'DISTRICT', 'CREATED'),
+    (59, 2, 'Huyện Bình Chánh', 'H.Bình Chánh', 'DISTRICT', 'DELETED'),
+    (59, 2, 'Huyện Cần Giờ', 'H.Cần Giờ', 'DISTRICT', 'DELETED'),
+    (59, 2, 'Huyện Củ Chi', 'H.Củ Chi', 'DISTRICT', 'DELETED'),
+    (59, 2, 'Huyện Hóc Môn', 'H.Hóc Môn', 'DISTRICT', 'DELETED'),
+    (59, 2, 'Huyện Nhà Bè', 'H.Nhà Bè', 'DISTRICT', 'DELETED'),
 
     /* Trà Vinh */
     (60, 2, 'Huyện ', 'H.', 'DISTRICT', 'CREATED'),
@@ -931,6 +934,7 @@ values
     (64, 2, 'Huyện ', 'H.', 'DISTRICT', 'CREATED'),
     (64, 2, 'Huyện ', 'H.', 'DISTRICT', 'CREATED');
 
+/* Level 3 */
 insert into location_unit(parentId, level, unitName, unitAlias, unitType, status)
 values
     /* Cần Thơ */
@@ -2277,11 +2281,11 @@ values
     (724, 3, 'Xã ', 'X.', 'WARD', 'DELETED');
 
 insert into address(addressNo, street, unitId, addressString, status)
-values ('190ABC', 'Doi Can', 8, '190ABC Doi Can, P.Doi Can, Q.Ba Dinh, TP.HN, VN', 'CREATED'),
-       ('4DEF', 'Ngoc Ha', 9, '4DEF Ngoc Ha, P.Ngoc Ha, Q.Ba Dinh, TP.HN, HN, VN', 'CREATED'),
+values ('190ABC', 'Đội Cấn', 911, '190ABC Đội Cấn, P.Đội Cấn, Q.Ba Đình, TP.Hà Nội, VN', 'CREATED'),
+       ('4DEF', 'Ngọc Hà', 915, '4DEF Ngọc Hà, P.Ngọc Hà, Q.Ba Đình, TP.Hà Nộ, HN, VN', 'CREATED'),
 
-       ('337GHI', 'Cau Giay', 8, '337GHI Cau Giay, P.Dich Vong, Q.Cau Giay, TP.HN, VN', 'CREATED'),
-       ('31JKL', 'Ho Tung Mau', 8, '31JKL Ho Tung Mau, P.Mai Dich, Q.Cau Giay, TP.HN, VN', 'CREATED');
+       ('337GHI', 'Cầu Giấy', 936, '337GHI Cầu Giấy, P.Dịch Vọng, Q.Cầu Giấy, TP.Hà Nội, VN', 'CREATED'),
+       ('31JKL', 'Hồ Tùng Mậu', 938, '31JKL Hồ Tùng Mậu, P.Mai Dịch, Q.Cầu Giấy, TP.Hà Nội, VN', 'CREATED');
 
 insert into role(roleName, roleDesc, status)
 values ('Student', 'Student', 'CREATED'),
@@ -2290,19 +2294,19 @@ values ('Student', 'Student', 'CREATED'),
        ('Admin', 'Admin', 'CREATED'),
        ('Staff', 'Staff', 'CREATED');
 
-insert into user(username, password, roleId, userAvatar, fullName, email,
+insert into user(username, password, roleId, userAvatar, fullName, gender, email,
                  phone, addressId, resetPasswordToken, parentId, status)
-values ('student', '$2a$10$2muXk6hqYaoTLnXWCszDaeDE71FGa2hJkh3QPaGKJLRJ77bm6GFJW', 1, null, 'Test Student',
+values ('student', '$2a$10$2muXk6hqYaoTLnXWCszDaeDE71FGa2hJkh3QPaGKJLRJ77bm6GFJW', 1, null, 'Test Student', 'OTHER',
         'test.student@gmail.com', null, null, null, null, 'CREATED'),
-       ('parent', '$2a$10$2muXk6hqYaoTLnXWCszDaeDE71FGa2hJkh3QPaGKJLRJ77bm6GFJW', 2, null, 'Test Parent',
+       ('parent', '$2a$10$2muXk6hqYaoTLnXWCszDaeDE71FGa2hJkh3QPaGKJLRJ77bm6GFJW', 2, null, 'Test Parent', 'OTHER',
         'test.parent@gmail.com', null, null, null, null, 'CREATED'),
-       ('teacher', '$2a$10$2muXk6hqYaoTLnXWCszDaeDE71FGa2hJkh3QPaGKJLRJ77bm6GFJW', 3, null, 'Test Teacher',
+       ('teacher', '$2a$10$2muXk6hqYaoTLnXWCszDaeDE71FGa2hJkh3QPaGKJLRJ77bm6GFJW', 3, null, 'Test Teacher', 'OTHER',
         'test.teacher@gmail.com', null, null, null, null, 'CREATED'),
-       ('admin', '$2a$10$2muXk6hqYaoTLnXWCszDaeDE71FGa2hJkh3QPaGKJLRJ77bm6GFJW', 4, null, 'Test Admin',
+       ('admin', '$2a$10$2muXk6hqYaoTLnXWCszDaeDE71FGa2hJkh3QPaGKJLRJ77bm6GFJW', 4, null, 'Test Admin', 'OTHER',
         'test.admin@gmail.com', null, null, null, null, 'CREATED'),
-       ('staff', '$2a$10$2muXk6hqYaoTLnXWCszDaeDE71FGa2hJkh3QPaGKJLRJ77bm6GFJW', 5, null, 'Test Staff',
+       ('staff', '$2a$10$2muXk6hqYaoTLnXWCszDaeDE71FGa2hJkh3QPaGKJLRJ77bm6GFJW', 5, null, 'Test Staff', 'OTHER',
         'test.staff@gmail.com', null, null, null, null, 'CREATED'),
-       ('teacher2', '$2a$10$2muXk6hqYaoTLnXWCszDaeDE71FGa2hJkh3QPaGKJLRJ77bm6GFJW', 3, null, 'Test Teacher2',
+       ('teacher2', '$2a$10$2muXk6hqYaoTLnXWCszDaeDE71FGa2hJkh3QPaGKJLRJ77bm6GFJW', 3, null, 'Test Teacher2', 'OTHER',
         'test.teacher2@gmail.com', null, null, null, null, 'CREATED');
 --     Password = 123456789
 

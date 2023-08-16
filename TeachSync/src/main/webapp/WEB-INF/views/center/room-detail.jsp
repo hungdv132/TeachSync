@@ -7,11 +7,11 @@
 
   <title>Room detail</title>
 
-  <link rel="stylesheet" href="../../resources/css/bootstrap-5.3.0/bootstrap.css">
-  <link rel="stylesheet" href="../../resources/css/certificate_style.css">
-  <script src="../../resources/js/jquery/jquery-3.6.3.js"></script>
-  <script src="../../resources/js/bootstrap-5.3.0/bootstrap.bundle.js"></script>
-  <script src="../../resources/js/common.js"></script>
+  <link rel="stylesheet" href="../../../resources/css/bootstrap-5.3.0/bootstrap.css">
+  <link rel="stylesheet" href="../../../resources/css/certificate_style.css">
+  <script src="../../../resources/js/jquery/jquery-3.6.3.js"></script>
+  <script src="../../../resources/js/bootstrap-5.3.0/bootstrap.bundle.js"></script>
+  <script src="../../../resources/js/common.js"></script>
   <style>
     .detail-container {
       display: flex;

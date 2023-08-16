@@ -21,8 +21,9 @@ import java.util.List;
 @NoArgsConstructor
 public class CenterReadDTO extends BaseReadDTO {
     private Long addressId;
-
     private AddressReadDTO address;
+
+    private String centerImg;
 
     private String centerName;
 
@@ -34,6 +35,4 @@ public class CenterReadDTO extends BaseReadDTO {
 
     private List<RoomReadDTO> roomList;
 //    private List<CenterStaffReadDTO> staffList;
-
-
 }

@@ -1,8 +1,8 @@
 package com.teachsync.dtos.center;
 
 import com.teachsync.dtos.BaseUpdateDTO;
+import com.teachsync.dtos.address.AddressCreateDTO;
 import com.teachsync.dtos.room.RoomReadDTO;
-import com.teachsync.entities.Address;
 import com.teachsync.utils.enums.CenterType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,8 +17,9 @@ import java.util.List;
 @AllArgsConstructor
 public class CenterCreateDTO extends BaseUpdateDTO {
     private Long addressId;
+    private AddressCreateDTO address;
 
-    private Address address;
+    private String centerImg;
 
     private String centerName;
 
