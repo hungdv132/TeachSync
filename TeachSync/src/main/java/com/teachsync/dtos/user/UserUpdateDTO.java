@@ -1,7 +1,7 @@
 package com.teachsync.dtos.user;
 
 import com.teachsync.dtos.BaseUpdateDTO;
-import com.teachsync.utils.enums.Status;
+import com.teachsync.utils.enums.Gender;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -18,43 +18,42 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserUpdateDTO extends BaseUpdateDTO {
-    @NotNull
-    @Positive
-    private Long id;
+    @NotBlank
+    @Size(min = 5, max = 45)
+    private String username;
+
+    @NotBlank
+    @Size(min = 5, max = 45)
+    private String password;
 
     @NotNull
     @Positive
     private Long roleId;
 
-    @Positive
-    private Long parentId;
+    private String userAvatar;
 
-    @NotBlank
-    @Size(min = 4, max = 45)
-    private String username;
-
-    @NotBlank
-    @Size(min = 1, max = 255)
-    private String password;
+    private String about;
 
     @NotBlank
     @Size(min = 1, max = 255)
     private String fullName;
 
+    private Gender gender = Gender.OTHER;
+
     @Email
     @Size(min = 5, max = 255)
     private String email;
 
-    @Pattern(regexp = "^\\\\d{10}$")
+    @Pattern(regexp = "\\b\\d{10}\\b")
     @Size(min = 10, max = 10)
     private String phone;
 
-    @Size(min = 5, max = 255)
-    private String address;
+    @Positive
+    private Long addressId;
 
-    private Status status = Status.UPDATED;
+    @Positive
+    private Long parentId;
 
-    @NotNull
     @Size(min = 1)
     private List<Long> childList;
 }

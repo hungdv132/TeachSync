@@ -1,10 +1,7 @@
 package com.teachsync.repositories;
 
-import com.teachsync.entities.Homework;
 import com.teachsync.entities.MemberHomeworkRecord;
 import com.teachsync.utils.enums.Status;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

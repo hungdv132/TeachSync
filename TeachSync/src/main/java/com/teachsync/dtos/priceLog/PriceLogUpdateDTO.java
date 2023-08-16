@@ -1,6 +1,5 @@
 package com.teachsync.dtos.priceLog;
 
-import com.teachsync.dtos.BaseCreateDTO;
 import com.teachsync.dtos.BaseUpdateDTO;
 import com.teachsync.utils.enums.PromotionType;
 import lombok.AllArgsConstructor;

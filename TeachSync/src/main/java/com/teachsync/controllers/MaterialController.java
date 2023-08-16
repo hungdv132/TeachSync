@@ -8,10 +8,10 @@ import com.teachsync.dtos.user.UserReadDTO;
 import com.teachsync.repositories.MaterialRepository;
 import com.teachsync.repositories.UserRepository;
 import com.teachsync.services.course.CourseService;
+import com.teachsync.services.material.MaterialService;
 import com.teachsync.utils.MiscUtil;
 import com.teachsync.utils.enums.DtoOption;
 import com.teachsync.utils.enums.MaterialType;
-import com.teachsync.services.material.MaterialService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +26,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.util.List;
 import java.util.Objects;
 
-import static com.teachsync.utils.Constants.*;
+import static com.teachsync.utils.Constants.ROLE_ADMIN;
+import static com.teachsync.utils.Constants.ROLE_STUDENT;
 
 @Controller
 public class MaterialController {

@@ -1,6 +1,5 @@
 package com.teachsync.dtos.address;
 
-import com.teachsync.dtos.BaseReadDTO;
 import com.teachsync.dtos.BaseUpdateDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -18,6 +17,4 @@ public class AddressUpdateDTO extends BaseUpdateDTO {
     private String addressNo;
     private String street;
     private Long unitId;
-
-
 }

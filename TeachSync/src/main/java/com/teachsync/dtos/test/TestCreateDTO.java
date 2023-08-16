@@ -1,8 +1,7 @@
 package com.teachsync.dtos.test;
+
 import com.teachsync.dtos.BaseCreateDTO;
-import com.teachsync.dtos.BaseReadDTO;
 import com.teachsync.dtos.question.QuestionCreateDTO;
-import com.teachsync.dtos.question.QuestionReadDTO;
 import com.teachsync.utils.enums.QuestionType;
 import com.teachsync.utils.enums.TestType;
 import lombok.AllArgsConstructor;

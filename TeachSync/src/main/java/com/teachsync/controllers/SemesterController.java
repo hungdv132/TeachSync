@@ -20,13 +20,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
-import static com.teachsync.utils.enums.DtoOption.CURRENT_PRICE;
 
 @Controller
 public class SemesterController {

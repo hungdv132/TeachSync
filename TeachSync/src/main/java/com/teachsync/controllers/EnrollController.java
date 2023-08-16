@@ -1,11 +1,8 @@
 package com.teachsync.controllers;
 
-import com.teachsync.dtos.BaseReadDTO;
 import com.teachsync.dtos.center.CenterReadDTO;
 import com.teachsync.dtos.clazz.ClazzReadDTO;
 import com.teachsync.dtos.course.CourseReadDTO;
-import com.teachsync.dtos.courseSemester.CourseSemesterReadDTO;
-import com.teachsync.dtos.request.RequestCreateDTO;
 import com.teachsync.dtos.semester.SemesterReadDTO;
 import com.teachsync.dtos.user.UserReadDTO;
 import com.teachsync.services.center.CenterService;
@@ -17,10 +14,7 @@ import com.teachsync.services.semester.SemesterService;
 import com.teachsync.utils.Constants;
 import com.teachsync.utils.MiscUtil;
 import com.teachsync.utils.enums.RequestType;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -30,8 +24,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import static com.teachsync.utils.enums.DtoOption.*;
 

@@ -122,7 +122,9 @@ CREATE TABLE IF NOT EXISTS `teachsync`.`user`
     `password`           VARCHAR(255) NOT NULL,
     `roleId`             BIGINT       NOT NULL,
     `userAvatar`         LONGTEXT     NULL DEFAULT NULL COMMENT 'Link to avatar',
+    `about`              VARCHAR(255) NULL DEFAULT NULL,
     `fullName`           VARCHAR(255) NOT NULL,
+    `gender`             VARCHAR(45)  NOT NULL,
     `email`              VARCHAR(255) NOT NULL,
     `phone`              VARCHAR(10)  NULL DEFAULT NULL,
     `addressId`          BIGINT       NULL DEFAULT NULL,
@@ -167,6 +169,7 @@ CREATE TABLE IF NOT EXISTS `teachsync`.`center`
 (
     `id`         BIGINT      NOT NULL AUTO_INCREMENT,
     `addressId`  BIGINT      NOT NULL,
+    `centerImg`  LONGTEXT    NULL DEFAULT NULL,
     `centerName` VARCHAR(45) NOT NULL,
     `centerType` VARCHAR(45) NOT NULL COMMENT 'Center Specialization: ENGLISH, FRENCH, MIXED, ...',
     `centerDesc` LONGTEXT    NULL DEFAULT NULL,

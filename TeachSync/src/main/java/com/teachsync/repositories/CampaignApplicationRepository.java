@@ -1,6 +1,5 @@
 package com.teachsync.repositories;
 
-import com.teachsync.entities.ApplicationDetail;
 import com.teachsync.entities.CampaignApplication;
 import com.teachsync.utils.enums.Status;
 import org.springframework.data.domain.Page;

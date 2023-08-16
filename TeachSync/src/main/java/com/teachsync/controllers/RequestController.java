@@ -1,10 +1,8 @@
 package com.teachsync.controllers;
 
 import com.teachsync.dtos.center.CenterReadDTO;
-import com.teachsync.dtos.clazz.ClazzReadDTO;
 import com.teachsync.dtos.course.CourseReadDTO;
 import com.teachsync.dtos.semester.SemesterReadDTO;
-import com.teachsync.dtos.staff.StaffReadDTO;
 import com.teachsync.dtos.user.UserReadDTO;
 import com.teachsync.services.center.CenterService;
 import com.teachsync.services.clazz.ClazzService;
@@ -22,9 +20,6 @@ import org.springframework.web.bind.annotation.SessionAttribute;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Objects;
-
-import static com.teachsync.utils.enums.DtoOption.*;
 
 @Controller
 public class RequestController {

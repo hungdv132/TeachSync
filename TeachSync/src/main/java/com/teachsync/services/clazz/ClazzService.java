@@ -15,8 +15,6 @@ import java.util.Map;
 
 public interface ClazzService {
     /* =================================================== CREATE =================================================== */
-    String addClazz(ClazzCreateDTO createDTO);
-
     Clazz createClazz(Clazz clazz) throws Exception;
     ClazzReadDTO createClazzByDTO(ClazzCreateDTO createDTO) throws Exception;
 
@@ -51,8 +49,6 @@ public interface ClazzService {
 
 
     /* =================================================== UPDATE =================================================== */
-    String editClazz(ClazzUpdateDTO updateDTO);
-
     Clazz updateClazz(Clazz clazz) throws Exception;
     ClazzReadDTO updateClazzByDTO(ClazzUpdateDTO updateDTO) throws Exception;
 
