@@ -28,6 +28,7 @@ import com.teachsync.utils.enums.TestType;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -302,9 +303,9 @@ public class TestController {
             if (page == null || page < 0) {
                 page = 0;
             }
-            Pageable pageable = miscUtil.makePaging(page, 3, "id", true);
-
-            Page<Test> testPage = testService.getPageAll(pageable);
+//            Pageable pageable = miscUtil.makePaging(page, 3, "id", true);
+            PageRequest pageable = PageRequest.of(page, 3);
+            Page<Test> testPage = testRepository.findAllByOrderByCreatedAtDesc(pageable);
 
             model.addAttribute("tests", testPage);
             model.addAttribute("pageNo", testPage.getPageable().getPageNumber());
@@ -319,32 +320,21 @@ public class TestController {
     @GetMapping("/searchbycourse")
     public String searchByCourse(
             @RequestParam(value = "page", required = false) Integer page,
-            @RequestParam("courseName") String courseName,
+            @RequestParam("searchText") String courseName,
             Model model) {
-        try {
-            if (page == null || page < 0) {
-                page = 0;
-            }
-            Pageable pageable = miscUtil.makePaging(page, 3, "id", true);
-
-            List<Course> courseList = courseService.getAllByNameContains(courseName);
-            if (courseList == null) {
-                throw new IllegalArgumentException("No course found with name containing: " + courseName);
-            }
-
-            Set<Long> courseIdSet = courseList.stream().map(BaseEntity::getId).collect(Collectors.toSet());
-
-            Page<Test> testPage = testService.getPageAllByCourseIdIn(pageable, courseIdSet);
-
-            model.addAttribute("tests", testPage);
-            model.addAttribute("pageNo", testPage.getPageable().getPageNumber());
-            model.addAttribute("pageTotal", testPage.getTotalPages());
-            model.addAttribute("searchText", courseName);
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (page == null) {
+            page = 0;
         }
-
-        return "test/list-test";
+        if (page < 0) {
+            page = 0;
+        }
+        PageRequest pageable = PageRequest.of(page, 3);
+        Page<Test> tests = testRepository.findByTestNameContainingOrderByCreatedAtDesc(courseName, pageable);
+        model.addAttribute("tests", tests);
+        model.addAttribute("pageNo", tests.getPageable().getPageNumber());
+        model.addAttribute("pageTotal", tests.getTotalPages());
+        model.addAttribute("searchText", courseName);
+        return "test/list-test-search";
     }
 
     @GetMapping("/take-test")
@@ -365,15 +355,23 @@ public class TestController {
             }
 
             ClazzTestReadDTO clazzTestDTO =
-                    clazzTestService.getDTOById(clazzTestId, List.of(TEST, QUESTION_LIST, ANSWER_LIST));
+                    clazzTestService.getDTOByClazzIdAndTestId(clazzId, clazzTestId, List.of(TEST, QUESTION_LIST, ANSWER_LIST));
             if (!(clazzTestDTO != null && clazzTestDTO.getTest() != null)) {
                 throw new IllegalArgumentException("Không thấy bài test nào với Id: " + clazzTestId);
             }
             TestReadDTO testDTO = clazzTestDTO.getTest();
 
-            Map<QuestionReadDTO, List<AnswerReadDTO>> lstQs =
-                    testDTO.getQuestionList().stream()
-                            .collect(Collectors.toMap(Function.identity(), QuestionReadDTO::getAnswerList));
+
+            Map<QuestionReadDTO, List<AnswerReadDTO>> lstQs = new HashMap<>();
+            if (testDTO.getTestDesc().equals("MULTIPLE")) {
+                lstQs = testDTO.getQuestionList().stream()
+                        .collect(Collectors.toMap(Function.identity(), QuestionReadDTO::getAnswerList));
+            } else {
+                for (QuestionReadDTO key : testDTO.getQuestionList()) {
+                    lstQs.put(key, null);
+                }
+            }
+
 
             model.addAttribute("idClazzTest", clazzTestDTO.getId());
             model.addAttribute("idTest", testDTO.getId());
@@ -427,6 +425,7 @@ public class TestController {
             for (QuestionReadDTO questionDTO : questionDTOList) {
                 testRecord = new TestRecord();
                 testRecord.setMemberTestRecordId(memberTestRecord.getId());
+                testRecord.setStatus(Status.CREATED);
 
                 switch (questionType) {
                     case MULTIPLE -> {
@@ -436,7 +435,7 @@ public class TestController {
                         testRecord.setScore(as.getAnswerScore());
                     }
 
-                    case  ESSAY -> {
+                    case ESSAY -> {
                         String essayAnswer = requestParams.get("question" + questionDTO.getId());
                         testRecord.setAnswerTxt(essayAnswer);
                     }
@@ -457,7 +456,7 @@ public class TestController {
                     earnedScore += tR.getScore();
                 }
 
-                Double finalScore = (earnedScore / totalScore ) * 10.0;
+                Double finalScore = (earnedScore / totalScore) * 10.0;
                 memberTestRecord.setScore(finalScore);
             }
 

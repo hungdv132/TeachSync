@@ -69,7 +69,7 @@
                   <td>
                 <span
                     class="inline-flex px-5 py-2 font-semibold leading-5 text-green-800 bg-green-100 rounded-lg text-md ">
-                <a href="/edit-test?id=${tests.id}"> ${test.testName}</a>
+                <a href="/edit-test?id=${test.id}"> ${test.testName}</a>
                 </span>
                   </td>
                   <td>

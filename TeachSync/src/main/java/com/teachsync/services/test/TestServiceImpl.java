@@ -56,19 +56,19 @@ public class TestServiceImpl implements TestService {
 
         /* Create dependency */
         List<QuestionCreateDTO> questionCreateDTOList = createDTO.getQuestionList();
-//        if (questionCreateDTOList != null) {
-//            /* Về lý thuyết luôn phải có nhưng vẫn phải tránh null exception */
-//            Long testId = test.getId();
-//            Long createdBy = test.getCreatedBy();
-//            questionCreateDTOList =
-//                    questionCreateDTOList.stream()
-//                            .peek(dto -> {
-//                                dto.setTestId(testId);
-//                                dto.setCreatedBy(createdBy); })
-//                            .collect(Collectors.toList());
-//
-//
-//        }
+        if (questionCreateDTOList != null) {
+            /* Về lý thuyết luôn phải có nhưng vẫn phải tránh null exception */
+            Long testId = test.getId();
+            Long createdBy = test.getCreatedBy();
+            questionCreateDTOList =
+                    questionCreateDTOList.stream()
+                            .peek(dto -> {
+                                dto.setTestId(testId);
+                                dto.setCreatedBy(createdBy); })
+                            .collect(Collectors.toList());
+
+
+        }
         questionService.createBulkQuestionByDTO(questionCreateDTOList, createDTO.getTestDesc());
 
         return wrapDTO(test, List.of(QUESTION_LIST));
