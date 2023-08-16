@@ -7,6 +7,7 @@ import com.teachsync.dtos.course.CourseReadDTO;
 import com.teachsync.dtos.memberTestRecord.MemberTestRecordReadDTO;
 import com.teachsync.dtos.question.QuestionCreateDTO;
 import com.teachsync.dtos.question.QuestionReadDTO;
+import com.teachsync.dtos.test.MarkTestDTO;
 import com.teachsync.dtos.test.TestCreateDTO;
 import com.teachsync.dtos.test.TestReadDTO;
 import com.teachsync.dtos.user.UserReadDTO;
@@ -27,6 +28,7 @@ import com.teachsync.utils.enums.TestType;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -110,9 +112,10 @@ public class TestController {
             TestCreateDTO createDTO = new TestCreateDTO();
 
             createDTO.setCourseId(courseId);
-            createDTO.setTestName(courseDTO.getCourseAlias().concat(" - test " + courseDTO.getTestList().size()));
+//            createDTO.setTestName(courseDTO.getCourseAlias().concat(" - test " + courseDTO.getTestList().size()));
+            createDTO.setTestName(courseRepository.findById(courseId).orElse(null).getCourseName());
             createDTO.setTestType(testType);
-            createDTO.setTestDesc(courseDTO.getCourseName().concat(" - test " + courseDTO.getTestList().size()));
+            createDTO.setTestDesc(questionType.getStringValue());
             createDTO.setNumQuestion(numQuestions);
             createDTO.setQuestionType(questionType);
             createDTO.setTimeLimit(timeLimit);
@@ -173,10 +176,12 @@ public class TestController {
                             } else {
                                 answerCreateDTO.setAnswerScore(0.0);
                             }
-
+                            answerCreateDTOList.add(answerCreateDTO);
                         }
                         questionCreateDTO.setAnswerList(answerCreateDTOList);
+                        questionCreateDTOList.add(questionCreateDTO);
                     }
+
                     createDTO.setQuestionList(questionCreateDTOList);
                 }
             }
@@ -301,9 +306,9 @@ public class TestController {
             if (page == null || page < 0) {
                 page = 0;
             }
-            Pageable pageable = miscUtil.makePaging(page, 3, "id", true);
-
-            Page<Test> testPage = testService.getPageAll(pageable);
+//            Pageable pageable = miscUtil.makePaging(page, 3, "id", true);
+            PageRequest pageable = PageRequest.of(page, 3);
+            Page<Test> testPage = testRepository.findAllByOrderByCreatedAtDesc(pageable);
 
             model.addAttribute("tests", testPage);
             model.addAttribute("pageNo", testPage.getPageable().getPageNumber());
@@ -318,32 +323,21 @@ public class TestController {
     @GetMapping("/searchbycourse")
     public String searchByCourse(
             @RequestParam(value = "page", required = false) Integer page,
-            @RequestParam("courseName") String courseName,
+            @RequestParam("searchText") String courseName,
             Model model) {
-        try {
-            if (page == null || page < 0) {
-                page = 0;
-            }
-            Pageable pageable = miscUtil.makePaging(page, 3, "id", true);
-
-            List<Course> courseList = courseService.getAllByNameContains(courseName);
-            if (courseList == null) {
-                throw new IllegalArgumentException("No course found with name containing: " + courseName);
-            }
-
-            Set<Long> courseIdSet = courseList.stream().map(BaseEntity::getId).collect(Collectors.toSet());
-
-            Page<Test> testPage = testService.getPageAllByCourseIdIn(pageable, courseIdSet);
-
-            model.addAttribute("tests", testPage);
-            model.addAttribute("pageNo", testPage.getPageable().getPageNumber());
-            model.addAttribute("pageTotal", testPage.getTotalPages());
-            model.addAttribute("searchText", courseName);
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (page == null) {
+            page = 0;
         }
-
-        return "test/list-test";
+        if (page < 0) {
+            page = 0;
+        }
+        PageRequest pageable = PageRequest.of(page, 3);
+        Page<Test> tests = testRepository.findByTestNameContainingOrderByCreatedAtDesc(courseName, pageable);
+        model.addAttribute("tests", tests);
+        model.addAttribute("pageNo", tests.getPageable().getPageNumber());
+        model.addAttribute("pageTotal", tests.getTotalPages());
+        model.addAttribute("searchText", courseName);
+        return "test/list-test-search";
     }
 
     @GetMapping("/take-test")
@@ -364,15 +358,23 @@ public class TestController {
             }
 
             ClazzTestReadDTO clazzTestDTO =
-                    clazzTestService.getDTOById(clazzTestId, List.of(TEST, QUESTION_LIST, ANSWER_LIST));
+                    clazzTestService.getDTOByClazzIdAndTestId(clazzId, clazzTestId, List.of(TEST, QUESTION_LIST, ANSWER_LIST));
             if (!(clazzTestDTO != null && clazzTestDTO.getTest() != null)) {
                 throw new IllegalArgumentException("Không thấy bài test nào với Id: " + clazzTestId);
             }
             TestReadDTO testDTO = clazzTestDTO.getTest();
 
-            Map<QuestionReadDTO, List<AnswerReadDTO>> lstQs =
-                    testDTO.getQuestionList().stream()
-                            .collect(Collectors.toMap(Function.identity(), QuestionReadDTO::getAnswerList));
+
+            Map<QuestionReadDTO, List<AnswerReadDTO>> lstQs = new HashMap<>();
+            if (testDTO.getTestDesc().equals("MULTIPLE")) {
+                lstQs = testDTO.getQuestionList().stream()
+                        .collect(Collectors.toMap(Function.identity(), QuestionReadDTO::getAnswerList));
+            } else {
+                for (QuestionReadDTO key : testDTO.getQuestionList()) {
+                    lstQs.put(key, null);
+                }
+            }
+
 
             model.addAttribute("idClazzTest", clazzTestDTO.getId());
             model.addAttribute("idTest", testDTO.getId());
@@ -426,17 +428,20 @@ public class TestController {
             for (QuestionReadDTO questionDTO : questionDTOList) {
                 testRecord = new TestRecord();
                 testRecord.setMemberTestRecordId(memberTestRecord.getId());
+                testRecord.setStatus(Status.CREATED);
 
                 switch (questionType) {
                     case MULTIPLE -> {
                         Long answerId = Long.parseLong(requestParams.get("question" + questionDTO.getId()));
                         Answer as = answerService.getById(answerId);
+                        testRecord.setQuestionId(questionDTO.getId());
                         testRecord.setAnswerId(as.getId());
                         testRecord.setScore(as.getAnswerScore());
                     }
 
-                    case  ESSAY -> {
+                    case ESSAY -> {
                         String essayAnswer = requestParams.get("question" + questionDTO.getId());
+                        testRecord.setQuestionId(questionDTO.getId());
                         testRecord.setAnswerTxt(essayAnswer);
                     }
                 }
@@ -456,7 +461,7 @@ public class TestController {
                     earnedScore += tR.getScore();
                 }
 
-                Double finalScore = (earnedScore / totalScore ) * 10.0;
+                Double finalScore = (earnedScore / totalScore) * 10.0;
                 memberTestRecord.setScore(finalScore);
             }
 
@@ -581,6 +586,51 @@ public class TestController {
         }
 
         return "test/testscore-class";
+    }
+
+    @GetMapping("/mark-essay")
+    public String markEssay(Model model,
+                            HttpSession session,
+                            @RequestParam("memberTestRecordId") Long memberTestRecordId) {
+
+        MemberTestRecord mtr = memberTestRecordRepository.findAllByIdAndStatus(memberTestRecordId, Status.DONE).orElse(null);
+        List<TestRecord> testRecords = testRecordRepository.findAllByMemberTestRecordId(memberTestRecordId);
+        List<MarkTestDTO> markTestDTOS = new ArrayList<>();
+        for (TestRecord testRecord : testRecords) {
+            Question question = questionRepository.findAllById(testRecord.getQuestionId()).orElse(null);
+            markTestDTOS.add(new MarkTestDTO(question.getQuestionDesc(), testRecord.getAnswerTxt(), testRecord.getId()));
+        }
+        model.addAttribute("markTestDTOS", markTestDTOS);
+        model.addAttribute("memberTestRecordId", memberTestRecordId);
+        return "test/mark-essay";
+    }
+
+    @PostMapping("/mark")
+    public String mark(
+            Model model,
+            @RequestParam("memberTestRecordId") Long memberTestRecordId,
+            @RequestParam Map<String, String> requestParams,
+            @SessionAttribute(value = "user", required = false) UserReadDTO userDTO) throws Exception {
+
+        MemberTestRecord memberTestRecord = memberTestRecordRepository.findAllByIdAndStatus(memberTestRecordId, Status.DONE).orElse(null);
+        ClazzTest clazzTest = clazzTestService.getById(memberTestRecord.getClazzTestId());
+        List<TestRecord> testRecords = testRecordRepository.findAllByMemberTestRecordId(memberTestRecordId);
+        List<Question> questions = questionRepository.findAllByTestIdAndStatusNot(clazzTest.getTestId(), Status.DELETED);
+
+        double totalScore = 0;
+        double maxScore = 0;
+        for (Question qs : questions) {
+            maxScore = maxScore + qs.getQuestionScore();
+        }
+        for (TestRecord testRecord : testRecords) {
+            Double score = Double.parseDouble(requestParams.get("scores[" + testRecord.getId() + "]"));
+            testRecord.setScore(score);
+            totalScore = totalScore + score;
+            testRecordRepository.save(testRecord);
+        }
+        memberTestRecord.setScore((totalScore / maxScore)*10);
+        memberTestRecordRepository.save(memberTestRecord);
+        return "redirect:/";
     }
 
 
