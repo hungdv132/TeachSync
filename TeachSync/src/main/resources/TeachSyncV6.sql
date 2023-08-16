@@ -1041,35 +1041,27 @@ DROP TABLE IF EXISTS `teachsync`.`test_record`;
 
 CREATE TABLE IF NOT EXISTS `teachsync`.`test_record`
 (
-    `id`                 BIGINT      NOT NULL AUTO_INCREMENT,
-    `memberTestRecordId` BIGINT      NOT NULL COMMENT 'Ai làm, bài test nào',
-    `answerId`           BIGINT      NOT NULL COMMENT 'Câu trả lời chọn (Câu hỏi MULTIPLE)',
-    `answerTxt`          LONGTEXT    NULL DEFAULT NULL COMMENT 'Câu trả lời ghi ra (Câu hỏi ESSAY. Giáo viên cần chấm)',
-    `score`              FLOAT       NULL DEFAULT NULL COMMENT 'Điểm đặt được (Auto tính = code. ESSAY thì giáo viên update)',
-    `status`             VARCHAR(45) NOT NULL,
-    `createdAt`          DATETIME    NULL DEFAULT NULL,
-    `createdBy`          BIGINT      NULL DEFAULT NULL,
-    `updatedAt`          DATETIME    NULL DEFAULT NULL,
-    `updatedBy`          BIGINT      NULL DEFAULT NULL,
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `memberTestRecordId` bigint NOT NULL COMMENT 'Ai làm, bài test nào',
+    `questionId` bigint NOT NULL,
+    `answerId` bigint DEFAULT NULL COMMENT 'Câu trả lời chọn (Câu hỏi MULTIPLE)',
+    `answerTxt` longtext COMMENT 'Câu trả lời ghi ra (Câu hỏi ESSAY. Giáo viên cần chấm)',
+    `score` float DEFAULT NULL COMMENT 'Điểm đặt được (Auto tính = code. ESSAY thì giáo viên update)',
+    `status` varchar(45) NOT NULL,
+    `createdAt` datetime DEFAULT NULL,
+    `createdBy` bigint DEFAULT NULL,
+    `updatedAt` datetime DEFAULT NULL,
+    `updatedBy` bigint DEFAULT NULL,
     PRIMARY KEY (`id`),
-    INDEX `fk_test_record_answer_idx` (`answerId` ASC) VISIBLE,
-    INDEX `fk_test_record_member_test_record_idx` (`memberTestRecordId` ASC) VISIBLE,
-    INDEX `fk_test_record_user_createdBy_idx` (`createdBy` ASC) VISIBLE,
-    INDEX `fk_test_record_user_updatedBy_idx` (`updatedBy` ASC) VISIBLE,
-    CONSTRAINT `fk_test_record_answer`
-        FOREIGN KEY (`answerId`)
-            REFERENCES `teachsync`.`answer` (`id`),
-    CONSTRAINT `fk_test_record_member_test_record`
-        FOREIGN KEY (`memberTestRecordId`)
-            REFERENCES `teachsync`.`member_test_record` (`id`),
-    CONSTRAINT `fk_test_record_user_createdBy`
-        FOREIGN KEY (`createdBy`)
-            REFERENCES `teachsync`.`user` (`id`),
-    CONSTRAINT `fk_test_record_user_updatedBy`
-        FOREIGN KEY (`updatedBy`)
-            REFERENCES `teachsync`.`user` (`id`)
-)
-    ENGINE = InnoDB;
+    KEY `fk_test_record_answer_idx` (`answerId`),
+    KEY `fk_test_record_member_test_record_idx` (`memberTestRecordId`),
+    KEY `fk_test_record_user_createdBy_idx` (`createdBy`),
+    KEY `fk_test_record_user_updatedBy_idx` (`updatedBy`),
+    CONSTRAINT `fk_test_record_answer` FOREIGN KEY (`answerId`) REFERENCES `answer` (`id`),
+    CONSTRAINT `fk_test_record_member_test_record` FOREIGN KEY (`memberTestRecordId`) REFERENCES `member_test_record` (`id`),
+    CONSTRAINT `fk_test_record_user_createdBy` FOREIGN KEY (`createdBy`) REFERENCES `user` (`id`),
+    CONSTRAINT `fk_test_record_user_updatedBy` FOREIGN KEY (`updatedBy`) REFERENCES `user` (`id`)
+    ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
 -- -----------------------------------------------------
@@ -1351,19 +1343,7 @@ CREATE TABLE IF NOT EXISTS `teachsync`.`application_detail`
     ENGINE = InnoDB;
 
 
-CREATE TABLE `testrecord` (
-                              `id` bigint NOT NULL AUTO_INCREMENT,
-                              `testId` bigint NOT NULL,
-                              `userId` bigint NOT NULL,
-                              `username` varchar(45) DEFAULT NULL,
-                              `class` varchar(45) DEFAULT NULL,
-                              `questionId` bigint NOT NULL,
-                              `questionType` varchar(45) DEFAULT NULL,
-                              `essayAnswer` varchar(4000) DEFAULT NULL,
-                              `answerMCId` bigint DEFAULT NULL,
-                              `correct` bit(1) DEFAULT NULL,
-                              PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=31 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
 
 
 CREATE TABLE `test_session` (
