@@ -4,7 +4,6 @@ import com.teachsync.dtos.campaignApplication.CampaignApplicationReadDTO;
 import com.teachsync.dtos.center.CenterReadDTO;
 import com.teachsync.dtos.recruitmentCampaign.RecruitmentCampaignReadDTO;
 import com.teachsync.dtos.user.UserReadDTO;
-import com.teachsync.entities.Homework;
 import com.teachsync.entities.RecruitmentCampaign;
 import com.teachsync.repositories.RecruitmentCampaignRepository;
 import com.teachsync.services.campaignApplication.CampaignApplicationService;
@@ -21,8 +20,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Service

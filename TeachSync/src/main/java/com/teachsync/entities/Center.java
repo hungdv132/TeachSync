@@ -18,6 +18,10 @@ public class Center extends BaseEntity {
     @Column(name = "addressId", nullable = false)
     private Long addressId;
 
+    @Lob
+    @Column(name = "centerImg", nullable = true, length = -1)
+    private String centerImg;
+
     @Column(name = "centerName", nullable = false, length = 45)
     private String centerName;
 

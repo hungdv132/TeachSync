@@ -64,23 +64,22 @@
 <!-- ================================================== Main Body ================================================== -->
 <div class="row ts-bg-white d-flex justify-content-center border ts-border-teal rounded-3 pt-3 mx-2 mb-3">
     <form onsubmit="editCourse(event)" class="col-12 d-flex justify-content-center px-5 mb-3">
-      
-      
       <div class="row">
         
-        <h4>Thêm khóa học</h4>
+        <h4>Sửa khóa học</h4>
         <br>
         
         <!-- Course Img -->
         <div class="col-sm-12 col-md-3 mb-3">
           <label class="w-100">
             Ảnh khóa học: <br/>
-            <img src="${course.courseImg}" alt="courseImg" id="imgCourseImg"
+            <img src="${empty course.courseImg ? '../../../resources/img/no-img.jpg' : course.courseImg}" alt="courseImg" id="imgCourseImg"
                  class="rounded-2 border ts-border-blue w-100 h-auto mb-3">
             <br/>
             <input type="file" name="img" id="txtImg" class="w-100"
                    accept="image/*" onchange="updateImgFromInput('txtImg', 'imgCourseImg', 0.75)">
           </label>
+          <p class="ts-txt-italic ts-txt-sm mb-0">*Tối đa 0.75 MB</p>
         </div>
         
         <!-- Course detail -->

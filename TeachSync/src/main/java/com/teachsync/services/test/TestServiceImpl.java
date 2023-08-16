@@ -24,7 +24,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.teachsync.utils.enums.DtoOption.*;
+import static com.teachsync.utils.enums.DtoOption.QUESTION_LIST;
 
 @Service
 public class TestServiceImpl implements TestService {

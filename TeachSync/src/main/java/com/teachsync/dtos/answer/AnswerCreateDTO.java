@@ -1,7 +1,6 @@
 package com.teachsync.dtos.answer;
 
 import com.teachsync.dtos.BaseCreateDTO;
-import com.teachsync.dtos.BaseReadDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

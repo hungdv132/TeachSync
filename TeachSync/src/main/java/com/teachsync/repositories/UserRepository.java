@@ -1,6 +1,5 @@
 package com.teachsync.repositories;
 
-import com.teachsync.entities.Test;
 import com.teachsync.entities.User;
 import com.teachsync.utils.enums.Status;
 import org.springframework.data.domain.Page;
@@ -26,6 +25,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByUsernameAndStatusNot(String username, Status status);
 
     List<User> findAllByRoleId(Long roleId);
+
+    List<User> findAllByUsernameAndIdNotAndStatusNot(String username, Long id, Status status);
 
     List<User> findAllByUsernameContaining(String username);
 

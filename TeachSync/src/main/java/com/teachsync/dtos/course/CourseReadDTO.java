@@ -5,7 +5,6 @@ import com.teachsync.dtos.priceLog.PriceLogReadDTO;
 import com.teachsync.dtos.test.TestReadDTO;
 import com.teachsync.entities.Clazz;
 import com.teachsync.entities.Material;
-import com.teachsync.entities.Test;
 import lombok.*;
 
 import java.util.List;

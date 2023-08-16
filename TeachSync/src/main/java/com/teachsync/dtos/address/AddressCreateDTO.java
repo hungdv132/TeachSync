@@ -1,7 +1,6 @@
 package com.teachsync.dtos.address;
 
 import com.teachsync.dtos.BaseCreateDTO;
-import com.teachsync.dtos.BaseReadDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -18,6 +17,4 @@ public class AddressCreateDTO extends BaseCreateDTO {
     private String addressNo;
     private String street;
     private Long unitId;
-
-
 }

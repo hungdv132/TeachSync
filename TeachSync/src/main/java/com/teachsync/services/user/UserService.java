@@ -31,6 +31,13 @@ public interface UserService {
     List<UserReadDTO> getAllDTOByIdIn(Collection<Long> idCollection, Collection<DtoOption> options) throws Exception;
     Map<Long, UserReadDTO> mapIdDTOByIdIn(Collection<Long> idCollection, Collection<DtoOption> options) throws Exception;
 
+    /* username */
+    List<User> getAllByUsernameAndIdNot(String username, Long id) throws Exception;
+
+    List<User> getListUserByType(Long type);
+    List<User> getListUserByUserName(String username);
+
+
     /* =================================================== UPDATE =================================================== */
 
     User updateUser(User user) throws Exception;
@@ -39,9 +46,6 @@ public interface UserService {
     UserReadDTO activateTeacherAccount(Long unactivatedTeacherAccId) throws Exception;
 
     /* =================================================== DELETE =================================================== */
-
-    List<User> getListUserByType(Long type);
-    List<User> getListUserByUserName(String username);
 
 
 

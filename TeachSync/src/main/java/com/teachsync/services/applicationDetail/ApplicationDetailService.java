@@ -1,7 +1,6 @@
 package com.teachsync.services.applicationDetail;
 
 import com.teachsync.dtos.applicationDetail.ApplicationDetailReadDTO;
-import com.teachsync.dtos.recruitmentCampaign.RecruitmentCampaignReadDTO;
 import com.teachsync.dtos.user.UserReadDTO;
 import com.teachsync.entities.ApplicationDetail;
 import com.teachsync.utils.enums.DtoOption;

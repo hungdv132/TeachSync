@@ -79,9 +79,9 @@
 <label for="question-type">Môn học:</label>
 <input type="hidden" name="idTest" id="idTest">
 <select name="courseId" id="selCourseId">
-  <c:forEach var="courseDTO" items="${courseList}">
-    <option value="${courseDTO.id}">
-      <c:out value="${courseDTO.courseName}"/>
+  <c:forEach var="centerDTO" items="${courseList}">
+    <option value="${centerDTO.id}">
+      <c:out value="${centerDTO.courseName}"/>
     </option>
   </c:forEach>
 </select>

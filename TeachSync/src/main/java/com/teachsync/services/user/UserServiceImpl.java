@@ -19,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
@@ -78,10 +77,13 @@ public class UserServiceImpl implements UserService {
 //            User parent = createUser(new User());
 //            user.setParent(parent);
         }
+
         //process password BCryptPasswordEncoder
         String password = user.getPassword();
+
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         String hashedPassword = passwordEncoder.encode(password);
+
         user.setPassword(hashedPassword);
 
         user = createUser(user);
@@ -103,7 +105,7 @@ public class UserServiceImpl implements UserService {
         User user = login(username);
 
         if (ObjectUtils.isEmpty(user)) {
-            throw new UsernameNotFoundException("Không tìm thấy tài khoản với username: " + username);
+            throw new BadCredentialsException("Sai username hoặc password");
         }
 
         //check password
@@ -115,19 +117,6 @@ public class UserServiceImpl implements UserService {
         }
 
         return wrapDTO(user);
-    }
-
-    @Override
-    public List<User> getListUserByType(Long type) {
-        System.out.println("type = " + type);
-        List<User> x = userRepository.findAllByRoleId(type);
-        System.out.println(x);
-        return x;
-    }
-
-    @Override
-    public List<User> getListUserByUserName(String username) {
-        return userRepository.findAllByUsernameContaining(username);
     }
 
     /* id */
@@ -191,13 +180,41 @@ public class UserServiceImpl implements UserService {
                 .collect(Collectors.toMap(BaseReadDTO::getId, Function.identity()));
     }
 
+    /* username */
+    @Override
+    public List<User> getAllByUsernameAndIdNot(String username, Long id) throws Exception {
+        List<User> userList = userRepository.findAllByUsernameAndIdNotAndStatusNot(username, id, Status.DELETED);
+
+        if (userList.isEmpty()) {
+            return null;
+        }
+
+        return userList;
+    }
+
+    @Override
+    public List<User> getListUserByUserName(String username) {
+        return userRepository.findAllByUsernameContaining(username);
+    }
+
+
+    @Override
+    public List<User> getListUserByType(Long type) {
+        System.out.println("type = " + type);
+        List<User> x = userRepository.findAllByRoleId(type);
+        System.out.println(x);
+        return x;
+    }
+
+    /* =================================================== UPDATE =================================================== */
     @Override
     public User updateUser(User user) throws Exception {
         User oldUser = getById(user.getId());
-
         if (oldUser == null) {
             throw new IllegalArgumentException("No User found with Id: " + user.getId());
         }
+        user.setCreatedAt(oldUser.getCreatedAt());
+        user.setCreatedBy(oldUser.getCreatedBy());
 
         //Check valid input (Vd: email, phone)
 
@@ -208,8 +225,18 @@ public class UserServiceImpl implements UserService {
         }
 //        user.setRole(role);
 
-        user.setUsername(oldUser.getUsername());
-        user.setPassword(oldUser.getPassword());
+        if (user.getUsername() == null) {
+            user.setUsername(oldUser.getUsername());
+        }
+
+        if (user.getPassword() == null) {
+            user.setPassword(oldUser.getPassword());
+        } else {
+            BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+            String hashedPassword = passwordEncoder.encode(user.getPassword());
+
+            user.setPassword(hashedPassword);
+        }
 
         return userRepository.saveAndFlush(user);
     }
@@ -239,9 +266,6 @@ public class UserServiceImpl implements UserService {
 
         return wrapDTO(teacher);
     }
-
-    /* =================================================== UPDATE =================================================== */
-
 
 
     /* =================================================== DELETE =================================================== */
@@ -346,10 +370,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void updatePassword(User user, String newPassword) {
-//        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-//        String encodedPassword = passwordEncoder.encode(newPassword);
-//        user.setPassword(encodedPassword);
-        user.setPassword(newPassword);
+        //process password BCryptPasswordEncoder
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        String hashedPassword = passwordEncoder.encode(newPassword);
+
+        user.setPassword(hashedPassword);
 
         user.setResetPasswordToken(null);
         userRepository.saveAndFlush(user);

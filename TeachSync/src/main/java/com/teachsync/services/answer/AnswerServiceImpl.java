@@ -5,7 +5,6 @@ import com.teachsync.dtos.answer.AnswerReadDTO;
 import com.teachsync.dtos.answer.AnswerUpdateDTO;
 import com.teachsync.entities.Answer;
 import com.teachsync.entities.BaseEntity;
-import com.teachsync.entities.LocationUnit;
 import com.teachsync.repositories.AnswerRepository;
 import com.teachsync.utils.enums.DtoOption;
 import com.teachsync.utils.enums.Status;

@@ -6,10 +6,8 @@ import com.teachsync.dtos.address.AddressCreateDTO;
 import com.teachsync.dtos.address.AddressReadDTO;
 import com.teachsync.dtos.address.AddressUpdateDTO;
 import com.teachsync.entities.Address;
-import com.teachsync.entities.BaseEntity;
 import com.teachsync.entities.LocationUnit;
 import com.teachsync.repositories.AddressRepository;
-import com.teachsync.repositories.LocationUnitRepository;
 import com.teachsync.services.locationUnit.LocationUnitService;
 import com.teachsync.utils.enums.DtoOption;
 import com.teachsync.utils.enums.Status;
@@ -49,8 +47,8 @@ public class AddressServiceImpl implements AddressService {
         return addressRepository.saveAndFlush(address);
     }
     @Override
-    public AddressReadDTO createAddressByDTO(AddressCreateDTO addressCreateDTO) throws Exception {
-        Address address = mapper.map(addressCreateDTO, Address.class);
+    public AddressReadDTO createAddressByDTO(AddressCreateDTO createDTO) throws Exception {
+        Address address = mapper.map(createDTO, Address.class);
 
         StringBuilder addressString = new StringBuilder(address.getAddressNo() + " " + address.getStreet());
 
@@ -123,11 +121,42 @@ public class AddressServiceImpl implements AddressService {
     /* =================================================== UPDATE =================================================== */
     @Override
     public Address updateAddress(Address address) throws Exception {
-        return null;
+        /* Check exist */
+        Address oldAddress = getById(address.getId());
+        if (oldAddress == null) {
+            throw new IllegalArgumentException("Update Error. No Address found with id: " + address.getId());
+        }
+        address.setCreatedBy(oldAddress.getCreatedBy());
+        address.setCreatedAt(oldAddress.getCreatedAt());
+
+        /* Validate input */
+        //TODO: Kiểm tra chính tả,...
+
+        /* Check FK */
+        //TODO: Kiểm tra khóa ngoại (locationUnit)
+
+        /* Insert to DB */
+
+        return addressRepository.saveAndFlush(address);
     }
     @Override
-    public AddressReadDTO updateAddressByDTO(AddressUpdateDTO addressUpdateDTO) throws Exception {
-        return null;
+    public AddressReadDTO updateAddressByDTO(AddressUpdateDTO updateDTO) throws Exception {
+        Address address = mapper.map(updateDTO, Address.class);
+
+        StringBuilder addressString = new StringBuilder(address.getAddressNo() + " " + address.getStreet());
+
+        Map<Integer, LocationUnit> levelUnitMap =
+                locationUnitService.mapLevelUnitByBottomChildId(address.getUnitId(), null);
+
+        for (int i = 3; i >= 0; i--) {
+            addressString.append(", ").append(levelUnitMap.get(i).getUnitAlias());
+        }
+
+        address.setAddressString(addressString.toString());
+
+        address = updateAddress(address);
+
+        return mapper.map(address, AddressReadDTO.class);
     }
 
     /* =================================================== DELETE =================================================== */

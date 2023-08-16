@@ -74,9 +74,9 @@
           <label class="col-12 mb-1">Khóa học: <br/>
             <select name="course" id="selCourse" class="w-100 py-1" onchange="loadClassList(); loadCourseDetail();">
               <option value="0" selected disabled hidden>- Xin chọn khóa học -</option>
-              <c:forEach var="courseDTO" items="${courseList}">
-                <option value="${courseDTO.id}">
-                  <c:out value="${courseDTO.courseAlias.concat(' - ').concat(courseDTO.courseName)}"/>
+              <c:forEach var="centerDTO" items="${courseList}">
+                <option value="${centerDTO.id}">
+                  <c:out value="${centerDTO.courseAlias.concat(' - ').concat(centerDTO.courseName)}"/>
                 </option>
               </c:forEach>
             </select>

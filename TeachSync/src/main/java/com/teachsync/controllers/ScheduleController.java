@@ -5,7 +5,6 @@ import com.teachsync.dtos.clazzSchedule.ClazzScheduleCreateDTO;
 import com.teachsync.dtos.clazzSchedule.ClazzScheduleReadDTO;
 import com.teachsync.dtos.clazzSchedule.ClazzScheduleUpdateDTO;
 import com.teachsync.dtos.user.UserReadDTO;
-
 import com.teachsync.entities.Room;
 import com.teachsync.services.clazz.ClazzService;
 import com.teachsync.services.clazzSchedule.ClazzScheduleService;
@@ -14,7 +13,6 @@ import com.teachsync.utils.Constants;
 import com.teachsync.utils.MiscUtil;
 import com.teachsync.utils.enums.DtoOption;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
@@ -24,13 +22,11 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import static com.teachsync.utils.Constants.ROLE_ADMIN;
 import static com.teachsync.utils.enums.DtoOption.CLAZZ_NAME;
 import static com.teachsync.utils.enums.DtoOption.ROOM_NAME;
 
