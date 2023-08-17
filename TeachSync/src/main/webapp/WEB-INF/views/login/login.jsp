@@ -1,4 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8" %>
 
 <!DOCTYPE HTML>
 <html lang="en">
@@ -65,13 +66,13 @@
   
       <p id="message"></p>
       
-      <button type="submit">LOGIN</button>
+      <button type="submit">Đăng nhập</button>
     </form>
 
     <form class="login-form" action="/sign-up" method="get">
-      <button type="submit">SIGN UP</button>
+      <button type="submit">Đăng ký</button>
     </form>
-    <a href="forgot_password"> Forgot your password?</a>
+    <a href="forgot_password"> Quên mật khẩu</a>
   </div>
 </div>
 
