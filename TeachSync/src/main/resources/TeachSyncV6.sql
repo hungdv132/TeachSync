@@ -1328,7 +1328,7 @@ DROP TABLE IF EXISTS `teachsync`.`application_detail`;
 
 CREATE TABLE IF NOT EXISTS `teachsync`.`application_detail`
 (
-    `id`            BIGINT      NOT NULL,
+    `id`            BIGINT      NOT NULL AUTO_INCREMENT,
     `applicationId` BIGINT      NOT NULL,
     `detailType`    VARCHAR(45) NOT NULL COMMENT 'cv, id, degree, ...',
     `detailLink`    LONGTEXT    NOT NULL COMMENT 'url to file',
