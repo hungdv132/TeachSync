@@ -1,4 +1,4 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <!DOCTYPE html>
@@ -7,10 +7,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   
-  <title>Chi tiết Cơ Sở</title>
+  <title>Danh sách đơn xin</title>
   
   <link rel="stylesheet" href="../../../resources/css/bootstrap-5.3.0/bootstrap.css">
-  
   <link rel="stylesheet" href="../../../resources/css/teachsync_style.css">
   
   <script src="../../../resources/js/jquery/jquery-3.6.3.js"></script>
@@ -34,11 +33,8 @@
             <i class="bi-house-door"></i>&nbsp;Trang chủ
           </a>
         </li>
-        <li class="breadcrumb-item">
-          <a href="/center">Danh sách Cơ Sở</a>
-        </li>
         <li class="breadcrumb-item active" aria-current="page">
-          Chi tiết Cơ sở
+          Danh sách Đơn xin
         </li>
       </ol>
     </nav>
@@ -48,36 +44,91 @@
 
 
 <!-- ================================================== Main Body ================================================== -->
-<div class="row ts-bg-white border ts-border-teal rounded-3 pt-3 px-5 mx-2 mb-3">
+<div class="row ts-bg-white border ts-border-teal rounded-3 px-5 pt-3 mx-2 mb-3">
+  
   <div class="col-12 d-flex justify-content-between align-items-center mb-3">
-    <h4 class="mb-0">${center.centerName}</h4>
+    <h5 class="mb-0">Danh sách đơn xin</h5>
     
-    <c:if test="${isAdmin}">
-      <a href="/edit-center?id=${center.id}" class="btn btn-warning">Chỉnh sửa</a>
+    <c:if test="${isStudent}">
+      <a href="/add-request" class="btn btn-success">Tạo mới</a>
     </c:if>
   </div>
   
-  <!-- Center Img -->
-  <div class="col-sm-12 col-md-4 mb-3">
-    <img src="${empty center.centerImg ? '../../../resources/img/no-img.jpg' : center.centerImg}" alt="courseImg"
-         class="rounded-2 border ts-border-blue w-100 h-auto mb-3">
-  </div>
-
-  <!-- Center detail -->
-  <div class="col-sm-12 col-md-8 mb-3">
-    <p>Địa chỉ: ${center.address.addressString}</p>
-    <p>Chuyên môn: ${center.centerType.stringValueVie}</p>
-    <p>Số phòng: ${center.centerSize} phòng</p>
-    <p>Mô tả: <br>${center.centerDesc}</p>
-  </div>
+  <table class="table table-striped">
+    <thead class="table-primary">
+      <tr>
+        <th scope="col">ID</th>
+        <c:if test="${isAdmin}">
+          <th scope="col">Xin bởi</th>
+        </c:if>
+        <th scope="col">Lớp</th>
+        <th scope="col">Khóa</th>
+        <th scope="col">Kỳ</th>
+        <th scope="col">Cơ sở</th>
+        <th scope="col">Trạng thái</th>
+        
+        <th scope="col">Chức năng</th>
+      </tr>
+    </thead>
+    
+    <tbody>
+    <c:forEach var="request" items="${requestList}">
+      <tr>
+        <c:url var="requestDetail" value="/request-detail">
+          <c:param name="id" value="${request.id}"/>
+        </c:url>
+        <th scope="row">
+          <a href="${requestDetail}">${request.id}</a>
+        </th>
+        <c:if test="${isAdmin}">
+          <td>${request.requesterFullName}</td>
+        </c:if>
+        <td><a href="${requestDetail}">${request.clazz.clazzName}</a></td>
+        <td><a href="${requestDetail}">${request.clazz.courseSemester.courseAlias}</a></td>
+        <td><a href="${requestDetail}">${request.clazz.courseSemester.semesterAlias}</a></td>
+        <td><a href="${requestDetail}">${request.clazz.courseSemester.centerName}</a></td>
+        <td><a href="${requestDetail}">${request.status.stringValueVie}</a></td>
+        <td>
+          <a href="/edit-request?id=${request.id}" class="btn btn-warning">Sửa</a>
+          <c:if test="${isStudent}">
+            <a href="/delete-request?id=${request.id}" class="btn btn-danger ms-2">Xóa</a>
+          </c:if>
+        </td>
+      </tr>
+    </c:forEach>
+    </tbody>
+  </table>
+  
+  <c:if test="${empty requestList}">
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+  </c:if>
 
 </div>
-
 <!-- ================================================== Main Body ================================================== -->
-
 
 <!-- ================================================== Footer ===================================================== -->
 <%@ include file="/WEB-INF/fragments/footer.jspf" %>
 <!-- ================================================== Footer ===================================================== -->
 </body>
+<script>
+    var mess = '${mess}'
+    if (mess != '') {
+        alert(mess);
+    }
+</script>
 </html>

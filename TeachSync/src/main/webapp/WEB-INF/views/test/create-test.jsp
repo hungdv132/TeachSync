@@ -98,8 +98,8 @@
 <form action="/process-question" method="post">
   <label for="question-type">Môn học:</label>
   <select name="courseId">
-    <c:forEach var="centerDTO" items="${lstCourse}">
-      <option value="${centerDTO.id}">${centerDTO.courseName}</option>
+    <c:forEach var="courseDTO" items="${lstCourse}">
+      <option value="${courseDTO.id}">${courseDTO.courseName}</option>
     </c:forEach>
   </select>
   

@@ -6,6 +6,7 @@ import com.teachsync.dtos.center.CenterCreateDTO;
 import com.teachsync.dtos.center.CenterReadDTO;
 import com.teachsync.dtos.center.CenterUpdateDTO;
 import com.teachsync.dtos.room.RoomReadDTO;
+import com.teachsync.entities.BaseEntity;
 import com.teachsync.entities.Center;
 import com.teachsync.repositories.CenterRepository;
 import com.teachsync.services.address.AddressService;
@@ -123,6 +124,16 @@ public class CenterServiceImpl implements CenterService {
             return null; }
 
         return centerList;
+    }
+    @Override
+    public Map<Long, String> mapIdCenterNameByIdIn(Collection<Long> idCollection) throws Exception {
+        List<Center> centerList = getAllByIdIn(idCollection);
+
+        if (centerList == null) {
+            return new HashMap<>(); }
+
+        return centerList.stream()
+                .collect(Collectors.toMap(BaseEntity::getId, Center::getCenterName));
     }
     @Override
     public List<CenterReadDTO> getAllDTOByIdIn(

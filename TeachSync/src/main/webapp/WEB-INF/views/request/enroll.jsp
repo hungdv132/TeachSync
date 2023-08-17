@@ -1,9 +1,12 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="vi" dir="ltr">
 <head>
+  <fmt:setLocale value="vi_VN"/>
+  
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -100,8 +103,12 @@
             <div class="border-bottom px-3 mb-3">
               <p class="mb-1">Kỳ: <c:out value="${semesterIdSemesterDTO.value.semesterAlias}"/>&nbsp;-&nbsp;
                  <c:out value="${semesterIdSemesterDTO.value.semesterName}"/></p>
-              <p>Từ: <c:out value="${semesterIdSemesterDTO.value.startDate}"/>&nbsp;&nbsp;&nbsp;
-                 Đến: <c:out value="${semesterIdSemesterDTO.value.endDate}"/></p>
+              <fmt:parseDate value="${semesterIdSemesterDTO.value.startDate}" type="date"
+                             pattern="yyyy-MM-dd" var="parsedStartDate" />
+              <fmt:parseDate value="${semesterIdSemesterDTO.value.endDate}" type="date"
+                             pattern="yyyy-MM-dd" var="parsedEndDate" />
+              <p>Từ: <fmt:formatDate value="${parsedStartDate}" type="date" pattern="dd/MM/yyyy"/>&nbsp;&nbsp;&nbsp;
+                 Đến: <fmt:formatDate value="${parsedEndDate}" type="date" pattern="dd/MM/yyyy"/></p>
             </div>
             
             <!-- Center Tab & TabPane -->
@@ -173,10 +180,11 @@
               
                             <div class="card-body">
                               <p class="card-text">
-                                Lịch học: <c:out value="${clazzDTO.clazzSchedule.scheduleType}"/><br/>
-                                Slot: <c:out value="${clazzDTO.clazzSchedule.slot}"/><br/>
-                                Từ: <c:out value="${clazzDTO.clazzSchedule.sessionStart}"/>&nbsp;
-                                Đến: <c:out value="${clazzDTO.clazzSchedule.sessionEnd}"/><br/>
+                                <c:set var="clazzSchedule" value="${clazzDTO.clazzSchedule}"/>
+                                Lịch học: <c:out value="${clazzSchedule.scheduleType.stringValueVie}"/><br/>
+                                Slot: <c:out value="${clazzSchedule.slot}"/><br/>
+                                Từ: <c:out value="${clazzSchedule.sessionStart}"/>&nbsp;
+                                Đến: <c:out value="${clazzSchedule.sessionEnd}"/><br/>
                   
                                 Thành viên: <c:out value="${memberCount}"/> &sol; <c:out value="${clazzDTO.clazzSize}"/>
                               </p>

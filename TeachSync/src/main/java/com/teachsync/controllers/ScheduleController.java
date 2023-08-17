@@ -24,12 +24,10 @@ import com.teachsync.services.room.RoomService;
 import com.teachsync.services.semester.SemesterService;
 import com.teachsync.utils.Constants;
 import com.teachsync.utils.MiscUtil;
-import com.teachsync.utils.enums.DtoOption;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.ObjectUtils;
@@ -42,6 +40,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import static com.teachsync.utils.Constants.*;
+import static com.teachsync.utils.enums.DtoOption.*;
 
 @Controller
 public class ScheduleController {
