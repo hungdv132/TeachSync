@@ -1041,27 +1041,40 @@ DROP TABLE IF EXISTS `teachsync`.`test_record`;
 
 CREATE TABLE IF NOT EXISTS `teachsync`.`test_record`
 (
-    `id` bigint NOT NULL AUTO_INCREMENT,
-    `memberTestRecordId` bigint NOT NULL COMMENT 'Ai làm, bài test nào',
-    `questionId` bigint NOT NULL,
-    `answerId` bigint DEFAULT NULL COMMENT 'Câu trả lời chọn (Câu hỏi MULTIPLE)',
-    `answerTxt` longtext COMMENT 'Câu trả lời ghi ra (Câu hỏi ESSAY. Giáo viên cần chấm)',
-    `score` float DEFAULT NULL COMMENT 'Điểm đặt được (Auto tính = code. ESSAY thì giáo viên update)',
-    `status` varchar(45) NOT NULL,
-    `createdAt` datetime DEFAULT NULL,
-    `createdBy` bigint DEFAULT NULL,
-    `updatedAt` datetime DEFAULT NULL,
-    `updatedBy` bigint DEFAULT NULL,
+    `id`                 BIGINT      NOT NULL AUTO_INCREMENT,
+    `memberTestRecordId` BIGINT      NOT NULL COMMENT 'Ai làm, bài test nào',
+    `questionId`         BIGINT      NULL DEFAULT NULL,
+    `answerId`           BIGINT      NULL DEFAULT NULL COMMENT 'Câu trả lời chọn (Câu hỏi MULTIPLE)',
+    `answerTxt`          LONGTEXT    NULL DEFAULT NULL COMMENT 'Câu trả lời ghi ra (Câu hỏi ESSAY. Giáo viên cần chấm)',
+    `score`              FLOAT       NULL DEFAULT NULL COMMENT 'Điểm đặt được (Auto tính = code. ESSAY thì giáo viên update)',
+    `status`             VARCHAR(45) NOT NULL,
+    `createdAt`          DATETIME    NULL DEFAULT NULL,
+    `createdBy`          BIGINT      NULL DEFAULT NULL,
+    `updatedAt`          DATETIME    NULL DEFAULT NULL,
+    `updatedBy`          BIGINT      NULL DEFAULT NULL,
     PRIMARY KEY (`id`),
-    KEY `fk_test_record_answer_idx` (`answerId`),
-    KEY `fk_test_record_member_test_record_idx` (`memberTestRecordId`),
-    KEY `fk_test_record_user_createdBy_idx` (`createdBy`),
-    KEY `fk_test_record_user_updatedBy_idx` (`updatedBy`),
-    CONSTRAINT `fk_test_record_answer` FOREIGN KEY (`answerId`) REFERENCES `answer` (`id`),
-    CONSTRAINT `fk_test_record_member_test_record` FOREIGN KEY (`memberTestRecordId`) REFERENCES `member_test_record` (`id`),
-    CONSTRAINT `fk_test_record_user_createdBy` FOREIGN KEY (`createdBy`) REFERENCES `user` (`id`),
-    CONSTRAINT `fk_test_record_user_updatedBy` FOREIGN KEY (`updatedBy`) REFERENCES `user` (`id`)
-    ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+    INDEX `fk_test_record_answer_idx` (`answerId` ASC) VISIBLE,
+    INDEX `fk_test_record_question_idx` (`questionId` ASC) VISIBLE,
+    INDEX `fk_test_record_member_test_record_idx` (`memberTestRecordId` ASC) VISIBLE,
+    INDEX `fk_test_record_user_createdBy_idx` (`createdBy` ASC) VISIBLE,
+    INDEX `fk_test_record_user_updatedBy_idx` (`updatedBy` ASC) VISIBLE,
+    CONSTRAINT `fk_test_record_answer` 
+        FOREIGN KEY (`answerId`) 
+            REFERENCES `teachsync`.`answer` (`id`),
+    CONSTRAINT `fk_test_record_question` 
+        FOREIGN KEY (`questionId`) 
+            REFERENCES `teachsync`.`question` (`id`),
+    CONSTRAINT `fk_test_record_member_test_record` 
+        FOREIGN KEY (`memberTestRecordId`) 
+            REFERENCES `teachsync`.`member_test_record` (`id`),
+    CONSTRAINT `fk_test_record_user_createdBy` 
+        FOREIGN KEY (`createdBy`) 
+            REFERENCES `teachsync`.`user` (`id`),
+    CONSTRAINT `fk_test_record_user_updatedBy` 
+        FOREIGN KEY (`updatedBy`) 
+            REFERENCES `teachsync`.`user` (`id`)
+) 
+        ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
