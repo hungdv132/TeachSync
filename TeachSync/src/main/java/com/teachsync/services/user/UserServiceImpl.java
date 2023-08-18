@@ -148,6 +148,17 @@ public class UserServiceImpl implements UserService {
         return userList;
     }
     @Override
+    public Map<Long, String> mapIdUsernameByIdIn(Collection<Long> idCollection) throws Exception {
+        List<User> userList = getAllByIdIn(idCollection);
+
+        if (userList == null) {
+            return new HashMap<>();
+        }
+
+        return userList.stream()
+                .collect(Collectors.toMap(BaseEntity::getId, User::getUsername));
+    }
+    @Override
     public Map<Long, String> mapIdFullNameByIdIn(Collection<Long> idCollection) throws Exception {
         List<User> userList = getAllByIdIn(idCollection);
 

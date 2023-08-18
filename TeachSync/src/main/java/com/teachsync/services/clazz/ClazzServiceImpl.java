@@ -4,12 +4,12 @@ import com.teachsync.dtos.BaseReadDTO;
 import com.teachsync.dtos.clazz.ClazzCreateDTO;
 import com.teachsync.dtos.clazz.ClazzReadDTO;
 import com.teachsync.dtos.clazz.ClazzUpdateDTO;
+import com.teachsync.dtos.clazzMember.ClazzMemberReadDTO;
 import com.teachsync.dtos.clazzSchedule.ClazzScheduleReadDTO;
 import com.teachsync.dtos.courseSemester.CourseSemesterReadDTO;
 import com.teachsync.dtos.staff.StaffReadDTO;
 import com.teachsync.entities.BaseEntity;
 import com.teachsync.entities.Clazz;
-import com.teachsync.entities.ClazzMember;
 import com.teachsync.entities.CourseSemester;
 import com.teachsync.repositories.ClazzRepository;
 import com.teachsync.repositories.CourseSemesterRepository;
@@ -28,8 +28,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.ObjectUtils;
 
 import java.util.*;
 import java.util.function.Function;
@@ -378,7 +376,7 @@ public class ClazzServiceImpl implements ClazzService {
 
             if (options.contains(DtoOption.MEMBER_LIST)) {
                 dto.setMemberList(
-                        clazzMemberService.getAllByClazzId(clazz.getId()));
+                        clazzMemberService.getAllDTOByClazzId(clazz.getId(), options));
             }
 
             if (options.contains(DtoOption.STAFF)) {
@@ -406,20 +404,20 @@ public class ClazzServiceImpl implements ClazzService {
         Map<Long, CourseSemesterReadDTO> scheduleIdCourseSemesterMap = new HashMap<>();
         Map<Long, ClazzScheduleReadDTO> clazzIdClazzScheduleMap = new HashMap<>();
 //      TODO: Map<Long, List<SessionReadDTO>> clazzIdSessionListMap = new HashMap<>();
-        Map<Long, List<ClazzMember>> clazzIdClazzMemberListMap = new HashMap<>();
+        Map<Long, List<ClazzMemberReadDTO>> clazzIdClazzMemberListMap = new HashMap<>();
         Map<Long, StaffReadDTO> staffIdStaffMap = new HashMap<>();
 //      TODO: Map<Long, List<HomeworkReadDTO>> clazzIdHomeworkListMap = new HashMap<>();
 //      TODO: Map<Long, List<ClazzTestReadDTO>> clazzIdClazzTestListMap = new HashMap<>();
 
         if (options != null && !options.isEmpty()) {
             Set<Long> clazzIdSet = new HashSet<>();
-            Set<Long> staffIdSet = new HashSet<>();
             Set<Long> courseSemesterIdSet = new HashSet<>();
+            Set<Long> staffIdSet = new HashSet<>();
 
             for (Clazz clazz : clazzCollection) {
                 clazzIdSet.add(clazz.getId());
-                staffIdSet.add(clazz.getStaffId());
                 courseSemesterIdSet.add(clazz.getCourseSemesterId());
+                staffIdSet.add(clazz.getStaffId());
             }
             if (options.contains(DtoOption.COURSE_SEMESTER)) {
                 scheduleIdCourseSemesterMap =
@@ -437,7 +435,7 @@ public class ClazzServiceImpl implements ClazzService {
 
             if (options.contains(DtoOption.MEMBER_LIST)) {
                 clazzIdClazzMemberListMap =
-                        clazzMemberService.mapClazzIdClazzMemberListByClazzIdIn(clazzIdSet);
+                        clazzMemberService.mapClazzIdListDTOByClazzIdIn(clazzIdSet, options);
             }
 
             if (options.contains(DtoOption.STAFF)) {

@@ -2,7 +2,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="vi" dir="ltr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -61,80 +61,28 @@
 <!-- ================================================== Breadcrumb ================================================= -->
 
 <!-- ================================================== Main Body ================================================== -->
-<div class="row ts-bg-white border ts-border-teal rounded-3 pt-3 mx-2 mb-3">
-  <!-- Course List paging -->
-  <div class="col-12 mb-3">
-    <div class="row-cols-1">
-
-      <h4>Khóa học: <c:out value="${course.courseName}"/></h4>
-      <h5>Học kỳ:</h5>
-
-      <c:forEach var="courseSemesterClazzList" items="${scheduleClazzListMap}">
-
-        <div class="col card">
-          <div class="card-header">
-            <h6 class="card-title mb-0">
-              Kỳ: <c:out value="${courseSemesterClazzList.key.scheduleAlias}"/><br/>
-              Cơ sở: <c:out value="${courseSemesterClazzList.key.centerName}"/><br/>
-              Từ: <c:out value="${courseSemesterClazzList.key.startDate}"/><br/>
-              Đến: <c:out value="${courseSemesterClazzList.key.endDate}"/><br/>
-            </h6>
-          </div>
-
-          <div class="card-body row flex-row flex-nowrap overflow-scroll">
-            <c:forEach var="clazzDTO" items="${courseSemesterClazzList.value}">
-              <div class="col-4">
-                <div class="card">
-                  <c:url var="enrollLink" value="enroll">
-                    <c:param name="clazzId" value="${clazzDTO.id}"/>
-                  </c:url>
-                  <form action="${enrollLink}" method="post">
-                    <div class="card-header">
-                      <h6 class="card-subtitle">
-                        Lớp: <c:out value="${clazzDTO.clazzName}"/>
-                      </h6>
-                    </div>
-
-                    <c:set var="memberCount" value="0"/>
-                    <c:if test="${clazzDTO.memberList ne null}">
-                      <c:set var="memberCount" value="${clazzDTO.memberList.size()}"/>
-                    </c:if>
-
-                    <div class="card-body">
-                      <p class="card-text">
-                        Lịch học: <c:out value="${clazzDTO.clazzSchedule.scheduleType}"/><br/>
-                        Slot: <c:out value="${clazzDTO.clazzSchedule.slot}"/><br/>
-                        Từ: <c:out value="${clazzDTO.clazzSchedule.sessionStart}"/>&nbsp;
-                        Đến: <c:out value="${clazzDTO.clazzSchedule.sessionEnd}"/><br/>
+<div class="row ts-bg-white border ts-border-teal rounded-3 px-5 pt-3 mx-2 mb-3">
+  <h5>Đơn: <c:out value="${request.requestName}"/></h5>
   
-                        Thành viên: <c:out value="${memberCount}"/> &sol; <c:out value="${clazzDTO.clazzSize}"/>
-                      </p>
-                    </div>
-
-                    <div class="card-footer">
-                      <c:choose>
-                        <c:when test="${memberCount lt clazzDTO.clazzSize}">
-                          <button type="submit" class="btn btn-primary w-100" >Đăng ký</button>
-                        </c:when>
-                        <c:when test="${memberCount ge clazzDTO.clazzSize}">
-                          <button type="submit" class="btn btn-primary w-100" disabled="disabled">Đăng ký</button>
-                          <span class="ts-txt-orange">Lớp học đã đầy</span>
-                        </c:when>
-                      </c:choose>
-                    </div>
-                  </form>
-                </div>
-
-              </div>
-            </c:forEach>
-          </div>
-
-        </div>
-
-      </c:forEach>
-
-    </div>
-  </div>
+  <h6>Chi tiết: </h6>
+  <p><c:out value="${request.requestDesc}"/></p>
+  
+  <h6>Học tại: </h6>
+  <p>Cơ sở: <c:out value="${request.clazz.courseSemester.centerName}"/></p>
+  <p>Phòng: <c:out value="${request.clazz.clazzSchedule.roomName}"/></p>
+  
+  <h6>Học kỳ </h6>
+  <p><c:out value="${request.clazz.courseSemester.semester.semesterName}"/></p>
+  
+  <h6>Khóa học: </h6>
+  <p><c:out value="${request.clazz.courseSemester.course.courseName}"/></p>
+  
+  <h6>Lớp: </h6>
+  <p><c:out value="${request.clazz.clazzName}"/></p>
+  
+  
+  
+  
 </div>
 <!-- ================================================== Main Body ================================================== -->
 

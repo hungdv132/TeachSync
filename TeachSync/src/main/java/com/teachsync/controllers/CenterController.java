@@ -12,7 +12,6 @@ import com.teachsync.services.center.CenterService;
 import com.teachsync.services.locationUnit.LocationUnitService;
 import com.teachsync.services.room.RoomService;
 import com.teachsync.utils.Constants;
-import com.teachsync.utils.enums.DtoOption;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -24,6 +23,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+
+import static com.teachsync.utils.enums.DtoOption.*;
 
 @Controller
 public class CenterController {
@@ -46,7 +48,7 @@ public class CenterController {
     @GetMapping("/center")
     public String centerListPage(Model model) {
         try{
-            List<CenterReadDTO> centerList = centerService.getAllDTO(List.of(DtoOption.ADDRESS));
+            List<CenterReadDTO> centerList = centerService.getAllDTO(List.of(ADDRESS));
 
             model.addAttribute("centerList",centerList);
         }catch (Exception e){
@@ -61,7 +63,7 @@ public class CenterController {
             Model model,
             @RequestParam Long id){
         try{
-            CenterReadDTO centerReadDTO = centerService.getDTOById(id, List.of(DtoOption.ADDRESS));
+            CenterReadDTO centerReadDTO = centerService.getDTOById(id, List.of(ADDRESS));
 
             model.addAttribute("center",centerReadDTO);
         }catch (Exception e){
@@ -116,7 +118,7 @@ public class CenterController {
         }
 
         try{
-            CenterReadDTO centerDTO = centerService.getDTOById(id, List.of(DtoOption.ADDRESS));
+            CenterReadDTO centerDTO = centerService.getDTOById(id, List.of(ADDRESS));
             model.addAttribute("center", centerDTO);
 
             AddressReadDTO addressDTO = centerDTO.getAddress();
@@ -222,4 +224,18 @@ public class CenterController {
         return levelUnitListMap;
     }
 
+    @GetMapping("/api/center-detail")
+    @ResponseBody
+    public Map<String, Object> getCenterDetail(
+            @RequestParam Long centerId) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            CenterReadDTO centerDTO = centerService.getDTOById(centerId, List.of(ADDRESS));
+            response.put("center", centerDTO);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return response;
+    }
 }

@@ -75,88 +75,68 @@
 <%@ include file="/WEB-INF/fragments/header.jspf" %>
 
 <h1>Sửa bài test</h1>
-<form action="/update-answer" method="post">
-    <label>Môn học:</label>
-    <input type="hidden" name="idTest" id="idTest" value="${test.id}">
-    <input type="hidden" name="questionType" id="questionType" value="${test.testDesc}">
-    <select name="courseId" id="selCourseId">
-        <c:forEach var="centerDTO" items="${lstCourse}">
-            <option value="${centerDTO.id}">
-                <c:out value="${centerDTO.courseName}"/>
-            </option>
-        </c:forEach>
-    </select>
 
-    <label>Loại kiểm tra:</label>
-    <select name="testType" id="selTestType">
-        <c:if test="${testType eq 'FIFTEEN_MINUTE'}">
-            <option value="FIFTEEN_MINUTE" selected>15 phút</option>
-            <option value="MIDTERM">Giữa kỳ</option>
-            <option value="FINAL">Cuối kỳ</option>
-        </c:if>
-        <c:if test="${testType eq 'MIDTERM'}">
-            <option value="FIFTEEN_MINUTE" >15 phút</option>
-            <option value="MIDTERM" selected>Giữa kỳ</option>
-            <option value="FINAL">Cuối kỳ</option>
-        </c:if>
-        <c:if test="${testType eq 'FINAL'}">
-            <option value="FIFTEEN_MINUTE" selected>15 phút</option>
-            <option value="MIDTERM">Giữa kỳ</option>
-            <option value="FINAL" selected>Cuối kỳ</option>
-        </c:if>
-    </select>
+<label for="question-type">Môn học:</label>
+<input type="hidden" name="idTest" id="idTest">
+<select name="courseId" id="selCourseId">
+  <c:forEach var="courseDTO" items="${courseList}">
+    <option value="${courseDTO.id}">
+      <c:out value="${courseDTO.courseName}"/>
+    </option>
+  </c:forEach>
+</select>
 
-    <label>Thời gian:</label>
-    <input type="number" id="timeLimit" name="timeLimit" min="1" value="${test.timeLimit}" required>
+<label for="question-type">Loại kiểm tra:</label>
+<select name="testType" id="selTestType">
+  <option value="FIFTEEN_MINUTE">15 phút</option>
+  <option value="MIDTERM">Giữa kỳ</option>
+  <option value="FINAL">Cuối kỳ</option>
+</select>
 
-    <label for="questionType">Loại câu hỏi:</label>
-    <select id="qt" name="qt" disabled>
-        <c:if test="${test.testDesc eq 'ESSAY'}">
-            <option value="ESSAY" selected>Tự luận</option>
-            <option value="MULTIPLE" >Trắc nghiệm</option>
-        </c:if>
-        <c:if test="${test.testDesc eq 'MULTIPLE'}">
-            <option value="ESSAY">Tự luận</option>
-            <option value="MULTIPLE" selected>Trắc nghiệm</option>
-        </c:if>
-    </select>
+<label>Thời gian:</label>
+<input type="number" id="timeLimit" name="timeLimit" min="1" value="${test.timeLimit}" required>
 
-    <div class="container">
-        <div class="left">
-            <table>
-                <thead>
-                <tr>
-                    <th>Câu hỏi</th>
-                </tr>
-                </thead>
-                <tbody>
-                <c:forEach var="qs" items="${questionAnswer}">
-                    <tr>
-                        <td>
-                            <a onclick="displayQuestion('${qs.key.questionDesc}', '${qs.key.id}', '${qs.value}' , '${qs.key.questionType}')">
-                                <c:out value="${qs.key.questionDesc}"/>
-                            </a>
-                        </td>
-                    </tr>
-                </c:forEach>
-                </tbody>
-            </table>
-        </div>
+<label for="question-type">Loại câu hỏi:</label>
+<select id="question-type" name="questionType" disabled>
+  <option value="ESSAY">Tự luận</option>
+  <option value="MULTIPLE">Trắc nghiệm</option>
+</select>
 
-        <div class="right">
+<div class="container">
+  <div class="left">
+    <table>
+      <thead>
+      <tr>
+        <th>Câu hỏi</th>
+      </tr>
+      </thead>
+      <tbody>
+      <c:forEach var="qs" items="${questionAnswer}">
+        <tr>
+          <td>
+            <a onclick="displayQuestion('${qs.key.questionDesc}', '${qs.value}' , '${qs.key.questionType}')">
+                <c:out value="${qs.key.questionDesc}"/>
+            </a>
+          </td>
+        </tr>
+      </c:forEach>
+      </tbody>
+    </table>
+  </div>
+  
+  <div class="right">
+    <form action="/update-answer" method="post">
+      <!-- Content for the right div -->
+      <label>Câu hỏi:</label>
+      <textarea id="multipleChoiceQuestion" name="questionAll"></textarea>
+      <input type="hidden" name="idQuestion" id="idQuestion">
+      <br>
+      <div id="checkEssay" style="display: none"></div>
+      <input type="submit" value="Submit">
+    </form>
+  </div>
+</div>
 
-            <!-- Content for the right div -->
-            <label>Câu hỏi:</label>
-            <textarea id="multipleChoiceQuestion" name="questionAll"></textarea>
-            <input type="hidden" name="idQuestion" id="idQuestion">
-            <br>
-            <div id="checkEssay" style="display: none"></div>
-            <input type="submit" value="Submit">
-
-        </div>
-
-    </div>
-</form>
 
 <script id="script1">
     $("#selCourseId").val('${test.courseId}');

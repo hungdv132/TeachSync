@@ -2,7 +2,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="vi" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -41,13 +41,13 @@
         </thead>
 
         <tbody>
-        <c:forEach var="clazz" items="${clazzList}">
+        <c:forEach var="request" items="${clazzList}">
             <tr>
-                <th scope="row">${clazz.id}</th>
-                <c:set var="clazzSchedule" value="${clazz.clazzSchedule}"/>
+                <th scope="row">${request.id}</th>
+                <c:set var="clazzSchedule" value="${request.clazzSchedule}"/>
 
                 <c:if test="${not empty clazzSchedule}">
-                    <td>${clazz.clazzName}</td>
+                    <td>${request.clazzName}</td>
                     <td>${clazzSchedule.roomName}</td>
                     <td>${clazzSchedule.scheduleType.stringValueVie}</td>
                     <td>${clazzSchedule.startDate}</td>
@@ -56,10 +56,10 @@
 
                     <c:if test="${isAdmin}">
                         <td>
-                            <a href="/edit-schedule?id=${clazz.id}">
+                            <a href="/edit-schedule?id=${request.id}">
                                 <button type="button" class="btn btn-warning">Sửa</button>
                             </a>
-                            <a href="/delete-schedule?id=${clazz.id}">
+                            <a href="/delete-schedule?id=${request.id}">
                                 <button type="button" class="btn btn-danger">Xóa</button>
                             </a>
                         </td>
@@ -67,7 +67,7 @@
                 </c:if>
 
                 <c:if test="${empty clazzSchedule}">
-                    <td>${clazz.clazzName}</td>
+                    <td>${request.clazzName}</td>
                     <td>Chưa</td>
                     <td>Chưa</td>
                     <td>Chưa</td>
@@ -76,7 +76,7 @@
 
                     <c:if test="${isAdmin}">
                         <td>
-                            <a href="/add-schedule?id=${clazz.id}">
+                            <a href="/add-schedule?id=${request.id}">
                                 <button type="button" class="btn btn-success">Thêm</button>
                             </a>
                         </td>
