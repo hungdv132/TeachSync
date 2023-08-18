@@ -14,6 +14,7 @@ import com.teachsync.dtos.user.UserReadDTO;
 import com.teachsync.entities.*;
 import com.teachsync.repositories.*;
 import com.teachsync.services.answer.AnswerService;
+import com.teachsync.services.clazz.ClazzService;
 import com.teachsync.services.clazzMember.ClazzMemberService;
 import com.teachsync.services.clazzTest.ClazzTestService;
 import com.teachsync.services.course.CourseService;
@@ -37,12 +38,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttribute;
 
+import javax.security.auth.Subject;
 import java.nio.file.AccessDeniedException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -76,6 +75,16 @@ public class TestController {
     private ClazzTestService clazzTestService;
     @Autowired
     private ClazzMemberService clazzMemberService;
+
+    @Autowired
+    private ClazzRepository clazzRepository;
+
+    @Autowired
+    private ClazzTestRepository clazzTestRepository;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private ClazzMemberRepository clazzMemberRepository;
 
     @Autowired
     private MiscUtil miscUtil;
@@ -208,19 +217,19 @@ public class TestController {
 //        }
 
         try {
-            List<CourseReadDTO> courseDTOList = courseService.getAllDTO(null);
+            Test test = testRepository.findAllById(Collections.singleton(testId)).get(0);
+            List<Question> lstQuestion = questionRepository.findAllByTestId(test.getId());
+            HashMap<Question, List<Answer>> hm = new HashMap<>();
+            for (Question qs : lstQuestion) {
+                hm.put(qs, answerRepository.findAllByQuestionId(qs.getId()));
+            }
+            List<Course> lst = courseRepository.findAllByStatusNot(Status.DELETED);
+            model.addAttribute("lstCourse", lst);
 
-            model.addAttribute("courseList", courseDTOList);
+            model.addAttribute("test", test);
 
-            TestReadDTO testDTO = testService.getDTOById(testId, List.of(QUESTION_LIST, ANSWER_LIST));
-
-            model.addAttribute("test", testDTO);
-
-            Map<QuestionReadDTO, List<AnswerReadDTO>> questionAnswerListMap =
-                    testDTO.getQuestionList().stream()
-                            .collect(Collectors.toMap(Function.identity(), QuestionReadDTO::getAnswerList));
-
-            model.addAttribute("questionAnswer", questionAnswerListMap);
+            model.addAttribute("questionAnswer", hm);
+            System.out.println("size cua hashmap: " + hm.size());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -504,57 +513,82 @@ public class TestController {
             @RequestParam(value = "page", required = false) Integer page,
             @RequestParam("searchText") String name,
             @RequestParam("searchType") String searchType,
-            Model model) {
-//        if (page == null || page < 0) {
-//            page = 0;
-//        }
-//
-//        PageRequest pageable = PageRequest.of(page, 3);
-//
-//        Page<TestSession> tests;
-//        if (searchType.equals("class")) {
-//            tests = testSessionRepository.findAllByClazzContainingOrderByStartDateDesc(pageable, name);
-//        } else if (searchType.equals("subject")) {
-//            tests = testSessionRepository.findAllBySubjectContainingOrderByStartDateDesc(pageable, name);
-//        } else {
-//            tests = testSessionRepository.findAllByUsernameContainingOrderByStartDate(pageable, name);
-//        }
-//
-//        model.addAttribute("tests", tests);
-//        model.addAttribute("pageNo", tests.getPageable().getPageNumber());
-//        model.addAttribute("pageTotal", tests.getTotalPages());
-//        model.addAttribute("searchText", name);
-//        model.addAttribute("searchType", searchType);
-        return "test/list-test-search";
+            Model model) throws Exception {
+        if (page == null || page < 0) {
+            page = 0;
+        }
+
+        PageRequest pageable = PageRequest.of(page, 3);
+        Page<MemberTestRecordReadDTO> mTRDTO = null;
+        Page<MemberTestRecord> tests;
+        List<Long> lstId = new ArrayList<>();
+        if (searchType.equals("class")) {
+            List<Clazz> clazz = clazzRepository.findAllByClazzNameContaining(name);
+            List<Long> lstIdClazz = clazz.stream().map(Clazz::getId).collect(Collectors.toList());
+            List<ClazzTest> clazzTests = clazzTestRepository.findAllByClazzIdIn(lstIdClazz);
+            List<Long> lstIdClazzTest = clazzTests.stream().map(ClazzTest::getId).collect(Collectors.toList());
+            mTRDTO = memberTestRecordService.getPageByClassDTO(pageable, List.of(MEMBER, USER, CLAZZ, COURSE_SEMESTER, COURSE_NAME), lstIdClazzTest);
+        } else if (searchType.equals("subject")) {
+            List<Course> courses = courseRepository.findAllByCourseNameContainsAndStatusNot(name, Status.DELETED);
+            List<Long> lstIdCourse = courses.stream().map(Course::getId).collect(Collectors.toList());
+            List<Test> lstTests = testRepository.findAllByCourseIdInAndStatusNot(lstIdCourse, Status.DELETED);
+            List<Long> lstTestId = lstTests.stream().map(Test::getId).collect(Collectors.toList());
+            List<ClazzTest> lstClazzTest = clazzTestRepository.findAllByTestIdIn(lstTestId);
+            List<Long> lstIdClazzTest = lstClazzTest.stream().map(ClazzTest::getId).collect(Collectors.toList());
+            mTRDTO = memberTestRecordService.getPageByClassDTO(pageable, List.of(MEMBER, USER, CLAZZ, COURSE_SEMESTER, COURSE_NAME), lstIdClazzTest);
+        } else {
+            List<User> userList = userRepository.findAllByUsernameContaining(name);
+            List<Long> lstIdUser = userList.stream().map(User::getId).collect(Collectors.toList());
+            List<ClazzMember> members = clazzMemberRepository.findAllByUserIdInAndStatusNot(lstIdUser, Status.DELETED);
+            List<Long> lstIdClazzMember = members.stream().map(ClazzMember::getId).collect(Collectors.toList());
+            mTRDTO = memberTestRecordService.getPageByUserDTO(pageable, List.of(MEMBER, USER, CLAZZ, COURSE_SEMESTER, COURSE_NAME), lstIdClazzMember);
+
+        }
+
+
+        model.addAttribute("testSessions", mTRDTO.getContent());
+        model.addAttribute("pageNo", mTRDTO.getPageable().getPageNumber());
+        model.addAttribute("pageTotal", mTRDTO.getTotalPages());
+        model.addAttribute("searchText", name);
+        model.addAttribute("searchType", searchType);
+        return "test/list-test-session-search";
     }
 
     @GetMapping("/update-test-session")
     public String updateTestSession(
             Model model,
             HttpSession session,
-            @RequestParam("idSession") String idSession,
+            @RequestParam("idSession") Long idSession,
             @RequestParam("newStatus") String newStatus,
             @SessionAttribute(value = "user", required = false) UserReadDTO userDTO) {
-//        UserReadDTO user = (UserReadDTO) session.getAttribute("user");
-//
-//        Date date = new Date();
-//
+        UserReadDTO user = (UserReadDTO) session.getAttribute("user");
+
+
 //        TestSession testSession = testSessionRepository.findById(Long.parseLong(idSession)).orElse(null);
-//
-//        testSession.setStatus(Long.parseLong(newStatus));
-//        testSession.setUpdateDate(date);
-//        testSession.setUserUpdate(user.getUsername());
-//
-//        testSessionRepository.save(testSession);
-//
-//        PageRequest pageable = PageRequest.of(0, 3);
-//
-//        Page<TestSession> tests = testSessionRepository.findAllByOrderByStartDateDesc(pageable);
-//
-//        model.addAttribute("tests", tests);
-//        model.addAttribute("pageNo", tests.getPageable().getPageNumber());
-//        model.addAttribute("pageTotal", tests.getTotalPages());
-//
+        MemberTestRecord mtr = memberTestRecordRepository.findById(idSession).orElse(null);
+        if (newStatus.equals(Status.ALLOWED_REDO.getStringValue())) {
+            mtr.setStatus(Status.ALLOWED_REDO);
+        } else if (newStatus.equals(Status.SUSPENDED.getStringValue())) {
+            mtr.setStatus(Status.SUSPENDED);
+        }
+
+        mtr.setUpdatedAt(LocalDateTime.now());
+        mtr.setUpdatedBy(user.getId());
+
+        memberTestRecordRepository.save(mtr);
+
+        Pageable pageable = miscUtil.makePaging(0, 3, "StartAt", false);
+        try {
+            Page<MemberTestRecordReadDTO> mTRDTO =
+                    memberTestRecordService.getPageAllDTO(pageable, List.of(MEMBER, USER, CLAZZ, COURSE_SEMESTER, COURSE_NAME));
+
+            model.addAttribute("testSessions", mTRDTO.getContent());
+            model.addAttribute("pageNo", mTRDTO.getPageable().getPageNumber());
+            model.addAttribute("pageTotal", mTRDTO.getTotalPages());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         return "test/list-test-session";
     }
 
@@ -628,7 +662,7 @@ public class TestController {
             totalScore = totalScore + score;
             testRecordRepository.save(testRecord);
         }
-        memberTestRecord.setScore((totalScore / maxScore)*10);
+        memberTestRecord.setScore((totalScore / maxScore) * 10);
         memberTestRecordRepository.save(memberTestRecord);
         return "redirect:/";
     }

@@ -72,10 +72,10 @@
               <c:forEach items="${testSessions}" var="testSession">
                 <tr>
                   <td>
-                      ${testSession.memberId}
+                      ${testSession.id}
                   </td>
                   <td>
-                      ${testSession.member.user.fullName}
+                      ${testSession.member.user.username}
                   </td>
                   <td>
                       ${testSession.member.clazz.courseSemester.courseName}
@@ -112,9 +112,9 @@
                       ${testSession.updatedBy}
                   </td>
                   <td>
-                    <a href="/update-test-session?idSession=${testSessions.id}&newStatus=ALLOWED_REDO"
+                    <a href="/update-test-session?idSession=${testSession.id}&newStatus=ALLOWED_REDO"
                        class="btn btn-outline-primary mr-2"><i class="fas fa-plus"></i>Làm lại</a>
-                    <a href="/update-test-session?idSession=${testSessions.id}&newStatus=SUSPENDED"
+                    <a href="/update-test-session?idSession=${testSession.id}&newStatus=SUSPENDED"
                        class="btn btn-outline-primary mr-2"><i class="fas fa-plus"></i>Đình chỉ</a>
                   </td>
                 </tr>
