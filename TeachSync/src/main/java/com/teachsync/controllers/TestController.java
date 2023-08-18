@@ -225,6 +225,8 @@ public class TestController {
             }
             List<Course> lst = courseRepository.findAllByStatusNot(Status.DELETED);
             model.addAttribute("lstCourse", lst);
+            model.addAttribute("testType", test.getTestType().getStringValue());
+            model.addAttribute("questionType", test.getTestDesc());
 
             model.addAttribute("test", test);
 
@@ -240,63 +242,66 @@ public class TestController {
     @PostMapping("/update-answer")
     public String updateAnswer(
             Model model,
-            @RequestParam("courseName") String courseName,
             @RequestParam("idTest") Long idTest,
             @RequestParam("idQuestion") Long idQuestion,
             @RequestParam("testType") TestType testType,
             @RequestParam("timeLimit") Integer timeLimit,
-            @RequestParam("numQuestions") Integer numQuestions,
+            @RequestParam(value = "numQuestions", required = false) Integer numQuestions,
             @RequestParam("questionType") String questionType,
+            @RequestParam("questionAll") String questionAll,
             @RequestParam Map<String, String> requestParams,
             @SessionAttribute(value = "user", required = false) UserReadDTO userDTO) {
 
-//        if (userDTO == null || userDTO.getRoleId().equals(Constants.ROLE_ADMIN)) {
-//            return "redirect:/";
-//        }
+        if (userDTO == null || userDTO.getRoleId().equals(Constants.ROLE_ADMIN)) {
+            return "redirect:/";
+        }
 
 //        TODO: This function is update answer, not update test, or else rename function
-//        Test test = testRepository.findById(Long.parseLong(idTest)).orElse(null);
-//
-//        test.setTestName(testType);
-//        if (testType.equals("15min")) {
-//            test.setMinScore(1.0);
-//            test.setTestWeight(1);
-//        } else if (testType.equals("midterm")) {
-//            test.setMinScore(1.0);
-//            test.setTestWeight(3);
-//        } else {
-//            test.setMinScore(4.0);
-//            test.setTestWeight(5);
-//        }
-//        test.setStatus(Status.UPDATED);
-//        test.setTimeLimit(timeLimit);
+        Test test = testRepository.findById(idTest).orElse(null);
+
+        if (testType.equals("FIFTEEN_MINUTE")) {
+            test.setMinScore(1.0);
+            test.setTestWeight(1);
+        } else if (testType.equals("MIDTERM")) {
+            test.setMinScore(1.0);
+            test.setTestWeight(3);
+        } else {
+            test.setMinScore(4.0);
+            test.setTestWeight(5);
+        }
+        test.setStatus(Status.UPDATED);
+        test.setTimeLimit(timeLimit);
 //        test.setCourseId(Long.parseLong(courseName));
-//        testRepository.save(test);
+        testRepository.save(test);
 
         try {
             Question question = questionService.getById(idQuestion);
             if (question == null) {
                 throw new IllegalArgumentException("Update error. No Question found with id: " + idQuestion);
             }
+            question.setQuestionDesc(questionAll);
+            questionRepository.save(question);
 
-            if (questionType.equals("multipleChoice")) {
-                answerService.deleteAllByQuestionId(question.getId());
-
-                int numAnswer = Integer.parseInt(requestParams.get("numOfOptions"));
-
-                List<AnswerCreateDTO> answerCreateDTOList = new ArrayList<>();
-                for (int i = 1; i < numAnswer; i++) {
-                    AnswerCreateDTO answerCreateDTO = new AnswerCreateDTO();
-                    answerCreateDTO.setQuestionId(question.getId());
-                    answerCreateDTO.setAnswerDesc(requestParams.get("answer" + i));
-                    answerCreateDTO.setIsCorrect(requestParams.get("correctAnswer" + i) != null);
-                    answerCreateDTO.setCreatedBy(userDTO.getId());
-
-                    answerCreateDTOList.add(answerCreateDTO);
-                }
-
-                answerService.createBulkAnswerByDTO(answerCreateDTOList);
-            }
+//            if (questionType.equals("MULTIPLE")) {
+//                answerService.deleteAllByQuestionId(question.getId());
+//
+//                int numAnswer = Integer.parseInt(requestParams.get("numOfOptions"));
+//
+//                List<AnswerCreateDTO> answerCreateDTOList = new ArrayList<>();
+//                for (int i = 1; i < numAnswer; i++) {
+//                    AnswerCreateDTO answerCreateDTO = new AnswerCreateDTO();
+//                    answerCreateDTO.setQuestionId(question.getId());
+//                    answerCreateDTO.setAnswerDesc(requestParams.get("answer" + i));
+//                    answerCreateDTO.setIsCorrect(requestParams.get("correctAnswer" + i) != null);
+//                    answerCreateDTO.setCreatedBy(userDTO.getId());
+//
+//                    answerCreateDTOList.add(answerCreateDTO);
+//                }
+//
+//                answerService.createBulkAnswerByDTO(answerCreateDTOList);
+//            } else {
+//
+//            }
         } catch (Exception e) {
             e.printStackTrace();
         }
