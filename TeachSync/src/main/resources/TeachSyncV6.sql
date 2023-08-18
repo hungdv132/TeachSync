@@ -459,7 +459,7 @@ CREATE TABLE IF NOT EXISTS `teachsync`.`question`
     `testId`         BIGINT       NOT NULL,
     `questionType`   VARCHAR(255) NOT NULL COMMENT 'MULTIPLE, ESSAY, ...',
     `questionDesc`   LONGTEXT     NOT NULL COMMENT 'VD: Last night I think I ___ a ghost when I was going to the bathroom.',
-    `questionPrompt` VARCHAR(45)  NOT NULL COMMENT 'VD: Chọn câu trả lời đúng nhất để điền vào chỗ trống',
+    `questionPrompt` VARCHAR(45)  COMMENT 'VD: Chọn câu trả lời đúng nhất để điền vào chỗ trống',
     `questionScore` DOUBLE       NOT NULL,
     `status`         VARCHAR(45)  NOT NULL,
     `createdAt`      DATETIME     NULL DEFAULT NULL,
