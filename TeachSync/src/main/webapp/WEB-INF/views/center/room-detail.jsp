@@ -47,7 +47,7 @@
     }
   </style>
 </head>
-<body class="container-fluid ts-bg-white-subtle">
+<body class="min-vh-100 container-fluid d-flex flex-column ts-bg-white-subtle">
 <!-- ================================================== Header ===================================================== -->
 <%@ include file="/WEB-INF/fragments/header.jspf" %>
 

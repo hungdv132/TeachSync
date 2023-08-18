@@ -17,7 +17,7 @@
   
   <script src="../../../resources/js/common.js"></script>
 </head>
-<body class="container-fluid ts-bg-white-subtle">
+<body class="min-vh-100 container-fluid d-flex flex-column ts-bg-white-subtle">
 <!-- ================================================== Header ===================================================== -->
 <%@ include file="/WEB-INF/fragments/header.jspf" %>
 <!-- ================================================== Header ===================================================== -->
@@ -34,7 +34,7 @@
           </a>
         </li>
         <li class="breadcrumb-item active" aria-current="page">
-          Danh sách Đơn xin
+          Đơn xin
         </li>
       </ol>
     </nav>
@@ -45,7 +45,7 @@
 
 <!-- ================================================== Main Body ================================================== -->
 <div class="row ts-bg-white border ts-border-teal rounded-3 px-5 pt-3 mx-2 mb-3">
-  
+  <!-- Title & create button -->
   <div class="col-12 d-flex justify-content-between align-items-center mb-3">
     <h5 class="mb-0">Danh sách đơn xin</h5>
     
@@ -54,10 +54,14 @@
     </c:if>
   </div>
   
-  <table class="table table-striped">
-    <thead class="table-primary">
+  <!-- Request list -->
+  <div class="col-12">
+    <table class="table table-striped table-bordered">
+    <thead class="table-primary ts-border-blue">
       <tr>
         <th scope="col">ID</th>
+        
+        <th scope="col">Đơn</th>
         <c:if test="${isAdmin}">
           <th scope="col">Xin bởi</th>
         </c:if>
@@ -71,15 +75,16 @@
       </tr>
     </thead>
     
-    <tbody>
+    <tbody class="table-hover ts-border-blue align-middle">
     <c:forEach var="request" items="${requestList}">
+      <c:url var="requestDetail" value="/request-detail">
+        <c:param name="id" value="${request.id}"/>
+      </c:url>
+      
       <tr>
-        <c:url var="requestDetail" value="/request-detail">
-          <c:param name="id" value="${request.id}"/>
-        </c:url>
-        <th scope="row">
-          <a href="${requestDetail}">${request.id}</a>
-        </th>
+        <th scope="row"><a href="${requestDetail}">${request.id}</a></th>
+        
+        <td><a href="${requestDetail}">${request.requestType.stringValueVie}</a></td>
         <c:if test="${isAdmin}">
           <td>${request.requesterFullName}</td>
         </c:if>
@@ -88,6 +93,7 @@
         <td><a href="${requestDetail}">${request.clazz.courseSemester.semesterAlias}</a></td>
         <td><a href="${requestDetail}">${request.clazz.courseSemester.centerName}</a></td>
         <td><a href="${requestDetail}">${request.status.stringValueVie}</a></td>
+        
         <td>
           <a href="/edit-request?id=${request.id}" class="btn btn-warning">Sửa</a>
           <c:if test="${isStudent}">
@@ -98,37 +104,58 @@
     </c:forEach>
     </tbody>
   </table>
+  </div>
   
-  <c:if test="${empty requestList}">
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-  </c:if>
-
+  <!-- Navigate page button -->
+  <form action="/request" method="get"
+        id="formNavTable" class="d-flex align-items-center mb-3">
+    <input type="hidden" id="txtPageNo" name="pageNo" value="${pageNo}">
+    
+    <button type="button" class="btn btn-secondary" onclick="toPage(0)">
+      <i class="bi-chevron-bar-left"></i>
+    </button>
+    <button type="button" class="btn btn-secondary mx-2" onclick="toPage(${pageNo - 1})">
+      <i class="bi-chevron-left"></i>
+    </button>
+    
+    Page: <c:out value="${pageNo + 1}"/> &sol; <c:out value="${pageTotal}"/>
+    
+    <button type="button" class="btn btn-secondary mx-2" onclick="toPage(${pageNo + 1})">
+      <i class="bi-chevron-right"></i>
+    </button>
+    <button type="button" class="btn btn-secondary" onclick="toPage(${pageTotal-1})">
+      <i class="bi-chevron-bar-right"></i>
+    </button>
+  </form>
 </div>
 <!-- ================================================== Main Body ================================================== -->
+
 
 <!-- ================================================== Footer ===================================================== -->
 <%@ include file="/WEB-INF/fragments/footer.jspf" %>
 <!-- ================================================== Footer ===================================================== -->
-</body>
+
+
+<!-- ================================================== Script ===================================================== -->
+<script id="script1">
+    let pageTotal = ${empty pageTotal ? 1 : pageTotal};
+    if (pageTotal === 1) {
+        disableAllButtonIn("divNavTable");
+    }
+    $("#script1").remove(); /* Xóa thẻ <script> sau khi xong */
+</script>
 <script>
     var mess = '${mess}'
     if (mess != '') {
         alert(mess);
     }
+    
+    function toPage(pageNo) {
+        $("#txtPageNo").val(pageNo);
+        const form = document.getElementById('formNavTable');
+        form.requestSubmit();
+    }
 </script>
+<!-- ================================================== Script ===================================================== -->
+</body>
 </html>

@@ -215,7 +215,7 @@ public class RequestController {
             return "redirect:/index";
         }
 
-        if (List.of(Constants.ROLE_STUDENT, Constants.ROLE_ADMIN).contains(userDTO.getRoleId())) {
+        if (!List.of(Constants.ROLE_STUDENT, Constants.ROLE_ADMIN).contains(userDTO.getRoleId())) {
             /* Quay về trang cũ */
             if (referer != null) {
                 return "redirect:" + referer;
@@ -227,7 +227,9 @@ public class RequestController {
             RequestReadDTO requestDTO = requestService.getDTOById(
                     requestId,
                     List.of(REQUESTER, CLAZZ, CLAZZ_SCHEDULE, ROOM_NAME,
-                            COURSE_SEMESTER, COURSE, SEMESTER, CENTER));
+                            COURSE_SEMESTER, SEMESTER, CENTER, COURSE));
+
+
 
             model.addAttribute("request", requestDTO);
         } catch (Exception e) {
