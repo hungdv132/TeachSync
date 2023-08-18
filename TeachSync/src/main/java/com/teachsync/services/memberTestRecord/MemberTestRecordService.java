@@ -36,4 +36,9 @@ public interface MemberTestRecordService {
     MemberTestRecordReadDTO wrapDTO(MemberTestRecord memberTestRecord, Collection<DtoOption> options) throws Exception;
     List<MemberTestRecordReadDTO> wrapListDTO(Collection<MemberTestRecord> memberTestRecordCollection, Collection<DtoOption> options) throws Exception;
     Page<MemberTestRecordReadDTO> wrapPageDTO(Page<MemberTestRecord> memberTestRecordPage, Collection<DtoOption> options) throws Exception;
+
+    Page<MemberTestRecordReadDTO> getPageByClassDTO(Pageable pageable, Collection<DtoOption> options, List<Long> lstId) throws Exception;
+
+    Page<MemberTestRecordReadDTO> getPageByUserDTO(Pageable pageable, Collection<DtoOption> options, List<Long> lstId) throws Exception;
+
 }

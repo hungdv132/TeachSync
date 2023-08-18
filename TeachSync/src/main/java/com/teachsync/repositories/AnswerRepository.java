@@ -21,4 +21,6 @@ public interface AnswerRepository extends JpaRepository<Answer, Long> {
     List<Answer> findAllByQuestionIdInAndStatusNot(Collection<Long> questionIdCollection, Status status);
 
     void deleteAllByQuestionId(Long id);
+
+    List<Answer> findAllByQuestionId(Long id);
 }

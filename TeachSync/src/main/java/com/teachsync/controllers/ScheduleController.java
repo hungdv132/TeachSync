@@ -42,6 +42,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import static com.teachsync.utils.Constants.*;
+import static com.teachsync.utils.enums.DtoOption.*;
 
 @Controller
 public class ScheduleController {

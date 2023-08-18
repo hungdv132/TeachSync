@@ -23,4 +23,6 @@ public interface QuestionRepository extends
     List<Question> findAllByTestIdInAndStatusNot(Collection<Long> testIdCollection, Status status);
 
     Optional<Question> findAllById(Long id);
+
+    List<Question> findAllByTestId(Long id);
 }
