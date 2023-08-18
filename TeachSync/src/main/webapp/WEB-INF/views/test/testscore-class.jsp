@@ -66,7 +66,7 @@
                   </td>
                   <c:if test="${testType eq 'essay'}">
                     <td>
-                      <a href="/examine" class="btn btn-outline-primary mr-2">
+                      <a href="/mark-essay?memberTestRecordId=${mTR.id}" class="btn btn-outline-primary mr-2">
                         <i class="fas fa-plus"></i>Chấm bài
                       </a>
                     </td>

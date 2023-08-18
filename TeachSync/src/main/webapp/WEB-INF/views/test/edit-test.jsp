@@ -2,73 +2,73 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  
-  <title>Chỉnh sửa bài kiểm tra</title>
-  
-  <link rel="stylesheet" href="../../../resources/css/bootstrap-5.3.0/bootstrap.css">
-  
-  <link rel="stylesheet" href="../../../resources/css/teachsync_style.css">
-  
-  <script src="../../../resources/js/jquery/jquery-3.6.3.js"></script>
-  <script src="../../../resources/js/bootstrap-5.3.0/bootstrap.bundle.js"></script>
-  
-  <script src="../../../resources/js/common.js"></script>
-  <style>
-      /* Áp dụng CSS để tùy chỉnh giao diện form */
-      .container {
-          display: flex;
-          width: 100%;
-      }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-      .left {
-          width: 50%;
-          box-sizing: border-box;
-          padding: 10px;
-      }
+    <title>Chỉnh sửa bài kiểm tra</title>
 
-      .right {
-          width: 50%;
-          box-sizing: border-box;
-          padding: 10px;
-      }
+    <link rel="stylesheet" href="../../../resources/css/bootstrap-5.3.0/bootstrap.css">
 
-      table {
-          border-collapse: collapse;
-          width: 100%;
-      }
+    <link rel="stylesheet" href="../../../resources/css/teachsync_style.css">
 
-      table, th, td {
-          border: 1px solid black;
-          padding: 5px;
-      }
+    <script src="../../../resources/js/jquery/jquery-3.6.3.js"></script>
+    <script src="../../../resources/js/bootstrap-5.3.0/bootstrap.bundle.js"></script>
 
-      /* Additional styles for better appearance */
-      h1 {
-          margin-top: 20px;
-      }
+    <script src="../../../resources/js/common.js"></script>
+    <style>
+        /* Áp dụng CSS để tùy chỉnh giao diện form */
+        .container {
+            display: flex;
+            width: 100%;
+        }
 
-      label {
-          display: block;
-          margin-top: 10px;
-      }
+        .left {
+            width: 50%;
+            box-sizing: border-box;
+            padding: 10px;
+        }
 
-      select, input[type="number"], textarea {
-          width: 100%;
-          padding: 8px;
-          border: 1px solid #ccc;
-          border-radius: 4px;
-          box-sizing: border-box;
-          margin-top: 6px;
-          margin-bottom: 16px;
-          resize: vertical;
-      }
+        .right {
+            width: 50%;
+            box-sizing: border-box;
+            padding: 10px;
+        }
 
-      #optionsContainer {
-          margin-top: 10px;
-      }
-  </style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        table, th, td {
+            border: 1px solid black;
+            padding: 5px;
+        }
+
+        /* Additional styles for better appearance */
+        h1 {
+            margin-top: 20px;
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+        }
+
+        select, input[type="number"], textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            margin-top: 6px;
+            margin-bottom: 16px;
+            resize: vertical;
+        }
+
+        #optionsContainer {
+            margin-top: 10px;
+        }
+    </style>
 </head>
 <body>
 
@@ -137,19 +137,21 @@
   </div>
 </div>
 
+
 <script id="script1">
     $("#selCourseId").val('${test.courseId}');
     $("#selTestType").val('${test.testType}');
     $("#question-type").val('${questionList.get(0).questionType}');
-    
+
     $("#script1").remove();
 </script>
 
 <script>
     var questionsArea = document.getElementById("multipleChoiceQuestion");
-
-    function displayQuestion(questionDesc, lstAnswer, type) {
+    var idQuestion = document.getElementById("idQuestion");
+    function displayQuestion(questionDesc, idQuestionInput,lstAnswer, type) {
         questionsArea.innerHTML = questionDesc;
+        idQuestion.value = idQuestionInput;
         var element = document.getElementById("checkEssay");
         if (type == "multipleChoice") {
             element.style.display = "block";

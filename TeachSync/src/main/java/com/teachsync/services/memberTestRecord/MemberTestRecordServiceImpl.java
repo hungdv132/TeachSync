@@ -184,4 +184,37 @@ public class MemberTestRecordServiceImpl implements MemberTestRecordService {
                 memberTestRecordPage.getPageable(),
                 memberTestRecordPage.getTotalPages());
     }
+
+    @Override
+    public Page<MemberTestRecordReadDTO> getPageByClassDTO(Pageable pageable, Collection<DtoOption> options, List<Long> lstId) throws Exception {
+        if (pageable == null) {
+            pageable = miscUtil.defaultPaging();
+        }
+
+        Page<MemberTestRecord> memberTestRecordPage =
+                memberTestRecordRepository.findAllByClazzTestIdIn(lstId, pageable);
+
+        if (memberTestRecordPage == null) {
+            return null;
+        }
+
+        return wrapPageDTO(memberTestRecordPage, options);
+    }
+
+    @Override
+    public Page<MemberTestRecordReadDTO> getPageByUserDTO(Pageable pageable, Collection<DtoOption> options, List<Long> lstId) throws Exception {
+        if (pageable == null) {
+            pageable = miscUtil.defaultPaging();
+        }
+
+        Page<MemberTestRecord> memberTestRecordPage =
+                memberTestRecordRepository.findAllByMemberIdIn(lstId, pageable);
+
+        if (memberTestRecordPage == null) {
+            return null;
+        }
+
+        return wrapPageDTO(memberTestRecordPage, options);
+    }
+
 }

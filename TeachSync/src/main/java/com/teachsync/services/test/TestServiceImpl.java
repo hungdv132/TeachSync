@@ -67,8 +67,9 @@ public class TestServiceImpl implements TestService {
                                 dto.setCreatedBy(createdBy); })
                             .collect(Collectors.toList());
 
-            questionService.createBulkQuestionByDTO(questionCreateDTOList);
+
         }
+        questionService.createBulkQuestionByDTO(questionCreateDTOList, createDTO.getTestDesc());
 
         return wrapDTO(test, List.of(QUESTION_LIST));
     }
@@ -279,7 +280,7 @@ public class TestServiceImpl implements TestService {
 
         /* Create dependency */
         if (updateDTO.getNewQuestionList() != null) {
-            questionService.createBulkQuestionByDTO(updateDTO.getNewQuestionList());
+//            questionService.createBulkQuestionByDTO(updateDTO.getNewQuestionList());
         }
 
         /* Update dependency */

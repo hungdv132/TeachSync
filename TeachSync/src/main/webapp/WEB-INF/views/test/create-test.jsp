@@ -142,9 +142,9 @@
     var questionType = document.getElementById("question-type").value;
     var numQuestions = document.getElementById("num-questions").value;
 
-    if (questionType === "essay") {
+    if (questionType === "ESSAY") {
       generateEssayQuestions(numQuestions);
-    } else if (questionType === "multipleChoice") {
+    } else if (questionType === "MULTIPLE") {
       generateMultipleChoiceQuestions(numQuestions);
     }
   });

@@ -28,4 +28,8 @@ public interface ClazzRepository extends JpaRepository<Clazz, Long> {
 
     /* Check duplicate */
 
+
+
+    List<Clazz> findAllByClazzNameContaining(String text);
+
 }
