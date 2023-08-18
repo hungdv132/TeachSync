@@ -1,3 +1,4 @@
+<%@ page import="com.teachsync.utils.enums.MaterialType" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
@@ -24,6 +25,7 @@
 <!-- ================================================== Main Body ================================================== -->
 <div class="row ts-bg-white border ts-border-teal rounded-3 pt-3 mx-2 mb-3">
     <form action="create-material" method="post">
+        <!--
         <div class="form-group">
             <label>Tên khóa học</label>
             <select name="courseId">
@@ -32,7 +34,7 @@
                 </c:forEach>
             </select>
         </div>
-
+-->
         <div class="form-group">
             <label>Tên tài liệu</label>
             <input type="text" name="name"
@@ -47,12 +49,6 @@
                    class="form-control" placeholder="Nhập link tài liệu">
         </div>
 
-        <div class="form-group">
-            <label>Content tài liệu</label>
-            <input type="text" name="content"
-                   required
-                   class="form-control" placeholder="Nhập content tài liệu">
-        </div>
 
         <div class="form-group">
             <label>Ảnh tài liệu</label>
@@ -60,10 +56,17 @@
                    class="form-control">
         </div>
 
-        <div class="form-group">
-            <label>Kiểu tài liệu</label>
-            <input type="text" name="type"
-                   class="form-control">
+        <div class="form-group mb-3">
+            <label class="dropdown">Kiểu tài liệu: <br>
+                <select class="btn btn-secondary dropdown-toggle"
+                        id="selMaterialType" name="materialType">
+                    <option value="${MaterialType.E_BOOK}">${MaterialType.E_BOOK.stringValueVie}</option>
+                    <option value="${MaterialType.EXCEL}">${MaterialType.EXCEL.stringValueVie}</option>
+                    <option value="${MaterialType.PDF}">${MaterialType.PDF.stringValueVie}</option>
+                    <option value="${MaterialType.POWER_POINT}">${MaterialType.POWER_POINT.stringValueVie}</option>
+                    <option value="${MaterialType.WORD}">${MaterialType.WORD.stringValueVie}</option>
+                </select>
+            </label>
         </div>
 
         <div class="form-group">
