@@ -24,17 +24,26 @@ public interface ClazzMemberService {
 
     /* clazzId */
     List<ClazzMember> getAllByClazzId(Long clazzId) throws Exception;
+    List<ClazzMemberReadDTO> getAllDTOByClazzId(Long clazzId, Collection<DtoOption> options) throws Exception;
 
     List<ClazzMember> getAllByClazzIdIn(Collection<Long> clazzIdCollection) throws Exception;
-    Map<Long, List<ClazzMember>> mapClazzIdClazzMemberListByClazzIdIn(Collection<Long> clazzIdCollection) throws Exception;
+    List<ClazzMemberReadDTO> getAllDTOByClazzIdIn(
+            Collection<Long> clazzIdCollection, Collection<DtoOption> options) throws Exception;
+    Map<Long, List<ClazzMemberReadDTO>> mapClazzIdListDTOByClazzIdIn(
+            Collection<Long> clazzIdCollection, Collection<DtoOption> options) throws Exception;
 
     /* userId */
     List<ClazzMember> getAllByUserId(Long userId) throws Exception;
+    List<ClazzMemberReadDTO> getAllDTOByUserId(Long userId, Collection<DtoOption> options) throws Exception;
 
     List<ClazzMember> getAllByUserIdIn(Collection<Long> userIdCollection) throws Exception;
+    List<ClazzMemberReadDTO> getAllDTOByUserIdIn(Collection<Long> userIdCollection
+            , Collection<DtoOption> options) throws Exception;
 
     /* clazzId & userId */
     ClazzMember getByClazzIdAndUserId(Long clazzId, Long userId) throws Exception;
+    ClazzMemberReadDTO getDTOByClazzIdAndUserId(
+            Long clazzId, Long userId, Collection<DtoOption> options) throws Exception;
 
     /* =================================================== UPDATE =================================================== */
 

@@ -340,38 +340,42 @@ public class CourseSemesterServiceImpl implements CourseSemesterService {
 
         /* Add Dependency */
         if (options != null && !options.isEmpty()) {
+            Long courseId = courseSemester.getCourseId();
+            Long centerId = courseSemester.getCenterId();
+            Long semesterId = courseSemester.getSemesterId();
+
             if (options.contains(DtoOption.COURSE)) {
-                CourseReadDTO courseDTO = courseService.getDTOById(dto.getCourseId(), options);
+                CourseReadDTO courseDTO = courseService.getDTOById(courseId, options);
                 dto.setCourse(courseDTO);
             }
             if (options.contains(DtoOption.COURSE_NAME)) {
-                Course course = courseService.getById(dto.getCourseId());
+                Course course = courseService.getById(courseId);
                 dto.setCourseName(course.getCourseName());
             }
             if (options.contains(DtoOption.COURSE_ALIAS)) {
-                Course course = courseService.getById(dto.getCourseId());
+                Course course = courseService.getById(courseId);
                 dto.setCourseAlias(course.getCourseAlias());
             }
 
             if (options.contains(DtoOption.CENTER)) {
-                CenterReadDTO center = centerService.getDTOById(courseSemester.getCenterId(), options);
+                CenterReadDTO center = centerService.getDTOById(centerId, options);
                 dto.setCenter(center);
             }
             if (options.contains(DtoOption.CENTER_NAME)) {
-                Center center = centerService.getById(courseSemester.getCenterId());
+                Center center = centerService.getById(centerId);
                 dto.setCenterName(center.getCenterName());
             }
 
             if (options.contains(DtoOption.SEMESTER)) {
-                SemesterReadDTO semester = semesterService.getDTOById(courseSemester.getSemesterId(), options);
+                SemesterReadDTO semester = semesterService.getDTOById(semesterId, options);
                 dto.setSemester(semester);
             }
             if (options.contains(DtoOption.SEMESTER_NAME)) {
-                Semester semester = semesterService.getById(courseSemester.getSemesterId());
+                Semester semester = semesterService.getById(semesterId);
                 dto.setSemesterName(semester.getSemesterName());
             }
             if (options.contains(DtoOption.SEMESTER_ALIAS)) {
-                Semester semester = semesterService.getById(courseSemester.getSemesterId());
+                Semester semester = semesterService.getById(semesterId);
                 dto.setSemesterAlias(semester.getSemesterAlias());
             }
         }
