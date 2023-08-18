@@ -217,7 +217,7 @@
                 <i class="bi-person-vcard"></i>&nbsp;QL Tài khoản
               </a>
               <ul class="dropdown-menu">
-                <li><a class="dropdown-item ts-txt-hover-blue" href="/user?type=teacher">Nhân viên</a></li>
+                <li><a class="dropdown-item ts-txt-hover-blue" href="/lst-user-by-type?type=3">Nhân viên</a></li>
                 <li><a class="dropdown-item ts-txt-hover-blue" href="/lst-user">Tài khoản</a></li>
                 <li><a class="dropdown-item ts-txt-hover-blue" href="/request">Đơn xin</a></li>
                 <li><a class="dropdown-item ts-txt-hover-blue" href="/application/list">Duyệt đơn tuyển dụng</a></li>
