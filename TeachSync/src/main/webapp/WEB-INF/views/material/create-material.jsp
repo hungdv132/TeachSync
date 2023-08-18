@@ -24,35 +24,47 @@
 
 <!-- ================================================== Main Body ================================================== -->
 <div class="row ts-bg-white border ts-border-teal rounded-3 pt-3 mx-2 mb-3">
-    <form action="create-material" method="post">
-        <!--
-        <div class="form-group">
-            <label>Tên khóa học</label>
-            <select name="courseId">
-                <c:forEach items="${courseList}" var="course">
-                    <option value="${course.id}"> ${course.courseName}</option>
-                </c:forEach>
-            </select>
-        </div>
--->
+    <form action="/create-material" method="post">
+
+        <%--        <p class="ms-5 mb-0">Tên khóa học</p>--%>
+        <%--        <div class="dropdown ms-3">--%>
+        <%--            <select class="btn btn-secondary dropdown-toggle"--%>
+        <%--                    id="selCourseId" name="courseId">--%>
+        <%--                <c:forEach items="${courseList}" var="course">--%>
+        <%--                    <option value="${course.id}"> ${course.courseName}</option>--%>
+        <%--                </c:forEach>--%>
+        <%--            </select>--%>
+        <%--        </div>--%>
+
+
         <div class="form-group">
             <label>Tên tài liệu</label>
-            <input type="text" name="name"
+            <input type="text" name="materialName"
+                   id="txtMaterialName"
                    required
                    class="form-control" placeholder="Nhập tên tài liệu">
         </div>
 
         <div class="form-group">
             <label>Link tài liệu </label>
-            <input type="text" name="link"
+            <input type="text" name="materialLink"
+                   id="txtMaterialLink"
                    required
                    class="form-control" placeholder="Nhập link tài liệu">
         </div>
 
+        <div class="form-group">
+            <label>Content tài liệu</label>
+            <input type="text" name="materialContent"
+                   id="txtMaterialContent"
+                   required
+                   class="form-control" placeholder="Nhập content tài liệu">
+        </div>
 
         <div class="form-group">
             <label>Ảnh tài liệu</label>
-            <input type="file" name="image"
+            <input type="file" name="materialImg"
+                   id="txtMaterialImg"
                    class="form-control">
         </div>
 
@@ -72,16 +84,12 @@
         <div class="form-group">
             <label>
                 Tài liệu free
-                <input type="checkbox" name="free" value="yes">
+                <input type="checkbox" id="chkisFree" name="isFree" value="yes">
             </label>
         </div>
 
 
-        <div class="form-group">
-            <br>
-            <button type="submit" class="btn btn-primary">Submit</button>
-            <br><br>
-        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
     </form>
 
 
@@ -91,5 +99,11 @@
 <!-- ================================================== Footer ===================================================== -->
 <%@ include file="/WEB-INF/fragments/footer.jspf" %>
 <!-- ================================================== Footer ===================================================== -->
+<script>
+    var mess = '${mess}'
+    if (mess != '') {
+        alert(mess);
+    }
+</script>
 </body>
 </html>
