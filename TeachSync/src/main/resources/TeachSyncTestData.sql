@@ -2308,6 +2308,8 @@ values ('student', '$2a$10$2muXk6hqYaoTLnXWCszDaeDE71FGa2hJkh3QPaGKJLRJ77bm6GFJW
         'test.staff@gmail.com', null, null, null, null, 'CREATED'),
        ('teacher2', '$2a$10$2muXk6hqYaoTLnXWCszDaeDE71FGa2hJkh3QPaGKJLRJ77bm6GFJW', 3, null, 'Test Teacher2', 'OTHER',
         'test.teacher2@gmail.com', null, null, null, null, 'CREATED');
+        ('thanhnvhe140127', '$2a$10$2muXk6hqYaoTLnXWCszDaeDE71FGa2hJkh3QPaGKJLRJ77bm6GFJW', 3, null, 'Nguyen Van Thanh', 'OTHER',
+        'test.teacher2@gmail.com', null, null, null, null, 'CREATED');
 --     Password = 123456789
 
 insert into center(addressId, centerName, centerType, centerDesc, centerSize, status)
