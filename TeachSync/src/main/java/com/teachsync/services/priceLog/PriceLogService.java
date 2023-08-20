@@ -7,6 +7,7 @@ import com.teachsync.entities.PriceLog;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -29,8 +30,11 @@ public interface PriceLogService {
     PriceLogReadDTO getDTOById(Long id) throws Exception;
 
     /* courseId */
-    PriceLog getLatestByCourseId(Long courseId) throws Exception;
-    PriceLogReadDTO getLatestDTOByCourseId(Long courseId) throws Exception;
+    PriceLog getCurrentByCourseId(Long courseId) throws Exception;
+    PriceLogReadDTO getCurrentDTOByCourseId(Long courseId) throws Exception;
+
+    PriceLog getByCourseIdAt(Long courseId, LocalDateTime searchAt) throws Exception;
+    PriceLogReadDTO getDTOByCourseIdAt(Long courseId, LocalDateTime searchAt) throws Exception;
 
     List<PriceLog> getAllCurrentByCourseIdIn(Collection<Long> courseIdCollection) throws Exception;
     List<PriceLogReadDTO> getAllCurrentDTOByCourseIdIn(Collection<Long> courseIdCollection) throws Exception;

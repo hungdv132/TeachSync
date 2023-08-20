@@ -1,7 +1,6 @@
 package com.teachsync.dtos.payment;
-import com.teachsync.dtos.BaseReadDTO;
-import com.teachsync.dtos.request.RequestReadDTO;
-import com.teachsync.dtos.user.UserReadDTO;
+
+import com.teachsync.dtos.BaseUpdateDTO;
 import com.teachsync.utils.enums.PaymentType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,21 +16,13 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class PaymentReadDTO extends BaseReadDTO {
+public class PaymentUpdateDTO extends BaseUpdateDTO {
     private Long payerId;
-    private UserReadDTO payer;
-
     private Long requestId;
-    private RequestReadDTO request;
-
     private PaymentType paymentType;
-
     private Double paymentAmount;
-
     private LocalDateTime paymentAt;
-
     private byte[] paymentDoc;
     private String paymentDocLink;
-
     private Long verifierId;
 }

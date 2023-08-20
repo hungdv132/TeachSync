@@ -6,7 +6,7 @@
 <!DOCTYPE html>
 <html lang="vi" dir="ltr">
 <head>
-  <fmt:setLocale value="vi_VN"/>
+  <fmt:setLocale value="vi_VN" scope="session"/>
   
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">

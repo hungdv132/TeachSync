@@ -54,6 +54,13 @@ function disableAllButtonIn(id) {
     $("#"+id+" button").prop("disabled", true);
 }
 
+function enableAllFormElementIn(id) {
+    $("#" + id).find("input, textarea, select, button").prop("disabled", false);
+}
+function disableAllFormElementIn(id) {
+    $("#" + id).find("input, textarea, select, button").prop("disabled", true);
+}
+
 function copyToClipboard(id) {
     const fadeTime = 1500;
 

@@ -1,5 +1,6 @@
 package com.teachsync.services.request;
 
+import com.teachsync.dtos.BaseReadDTO;
 import com.teachsync.dtos.clazz.ClazzReadDTO;
 import com.teachsync.dtos.request.RequestCreateDTO;
 import com.teachsync.dtos.request.RequestReadDTO;
@@ -20,6 +21,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static com.teachsync.utils.enums.Status.*;
 import static com.teachsync.utils.enums.DtoOption.*;
@@ -160,6 +163,18 @@ public class RequestServiceImpl implements RequestService {
         }
 
         return wrapListDTO(requestList, options);
+    }
+    @Override
+    public Map<Long, RequestReadDTO> mapIdDTOByIdIn(
+            Collection<Long> idCollection, Collection<DtoOption> options) throws Exception {
+        List<RequestReadDTO> requestDTOList = getAllDTOByIdIn(idCollection, options);
+
+        if (requestDTOList == null) {
+            return new HashMap<>();
+        }
+
+        return requestDTOList.stream()
+                .collect(Collectors.toMap(BaseReadDTO::getId, Function.identity()));
     }
 
     /* requesterId (userId) */

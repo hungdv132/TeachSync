@@ -55,11 +55,11 @@
   </div>
   
   <!-- Request list -->
-  <div class="col-12">
-    <table class="table table-striped table-bordered">
+  <div class="col-12 overflow-auto mb-3">
+    <table class="table table-striped table-bordered table-hover mb-0">
     <thead class="table-primary ts-border-blue">
       <tr>
-        <th scope="col">ID</th>
+        <th scope="col" class="text-center">ID</th>
         
         <th scope="col">Đơn</th>
         <c:if test="${isAdmin}">
@@ -77,25 +77,25 @@
     
     <tbody class="table-hover ts-border-blue align-middle">
     <c:forEach var="request" items="${requestList}">
-      <c:url var="requestDetail" value="/request-detail">
+      <c:url var="requestDetail" value="/edit-request">
         <c:param name="id" value="${request.id}"/>
       </c:url>
       
       <tr>
-        <th scope="row"><a href="${requestDetail}">${request.id}</a></th>
+        <th scope="row" class="text-center"><a href="${requestDetail}">${request.id}</a></th>
         
         <td><a href="${requestDetail}">${request.requestType.stringValueVie}</a></td>
         <c:if test="${isAdmin}">
           <td>${request.requesterFullName}</td>
         </c:if>
-        <td><a href="${requestDetail}">${request.clazz.clazzName}</a></td>
-        <td><a href="${requestDetail}">${request.clazz.courseSemester.courseAlias}</a></td>
-        <td><a href="${requestDetail}">${request.clazz.courseSemester.semesterAlias}</a></td>
-        <td><a href="${requestDetail}">${request.clazz.courseSemester.centerName}</a></td>
-        <td><a href="${requestDetail}">${request.status.stringValueVie}</a></td>
+        <td>${request.clazz.clazzName}</td>
+        <td>${request.clazz.courseSemester.courseAlias}</td>
+        <td>${request.clazz.courseSemester.semesterAlias}</td>
+        <td>${request.clazz.courseSemester.centerName}</td>
+        <td>${request.status.stringValueVie}</td>
         
-        <td>
-          <a href="/edit-request?id=${request.id}" class="btn btn-warning">Sửa</a>
+        <td class=text-center"">
+          <a href="${requestDetail}" class="btn btn-warning">Sửa</a>
           <c:if test="${isStudent}">
             <a href="/delete-request?id=${request.id}" class="btn btn-danger ms-2">Xóa</a>
           </c:if>
@@ -140,9 +140,9 @@
 <script id="script1">
     let pageTotal = ${empty pageTotal ? 1 : pageTotal};
     if (pageTotal === 1) {
-        disableAllButtonIn("divNavTable");
+        disableAllButtonIn("formNavTable");
     }
-    $("#script1").remove(); /* Xóa thẻ <script> sau khi xong */
+    // $("#script1").remove(); /* Xóa thẻ <script> sau khi xong */
 </script>
 <script>
     var mess = '${mess}'

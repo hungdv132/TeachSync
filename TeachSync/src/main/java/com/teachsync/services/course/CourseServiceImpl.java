@@ -352,7 +352,7 @@ public class CourseServiceImpl implements CourseService {
 
         /* Update dependency */
         /* Close old price */
-        PriceLogReadDTO oldPrice = priceLogService.getLatestDTOByCourseId(course.getId());
+        PriceLogReadDTO oldPrice = priceLogService.getCurrentDTOByCourseId(course.getId());
         oldPrice.setValidTo(LocalDateTime.now());
         priceLogService.updatePriceLogByDTO(mapper.map(oldPrice, PriceLogUpdateDTO.class));
 
@@ -391,7 +391,7 @@ public class CourseServiceImpl implements CourseService {
         /* Add Dependency */
         /* TODO: replace with dto and call service */
         PriceLogReadDTO priceLogDTO =
-                priceLogService.getLatestDTOByCourseId(course.getId());
+                priceLogService.getCurrentDTOByCourseId(course.getId());
 
         dto.setCurrentPrice(priceLogDTO);
 
@@ -446,7 +446,7 @@ public class CourseServiceImpl implements CourseService {
             }
 
             if (options.contains(DtoOption.CURRENT_PRICE)) {
-                PriceLogReadDTO priceLogDTO = priceLogService.getLatestDTOByCourseId(course.getId());
+                PriceLogReadDTO priceLogDTO = priceLogService.getCurrentDTOByCourseId(course.getId());
 
                 dto.setCurrentPrice(priceLogDTO);
             }

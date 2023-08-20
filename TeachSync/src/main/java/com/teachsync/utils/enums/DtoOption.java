@@ -101,5 +101,12 @@ public enum DtoOption {
     /** Request */
     RESOLVER_FULL_NAME,
     /** Request */
-    RESOLVER_USERNAME;
+    RESOLVER_USERNAME,
+    /** Request */
+    PAYMENT,
+
+    /** Payment */
+    REQUEST,
+    /** Payment */
+    PAYER;
 }
