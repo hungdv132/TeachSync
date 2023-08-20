@@ -19,13 +19,13 @@ import java.time.LocalDateTime;
 public class PriceLogReadDTO extends BaseReadDTO {
     private Long courseId;
 
-    private String price;
+    private Double price;
 
     private Boolean isPromotion;
 
     private PromotionType promotionType;
 
-    private String promotionAmount;
+    private Double promotionAmount;
 
     private String promotionDesc;
 
@@ -33,5 +33,5 @@ public class PriceLogReadDTO extends BaseReadDTO {
 
     private LocalDateTime validTo;
 
-    private String finalPrice;
+    private Double finalPrice;
 }

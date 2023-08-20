@@ -16,13 +16,9 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ClazzMemberReadDTO extends BaseReadDTO {
-    private ClazzReadDTO clazz;
-    private String clazzName;
+public class ClazzMemberUpdateDTO extends BaseUpdateDTO {
     private Long clazzId;
 
-    private UserReadDTO user;
-    private String userFullName;
     private Long userId;
 
     private Double score;

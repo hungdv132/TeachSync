@@ -1,6 +1,8 @@
 package com.teachsync.services.clazzMember;
 
+import com.teachsync.dtos.clazzMember.ClazzMemberCreateDTO;
 import com.teachsync.dtos.clazzMember.ClazzMemberReadDTO;
+import com.teachsync.dtos.clazzMember.ClazzMemberUpdateDTO;
 import com.teachsync.entities.ClazzMember;
 import com.teachsync.utils.enums.DtoOption;
 import org.springframework.data.domain.Page;
@@ -11,6 +13,8 @@ import java.util.Map;
 
 public interface ClazzMemberService {
     /* =================================================== CREATE =================================================== */
+    ClazzMember createClazzMember(ClazzMember member) throws Exception;
+    ClazzMemberReadDTO createClazzMemberByDTO(ClazzMemberCreateDTO createDTO) throws Exception;
     
 
     /* =================================================== READ ===================================================== */
@@ -46,6 +50,8 @@ public interface ClazzMemberService {
             Long clazzId, Long userId, Collection<DtoOption> options) throws Exception;
 
     /* =================================================== UPDATE =================================================== */
+    ClazzMember updateClazzMember(ClazzMember member) throws Exception;
+    ClazzMemberReadDTO updateClazzMemberByDTO(ClazzMemberUpdateDTO updateDTO) throws Exception;
 
     
     /* =================================================== DELETE =================================================== */

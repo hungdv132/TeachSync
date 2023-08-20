@@ -6,7 +6,7 @@
 <!DOCTYPE html>
 <html lang="vi" dir="ltr">
 <head>
-  <fmt:setLocale value="vi_VN"/>
+  <fmt:setLocale value="vi_VN" scope="session"/>
   
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -27,7 +27,7 @@
   
   <script src="../../../resources/js/common.js"></script>
 </head>
-<body class="container-fluid ts-bg-white-subtle">
+<body class="min-vh-100 container-fluid d-flex flex-column ts-bg-white-subtle">
 <!-- ================================================== Header ===================================================== -->
 <%@ include file="/WEB-INF/fragments/header.jspf" %>
 <!-- ================================================== Header ===================================================== -->
@@ -205,27 +205,6 @@
   
     </form>
     
-    <div id="divEmpty">
-      <br>
-      <br>
-      <br>
-      <br>
-      <br>
-      <br>
-      <br>
-      <br>
-      <br>
-      <br>
-      <br>
-      <br>
-      <br>
-      <br>
-      <br>
-      <br>
-      <br>
-      <br>
-    </div>
-    
   </div>
 </div>
 <!-- ================================================== Main Body ================================================== -->
@@ -245,19 +224,16 @@
             case '${RequestType.ENROLL}':
                 showById("enrollForm");
                 hideById("changeClassForm");
-                hideById("divEmpty");
                 break;
 
             case '${RequestType.CHANGE_CLASS}':
                 hideById("enrollForm");
                 showById("changeClassForm");
-                hideById("divEmpty");
                 break;
 
             default:
                 hideById("enrollForm");
                 hideById("changeClassForm");
-                showById("divEmpty");
                 break;
         }
     }

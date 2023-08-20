@@ -1,7 +1,6 @@
 function showById(id) {
     $("#" + id).removeClass("visually-hidden");
 }
-
 function hideById(id) {
     $("#" + id).addClass("visually-hidden");
 }
@@ -9,7 +8,6 @@ function hideById(id) {
 function enableById(id) {
     $("#" + id).prop("disabled", false);
 }
-
 function disableById(id) {
     $("#" + id).prop("disabled", true);
 }
@@ -24,7 +22,6 @@ function enableAllInputIn(id, type) {
         $("#"+id+" input[type="+type+"]").prop("disabled", false);
     }
 }
-
 /**  Add the disabled property in a container by id
  * @param id Id of the container for input
  * @param type *Optional. The type of input to be disabled */
@@ -39,7 +36,6 @@ function disableAllInputIn(id, type) {
 function enableAllSelectIn(id) {
     $("#"+id+" select").prop("disabled", false);
 }
-
 function disableAllSelectIn(id) {
     $("#"+id+" select").prop("disabled", true);
 }
@@ -47,9 +43,22 @@ function disableAllSelectIn(id) {
 function enableAllTextAreaIn(id) {
     $("#"+id+" textarea").prop("disabled", false);
 }
-
 function disableAllTextAreaIn(id) {
     $("#"+id+" textarea").prop("disabled", true);
+}
+
+function enableAllButtonIn(id) {
+    $("#"+id+" button").prop("disabled", false);
+}
+function disableAllButtonIn(id) {
+    $("#"+id+" button").prop("disabled", true);
+}
+
+function enableAllFormElementIn(id) {
+    $("#" + id).find("input, textarea, select, button").prop("disabled", false);
+}
+function disableAllFormElementIn(id) {
+    $("#" + id).find("input, textarea, select, button").prop("disabled", true);
 }
 
 function copyToClipboard(id) {

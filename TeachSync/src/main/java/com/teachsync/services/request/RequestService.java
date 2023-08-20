@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 public interface RequestService {
     /* =================================================== CREATE =================================================== */
@@ -30,6 +31,8 @@ public interface RequestService {
 
     List<Request> getAllByIdIn(Collection<Long> idCollection) throws Exception;
     List<RequestReadDTO> getAllDTOByIdIn(Collection<Long> idCollection, Collection<DtoOption> options) throws Exception;
+    Map<Long, RequestReadDTO> mapIdDTOByIdIn(
+            Collection<Long> idCollection, Collection<DtoOption> options) throws Exception;
 
     /* requesterId (userId) */
     List<Request> getAllByRequesterId(Long requesterId) throws Exception;

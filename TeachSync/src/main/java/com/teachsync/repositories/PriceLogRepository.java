@@ -29,13 +29,13 @@ public interface PriceLogRepository extends JpaRepository<PriceLog, Long> {
 
     /* courseId */
     @Query("SELECT pL FROM PriceLog  pL " +
-            "WHERE (pL.courseId = ?1) AND (pL.validFrom <= ?2) AND (pL.validTo = null OR pL.validTo >= ?2) AND (pL.status <> ?3)")
+            "WHERE (pL.courseId = ?1) AND ((pL.validFrom <= ?2) AND (pL.validTo = null OR pL.validTo >= ?2)) AND (pL.status <> ?3)")
     Optional<PriceLog> findByCourseIdAndValidBetweenAndStatusNot(
             Long courseId, LocalDateTime validDateTime, Status status);
     List<PriceLog> findAllByCourseIdAndStatusNot(Long courseId, Status status);
 
     @Query("SELECT pL FROM PriceLog  pL " +
-            "WHERE (pL.courseId IN ?1) AND (pL.validFrom <= ?2) AND (pL.validTo = null OR pL.validTo >= ?2) AND (pL.status <> ?3)")
+            "WHERE (pL.courseId IN ?1) AND ((pL.validFrom <= ?2) AND (pL.validTo = null OR pL.validTo >= ?2)) AND (pL.status <> ?3)")
     List<PriceLog> findAllByCourseIdInAndValidBetweenAndStatusNot(
             Collection<Long> courseIdCollection, LocalDateTime validDateTime, Status status);
     List<PriceLog> findAllByCourseIdInAndStatusNot(Collection<Long> courseIdCollection, Status status);
