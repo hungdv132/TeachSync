@@ -35,8 +35,8 @@
             <th scope="col">Lớp</th>
             <th scope="col">Tên bài tập</th>
             <th scope="col">Miêu tả</th>
-            <th scope="col">File đính kèm</th>
             <th scope="col">Link đính kèm</th>
+            <th scope="col">File đính kèm</th>
             <th scope="col">Thời hạn</th>
             <th scope="col">Ngày mở</th>
             <th scope="col">Chức năng</th>
