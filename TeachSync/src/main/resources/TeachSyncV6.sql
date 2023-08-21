@@ -892,7 +892,7 @@ CREATE TABLE IF NOT EXISTS `teachsync`.`homework`
     `homeworkName`    VARCHAR(45) NOT NULL COMMENT 'Bài dịch số 2',
     `homeworkDesc`    LONGTEXT    NULL DEFAULT NULL COMMENT 'Dịch đoạn văn trong file Word đính kèm. (Nộp bài qua file dưới dạng Word, không được dùng file ảnh)',
     `homeworkDoc`     LONGTEXT    NULL DEFAULT NULL COMMENT 'Link to file attachment',
-    `homeworkContent` MEDIUMBLOB  NULL DEFAULT NULL COMMENT 'File attachment store in DB',
+    `homeworkContent` LONGTEXT  NULL DEFAULT NULL COMMENT 'File attachment store in DB',
     `openAt`          DATETIME    NULL DEFAULT NULL COMMENT 'Thời gian mở xem bài và nộp bài',
     `deadline`        DATETIME    NULL DEFAULT NULL COMMENT 'Hạn chót nộp bài',
     `status`          VARCHAR(45) NOT NULL,
