@@ -2,6 +2,7 @@ package com.teachsync.services.semester;
 
 import com.teachsync.dtos.BaseReadDTO;
 import com.teachsync.dtos.semester.SemesterReadDTO;
+import com.teachsync.entities.BaseEntity;
 import com.teachsync.entities.Semester;
 import com.teachsync.repositories.SemesterRepository;
 import com.teachsync.utils.MiscUtil;
@@ -135,6 +136,26 @@ public class SemesterServiceImpl implements SemesterService {
             return null; }
         
         return semesterList;
+    }
+    @Override
+    public Map<Long, String> mapIdSemesterNameByIdIn(Collection<Long> idCollection) throws Exception {
+        List<Semester> semesterList = getAllByIdIn(idCollection);
+
+        if (semesterList == null) {
+            return new HashMap<>(); }
+
+        return semesterList.stream()
+                .collect(Collectors.toMap(BaseEntity::getId, Semester::getSemesterName));
+    }
+    @Override
+    public Map<Long, String> mapIdSemesterAliasByIdIn(Collection<Long> idCollection) throws Exception {
+        List<Semester> semesterList = getAllByIdIn(idCollection);
+
+        if (semesterList == null) {
+            return new HashMap<>(); }
+
+        return semesterList.stream()
+                .collect(Collectors.toMap(BaseEntity::getId, Semester::getSemesterAlias));
     }
     @Override
     public List<SemesterReadDTO> getAllDTOByIdIn(

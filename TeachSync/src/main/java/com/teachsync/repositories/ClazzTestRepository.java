@@ -21,4 +21,8 @@ public interface ClazzTestRepository extends JpaRepository<ClazzTest, Long> {
 
     /* clazzId & testId */
     Optional<ClazzTest> findByClazzIdAndTestIdAndStatusNot(Long clazzId, Long testId, Status status);
+
+    List<ClazzTest> findAllByClazzIdIn(List<Long> lstId);
+
+    List<ClazzTest> findAllByTestIdIn(List<Long> lstId);
 }

@@ -31,6 +31,4 @@ public class RequestCreateDTO extends BaseCreateDTO {
 
     @Lob
     private String contentLink;
-
-    private Long resolverId;
 }

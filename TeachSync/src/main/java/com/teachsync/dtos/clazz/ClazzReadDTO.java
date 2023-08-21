@@ -1,8 +1,12 @@
 package com.teachsync.dtos.clazz;
 
 import com.teachsync.dtos.BaseReadDTO;
+import com.teachsync.dtos.clazzMember.ClazzMemberReadDTO;
 import com.teachsync.dtos.clazzSchedule.ClazzScheduleReadDTO;
+import com.teachsync.dtos.clazzTest.ClazzTestReadDTO;
 import com.teachsync.dtos.courseSemester.CourseSemesterReadDTO;
+import com.teachsync.dtos.homework.HomeworkReadDTO;
+import com.teachsync.dtos.session.SessionReadDTO;
 import com.teachsync.dtos.staff.StaffReadDTO;
 import com.teachsync.entities.*;
 import lombok.AllArgsConstructor;
@@ -34,11 +38,11 @@ public class ClazzReadDTO extends BaseReadDTO {
 
     private ClazzScheduleReadDTO clazzSchedule;
 
-    private List<Session> sessionList;
+    private List<SessionReadDTO> sessionList;
 
-    private List<ClazzMember> memberList;
+    private List<ClazzMemberReadDTO> memberList;
 
-    private List<Homework> homeworkList;
+    private List<HomeworkReadDTO> homeworkList;
 
-    private List<ClazzTest> testList;
+    private List<ClazzTestReadDTO> testList;
 }

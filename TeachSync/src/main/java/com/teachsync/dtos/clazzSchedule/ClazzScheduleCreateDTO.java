@@ -17,11 +17,7 @@ import java.time.LocalTime;
 public class ClazzScheduleCreateDTO extends BaseCreateDTO {
     private Long clazzId;
 
-    private String clazzName;
-
     private Long roomId;
-
-    private String roomName;
 
     private ScheduleType scheduleType;
 

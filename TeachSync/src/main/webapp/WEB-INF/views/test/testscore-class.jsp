@@ -2,7 +2,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="vi" dir="ltr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -18,7 +18,7 @@
   
   <script src="../../../resources/js/common.js"></script>
 </head>
-<body class="container-fluid ts-bg-white-subtle">
+<body class="min-vh-100 container-fluid d-flex flex-column ts-bg-white-subtle">
 <!-- ================================================== Header ===================================================== -->
 <%@ include file="/WEB-INF/fragments/header.jspf" %>
 <!-- ================================================== Header ===================================================== -->
@@ -66,7 +66,7 @@
                   </td>
                   <c:if test="${testType eq 'essay'}">
                     <td>
-                      <a href="/examine" class="btn btn-outline-primary mr-2">
+                      <a href="/mark-essay?memberTestRecordId=${mTR.id}" class="btn btn-outline-primary mr-2">
                         <i class="fas fa-plus"></i>Chấm bài
                       </a>
                     </td>

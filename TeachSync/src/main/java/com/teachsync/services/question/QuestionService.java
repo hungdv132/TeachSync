@@ -5,6 +5,8 @@ import com.teachsync.dtos.question.QuestionReadDTO;
 import com.teachsync.dtos.question.QuestionUpdateDTO;
 import com.teachsync.entities.Question;
 import com.teachsync.utils.enums.DtoOption;
+import com.teachsync.utils.enums.QuestionType;
+import com.teachsync.utils.enums.TestType;
 import org.springframework.data.domain.Page;
 
 import java.util.Collection;
@@ -17,7 +19,7 @@ public interface QuestionService {
     QuestionReadDTO createQuestionByDTO(QuestionCreateDTO createDTO) throws Exception;
 
     List<Question> createBulkQuestion(Collection<Question> questionCollection) throws Exception;
-    List<QuestionReadDTO> createBulkQuestionByDTO(Collection<QuestionCreateDTO> createDTOCollection) throws Exception;
+    List<QuestionReadDTO> createBulkQuestionByDTO(Collection<QuestionCreateDTO> createDTOCollection, String questionType) throws Exception;
 
 
     /* =================================================== READ ===================================================== */

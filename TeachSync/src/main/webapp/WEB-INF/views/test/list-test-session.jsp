@@ -3,7 +3,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="vi" dir="ltr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -19,7 +19,7 @@
   
   <script src="../../../resources/js/common.js"></script>
 </head>
-<body class="container-fluid ts-bg-white-subtle">
+<body class="min-vh-100 container-fluid d-flex flex-column ts-bg-white-subtle">
 <!-- ================================================== Header ===================================================== -->
 <%@ include file="/WEB-INF/fragments/header.jspf" %>
 <!-- ================================================== Header ===================================================== -->
@@ -75,7 +75,7 @@
                       ${testSession.id}
                   </td>
                   <td>
-                      ${testSession.member.user.fullName}
+                      ${testSession.member.user.username}
                   </td>
                   <td>
                       ${testSession.member.clazz.courseSemester.courseName}
@@ -112,9 +112,9 @@
                       ${testSession.updatedBy}
                   </td>
                   <td>
-                    <a href="/update-test-session?idSession=${testSessions.id}&newStatus=ALLOWED_REDO"
+                    <a href="/update-test-session?idSession=${testSession.id}&newStatus=ALLOWED_REDO"
                        class="btn btn-outline-primary mr-2"><i class="fas fa-plus"></i>Làm lại</a>
-                    <a href="/update-test-session?idSession=${testSessions.id}&newStatus=SUSPENDED"
+                    <a href="/update-test-session?idSession=${testSession.id}&newStatus=SUSPENDED"
                        class="btn btn-outline-primary mr-2"><i class="fas fa-plus"></i>Đình chỉ</a>
                   </td>
                 </tr>

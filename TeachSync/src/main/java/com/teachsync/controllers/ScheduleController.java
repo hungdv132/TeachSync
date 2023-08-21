@@ -1,21 +1,33 @@
 package com.teachsync.controllers;
 
 
+import com.teachsync.dtos.center.CenterReadDTO;
+import com.teachsync.dtos.clazz.ClazzReadDTO;
 import com.teachsync.dtos.clazzSchedule.ClazzScheduleCreateDTO;
 import com.teachsync.dtos.clazzSchedule.ClazzScheduleReadDTO;
 import com.teachsync.dtos.clazzSchedule.ClazzScheduleUpdateDTO;
+import com.teachsync.dtos.course.CourseReadDTO;
+import com.teachsync.dtos.courseSemester.CourseSemesterReadDTO;
+import com.teachsync.dtos.room.RoomReadDTO;
+import com.teachsync.dtos.semester.SemesterReadDTO;
 import com.teachsync.dtos.user.UserReadDTO;
+
+import com.teachsync.entities.ClazzSchedule;
+import com.teachsync.entities.CourseSemester;
 import com.teachsync.entities.Room;
+import com.teachsync.services.center.CenterService;
 import com.teachsync.services.clazz.ClazzService;
 import com.teachsync.services.clazzSchedule.ClazzScheduleService;
+import com.teachsync.services.course.CourseService;
+import com.teachsync.services.courseSemester.CourseSemesterService;
 import com.teachsync.services.room.RoomService;
+import com.teachsync.services.semester.SemesterService;
 import com.teachsync.utils.Constants;
 import com.teachsync.utils.MiscUtil;
-import com.teachsync.utils.enums.DtoOption;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.http.MediaType;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.ObjectUtils;
@@ -27,8 +39,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import static com.teachsync.utils.enums.DtoOption.CLAZZ_NAME;
-import static com.teachsync.utils.enums.DtoOption.ROOM_NAME;
+import static com.teachsync.utils.Constants.*;
+import static com.teachsync.utils.enums.DtoOption.*;
 
 @Controller
 public class ScheduleController {
@@ -43,28 +55,113 @@ public class ScheduleController {
     private RoomService roomService;
 
     @Autowired
+    private CourseService courseService;
+
+    @Autowired
+    private CenterService centerService;
+
+    @Autowired
+    private SemesterService semesterService;
+
+    @Autowired
+    private CourseSemesterService courseSemesterService;
+
+    @Autowired
     private MiscUtil miscUtil;
 
-
-    @GetMapping("/schedule-clazz")
-    public String courseListPage(
+    /* =================================================== CREATE =================================================== */
+    @GetMapping("/add-schedule")
+    public String addSchedulePage(
             Model model,
+            @RequestParam("id") Long clazzId,
             @ModelAttribute("mess") String mess,
             @SessionAttribute(name = "user", required = false) UserReadDTO userDTO) {
+        if (userDTO == null ) {
+            return "redirect:/index";
+        }
+
+        if (!userDTO.getRoleId().equals(ROLE_ADMIN)) {
+            return "redirect:/index";
+        }
+
         try {
-            Page<ClazzScheduleReadDTO> dtoPage;
-            if (userDTO.getRoleId().equals(Constants.ROLE_STUDENT) || userDTO.getRoleId().equals(Constants.ROLE_TEACHER)) {
-                /* All schedule */
-                dtoPage = clazzScheduleService.getPageDTOAll(
-                        null,
-                        List.of(CLAZZ_NAME, ROOM_NAME)
-                );
+            /* Clazz */
+            ClazzReadDTO clazzReadDTO = clazzService.getDTOById(clazzId, List.of(COURSE_SEMESTER, SEMESTER, CENTER));
+            model.addAttribute("clazz", clazzReadDTO);
+
+            /* Semester (max, min for startDtae & endDate) */
+            model.addAttribute("semester", clazzReadDTO.getCourseSemester().getSemester());
+
+            CenterReadDTO centerReadDTO = clazzReadDTO.getCourseSemester().getCenter();
+
+            /* Room List */
+            List<RoomReadDTO> roomReadDTOList = roomService.getAllDTOByCenterId(centerReadDTO.getId(), null);
+            model.addAttribute("roomList", roomReadDTOList);
+        } catch (Exception e) {
+            e.printStackTrace();
+            /* Log Error or return error msg */
+        }
+
+        return "schedule/add-schedule";
+    }
+
+    @PostMapping("/add-schedule")
+    public String addClazzSchedule(
+            Model model,
+            @ModelAttribute ClazzScheduleCreateDTO createDTO,
+            @SessionAttribute(value = "user", required = false) UserReadDTO userDTO,
+            RedirectAttributes redirect) throws Exception {
+
+        //check login
+        if (ObjectUtils.isEmpty(userDTO)) {
+            redirect.addAttribute("mess", "Làm ơn đăng nhập");
+            return "redirect:/index";
+        }
+
+        if (!userDTO.getRoleId().equals(Constants.ROLE_ADMIN)) {
+            redirect.addAttribute("mess", "bạn không đủ quyền");
+            return "redirect:/index";
+        }
+
+        try {
+            clazzScheduleService.createClazzScheduleByDTO(createDTO);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "redirect:/add-schedule";
+        }
+
+        return "redirect:/schedule-clazz";
+    }
+
+
+    /* =================================================== READ ===================================================== */
+    @GetMapping("/schedule-clazz")
+    public String scheduleListPage(
+            Model model,
+            @RequestParam(value = "pageNo", required = false) Integer pageNo,
+            @ModelAttribute("mess") String mess,
+            @SessionAttribute(name = "user", required = false) UserReadDTO userDTO) {
+
+        if (userDTO == null) {
+            return "redirect:/index";
+        }
+
+        try {
+            Page<ClazzReadDTO> dtoPage;
+            if (userDTO.getRoleId() == ROLE_STUDENT) {
+            } else if (userDTO.getRoleId() == ROLE_TEACHER || userDTO.getRoleId() == ROLE_ADMIN) {
+                if (pageNo == null || pageNo < 0) {
+                    pageNo = 0;
+                }
+
+                Pageable paging = miscUtil.makePaging(pageNo, 10, "id", true);
+                dtoPage = clazzService.getPageDTOAll(paging, List.of(CLAZZ_SCHEDULE, ROOM_NAME));
+
                 if (dtoPage != null) {
-                    model.addAttribute("scheduleList", dtoPage.getContent());
+                    model.addAttribute("clazzList", dtoPage.getContent());
                     model.addAttribute("pageNo", dtoPage.getPageable().getPageNumber());
                     model.addAttribute("pageTotal", dtoPage.getTotalPages());
                 }
-
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -75,110 +172,80 @@ public class ScheduleController {
         return "schedule/list-schedule";
     }
 
-    /* =================================================== CREATE =================================================== */
-    @GetMapping("/add-schedule")
-    public String addSchedulePage(
+
+    /* =================================================== UPDATE =================================================== */
+    @GetMapping("/edit-schedule")
+    public String editSchedulePage(
             Model model,
-            @RequestParam(value = "id", required = false) Long scheduleid,
-            @RequestParam("option") String option) {
+            @RequestParam("id") Long clazzId,
+            @ModelAttribute("mess") String mess,
+            @SessionAttribute(name = "user", required = false) UserReadDTO userDTO) {
+        if (userDTO == null ) {
+            return "redirect:/index";
+        }
+
+        if (!userDTO.getRoleId().equals(ROLE_ADMIN)) {
+            return "redirect:/index";
+        }
 
         try {
-            /* Nếu Id => Edit, Lấy dữ liệu cũ */
-            ClazzScheduleReadDTO clazzScheduleReadDTO = null;
-            if (Objects.nonNull(scheduleid)) {
-                clazzScheduleReadDTO =
-                        clazzScheduleService.getDTOByClazzId(scheduleid,
-                                List.of(DtoOption.CLAZZ_SCHEDULE,
-                                        DtoOption.USER));
+            /* Clazz */
+            ClazzReadDTO clazzReadDTO =
+                    clazzService.getDTOById(clazzId, List.of(CLAZZ_SCHEDULE, COURSE_SEMESTER, SEMESTER, CENTER));
+            model.addAttribute("clazz", clazzReadDTO);
 
-                model.addAttribute("clazzSchedule", clazzScheduleReadDTO);
-            }
+            /* Semester (max, min for startDtae & endDate) */
+            model.addAttribute("semester", clazzReadDTO.getCourseSemester().getSemester());
 
-            /* List Clazz (lớp nào) */
-            List<ClazzScheduleReadDTO> clazzScheduleDTOList = clazzScheduleService.getAllDTOByClazzIdIn(null, null);
-            model.addAttribute("clazzList", clazzScheduleDTOList);
+            /* ClazzSchedule */
+            model.addAttribute("schedule", clazzReadDTO.getClazzSchedule());
 
 
-            /* List Room (Phòng nào) */
-            List<Room> roomDTOList = roomService.getAllByIdIn(null);
-            model.addAttribute("roomList", roomDTOList);
+            CenterReadDTO centerReadDTO = clazzReadDTO.getCourseSemester().getCenter();
 
-            model.addAttribute("option", option);
+            /* Room List */
+            List<RoomReadDTO> roomReadDTOList = roomService.getAllDTOByCenterId(centerReadDTO.getId(), null);
+            model.addAttribute("roomList", roomReadDTOList);
+
         } catch (Exception e) {
             e.printStackTrace();
             /* Log Error or return error msg */
         }
 
-        return "schedule/add-schedule";
+        return "schedule/edit-schedule";
     }
 
-    @PostMapping(value = "/add-schedule", consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
-    public Map<String, Object> addClazzSchedule(
-            @RequestBody ClazzScheduleCreateDTO createDTO,
+    @PostMapping("/edit-schedule")
+    public String editClazzSchedule(
+            Model model,
+            @ModelAttribute ClazzScheduleUpdateDTO updateDTO,
             @SessionAttribute(value = "user", required = false) UserReadDTO userDTO,
             RedirectAttributes redirect) throws Exception {
-        Map<String, Object> response = new HashMap<>();
 
         //check login
         if (ObjectUtils.isEmpty(userDTO)) {
             redirect.addAttribute("mess", "Làm ơn đăng nhập");
-            response.put("view", "/index");
-            return response;
+            return "redirect:/index";
         }
 
         if (!userDTO.getRoleId().equals(Constants.ROLE_ADMIN)) {
             redirect.addAttribute("mess", "bạn không đủ quyền");
-            response.put("view", "/index");
-            return response;
+            return "redirect:/index";
         }
-        ClazzScheduleReadDTO readDTO;
+
         try {
-            readDTO = clazzScheduleService.createClazzScheduleByDTO(createDTO);
+            clazzScheduleService.updateClazzScheduleByDTO(updateDTO);
         } catch (Exception e) {
             e.printStackTrace();
-            response.put("error", e.getMessage());
-            return response;
+            return "redirect:/edit-schedule";
         }
 
-        response.put("view", "/clazzSchedule-detail?id=" + readDTO.getId());
-        return response;
+        return "redirect:/schedule-clazz";
     }
 
-    @PutMapping(value = "/edit-clazzSchedule", consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
-    public Map<String, Object> editClazzSchedule(
-            @RequestBody ClazzScheduleUpdateDTO updateDTO,
-            @SessionAttribute(value = "user", required = false) UserReadDTO userDTO,
-            RedirectAttributes redirect) throws Exception {
-        Map<String, Object> response = new HashMap<>();
 
-        //check login
-        if (ObjectUtils.isEmpty(userDTO)) {
-            redirect.addAttribute("mess", "Làm ơn đăng nhập");
-            response.put("view", "/index");
-            return response;
-        }
 
-        if (!userDTO.getRoleId().equals(Constants.ROLE_ADMIN)) {
-            redirect.addAttribute("mess", "bạn không đủ quyền");
-            response.put("view", "/index");
-            return response;
-        }
-
-        ClazzScheduleReadDTO readDTO;
-        try {
-            readDTO = clazzScheduleService.updateClazzScheduleByDTO(updateDTO);
-        } catch (Exception e) {
-            e.printStackTrace();
-            response.put("error", e.getMessage());
-            return response;
-        }
-
-        response.put("view", "/clazzSchedule-detail?id=" + readDTO.getId());
-        return response;
-    }
-
+    /* =================================================== DELETE =================================================== */
     @GetMapping("/delete-clazzSchedule")
     public String deleteClazzSchedule(
             @SessionAttribute(value = "user", required = false) UserReadDTO userDTO,

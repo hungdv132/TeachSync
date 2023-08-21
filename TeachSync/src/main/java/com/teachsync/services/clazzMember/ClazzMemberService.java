@@ -1,6 +1,8 @@
 package com.teachsync.services.clazzMember;
 
+import com.teachsync.dtos.clazzMember.ClazzMemberCreateDTO;
 import com.teachsync.dtos.clazzMember.ClazzMemberReadDTO;
+import com.teachsync.dtos.clazzMember.ClazzMemberUpdateDTO;
 import com.teachsync.entities.ClazzMember;
 import com.teachsync.utils.enums.DtoOption;
 import org.springframework.data.domain.Page;
@@ -11,6 +13,8 @@ import java.util.Map;
 
 public interface ClazzMemberService {
     /* =================================================== CREATE =================================================== */
+    ClazzMember createClazzMember(ClazzMember member) throws Exception;
+    ClazzMemberReadDTO createClazzMemberByDTO(ClazzMemberCreateDTO createDTO) throws Exception;
     
 
     /* =================================================== READ ===================================================== */
@@ -24,19 +28,30 @@ public interface ClazzMemberService {
 
     /* clazzId */
     List<ClazzMember> getAllByClazzId(Long clazzId) throws Exception;
+    List<ClazzMemberReadDTO> getAllDTOByClazzId(Long clazzId, Collection<DtoOption> options) throws Exception;
 
     List<ClazzMember> getAllByClazzIdIn(Collection<Long> clazzIdCollection) throws Exception;
-    Map<Long, List<ClazzMember>> mapClazzIdClazzMemberListByClazzIdIn(Collection<Long> clazzIdCollection) throws Exception;
+    List<ClazzMemberReadDTO> getAllDTOByClazzIdIn(
+            Collection<Long> clazzIdCollection, Collection<DtoOption> options) throws Exception;
+    Map<Long, List<ClazzMemberReadDTO>> mapClazzIdListDTOByClazzIdIn(
+            Collection<Long> clazzIdCollection, Collection<DtoOption> options) throws Exception;
 
     /* userId */
     List<ClazzMember> getAllByUserId(Long userId) throws Exception;
+    List<ClazzMemberReadDTO> getAllDTOByUserId(Long userId, Collection<DtoOption> options) throws Exception;
 
     List<ClazzMember> getAllByUserIdIn(Collection<Long> userIdCollection) throws Exception;
+    List<ClazzMemberReadDTO> getAllDTOByUserIdIn(Collection<Long> userIdCollection
+            , Collection<DtoOption> options) throws Exception;
 
     /* clazzId & userId */
     ClazzMember getByClazzIdAndUserId(Long clazzId, Long userId) throws Exception;
+    ClazzMemberReadDTO getDTOByClazzIdAndUserId(
+            Long clazzId, Long userId, Collection<DtoOption> options) throws Exception;
 
     /* =================================================== UPDATE =================================================== */
+    ClazzMember updateClazzMember(ClazzMember member) throws Exception;
+    ClazzMemberReadDTO updateClazzMemberByDTO(ClazzMemberUpdateDTO updateDTO) throws Exception;
 
     
     /* =================================================== DELETE =================================================== */

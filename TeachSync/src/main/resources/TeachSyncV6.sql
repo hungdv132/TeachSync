@@ -459,7 +459,7 @@ CREATE TABLE IF NOT EXISTS `teachsync`.`question`
     `testId`         BIGINT       NOT NULL,
     `questionType`   VARCHAR(255) NOT NULL COMMENT 'MULTIPLE, ESSAY, ...',
     `questionDesc`   LONGTEXT     NOT NULL COMMENT 'VD: Last night I think I ___ a ghost when I was going to the bathroom.',
-    `questionPrompt` VARCHAR(45)  NOT NULL COMMENT 'VD: Chọn câu trả lời đúng nhất để điền vào chỗ trống',
+    `questionPrompt` VARCHAR(45)  COMMENT 'VD: Chọn câu trả lời đúng nhất để điền vào chỗ trống',
     `questionScore` DOUBLE       NOT NULL,
     `status`         VARCHAR(45)  NOT NULL,
     `createdAt`      DATETIME     NULL DEFAULT NULL,
@@ -1043,7 +1043,8 @@ CREATE TABLE IF NOT EXISTS `teachsync`.`test_record`
 (
     `id`                 BIGINT      NOT NULL AUTO_INCREMENT,
     `memberTestRecordId` BIGINT      NOT NULL COMMENT 'Ai làm, bài test nào',
-    `answerId`           BIGINT      NOT NULL COMMENT 'Câu trả lời chọn (Câu hỏi MULTIPLE)',
+    `questionId`         BIGINT      NULL DEFAULT NULL,
+    `answerId`           BIGINT      NULL DEFAULT NULL COMMENT 'Câu trả lời chọn (Câu hỏi MULTIPLE)',
     `answerTxt`          LONGTEXT    NULL DEFAULT NULL COMMENT 'Câu trả lời ghi ra (Câu hỏi ESSAY. Giáo viên cần chấm)',
     `score`              FLOAT       NULL DEFAULT NULL COMMENT 'Điểm đặt được (Auto tính = code. ESSAY thì giáo viên update)',
     `status`             VARCHAR(45) NOT NULL,
@@ -1053,23 +1054,27 @@ CREATE TABLE IF NOT EXISTS `teachsync`.`test_record`
     `updatedBy`          BIGINT      NULL DEFAULT NULL,
     PRIMARY KEY (`id`),
     INDEX `fk_test_record_answer_idx` (`answerId` ASC) VISIBLE,
+    INDEX `fk_test_record_question_idx` (`questionId` ASC) VISIBLE,
     INDEX `fk_test_record_member_test_record_idx` (`memberTestRecordId` ASC) VISIBLE,
     INDEX `fk_test_record_user_createdBy_idx` (`createdBy` ASC) VISIBLE,
     INDEX `fk_test_record_user_updatedBy_idx` (`updatedBy` ASC) VISIBLE,
-    CONSTRAINT `fk_test_record_answer`
-        FOREIGN KEY (`answerId`)
+    CONSTRAINT `fk_test_record_answer` 
+        FOREIGN KEY (`answerId`) 
             REFERENCES `teachsync`.`answer` (`id`),
-    CONSTRAINT `fk_test_record_member_test_record`
-        FOREIGN KEY (`memberTestRecordId`)
+    CONSTRAINT `fk_test_record_question` 
+        FOREIGN KEY (`questionId`) 
+            REFERENCES `teachsync`.`question` (`id`),
+    CONSTRAINT `fk_test_record_member_test_record` 
+        FOREIGN KEY (`memberTestRecordId`) 
             REFERENCES `teachsync`.`member_test_record` (`id`),
-    CONSTRAINT `fk_test_record_user_createdBy`
-        FOREIGN KEY (`createdBy`)
+    CONSTRAINT `fk_test_record_user_createdBy` 
+        FOREIGN KEY (`createdBy`) 
             REFERENCES `teachsync`.`user` (`id`),
-    CONSTRAINT `fk_test_record_user_updatedBy`
-        FOREIGN KEY (`updatedBy`)
+    CONSTRAINT `fk_test_record_user_updatedBy` 
+        FOREIGN KEY (`updatedBy`) 
             REFERENCES `teachsync`.`user` (`id`)
-)
-    ENGINE = InnoDB;
+) 
+        ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
@@ -1323,7 +1328,7 @@ DROP TABLE IF EXISTS `teachsync`.`application_detail`;
 
 CREATE TABLE IF NOT EXISTS `teachsync`.`application_detail`
 (
-    `id`            BIGINT      NOT NULL,
+    `id`            BIGINT      NOT NULL AUTO_INCREMENT,
     `applicationId` BIGINT      NOT NULL,
     `detailType`    VARCHAR(45) NOT NULL COMMENT 'cv, id, degree, ...',
     `detailLink`    LONGTEXT    NOT NULL COMMENT 'url to file',
@@ -1351,19 +1356,7 @@ CREATE TABLE IF NOT EXISTS `teachsync`.`application_detail`
     ENGINE = InnoDB;
 
 
-CREATE TABLE `testrecord` (
-                              `id` bigint NOT NULL AUTO_INCREMENT,
-                              `testId` bigint NOT NULL,
-                              `userId` bigint NOT NULL,
-                              `username` varchar(45) DEFAULT NULL,
-                              `class` varchar(45) DEFAULT NULL,
-                              `questionId` bigint NOT NULL,
-                              `questionType` varchar(45) DEFAULT NULL,
-                              `essayAnswer` varchar(4000) DEFAULT NULL,
-                              `answerMCId` bigint DEFAULT NULL,
-                              `correct` bit(1) DEFAULT NULL,
-                              PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=31 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
 
 
 CREATE TABLE `test_session` (

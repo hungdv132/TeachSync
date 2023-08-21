@@ -30,10 +30,15 @@ public class UserController {
         model.addAttribute("pageTotal", users.getTotalPages());
         return "user/list-user";
     }
+
     @GetMapping("/searchuserbyusername")
-    public String searchUserByUserName(@RequestParam(value = "page", required = false) Integer page, @RequestParam("searchText") String name, Model model){
-        if (page == null) { page = 0; }
-        if(page < 0) { page = 0; }
+    public String searchUserByUserName(@RequestParam(value = "page", required = false) Integer page, @RequestParam("searchText") String name, Model model) {
+        if (page == null) {
+            page = 0;
+        }
+        if (page < 0) {
+            page = 0;
+        }
         PageRequest pageable = PageRequest.of(page, 3);
         Page<User> users = userRepository.findAllByUsernameContainingOrderByCreatedAtDesc(name, pageable);
         model.addAttribute("lstUserSearch", users);
@@ -41,5 +46,38 @@ public class UserController {
         model.addAttribute("pageTotal", users.getTotalPages());
         model.addAttribute("searchText", name);
         return "user/lst-user-search";
+    }
+
+    @GetMapping("/lst-user-by-type")
+    public String lstStudentUser(@RequestParam(value = "page", required = false) Integer page, @RequestParam(value = "searchText", required = false) String name,
+                                 @RequestParam("type") Long typeUser, Model model) {
+        if (page == null) {
+            page = 0;
+        }
+        if (page < 0) {
+            page = 0;
+        }
+        PageRequest pageable = PageRequest.of(page, 3);
+        Page<User> users = userRepository.findAllByRoleId(typeUser,pageable);
+        model.addAttribute("lstUserSearch", users);
+        model.addAttribute("pageNo", users.getPageable().getPageNumber());
+        model.addAttribute("pageTotal", users.getTotalPages());
+        model.addAttribute("searchText", name);
+        return "user/lst-user-search";
+    }
+
+    @GetMapping("/lst-parent")
+    public String lstParentUser(@RequestParam(value = "page", required = false) Integer page, @RequestParam(value = "searchText",  required = false) String name, Model model) {
+        return "redirect:/";
+    }
+
+    @GetMapping("/lst-staff")
+    public String lstStaffUser(@RequestParam(value = "page", required = false) Integer page, @RequestParam(value = "searchText",  required = false) String name, Model model) {
+        return "redirect:/";
+    }
+
+    @GetMapping("/lst-admin")
+    public String lstAdminUser(@RequestParam(value = "page", required = false) Integer page, @RequestParam(value = "searchText",  required = false) String name, Model model) {
+        return "redirect:/";
     }
 }

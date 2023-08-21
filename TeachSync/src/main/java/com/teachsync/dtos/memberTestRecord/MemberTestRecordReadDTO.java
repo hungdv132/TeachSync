@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class MemberTestRecordReadDTO extends BaseReadDTO {
-    private Long memberId;
+    private Long id;
     private ClazzMemberReadDTO member;
     private Long clazzTestId;
     private ClazzTestReadDTO clazzTest;

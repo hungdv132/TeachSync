@@ -1,7 +1,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <!DOCTYPE HTML>
-<html lang="en">
+<html lang="vi">
 <html>
 <head>
   <title>Forgot Passwprd</title>

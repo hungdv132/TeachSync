@@ -1,6 +1,7 @@
 package com.teachsync.dtos.clazzMember;
 
 import com.teachsync.dtos.BaseReadDTO;
+import com.teachsync.dtos.BaseUpdateDTO;
 import com.teachsync.dtos.clazz.ClazzReadDTO;
 import com.teachsync.dtos.user.UserReadDTO;
 import lombok.AllArgsConstructor;
