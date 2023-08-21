@@ -239,23 +239,23 @@ public class TestController {
         return "test/edit-test";
     }
 
-    @PostMapping("/update-answer")
+    @GetMapping("/update-answer")
     public String updateAnswer(
             Model model,
             @RequestParam("idTest") Long idTest,
-            @RequestParam("idQuestion") Long idQuestion,
-            @RequestParam("testType") TestType testType,
+            @RequestParam("idQuestion") String idQuestionS,
+            @RequestParam("testType") String testType,
             @RequestParam("timeLimit") Integer timeLimit,
             @RequestParam(value = "numQuestions", required = false) Integer numQuestions,
-            @RequestParam("questionType") String questionType,
             @RequestParam("questionAll") String questionAll,
             @RequestParam Map<String, String> requestParams,
             @SessionAttribute(value = "user", required = false) UserReadDTO userDTO) {
 
-        if (userDTO == null || userDTO.getRoleId().equals(Constants.ROLE_ADMIN)) {
+        if (userDTO == null || !userDTO.getRoleId().equals(Constants.ROLE_ADMIN)) {
             return "redirect:/";
         }
 
+        Long idQuestion = Long.parseLong(idQuestionS);
 //        TODO: This function is update answer, not update test, or else rename function
         Test test = testRepository.findById(idTest).orElse(null);
 
@@ -501,7 +501,9 @@ public class TestController {
         Pageable pageable = miscUtil.makePaging(page, 3, "StartAt", false);
         try {
             Page<MemberTestRecordReadDTO> mTRDTO =
-                    memberTestRecordService.getPageAllDTO(pageable, List.of(MEMBER, USER, CLAZZ, COURSE_SEMESTER, COURSE_NAME));
+                    memberTestRecordService.getPageAllDTO(
+                            pageable,
+                            List.of(MEMBER, USER, CLAZZ, COURSE_SEMESTER, COURSE_NAME));
 
             model.addAttribute("testSessions", mTRDTO.getContent());
             model.addAttribute("pageNo", mTRDTO.getPageable().getPageNumber());
