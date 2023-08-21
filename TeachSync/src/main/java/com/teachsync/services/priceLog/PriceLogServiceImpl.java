@@ -1,11 +1,13 @@
 package com.teachsync.services.priceLog;
 
+import com.oracle.wls.shaded.org.apache.xpath.operations.Bool;
 import com.teachsync.dtos.priceLog.PriceLogCreateDTO;
 import com.teachsync.dtos.priceLog.PriceLogReadDTO;
 import com.teachsync.dtos.priceLog.PriceLogUpdateDTO;
 import com.teachsync.entities.PriceLog;
 import com.teachsync.repositories.PriceLogRepository;
 import com.teachsync.utils.MiscUtil;
+import com.teachsync.utils.enums.PromotionType;
 import com.teachsync.utils.enums.Status;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -132,16 +134,30 @@ public class PriceLogServiceImpl implements PriceLogService {
 
     /* courseId */
     @Override
-    public PriceLog getLatestByCourseId(Long courseId) throws Exception {
-        Optional<PriceLog> priceLog =
-                priceLogRepository.findByCourseIdAndValidBetweenAndStatusNot(
-                        courseId, LocalDateTime.now(), Status.DELETED);
-
-        return priceLog.orElse(null);
+    public PriceLog getCurrentByCourseId(Long courseId) throws Exception {
+        return priceLogRepository
+                .findByCourseIdAndValidBetweenAndStatusNot(courseId, LocalDateTime.now(), Status.DELETED)
+                .orElse(null);
     }
     @Override
-    public PriceLogReadDTO getLatestDTOByCourseId(Long CourseId) throws Exception {
-        PriceLog priceLog = getLatestByCourseId(CourseId);
+    public PriceLogReadDTO getCurrentDTOByCourseId(Long courseId) throws Exception {
+        PriceLog priceLog = getCurrentByCourseId(courseId);
+
+        if (priceLog == null) {
+            return null; }
+
+        return wrapDTO(priceLog);
+    }
+
+    @Override
+    public PriceLog getByCourseIdAt(Long courseId, LocalDateTime searchAt) throws Exception {
+        return priceLogRepository
+                .findByCourseIdAndValidBetweenAndStatusNot(courseId, searchAt, Status.DELETED)
+                .orElse(null);
+    }
+    @Override
+    public PriceLogReadDTO getDTOByCourseIdAt(Long courseId, LocalDateTime searchAt) throws Exception {
+        PriceLog priceLog = getByCourseIdAt(courseId, searchAt);
 
         if (priceLog == null) {
             return null; }
@@ -249,51 +265,26 @@ public class PriceLogServiceImpl implements PriceLogService {
     /* =================================================== WRAPPER ================================================== */
     @Override
     public PriceLogReadDTO wrapDTO(PriceLog priceLog) throws Exception {
-        mapper.typeMap(PriceLog.class, PriceLogReadDTO.class)
-                .addMappings(mapping -> {
-                    mapping.skip(PriceLogReadDTO::setPrice);
-                    mapping.skip(PriceLogReadDTO::setPromotionAmount);
-                });
-
         PriceLogReadDTO dto = mapper.map(priceLog, PriceLogReadDTO.class);
 
-        DecimalFormat moneyFormat = new DecimalFormat("#,###");
-        dto.setPrice(moneyFormat.format(priceLog.getPrice()));
+        dto.setPrice(priceLog.getPrice());
 
         Double finalPrice = priceLog.getPrice();
 
         if (priceLog.getIsPromotion()) {
-            switch (priceLog.getPromotionType()) {
-                case AMOUNT -> {
-                    finalPrice = priceLog.getPrice() - priceLog.getPromotionAmount();
-                    dto.setPromotionAmount(moneyFormat.format(priceLog.getPromotionAmount()));
-                }
-                case PERCENT -> {
-                    finalPrice = priceLog.getPrice() * ((100.0 - priceLog.getPromotionAmount()) / 100.0);
-                    long roundedFinalPrice = Math.round(finalPrice); /* Bỏ số lẻ */
-                    finalPrice = ((roundedFinalPrice + 99) / 100) * 100.0; /* Nâng lên hàng trăm */
-
-                    DecimalFormat percentFormat = new DecimalFormat("#,###.##");
-                    dto.setPromotionAmount(percentFormat.format(priceLog.getPromotionAmount()));
-                }
-            }
+            finalPrice = calculateFinalPrice(
+                    priceLog.getPromotionType(),
+                    priceLog.getPrice(),
+                    priceLog.getPromotionAmount());
         }
 
-        dto.setFinalPrice(moneyFormat.format(finalPrice));
+        dto.setFinalPrice(finalPrice);
         
         return dto;
     }
 
     @Override
     public List<PriceLogReadDTO> wrapListDTO(Collection<PriceLog> priceLogCollection) throws Exception {
-        mapper.typeMap(PriceLog.class, PriceLogReadDTO.class)
-                .addMappings(mapping -> {
-                    mapping.skip(PriceLogReadDTO::setPrice);
-                    mapping.skip(PriceLogReadDTO::setPromotionAmount);
-                });
-        DecimalFormat moneyFormat = new DecimalFormat("#,###");
-        DecimalFormat percentFormat = new DecimalFormat("#,###.##");
-
         List<PriceLogReadDTO> dtoList = new ArrayList<>();
 
         PriceLogReadDTO dto;
@@ -305,22 +296,13 @@ public class PriceLogServiceImpl implements PriceLogService {
             finalPrice = priceLog.getPrice();
 
             if (priceLog.getIsPromotion()) {
-                switch (priceLog.getPromotionType()) {
-                    case AMOUNT -> {
-                        finalPrice = priceLog.getPrice() - priceLog.getPromotionAmount();
-                        dto.setPromotionAmount(moneyFormat.format(priceLog.getPromotionAmount()));
-                    }
-                    case PERCENT -> {
-                        finalPrice = priceLog.getPrice() * ((100.0 - priceLog.getPromotionAmount()) / 100.0);
-                        long roundedFinalPrice = Math.round(finalPrice); /* Bỏ số lẻ */
-                        finalPrice = ((roundedFinalPrice + 99) / 100) * 100.0; /* Nâng lên hàng trăm */
-
-                        dto.setPromotionAmount(percentFormat.format(priceLog.getPromotionAmount()));
-                    }
-                }
+                finalPrice = calculateFinalPrice(
+                        priceLog.getPromotionType(),
+                        priceLog.getPrice(),
+                        priceLog.getPromotionAmount());
             }
 
-            dto.setFinalPrice(moneyFormat.format(finalPrice));
+            dto.setFinalPrice(finalPrice);
 
             dtoList.add(dto);
         }
@@ -334,5 +316,23 @@ public class PriceLogServiceImpl implements PriceLogService {
                 wrapListDTO(priceLogPage.getContent()),
                 priceLogPage.getPageable(),
                 priceLogPage.getTotalPages());
+    }
+
+
+    /* =================================================== OTHER ==================================================== */
+    private Double calculateFinalPrice(PromotionType promotionType, Double price, Double promotionAmount) {
+        Double finalPrice = null;
+        switch (promotionType) {
+            case AMOUNT -> {
+                finalPrice = price - promotionAmount;
+            }
+            case PERCENT -> {
+                finalPrice = price * ((100.0 - promotionAmount) / 100.0);
+                long roundedFinalPrice = Math.round(finalPrice); /* Bỏ số lẻ */
+                finalPrice = ((roundedFinalPrice + 99) / 100) * 100.0; /* Nâng lên hàng trăm */
+            }
+        }
+
+        return finalPrice;
     }
 }

@@ -51,7 +51,7 @@ public class EnrollController {
     public String enrollPage (
             Model model,
             @RequestParam(name = "id") Long courseId,
-            @RequestHeader("Referer") String referer,
+            @RequestHeader(value = "Referer", required = false) String referer,
             @SessionAttribute(name = "user", required = false) UserReadDTO userDTO) {
         if (userDTO == null) {
             return "redirect:/course";
@@ -59,7 +59,10 @@ public class EnrollController {
 
         if (!userDTO.getRoleId().equals(Constants.ROLE_STUDENT)) {
             /* Quay về trang cũ */
-            return "redirect:" + referer;
+            if (referer != null) {
+                return "redirect:" + referer;
+            }
+            return "redirect:/course";
         }
 
         try {
@@ -107,16 +110,19 @@ public class EnrollController {
     public String enroll(
             Model model,
             @RequestParam Long clazzId,
-            @RequestHeader("Referer") String referer,
+            @RequestHeader(value = "Referer", required = false) String referer,
             @SessionAttribute(name = "user", required = false) UserReadDTO userDTO) {
-//        if (userDTO == null) {
-//            return "redirect:/course";
-//        }
-//
-//        if (!userDTO.getRoleId().equals(Constants.ROLE_STUDENT)) {
-//            /* Quay về trang cũ */
-//            return "redirect:" + referer;
-//        }
+        if (userDTO == null) {
+            return "redirect:/course";
+        }
+
+        if (!userDTO.getRoleId().equals(Constants.ROLE_STUDENT)) {
+            /* Quay về trang cũ */
+            if (referer != null) {
+                return "redirect:" + referer;
+            }
+            return "redirect:/course";
+        }
 
         try {
             /* Trả về list vì theo controller chính của request */

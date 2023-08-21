@@ -32,6 +32,10 @@ public interface SemesterService {
     SemesterReadDTO getDTOById(Long id, Collection<DtoOption> options) throws Exception;
 
     List<Semester> getAllByIdIn(Collection<Long> idCollection) throws Exception;
+    Map<Long, String> mapIdSemesterNameByIdIn(
+            Collection<Long> idCollection) throws Exception;
+    Map<Long, String> mapIdSemesterAliasByIdIn(
+            Collection<Long> idCollection) throws Exception;
     List<SemesterReadDTO> getAllDTOByIdIn(
             Collection<Long> idCollection, Collection<DtoOption> options) throws Exception;
     Map<Long, SemesterReadDTO> mapIdDTOByIdIn(

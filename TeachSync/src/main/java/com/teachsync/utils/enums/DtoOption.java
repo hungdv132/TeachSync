@@ -28,14 +28,14 @@ public enum DtoOption {
     /** Question */
     ANSWER_LIST,
 
-    /** ClazzSchedule, ClazzMember */
+    /** ClazzSchedule, ClazzMember, Request */
     CLAZZ_NAME,
     /** ClazzSchedule */
     ROOM_NAME,
 
-    /** ClazzMember */
+    /** ClazzMember, Request */
     CLAZZ,
-    /** ClazzMember, Staff, CampaignApplication */
+    /** ClazzMember, Staff, CampaignApplication, Request */
     USER,
     /** ClazzMember, Staff */
     USER_FULL_NAME,
@@ -73,8 +73,14 @@ public enum DtoOption {
     COURSE_ALIAS,
     /** CourseSemester, Staff, RecruitmentCampaign */
     CENTER,
+    /** CourseSemester, Staff, RecruitmentCampaign */
+    CENTER_NAME,
     /** CourseSemester */
     SEMESTER,
+    /** CourseSemester */
+    SEMESTER_NAME,
+    /** CourseSemester */
+    SEMESTER_ALIAS,
 
     /** RecruitmentCampaign */
     APPLICATION_LIST,
@@ -82,5 +88,25 @@ public enum DtoOption {
     /** CampaignApplication */
     CAMPAIGN,
     /** CampaignApplication */
-    APPLICATION_DETAIL_LIST;
+    APPLICATION_DETAIL_LIST,
+
+    /** Request */
+    REQUESTER,
+    /** Request */
+    REQUESTER_FULL_NAME,
+    /** Request */
+    REQUESTER_USERNAME,
+    /** Request */
+    RESOLVER,
+    /** Request */
+    RESOLVER_FULL_NAME,
+    /** Request */
+    RESOLVER_USERNAME,
+    /** Request */
+    PAYMENT,
+
+    /** Payment */
+    REQUEST,
+    /** Payment */
+    PAYER;
 }

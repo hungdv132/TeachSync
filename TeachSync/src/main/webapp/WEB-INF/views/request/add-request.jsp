@@ -1,10 +1,13 @@
 <%@ page import="com.teachsync.utils.enums.RequestType" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="vi" dir="ltr">
 <head>
+  <fmt:setLocale value="vi_VN" scope="session"/>
+  
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -24,7 +27,7 @@
   
   <script src="../../../resources/js/common.js"></script>
 </head>
-<body class="container-fluid ts-bg-white-subtle">
+<body class="min-vh-100 container-fluid d-flex flex-column ts-bg-white-subtle">
 <!-- ================================================== Header ===================================================== -->
 <%@ include file="/WEB-INF/fragments/header.jspf" %>
 <!-- ================================================== Header ===================================================== -->
@@ -41,7 +44,7 @@
           </a>
         </li>
         <li class="breadcrumb-item" aria-current="page">
-          <a href="/request/list">
+          <a href="/request">
             Đơn xin
           </a>
         </li>
@@ -60,13 +63,17 @@
   <div class="col-12 mb-3">
     <label class="border-bottom ts-border-blue ts-txt-lg w-100 pb-3 mb-3">Loại đơn: <br/>
       <select name="requestType" id="selRequestType" class="py-1" onchange="toggleRequestForm()">
-        <option value="no" selected disabled hidden>-- Xin chọn loại đơn --</option>
+        <option value="0" selected disabled hidden>-- Xin chọn loại đơn --</option>
         <option value="${RequestType.ENROLL}">Đăng ký học</option>
-        <option value="${RequestType.CHANGE_CLASS}">Xin chuyển lớp</option>
+<%--        <option value="${RequestType.CHANGE_CLASS}">Xin chuyển lớp</option>--%>
       </select>
     </label>
   
-    <form class="row visually-hidden" id="enrollForm" onsubmit="sendRequest('${RequestType.ENROLL}', event)">
+    <form action="/add-request/enroll" method="POST"
+          id="enrollForm" class="row visually-hidden">
+      <input type="hidden" name="requesterId" value="${user.id}">
+      <input type="hidden" name="requestType" value="${RequestType.ENROLL}">
+      
       <!-- Course, Semester, Center -->
       <div class="col-sm-12 col-md-6">
         <div class="row">
@@ -74,9 +81,9 @@
           <label class="col-12 mb-1">Khóa học: <br/>
             <select name="course" id="selCourse" class="w-100 py-1" onchange="loadClassList(); loadCourseDetail();">
               <option value="0" selected disabled hidden>- Xin chọn khóa học -</option>
-              <c:forEach var="centerDTO" items="${courseList}">
-                <option value="${centerDTO.id}">
-                  <c:out value="${centerDTO.courseAlias.concat(' - ').concat(centerDTO.courseName)}"/>
+              <c:forEach var="courseDTO" items="${courseList}">
+                <option value="${courseDTO.id}">
+                  <c:out value="${courseDTO.courseAlias.concat(' - ').concat(courseDTO.courseName)}"/>
                 </option>
               </c:forEach>
             </select>
@@ -121,7 +128,7 @@
 
           <!-- Select Center -->
           <label class="col-12 mb-1">Cơ sở: <br/>
-            <select name="center" id="selCenter" class="w-100 py-1" onchange="loadClassList()">
+            <select name="center" id="selCenter" class="w-100 py-1" onchange="loadClassList(); loadCenterDetail();">
               <option value="0" selected disabled hidden>- Xin chọn cơ sở -</option>
               
               <c:forEach var="centerDTO" items="${centerList}">
@@ -142,11 +149,11 @@
       </div>
       
       <!-- Class -->
-      <div class="col-sm-12 col-md-6 visually-hidden" id="classDetail">
+      <div id="classDetail" class="col-sm-12 col-md-6 visually-hidden">
         <div class="row">
           <!-- Select Class -->
           <label class="col-12 mb-1">Lớp học: <br/>
-            <select name="clazz" id="selClazz" class="w-100 py-1" onchange="loadClassDetail()">
+            <select id="selClazz" name="clazzId" class="w-100 py-1" onchange="loadClassDetail()">
               <option value="0" selected disabled hidden>- Xin chọn lớp học -</option>
             </select>
             <b class="ts-txt-orange visually-hidden" id="selClazz404">
@@ -188,14 +195,15 @@
         </div>
       </div>
       
-      <div class="col-12 d-flex justify-content-center" id="submitSection">
+      <!-- Button / Message -->
+      <div id="submitSection" class="col-12 d-flex justify-content-center" >
       </div>
-      
     </form>
-    
-    <div class="row visually-hidden mt-3" id="changeClassForm">
   
-    </div>
+    <form action="/add-request/change-class" method="POST"
+          id="changeClassForm" class="row visually-hidden">
+  
+    </form>
     
   </div>
 </div>
@@ -209,258 +217,267 @@
 
 <!-- ================================================== Script ===================================================== -->
 <script>
-  function toggleRequestForm() {
-      let requestType = $("#selRequestType").val();
-      let enrollForm = $("#enrollForm");
-      let changeClassForm = $("#changeClassForm");
-      
-      switch (requestType) {
-          case '${RequestType.ENROLL}':
-              enrollForm.removeClass("visually-hidden");
-              changeClassForm.addClass("visually-hidden");
-              break;
-              
-          case '${RequestType.CHANGE_CLASS}':
-              changeClassForm.removeClass("visually-hidden");
-              enrollForm.addClass("visually-hidden");
-              break;
-              
-          default:
-              changeClassForm.addClass("visually-hidden");
-              enrollForm.addClass("visually-hidden");
-              break;
-      }
-  }
+    function toggleRequestForm() {
+        let requestType = $("#selRequestType").val();
 
-  function loadCourseDetail() {
-      let courseId = Number($("#selCourse").val());
+        switch (requestType) {
+            case '${RequestType.ENROLL}':
+                showById("enrollForm");
+                hideById("changeClassForm");
+                break;
 
-      /* value = '-1' khi là option mặc định '- Chọn ... -'. Tức là chưa có chọn */
-      if (courseId !== 0) {
-          $.ajax({
-              type: "GET",
-              url: "/api/course-detail?courseId=" + courseId,
-              success: function(response) {
-                  let courseDTO = response['course'];
+            case '${RequestType.CHANGE_CLASS}':
+                hideById("enrollForm");
+                showById("changeClassForm");
+                break;
 
-                  $("#txtCoursePrice").empty()
-                      .append("Giá tiền: <br/> " + (courseDTO['currentPrice'])['price'] + " ₫");
-
-                  let isPromotion = (courseDTO['currentPrice'])['isPromotion'];
-                  if (isPromotion) {
-                      $("#txtCourseDiscount").removeClass("visually-hidden").empty()
-                          .append("Giảm giá: <br/> " + (courseDTO['currentPrice'])['promotionAmount']);
-
-                      $("#txtCourseFinalPrice").removeClass("visually-hidden").empty()
-                          .append("Giá cuối: <br/> " + (courseDTO['currentPrice'])['finalPrice'] + " ₫");
-                  } else {
-                      $("#txtCourseDiscount").addClass("visually-hidden").empty();
-                      $("#txtCourseFinalPrice").addClass("visually-hidden").empty();
-                  }
-              }
-          })
-      }
-  }
-  
-  function loadSemesterDetail() {
-      let semesterId = Number($("#selSemester").val());
-
-      /* value = '-1' khi là option mặc định '- Chọn ... -'. Tức là chưa có chọn */
-      if (semesterId !== 0) {
-          $.ajax({
-              type: "GET",
-              url: "/api/semester-detail?semesterId=" + semesterId,
-              success: function(response) {
-                  let semesterDTO = response['semester'];
-
-                  $("#txtSemesterStart").empty()
-                      .append("Bắt đầu: <br/> " + semesterDTO['startDate']);
-
-                  $("#txtSemesterEnd").empty()
-                      .append("Kết thúc: <br/> " + semesterDTO['endDate']);
-
-              }
-          })
-      }
-  }
-
-  function loadClassList() {
-      let courseId = Number($("#selCourse").val());
-      let semesterId = Number($("#selSemester").val());
-      let centerId = Number($("#selCenter").val());
-      
-      console.log("course "+ courseId + " sem " + semesterId + " cen " + centerId)
-
-      /* value = '-1' khi là option mặc định '- Chọn ... -'. Tức là chưa có chọn */
-      if (courseId !== 0 && semesterId !== 0 && centerId !== 0) {
-          $.ajax({
-              type: "GET",
-              url: "/api/clazz?courseId=" + courseId + "&semesterId=" + semesterId  + "&centerId=" + centerId ,
-              success: function(response) {
-                  let clazzList = response['clazzList'];
-
-                  let selClazz = $("#selClazz");
-                  selClazz.empty(); /* xóa dữ liệu cũ */
-
-                  if (clazzList == null) {
-                      $("#classDetail").addClass("visually-hidden");
-                      
-                      $("#txtClazzSchedule").addClass("visually-hidden").empty();
-                      $("#txtClazzSlot").addClass("visually-hidden").empty();
-                      $("#txtClazzFrom").addClass("visually-hidden").empty();
-                      $("#txtClazzTo").addClass("visually-hidden").empty();
-                      $("#txtClazzRoom").addClass("visually-hidden").empty();
-                      $("#txtClazzTeacher").addClass("visually-hidden").empty();
-                      $("#txtClazzMember").addClass("visually-hidden").empty();
-                      selClazz.addClass("visually-hidden");
-                      $("#selClazz404").removeClass("visually-hidden");
-                  } else {
-                      $("#classDetail").removeClass("visually-hidden");
-                      
-                      selClazz.removeClass("visually-hidden");
-                      $("#selClazz404").addClass("visually-hidden");
-                      
-                      selClazz.append('<option value="0" selected disabled hidden>-- Xin chọn lớp học --</option>');
-                      for (const clazzDTO of clazzList) {
-                          selClazz.append('<option value="' + clazzDTO['id'] + '">' + clazzDTO['clazzName'] + '</option>');
-                      }
-                  }
-              }
-          })
-      }
-  }
-  
-  function loadClassDetail() {
-      let clazzId = Number($("#selClazz").val());
-
-      /* value = '-1' khi là option mặc định '- Chọn ... -'. Tức là chưa có chọn */
-      if (clazzId !== 0) {
-          $.ajax({
-              type: "GET",
-              url: "/api/clazz-detail?clazzId=" + clazzId,
-              success: function(response) {
-                  let clazzDTO = response['clazz'];
-                  
-                  console.log(JSON.stringify(clazzDTO));
-                  
-                  let scheduleType = '';
-                  switch ((clazzDTO['clazzSchedule'])['scheduleType']) {
-                      case 'MON_WED_FRI':
-                          scheduleType = "T2, T4, T6";
-                          break;
-                      case 'TUE_THU_SAT':
-                          scheduleType = "T3, T5, T7";
-                          break;
-                      case 'SAT_SUN':
-                          scheduleType = "T7, CN";
-                          break;
-                      case 'CUSTOM':
-                          scheduleType = "Khác";
-                          break;
-                  }
-                  
-                  $("#txtClazzSchedule").removeClass("visually-hidden").empty()
-                      .append("Lịch học: <br/> " + scheduleType);
-                  
-                  
-                  $("#txtClazzSlot").removeClass("visually-hidden").empty()
-                      .append("Tiết học: <br/> " + (clazzDTO['clazzSchedule'])['slot']);
-                  $("#txtClazzFrom").removeClass("visually-hidden").empty()
-                      .append("Bắt đầu: <br/> " + (clazzDTO['clazzSchedule'])['sessionStart']);
-                  $("#txtClazzTo").removeClass("visually-hidden").empty()
-                      .append("Kết thúc: <br/> " + (clazzDTO['clazzSchedule'])['sessionEnd']);
-                  $("#txtClazzRoom").removeClass("visually-hidden").empty()
-                      .append("Phòng học: <br/> " + (clazzDTO['clazzSchedule'])['roomName']);
-                  $("#txtClazzTeacher").removeClass("visually-hidden").empty()
-                      .append("Giáo viên: <br/> " + ((clazzDTO['staff'])['user'])['fullName']);
-                  let memberList = clazzDTO['memberList'];
-                  let memberCount = memberList == null ? 0 : memberList.length;
-                  $("#txtClazzMember").removeClass("visually-hidden").empty()
-                      .append("Thành viên: <br/> " + memberCount + " / " + clazzDTO['clazzSize']);
-                  
-                  if (memberCount < clazzDTO['clazzSize']) {
-                      $("#submitSection").empty()
-                          .append('<button type="submit" class="btn btn-primary w-50">Gửi đơn</button>');
-                  } else {
-                      $("#submitSection").empty()
-                          .append('<p class="ts-txt-orange ts-txt-italic">Lớp học này đã đầy, xin hãy thử lớp khác</p>');
-                  }
-              }
-          })
-      }
-  }
-  
-  async function sendRequest(type, event) {
-      event.preventDefault()
-      switch (type) {
-          case '${RequestType.ENROLL}':
-              await sendEnrollRequest();
-              break;
-  
-          case '${RequestType.CHANGE_CLASS}':
-              await sendChangeClassRequest();
-              break;
-  
-          default:
-              break;
+            default:
+                hideById("enrollForm");
+                hideById("changeClassForm");
+                break;
+        }
     }
-  }
 
-  async function sendEnrollRequest() {
+    function loadCourseDetail() {
+        let courseId = Number($("#selCourse").val());
 
-  }
+        /* value = '0' khi là option mặc định '- Chọn ... -'. Tức là chưa có chọn */
+        if (courseId !== 0) {
+            $.ajax({
+                type: "GET",
+                url: "/api/course-detail?courseId=" + courseId,
+                success: function (response) {
+                    let courseDTO = response['course'];
 
-  async function sendChangeClassRequest() {
+                    $("#txtCoursePrice").empty()
+                        .append("Giá tiền: <br/> " + (courseDTO['currentPrice'])['price'] + " ₫");
 
-  }
+                    let isPromotion = (courseDTO['currentPrice'])['isPromotion'];
+                    if (isPromotion) {
+                        let txtCourseDiscount = $("#txtCourseDiscount");
+                        
+                        txtCourseDiscount.removeClass("visually-hidden").empty()
+                            .append("Giảm giá: <br/> " + (courseDTO['currentPrice'])['promotionAmount']);
+                        
+                        let promotionType = (courseDTO['currentPrice'])['promotionType'];
+                        switch (promotionType) {
+                            case "PERCENT":
+                                txtCourseDiscount.append(" %");
+                                break;
+                            case "AMOUNT":
+                                txtCourseDiscount.append(" ₫");
+                                break;
+                        }
+                        
+                        
+
+                        $("#txtCourseFinalPrice").removeClass("visually-hidden").empty()
+                            .append("Giá cuối: <br/> " + (courseDTO['currentPrice'])['finalPrice'] + " ₫");
+                    } else {
+                        $("#txtCourseDiscount").addClass("visually-hidden").empty();
+                        $("#txtCourseFinalPrice").addClass("visually-hidden").empty();
+                    }
+                }
+            })
+        }
+    }
+
+    function loadSemesterDetail() {
+        let semesterId = Number($("#selSemester").val());
+
+        /* value = '0' khi là option mặc định '- Chọn ... -'. Tức là chưa có chọn */
+        if (semesterId !== 0) {
+            $.ajax({
+                type: "GET",
+                url: "/api/semester-detail?semesterId=" + semesterId,
+                success: function (response) {
+                    let semesterDTO = response['semester'];
+
+                    $("#txtSemesterStart").empty()
+                        .append("Bắt đầu: <br/> " + semesterDTO['startDate']);
+
+                    $("#txtSemesterEnd").empty()
+                        .append("Kết thúc: <br/> " + semesterDTO['endDate']);
+
+                }
+            })
+        }
+    }
+
+    function loadCenterDetail() {
+        let centerId = Number($("#selCenter").val());
+
+        /* value = '0' khi là option mặc định '- Chọn ... -'. Tức là chưa có chọn */
+        if (centerId !== 0) {
+            $.ajax({
+                type: "GET",
+                url: "/api/center-detail?centerId=" + centerId,
+                success: function (response) {
+                    let centerDTO = response['center'];
+
+                    $("#txtCenterAddr").empty()
+                        .append("Địa chỉ: <br/> " + (centerDTO['address'])['addressString']);
+                }
+            })
+        }
+    }
+
+    function loadClassList() {
+        let courseId = Number($("#selCourse").val());
+        let semesterId = Number($("#selSemester").val());
+        let centerId = Number($("#selCenter").val());
+
+        /* value = '0' khi là option mặc định '- Chọn ... -'. Tức là chưa có chọn */
+        if (courseId !== 0 && semesterId !== 0 && centerId !== 0) {
+            $.ajax({
+                type: "GET",
+                url: "/api/clazz?courseId=" + courseId + "&semesterId=" + semesterId + "&centerId=" + centerId,
+                success: function (response) {
+                    let clazzList = response['clazzList'];
+                    
+                    let selClazz = $("#selClazz");
+                    selClazz.empty(); /* xóa dữ liệu cũ */
+
+                    if (clazzList === null) {
+                        $("#classDetail").removeClass("visually-hidden");
+
+                        $("#txtClazzSchedule").addClass("visually-hidden").empty();
+                        $("#txtClazzSlot").addClass("visually-hidden").empty();
+                        $("#txtClazzFrom").addClass("visually-hidden").empty();
+                        $("#txtClazzTo").addClass("visually-hidden").empty();
+                        $("#txtClazzRoom").addClass("visually-hidden").empty();
+                        $("#txtClazzTeacher").addClass("visually-hidden").empty();
+                        $("#txtClazzMember").addClass("visually-hidden").empty();
+                        selClazz.addClass("visually-hidden");
+                        
+                        $("#selClazz404").removeClass("visually-hidden");
+                    } else {
+                        $("#classDetail").removeClass("visually-hidden");
+
+                        selClazz.removeClass("visually-hidden");
+                        $("#selClazz404").addClass("visually-hidden");
+
+                        selClazz.append(
+                            '<option value="0" selected disabled hidden>-- Xin chọn lớp học --</option>');
+                        for (const clazzDTO of clazzList) {
+                            selClazz.append(
+                                '<option value="' + clazzDTO['id'] + '">' + clazzDTO['clazzName'] + '</option>');
+                        }
+                    }
+                }
+            })
+        }
+    }
+
+    function loadClassDetail() {
+        let clazzId = Number($("#selClazz").val());
+
+        /* value = '-1' khi là option mặc định '- Chọn ... -'. Tức là chưa có chọn */
+        if (clazzId !== 0) {
+            $.ajax({
+                type: "GET",
+                url: "/api/clazz-detail?clazzId=" + clazzId,
+                success: function (response) {
+                    let clazzDTO = response['clazz'];
+
+                    let scheduleType = '';
+                    switch ((clazzDTO['clazzSchedule'])['scheduleType']) {
+                        case 'MON_WED_FRI':
+                            scheduleType = "T2, T4, T6";
+                            break;
+                        case 'TUE_THU_SAT':
+                            scheduleType = "T3, T5, T7";
+                            break;
+                        case 'SAT_SUN':
+                            scheduleType = "T7, CN";
+                            break;
+                        case 'CUSTOM':
+                            scheduleType = "Khác";
+                            break;
+                    }
+
+                    $("#txtClazzSchedule").removeClass("visually-hidden").empty()
+                        .append("Lịch học: <br/> " + scheduleType);
+
+                    $("#txtClazzSlot").removeClass("visually-hidden").empty()
+                        .append("Tiết học: <br/> Tiết " + (clazzDTO['clazzSchedule'])['slot']);
+                    $("#txtClazzFrom").removeClass("visually-hidden").empty()
+                        .append("Bắt đầu: <br/> " + (clazzDTO['clazzSchedule'])['sessionStart']);
+                    $("#txtClazzTo").removeClass("visually-hidden").empty()
+                        .append("Kết thúc: <br/> " + (clazzDTO['clazzSchedule'])['sessionEnd']);
+                    $("#txtClazzRoom").removeClass("visually-hidden").empty()
+                        .append("Phòng học: <br/> " + (clazzDTO['clazzSchedule'])['roomName']);
+                    $("#txtClazzTeacher").removeClass("visually-hidden").empty()
+                        .append("Giáo viên: <br/> " + ((clazzDTO['staff'])['user'])['fullName']);
+                    let memberList = clazzDTO['memberList'];
+                    let memberCount = memberList == null ? 0 : memberList.length;
+                    $("#txtClazzMember").removeClass("visually-hidden").empty()
+                        .append("Thành viên: <br/> " + memberCount + " / " + clazzDTO['clazzSize']);
+
+                    if (memberCount < clazzDTO['clazzSize']) {
+                        $("#submitSection").empty()
+                            .append('<button type="submit" class="btn btn-primary w-50">Gửi đơn</button>');
+                    } else {
+                        $("#submitSection").empty()
+                            .append('<p class="ts-txt-orange ts-txt-italic">Lớp học này đã đầy, xin hãy thử lớp khác</p>');
+                    }
+                }
+            })
+        }
+    }
 </script>
 
-<c:if test="${fromEnroll}">
-  <script id="script1">
-      $("#selRequestType").val("${RequestType.ENROLL}").prop('disabled', true);
-      toggleRequestForm();
-      
-      /* Course */
-      $("#selCourse").val("${courseList.get(0).id}").prop('disabled', true);
-      $("#txtCoursePrice").append("${courseList.get(0).currentPrice.price} ₫");
-      let isPromotion = ${courseList.get(0).currentPrice.isPromotion};
-      if (isPromotion) {
-          $("#txtCourseDiscount").removeClass("visually-hidden")
-              .append("${courseList.get(0).currentPrice.promotionAmount}");
-          $("#txtCourseFinalPrice").removeClass("visually-hidden")
-              .append("${courseList.get(0).currentPrice.finalPrice} ₫");
-      }
-      
-      /* Semester */
-      $("#selSemester").val("${semesterList.get(0).id}").prop('disabled', true);
-      $("#txtSemesterStart").append("${semesterList.get(0).startDate}");
-      $("#txtSemesterEnd").append("${semesterList.get(0).endDate}");
+<script id="script1">
+    <c:if test="${fromEnroll}">
+    $("#selRequestType").val("${RequestType.ENROLL}").prop('disabled', true);
+    toggleRequestForm();
 
-      /* Center */
-      $("#selCenter").val("${centerList.get(0).id}").prop('disabled', true);
-      $("#txtCenterAddr").append("${centerList.get(0).address.addressString}");
-      
-      /* Clazz */
-      $("#classDetail").removeClass("visually-hidden");
-      let selClazz = $("#selClazz");
-      selClazz.append('<option value="${clazzList.get(0).id}"><c:out value="${clazzList.get(0).clazzName}"/></option>')
-      selClazz.val("${clazzList.get(0).id}").prop('disabled', true);
-      $("#txtClazzSchedule").removeClass("visually-hidden").append("${clazzList.get(0).clazzSchedule.scheduleType.stringValueVie}");
-      $("#txtClazzSlot").removeClass("visually-hidden").append("${clazzList.get(0).clazzSchedule.slot}");
-      $("#txtClazzFrom").removeClass("visually-hidden").append("${clazzList.get(0).clazzSchedule.sessionStart}");
-      $("#txtClazzTo").removeClass("visually-hidden").append("${clazzList.get(0).clazzSchedule.sessionEnd}");
-      $("#txtClazzRoom").removeClass("visually-hidden").append("${clazzList.get(0).clazzSchedule.roomName}");
-      $("#txtClazzTeacher").removeClass("visually-hidden").append("${clazzList.get(0).staff.user.fullName}");
-      let memberCount = ${empty clazzList.get(0).memberList ? 0 : clazzList.get(0).memberList.size()};
-      $("#txtClazzMember").removeClass("visually-hidden").append(memberCount + " / ${clazzList.get(0).clazzSize}");
+    /* Course */
+    $("#selCourse").val("${courseList.get(0).id}").prop('disabled', true);
+    $("#txtCoursePrice").append("${courseList.get(0).currentPrice.price} ₫");
+    let isPromotion = ${courseList.get(0).currentPrice.isPromotion};
+    if (isPromotion) {
+        $("#txtCourseDiscount").removeClass("visually-hidden")
+            .append("${courseList.get(0).currentPrice.promotionAmount}");
+        $("#txtCourseFinalPrice").removeClass("visually-hidden")
+            .append("${courseList.get(0).currentPrice.finalPrice} ₫");
+    }
 
-      $("#submitSection").empty()
-          .append('<button type="submit" class="btn btn-primary w-50">Gửi đơn</button>');
+    /* Semester */
+    $("#selSemester").val("${semesterList.get(0).id}").prop('disabled', true);
 
-      $("#changeClassForm").remove();
-      // $("#script1").remove(); /* Xóa thẻ <script> sau khi xong */
-  </script>
-</c:if>
+    <fmt:parseDate value="${semesterList.get(0).startDate}" type="date"
+                   pattern="yyyy-MM-dd" var="parsedStartDate" />
+    <fmt:parseDate value="${semesterList.get(0).endDate}" type="date"
+                   pattern="yyyy-MM-dd" var="parsedEndDate" />
+    
+    $("#txtSemesterStart").append('<fmt:formatDate value="${parsedStartDate}" type="date" pattern="dd/MM/yyyy"/>');
+    $("#txtSemesterEnd").append('<fmt:formatDate value="${parsedEndDate}" type="date" pattern="dd/MM/yyyy"/>');
+
+    /* Center */
+    $("#selCenter").val("${centerList.get(0).id}").prop('disabled', true);
+    $("#txtCenterAddr").append("${centerList.get(0).address.addressString}");
+
+    /* Clazz */
+    $("#classDetail").removeClass("visually-hidden");
+    let selClazz = $("#selClazz");
+    selClazz.append('<option value="${clazzList.get(0).id}"><c:out value="${clazzList.get(0).clazzName}"/></option>')
+    selClazz.val("${clazzList.get(0).id}").prop('disabled', true);
+    $("#txtClazzSchedule").removeClass("visually-hidden").append("${clazzList.get(0).clazzSchedule.scheduleType.stringValueVie}");
+    $("#txtClazzSlot").removeClass("visually-hidden").append("Tiết ${clazzList.get(0).clazzSchedule.slot}");
+    $("#txtClazzFrom").removeClass("visually-hidden").append("${clazzList.get(0).clazzSchedule.sessionStart}");
+    $("#txtClazzTo").removeClass("visually-hidden").append("${clazzList.get(0).clazzSchedule.sessionEnd}");
+    $("#txtClazzRoom").removeClass("visually-hidden").append("${clazzList.get(0).clazzSchedule.roomName}");
+    $("#txtClazzTeacher").removeClass("visually-hidden").append("${clazzList.get(0).staff.user.fullName}");
+    let memberCount = ${empty clazzList.get(0).memberList ? 0 : clazzList.get(0).memberList.size()};
+    $("#txtClazzMember").removeClass("visually-hidden").append(memberCount + " / ${clazzList.get(0).clazzSize}");
+
+    $("#submitSection").empty()
+        .append('<button type="submit" class="btn btn-primary w-50">Gửi đơn</button>');
+    $("#changeClassForm").remove();
+    </c:if>
+    $("#script1").remove(); /* Xóa thẻ <script> sau khi xong */
+</script>
 <!-- ================================================== Script ===================================================== -->
 </body>
 </html>

@@ -47,8 +47,8 @@ public class TeacherRequestServiceImpl implements TeacherRequestService {
             RequestReadDTO requestReadDTO = mapper.map(request, RequestReadDTO.class);
             //get user
             User user = userRepository.findById(request.getRequesterId()).orElseThrow(() -> new Exception("không tìm thấy tài khoản"));
-            requestReadDTO.setUsername(user.getUsername());
-            requestReadDTO.setFullName(user.getFullName());
+            requestReadDTO.setRequesterUsername(user.getUsername());
+            requestReadDTO.setRequesterFullName(user.getFullName());
             teacherRequestDtoList.add(requestReadDTO);
         }
 

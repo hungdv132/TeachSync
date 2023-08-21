@@ -5,10 +5,7 @@ import com.teachsync.dtos.center.CenterReadDTO;
 import com.teachsync.dtos.course.CourseReadDTO;
 import com.teachsync.dtos.courseSemester.CourseSemesterReadDTO;
 import com.teachsync.dtos.semester.SemesterReadDTO;
-import com.teachsync.entities.BaseEntity;
-import com.teachsync.entities.Course;
-import com.teachsync.entities.CourseSemester;
-import com.teachsync.entities.Semester;
+import com.teachsync.entities.*;
 import com.teachsync.repositories.CourseSemesterRepository;
 import com.teachsync.repositories.SemesterRepository;
 import com.teachsync.services.center.CenterService;
@@ -343,27 +340,43 @@ public class CourseSemesterServiceImpl implements CourseSemesterService {
 
         /* Add Dependency */
         if (options != null && !options.isEmpty()) {
+            Long courseId = courseSemester.getCourseId();
+            Long centerId = courseSemester.getCenterId();
+            Long semesterId = courseSemester.getSemesterId();
+
             if (options.contains(DtoOption.COURSE)) {
-                CourseReadDTO courseDTO = courseService.getDTOById(dto.getCourseId(), options);
+                CourseReadDTO courseDTO = courseService.getDTOById(courseId, options);
                 dto.setCourse(courseDTO);
             }
             if (options.contains(DtoOption.COURSE_NAME)) {
-                Course course = courseService.getById(dto.getCourseId());
+                Course course = courseService.getById(courseId);
                 dto.setCourseName(course.getCourseName());
             }
             if (options.contains(DtoOption.COURSE_ALIAS)) {
-                Course course = courseService.getById(dto.getCourseId());
+                Course course = courseService.getById(courseId);
                 dto.setCourseAlias(course.getCourseAlias());
             }
 
             if (options.contains(DtoOption.CENTER)) {
-                CenterReadDTO center = centerService.getDTOById(courseSemester.getCenterId(), options);
+                CenterReadDTO center = centerService.getDTOById(centerId, options);
                 dto.setCenter(center);
             }
-            
+            if (options.contains(DtoOption.CENTER_NAME)) {
+                Center center = centerService.getById(centerId);
+                dto.setCenterName(center.getCenterName());
+            }
+
             if (options.contains(DtoOption.SEMESTER)) {
-                SemesterReadDTO semester = semesterService.getDTOById(courseSemester.getSemesterId(), options);
+                SemesterReadDTO semester = semesterService.getDTOById(semesterId, options);
                 dto.setSemester(semester);
+            }
+            if (options.contains(DtoOption.SEMESTER_NAME)) {
+                Semester semester = semesterService.getById(semesterId);
+                dto.setSemesterName(semester.getSemesterName());
+            }
+            if (options.contains(DtoOption.SEMESTER_ALIAS)) {
+                Semester semester = semesterService.getById(semesterId);
+                dto.setSemesterAlias(semester.getSemesterAlias());
             }
         }
 
@@ -376,10 +389,16 @@ public class CourseSemesterServiceImpl implements CourseSemesterService {
 
         CourseSemesterReadDTO dto;
 
+        Map<Long, CourseReadDTO> courseIdCourseDTOMap = new HashMap<>();
         Map<Long, String> courseIdCourseNameMap = new HashMap<>();
         Map<Long, String> courseIdCourseAliasMap = new HashMap<>();
+
         Map<Long, CenterReadDTO> centerIdCenterDTOMap = new HashMap<>();
+        Map<Long, String> centerIdCenterNameMap = new HashMap<>();
+
         Map<Long, SemesterReadDTO> semesterIdSemesterDTOMap = new HashMap<>();
+        Map<Long, String> semesterIdSemesterNameMap = new HashMap<>();
+        Map<Long, String> semesterIdSemesterAliasMap = new HashMap<>();
 
         if (options != null && !options.isEmpty()) {
             Set<Long> courseIdSet = new HashSet<>();
@@ -392,10 +411,12 @@ public class CourseSemesterServiceImpl implements CourseSemesterService {
                 SemesterIdSet.add(courseSemester.getSemesterId());
             }
 
+            if (options.contains(DtoOption.COURSE)) {
+                courseIdCourseDTOMap = courseService.mapIdDTOByIdIn(courseIdSet, options);
+            }
             if (options.contains(DtoOption.COURSE_NAME)) {
                 courseIdCourseNameMap = courseService.mapCourseIdCourseNameByIdIn(courseIdSet);
             }
-
             if (options.contains(DtoOption.COURSE_ALIAS)) {
                 courseIdCourseAliasMap = courseService.mapCourseIdCourseAliasByIdIn(courseIdSet);
             }
@@ -403,9 +424,18 @@ public class CourseSemesterServiceImpl implements CourseSemesterService {
             if (options.contains(DtoOption.CENTER)) {
                 centerIdCenterDTOMap = centerService.mapIdDTOByIdIn(centerIdSet, options);
             }
-    
+            if (options.contains(DtoOption.CENTER_NAME)) {
+                centerIdCenterNameMap = centerService.mapIdCenterNameByIdIn(centerIdSet);
+            }
+
             if (options.contains(DtoOption.SEMESTER)) {
                 semesterIdSemesterDTOMap = semesterService.mapIdDTOByIdIn(SemesterIdSet, options);
+            }
+            if (options.contains(DtoOption.SEMESTER_NAME)) {
+                semesterIdSemesterNameMap = semesterService.mapIdSemesterNameByIdIn(SemesterIdSet);
+            }
+            if (options.contains(DtoOption.SEMESTER_ALIAS)) {
+                semesterIdSemesterAliasMap = semesterService.mapIdSemesterAliasByIdIn(SemesterIdSet);
             }
         }
 
@@ -413,12 +443,16 @@ public class CourseSemesterServiceImpl implements CourseSemesterService {
             dto = mapper.map(courseSemester, CourseSemesterReadDTO.class);
 
             /* Add Dependency */
+            dto.setCourse(courseIdCourseDTOMap.get(courseSemester.getCourseId()));
             dto.setCourseName(courseIdCourseNameMap.get(courseSemester.getCourseId()));
             dto.setCourseAlias(courseIdCourseAliasMap.get(courseSemester.getCourseId()));
 
             dto.setCenter(centerIdCenterDTOMap.get(courseSemester.getCenterId()));
-    
+            dto.setCenterName(centerIdCenterNameMap.get(courseSemester.getCenterId()));
+
             dto.setSemester(semesterIdSemesterDTOMap.get(courseSemester.getSemesterId()));
+            dto.setSemesterName(semesterIdSemesterNameMap.get(courseSemester.getSemesterId()));
+            dto.setSemesterAlias(semesterIdSemesterAliasMap.get(courseSemester.getSemesterId()));
 
             dtoList.add(dto);
         }

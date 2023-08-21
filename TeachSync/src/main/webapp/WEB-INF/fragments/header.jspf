@@ -102,7 +102,7 @@
                 <i class="bi-envelope-paper"></i>&nbsp;Đơn xin
               </a>
               <ul class="dropdown-menu">
-                <li><a class="dropdown-item ts-txt-hover-blue" href="/request/list">Đơn xin</a></li>
+                <li><a class="dropdown-item ts-txt-hover-blue" href="/request">Đơn xin</a></li>
                 <li><a class="dropdown-item ts-txt-hover-blue" href="/application/list">Tuyển dụng</a></li>
               </ul>
             </li>

@@ -1,6 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<html lang="en" dir="ltr">
+<html lang="vi" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -53,7 +53,7 @@
         }
     </style>
 </head>
-<body class="container-fluid ts-bg-white-subtle">
+<body class="min-vh-100 container-fluid d-flex flex-column ts-bg-white-subtle">
 <!-- ================================================== Header ===================================================== -->
 <%@ include file="/WEB-INF/fragments/header.jspf" %>
 <!-- ================================================== Header ===================================================== -->

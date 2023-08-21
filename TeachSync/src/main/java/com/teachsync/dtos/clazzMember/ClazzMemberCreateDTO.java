@@ -1,7 +1,7 @@
 package com.teachsync.dtos.clazzMember;
 
+import com.teachsync.dtos.BaseCreateDTO;
 import com.teachsync.dtos.BaseReadDTO;
-import com.teachsync.dtos.BaseUpdateDTO;
 import com.teachsync.dtos.clazz.ClazzReadDTO;
 import com.teachsync.dtos.user.UserReadDTO;
 import lombok.AllArgsConstructor;
@@ -16,18 +16,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ClazzMemberReadDTO extends BaseReadDTO {
-    private ClazzReadDTO clazz;
-    private String clazzName;
+public class ClazzMemberCreateDTO extends BaseCreateDTO {
     private Long clazzId;
-
-    private UserReadDTO user;
-    private String userFullName;
     private Long userId;
-
-    private Double score;
-
-    private Double attendant;
-
-    private Boolean isPassed;
 }
