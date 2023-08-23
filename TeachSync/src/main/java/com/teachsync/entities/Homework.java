@@ -31,7 +31,7 @@ public class Homework extends BaseEntity {
     private String homeworkDoc;
 
     @Column(name = "homeworkContent", nullable = true)
-    private byte[] homeworkContent;
+    private String homeworkContent;
 
     @Column(name = "openAt", nullable = true)
     private LocalDateTime openAt;

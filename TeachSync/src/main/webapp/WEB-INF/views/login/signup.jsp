@@ -18,7 +18,7 @@
   
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.1/css/all.css"
         integrity="sha384-vp86vTRFVJgpjF9jiIGPEEqYqlDwgyBgEF109VFjmqGmIY/Y4HV4d3Gp2irVfcrp" crossorigin="anonymous">
-  
+
   <script>
       function signUp() {
           let createDTO = {
@@ -27,7 +27,26 @@
               "fullName" : $("#fullName").val(),
               "email" : $("#email").val()
           }
-          
+        let username = $("#username").val();
+        let password = $("#password").val();
+        let fullName = $("#fullName").val();
+        let email = $("#email").val();
+
+        if (!username || !password || !email || !fullName) {
+          $("#message").text("Vui lòng điền đầy đủ thông tin.");
+          return;
+        }
+
+        if (!isValidEmail(email)) {
+          $("#message").text("Email không hợp lệ.");
+          return;
+        }
+
+        if (!isValidInput(username) || !isValidInput(password)) {
+          $("#message").text("User or password tối thiểu 4 ký tự có thể là số hoặc chữ cái, viết liền, viết thường không dấu");
+          return;
+        }
+
           $.get({
               type: "POST",
               url: "/sign-up",
@@ -42,17 +61,21 @@
               }
           });
       }
+
+      function isValidInput(input) {
+        let pattern = /^[a-z0-9_-]{4,45}$/;
+        return pattern.test(input) && input === input.toLowerCase();
+      }
+      function isValidEmail(email) {
+        // Kiểm tra email dựa trên định dạng abc@xyz
+        let emailRegex = /^[a-z0-9._-]+@[a-z0-9.-]+\.[a-z]{2,4}$/;
+        return emailRegex.test(email) && email === email.toLowerCase();
+      }
   </script>
 </head>
 
 <body class="body">
-<a href="https://github.com/Mehedi61/Login-form-Sign-up-form"
-><img
-    style="position: absolute; top: 0; left: 0; border: 0"
-    src="https://camo.githubusercontent.com/c6625ac1f3ee0a12250227cf83ce904423abf351/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f6c6566745f677261795f3664366436642e706e67"
-    alt="Fork me on GitHub"
-    data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_left_gray_6d6d6d.png"
-/></a>
+
 
 <div class="login-page">
   <div class="form">
@@ -80,7 +103,7 @@
       <p id="message"></p>
       
       <button type="button" onclick="signUp()">
-        SIGN UP
+        Đăng ký
       </button>
     </form>
   </div>
