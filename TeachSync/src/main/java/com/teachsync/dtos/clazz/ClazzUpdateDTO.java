@@ -25,6 +25,8 @@ public class ClazzUpdateDTO extends BaseUpdateDTO {
 
     private String clazzDesc;
 
+    private String statusClazz;
+
     private Integer clazzSize;
 
     private ScheduleType scheduleType;
