@@ -149,7 +149,7 @@ public class ClazzController {
         statusLabelMap.put("FINISH_CLAZZ", "Đã hoàn thành");
         model.addAttribute("statusLabelMap", statusLabelMap);
 
-        
+
         return "clazz/clazz-detail";
     }
 

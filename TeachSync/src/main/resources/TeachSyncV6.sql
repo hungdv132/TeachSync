@@ -692,6 +692,7 @@ CREATE TABLE IF NOT EXISTS `teachsync`.`clazz`
     `clazzName`        VARCHAR(45) NOT NULL,
     `clazzDesc`        LONGTEXT    NULL DEFAULT NULL,
     `clazzSize`        INT         NOT NULL COMMENT 'Số học sinh tối đa',
+    `statusClazz`      varchar(45) DEFAULT NULL,
     `status`           VARCHAR(45) NOT NULL,
     `createdAt`        DATETIME    NULL DEFAULT NULL,
     `createdBy`        BIGINT      NULL DEFAULT NULL,
