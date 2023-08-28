@@ -1,12 +1,15 @@
 package com.teachsync.controllers;
 
+import com.teachsync.dtos.address.AddressCreateDTO;
 import com.teachsync.dtos.address.AddressReadDTO;
 import com.teachsync.dtos.address.AddressUpdateDTO;
+import com.teachsync.dtos.center.CenterCreateDTO;
 import com.teachsync.dtos.center.CenterReadDTO;
 import com.teachsync.dtos.center.CenterUpdateDTO;
 import com.teachsync.dtos.room.RoomReadDTO;
 import com.teachsync.dtos.user.UserReadDTO;
 import com.teachsync.entities.LocationUnit;
+import com.teachsync.entities.User;
 import com.teachsync.services.address.AddressService;
 import com.teachsync.services.center.CenterService;
 import com.teachsync.services.locationUnit.LocationUnitService;
@@ -93,10 +96,92 @@ public class CenterController {
     public String roomDetailPage(
     ){
 
-
         return "center/room-detail";
     }
 
+    /* =================================================== CREATE =================================================== */
+
+    @GetMapping("add-center")
+    public String createCenterPage(
+            Model model,
+            @SessionAttribute(value = "user", required = false) UserReadDTO userDTO,
+            RedirectAttributes redirect
+    ){
+        //check login
+        if (ObjectUtils.isEmpty(userDTO)) {
+            redirect.addAttribute("mess", "Làm ơn đăng nhập");
+            return "redirect:/index";
+        }
+
+        if (!userDTO.getRoleId().equals(Constants.ROLE_ADMIN)) {
+            redirect.addAttribute("mess", "bạn không đủ quyền");
+            return "redirect:/index";
+        }
+
+        try{
+            List<LocationUnit> countryList = locationUnitService.getAllByLevel(0);
+            model.addAttribute("countryList", countryList);
+            Long parentId = countryList.get(0).getId();
+            List<LocationUnit> provinceList = locationUnitService.getAllByParentId(parentId);
+            model.addAttribute("provinceList", provinceList);
+
+            parentId = provinceList.get(0).getId();
+            List<LocationUnit> districtList = locationUnitService.getAllByParentId(parentId);
+            model.addAttribute("districtList", districtList);
+
+            parentId = districtList.get(0).getId();
+            List<LocationUnit> wardList = locationUnitService.getAllByParentId(parentId);
+            model.addAttribute("wardList", wardList);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+
+        return "center/add-center";
+    }
+
+    @PostMapping("add-center")
+    @ResponseBody
+    public String addCenter(
+            Model model,
+            @ModelAttribute AddressCreateDTO addressCreateDTO,
+            @ModelAttribute CenterCreateDTO centerCreateDTO,
+            @SessionAttribute(value = "user", required = false) UserReadDTO userDTO,
+            RedirectAttributes redirect
+            ){
+
+        CenterReadDTO centerReadDTO = null;
+
+        if (ObjectUtils.isEmpty(userDTO)) {
+            redirect.addAttribute("mess", "Làm ơn đăng nhập");
+            return "redirect:/index";
+        }
+
+        if (!userDTO.getRoleId().equals(Constants.ROLE_ADMIN)) {
+            redirect.addAttribute("mess", "bạn không đủ quyền");
+            return "redirect:/index";
+        }
+
+        try{
+
+            addressCreateDTO.setCreatedBy(userDTO.getId());
+
+            AddressReadDTO addressReadDTO =
+                    addressService.createAddressByDTO(addressCreateDTO);
+
+            centerCreateDTO.setAddressId(addressReadDTO.getId());
+
+            centerReadDTO = centerService.createCenterByDTO(centerCreateDTO);
+
+            centerReadDTO.setAddress(addressReadDTO);
+
+            model.addAttribute("center", centerReadDTO);
+        }catch (Exception e){
+            e.printStackTrace();
+
+        }
+        return "center/list-center";
+    }
 
     /* =================================================== UPDATE =================================================== */
     @GetMapping("edit-center")

@@ -49,7 +49,7 @@
     <h4 class="mb-0">Cơ sở: </h4>
     
     <c:if test="${isAdmin}">
-      <a href="/create-center" class="btn btn-success">Thêm mới</a>
+      <a href="/add-center" class="btn btn-success">Thêm mới</a>
     </c:if>
   </div>
   
