@@ -59,7 +59,7 @@ public class CenterServiceImpl implements CenterService {
     public CenterReadDTO createCenterByDTO(CenterCreateDTO createDTO) throws Exception {
         Center center = mapper.map(createDTO,Center.class);
 
-        center = updateCenter(center);
+        center = createCenter(center);
 
         /* create dependencies */
 

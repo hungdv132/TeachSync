@@ -55,7 +55,7 @@
 
 <!-- ================================================== Main Body ================================================== -->
 <div class="row ts-bg-white border ts-border-teal rounded-3 pt-3 px-5 mx-2 mb-3">
-    <form class="col-12" id="form" action="/create-center" method="POST">
+    <form class="col-12" id="form" action="/add-center" method="POST">
         <div class="row mb-3">
             <h4>Tạo mới cơ sở</h4>
             <br>
