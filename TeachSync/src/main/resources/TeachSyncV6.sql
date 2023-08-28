@@ -459,8 +459,8 @@ CREATE TABLE IF NOT EXISTS `teachsync`.`question`
     `testId`         BIGINT       NOT NULL,
     `questionType`   VARCHAR(255) NOT NULL COMMENT 'MULTIPLE, ESSAY, ...',
     `questionDesc`   LONGTEXT     NOT NULL COMMENT 'VD: Last night I think I ___ a ghost when I was going to the bathroom.',
-    `questionPrompt` VARCHAR(45)  COMMENT 'VD: Chọn câu trả lời đúng nhất để điền vào chỗ trống',
-    `questionScore` DOUBLE       NOT NULL,
+    `questionPrompt` VARCHAR(255) NULL DEFAULT NULL COMMENT 'VD: Chọn câu trả lời đúng nhất để điền vào chỗ trống',
+    `questionScore`  DOUBLE       NOT NULL,
     `status`         VARCHAR(45)  NOT NULL,
     `createdAt`      DATETIME     NULL DEFAULT NULL,
     `createdBy`      BIGINT       NULL DEFAULT NULL,
@@ -1058,23 +1058,23 @@ CREATE TABLE IF NOT EXISTS `teachsync`.`test_record`
     INDEX `fk_test_record_member_test_record_idx` (`memberTestRecordId` ASC) VISIBLE,
     INDEX `fk_test_record_user_createdBy_idx` (`createdBy` ASC) VISIBLE,
     INDEX `fk_test_record_user_updatedBy_idx` (`updatedBy` ASC) VISIBLE,
-    CONSTRAINT `fk_test_record_answer` 
-        FOREIGN KEY (`answerId`) 
+    CONSTRAINT `fk_test_record_answer`
+        FOREIGN KEY (`answerId`)
             REFERENCES `teachsync`.`answer` (`id`),
-    CONSTRAINT `fk_test_record_question` 
-        FOREIGN KEY (`questionId`) 
+    CONSTRAINT `fk_test_record_question`
+        FOREIGN KEY (`questionId`)
             REFERENCES `teachsync`.`question` (`id`),
-    CONSTRAINT `fk_test_record_member_test_record` 
-        FOREIGN KEY (`memberTestRecordId`) 
+    CONSTRAINT `fk_test_record_member_test_record`
+        FOREIGN KEY (`memberTestRecordId`)
             REFERENCES `teachsync`.`member_test_record` (`id`),
-    CONSTRAINT `fk_test_record_user_createdBy` 
-        FOREIGN KEY (`createdBy`) 
+    CONSTRAINT `fk_test_record_user_createdBy`
+        FOREIGN KEY (`createdBy`)
             REFERENCES `teachsync`.`user` (`id`),
-    CONSTRAINT `fk_test_record_user_updatedBy` 
-        FOREIGN KEY (`updatedBy`) 
+    CONSTRAINT `fk_test_record_user_updatedBy`
+        FOREIGN KEY (`updatedBy`)
             REFERENCES `teachsync`.`user` (`id`)
-) 
-        ENGINE = InnoDB;
+)
+    ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
@@ -1134,6 +1134,7 @@ CREATE TABLE IF NOT EXISTS `teachsync`.`payment`
     `payerId`        BIGINT      NOT NULL,
     `requestId`      BIGINT      NOT NULL,
     `paymentType`    VARCHAR(45) NOT NULL,
+    `paymentDesc`    LONGTEXT    NULL DEFAULT NULL,
     `paymentAmount`  DOUBLE      NOT NULL,
     `paymentAt`      DATETIME    NOT NULL,
     `paymentDoc`     MEDIUMBLOB  NULL DEFAULT NULL,
@@ -1354,26 +1355,6 @@ CREATE TABLE IF NOT EXISTS `teachsync`.`application_detail`
             REFERENCES `teachsync`.`user` (`id`)
 )
     ENGINE = InnoDB;
-
-
-
-
-
-CREATE TABLE `test_session` (
-                                `id` bigint NOT NULL AUTO_INCREMENT,
-                                `userid` bigint NOT NULL,
-                                `username` varchar(100) NOT NULL,
-                                `testid` bigint DEFAULT NULL,
-                                `subject` varchar(200) DEFAULT NULL,
-                                `class` varchar(45) DEFAULT NULL,
-                                `start_date` datetime DEFAULT NULL,
-                                `submit_date` datetime DEFAULT NULL,
-                                `status` bigint NOT NULL,
-                                `update_date` datetime DEFAULT NULL,
-                                `user_update` varchar(200) DEFAULT NULL,
-                                PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
 
 
 SET SQL_MODE = @OLD_SQL_MODE;

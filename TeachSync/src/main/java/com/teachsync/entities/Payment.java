@@ -26,6 +26,10 @@ public class Payment extends BaseEntity {
     @Column(name = "paymentType", nullable = false, length = 45)
     private PaymentType paymentType;
 
+    @Lob
+    @Column(name = "paymentDesc", nullable = true, length = -1)
+    private String paymentDesc;
+
     @Column(name = "paymentAmount", nullable = false, precision = 0)
     private Double paymentAmount;
 

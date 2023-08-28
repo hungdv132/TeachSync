@@ -2281,39 +2281,57 @@ values
     (724, 3, 'Xã ', 'X.', 'WARD', 'DELETED');
 
 insert into address(addressNo, street, unitId, addressString, status)
-values ('190ABC', 'Đội Cấn', 911, '190ABC Đội Cấn, P.Đội Cấn, Q.Ba Đình, TP.Hà Nội, VN', 'CREATED'),
-       ('4DEF', 'Ngọc Hà', 915, '4DEF Ngọc Hà, P.Ngọc Hà, Q.Ba Đình, TP.Hà Nộ, HN, VN', 'CREATED'),
+values ('190ABC', 'Đội Cấn',     911, '190ABC Đội Cấn, P.Đội Cấn, Q.Ba Đình, TP.Hà Nội, VN',      'CREATED'),
+       ('4DEF',   'Ngọc Hà',     915, '4DEF Ngọc Hà, P.Ngọc Hà, Q.Ba Đình, TP.Hà Nộ, HN, VN',     'CREATED'),
 
-       ('337GHI', 'Cầu Giấy', 936, '337GHI Cầu Giấy, P.Dịch Vọng, Q.Cầu Giấy, TP.Hà Nội, VN', 'CREATED'),
-       ('31JKL', 'Hồ Tùng Mậu', 938, '31JKL Hồ Tùng Mậu, P.Mai Dịch, Q.Cầu Giấy, TP.Hà Nội, VN', 'CREATED');
+       ('337GHI', 'Cầu Giấy',    936, '337GHI Cầu Giấy, P.Dịch Vọng, Q.Cầu Giấy, TP.Hà Nội, VN',  'CREATED'),
+       ('31JKL',  'Hồ Tùng Mậu', 938, '31JKL Hồ Tùng Mậu, P.Mai Dịch, Q.Cầu Giấy, TP.Hà Nội, VN', 'CREATED');
 
 insert into role(roleName, roleDesc, status)
 values ('Student', 'Student', 'CREATED'),
-       ('Parent', 'Parent', 'CREATED'),
+       ('Parent',  'Parent',  'CREATED'),
        ('Teacher', 'Teacher', 'CREATED'),
-       ('Admin', 'Admin', 'CREATED'),
-       ('Staff', 'Staff', 'CREATED');
+       ('Admin',   'Admin',   'CREATED'),
+       ('Staff',   'Staff',   'CREATED');
 
-insert into user(username, password, roleId, userAvatar, fullName, gender, email,
-                 phone, addressId, resetPasswordToken, parentId, status)
-values ('student', '$2a$10$2muXk6hqYaoTLnXWCszDaeDE71FGa2hJkh3QPaGKJLRJ77bm6GFJW', 1, null, 'Test Student', 'OTHER',
-        'test.student@gmail.com', null, null, null, null, 'CREATED'),
-       ('parent', '$2a$10$2muXk6hqYaoTLnXWCszDaeDE71FGa2hJkh3QPaGKJLRJ77bm6GFJW', 2, null, 'Test Parent', 'OTHER',
-        'test.parent@gmail.com', null, null, null, null, 'CREATED'),
-       ('teacher', '$2a$10$2muXk6hqYaoTLnXWCszDaeDE71FGa2hJkh3QPaGKJLRJ77bm6GFJW', 3, null, 'Test Teacher', 'OTHER',
-        'test.teacher@gmail.com', null, null, null, null, 'CREATED'),
-       ('admin', '$2a$10$2muXk6hqYaoTLnXWCszDaeDE71FGa2hJkh3QPaGKJLRJ77bm6GFJW', 4, null, 'Test Admin', 'OTHER',
-        'test.admin@gmail.com', null, null, null, null, 'CREATED'),
-       ('staff', '$2a$10$2muXk6hqYaoTLnXWCszDaeDE71FGa2hJkh3QPaGKJLRJ77bm6GFJW', 5, null, 'Test Staff', 'OTHER',
-        'test.staff@gmail.com', null, null, null, null, 'CREATED'),
-       ('teacher2', '$2a$10$2muXk6hqYaoTLnXWCszDaeDE71FGa2hJkh3QPaGKJLRJ77bm6GFJW', 3, null, 'Test Teacher2', 'OTHER',
-        'test.teacher2@gmail.com', null, null, null, null, 'CREATED');
-        ('thanhnvhe140127', '$2a$10$2muXk6hqYaoTLnXWCszDaeDE71FGa2hJkh3QPaGKJLRJ77bm6GFJW', 3, null, 'Nguyen Van Thanh', 'OTHER',
-        'test.teacher2@gmail.com', null, null, null, null, 'CREATED');
+insert into user(username, password, roleId, userAvatar, fullName, gender, email, addressId, parentId, status)
+values ('student',         '$2a$10$2muXk6hqYaoTLnXWCszDaeDE71FGa2hJkh3QPaGKJLRJ77bm6GFJW', 1, null, 'Test Student',
+        'OTHER', 'test.student@gmail.com',  null, null, 'CREATED'),
+       ('parent',          '$2a$10$2muXk6hqYaoTLnXWCszDaeDE71FGa2hJkh3QPaGKJLRJ77bm6GFJW', 2, null, 'Test Parent',
+        'OTHER', 'test.parent@gmail.com',   null, null, 'CREATED'),
+       ('teacher',         '$2a$10$2muXk6hqYaoTLnXWCszDaeDE71FGa2hJkh3QPaGKJLRJ77bm6GFJW', 3, null, 'Test Teacher',
+        'OTHER', 'test.teacher@gmail.com',  null, null, 'CREATED'),
+       ('admin',           '$2a$10$2muXk6hqYaoTLnXWCszDaeDE71FGa2hJkh3QPaGKJLRJ77bm6GFJW', 4, null, 'Test Admin',
+        'OTHER', 'test.admin@gmail.com',    null, null, 'CREATED'),
+       ('staff',           '$2a$10$2muXk6hqYaoTLnXWCszDaeDE71FGa2hJkh3QPaGKJLRJ77bm6GFJW', 5, null, 'Test Staff',
+        'OTHER', 'test.staff@gmail.com',    null, null, 'CREATED'),
+       ('teacher2',        '$2a$10$2muXk6hqYaoTLnXWCszDaeDE71FGa2hJkh3QPaGKJLRJ77bm6GFJW', 3, null, 'Test Teacher2',
+        'OTHER', 'test.teacher2@gmail.com', null, null, 'CREATED'),
+
+       ('thanhnvhe140127', '$2a$10$2muXk6hqYaoTLnXWCszDaeDE71FGa2hJkh3QPaGKJLRJ77bm6GFJW', 1, null, 'Nguyen Van Thanh',
+        'OTHER', 'test.teacher2@gmail.com', null, null, 'CREATED'),
+       ('student1',        '$2a$10$2muXk6hqYaoTLnXWCszDaeDE71FGa2hJkh3QPaGKJLRJ77bm6GFJW', 1, null, 'Test Student 1',
+        'OTHER', 'test.student1@gmail.com', null, null, 'CREATED'),
+       ('student2',        '$2a$10$2muXk6hqYaoTLnXWCszDaeDE71FGa2hJkh3QPaGKJLRJ77bm6GFJW', 1, null, 'Test Student 2',
+        'OTHER', 'test.student2@gmail.com', null, null, 'CREATED'),
+       ('student3',        '$2a$10$2muXk6hqYaoTLnXWCszDaeDE71FGa2hJkh3QPaGKJLRJ77bm6GFJW', 1, null, 'Test Student 3',
+        'OTHER', 'test.student3@gmail.com', null, null, 'CREATED'),
+       ('student4',        '$2a$10$2muXk6hqYaoTLnXWCszDaeDE71FGa2hJkh3QPaGKJLRJ77bm6GFJW', 1, null, 'Test Student 4',
+        'OTHER', 'test.student4@gmail.com', null, null, 'CREATED'),
+       ('student5',        '$2a$10$2muXk6hqYaoTLnXWCszDaeDE71FGa2hJkh3QPaGKJLRJ77bm6GFJW', 1, null, 'Test Student 5',
+        'OTHER', 'test.student5@gmail.com', null, null, 'CREATED'),
+       ('student6',        '$2a$10$2muXk6hqYaoTLnXWCszDaeDE71FGa2hJkh3QPaGKJLRJ77bm6GFJW', 1, null, 'Test Student 6',
+        'OTHER', 'test.student6@gmail.com', null, null, 'CREATED'),
+       ('student7',        '$2a$10$2muXk6hqYaoTLnXWCszDaeDE71FGa2hJkh3QPaGKJLRJ77bm6GFJW', 1, null, 'Test Student 7',
+        'OTHER', 'test.student7@gmail.com', null, null, 'CREATED'),
+       ('student8',        '$2a$10$2muXk6hqYaoTLnXWCszDaeDE71FGa2hJkh3QPaGKJLRJ77bm6GFJW', 1, null, 'Test Student 8',
+        'OTHER', 'test.student8@gmail.com', null, null, 'CREATED'),
+       ('student9',        '$2a$10$2muXk6hqYaoTLnXWCszDaeDE71FGa2hJkh3QPaGKJLRJ77bm6GFJW', 1, null, 'Test Student 9',
+        'OTHER', 'test.student9@gmail.com', null, null, 'CREATED');
 --     Password = 123456789
 
 insert into center(addressId, centerName, centerType, centerDesc, centerSize, status)
-values (1, 'TeachSync Doi Can', 'ENGLISH', null, 20, 'CREATED'),
+values (1, 'TeachSync Doi Can',  'ENGLISH', null, 20, 'CREATED'),
        (4, 'TeachSync Mai Dich', 'ENGLISH', null, 25, 'CREATED');
 
 insert into room(centerId, roomType, roomDesc, roomName, roomSize, status)
@@ -2347,9 +2365,12 @@ values ('ielts 101', 'ILT101',
         'https://th.bing.com/th/id/OIP.H1Q3_d4okF70VIVYp-YA5AAAAA?pid=ImgDet&w=360&h=470&rs=1',
         null, 12, 5.0, 75, 'CREATED');
 
-insert into price_log(courseId, price, isPromotion, promotionAmount, promotionType, promotionDesc, validFrom, validTo, status)
-values (1, 200000, true, 15, 'PERCENT', 'Grand opening super deal, now cheaper ', '2023-06-10 00:00:01', null,'CREATED'),
-       (2, 100000, true, 20000, 'AMOUNT', 'To help with the first step, now reduce', '2023-06-10 00:00:01', null,'CREATED'),
+insert into price_log(courseId, price, isPromotion, promotionAmount, promotionType, promotionDesc, validFrom, validTo,
+                      status)
+values (1, 200000, true, 15, 'PERCENT', 'Grand opening super deal, now cheaper ', '2023-06-10 00:00:01', null,
+        'CREATED'),
+       (2, 100000, true, 20000, 'AMOUNT', 'To help with the first step, now reduce', '2023-06-10 00:00:01', null,
+        'CREATED'),
        (3, 125000, false, null, null, null, '2023-06-10 00:00:01', null, 'CREATED'),
        (4, 150000, false, null, null, null, '2023-06-10 00:00:01', null, 'CREATED');
 
@@ -2360,44 +2381,43 @@ values (1, 'Ielts 101', 'You have complete the Ielts 101 course', 'CREATED'),
        (4, 'Eng 3', 'You have complete the Eng 3 course', 'CREATED');
 
 insert into semester(semesterName, semesterAlias, semesterDesc, semesterType, startDate, endDate, status)
-values ('Spring 23','SP23','Spring 23', 'SEASON', '2023-01-05', '2023-03-05', 'CREATED'),
-       ('Summer 23','SU23','Summer 23', 'SEASON', '2023-03-10', '2023-06-10', 'CREATED'),
+values ('Spring 23', 'SP23', 'Spring 23', 'SEASON', '2023-01-05', '2023-03-05', 'CREATED'),
+       ('Summer 23', 'SU23', 'Summer 23', 'SEASON', '2023-03-10', '2023-06-10', 'CREATED'),
        ('Fall 23', 'FA23', 'Fall 23', 'SEASON', '2023-06-15', '2023-09-15', 'CREATED'),
        ('Winter 23', 'WI23', 'Winter 23', 'SEASON', '2023-09-15', '2023-12-15', 'CREATED');
 
 insert into course_semester(courseId, semesterId, centerId, status)
-values
-    (1, 1, 1, 'CREATED'),
-    (1, 2, 1, 'CREATED'),
-    (1, 3, 1, 'CREATED'),
-    (1, 4, 1, 'CREATED'),
-    (2, 1, 1, 'CREATED'),
-    (2, 2, 1, 'CREATED'),
-    (2, 3, 1, 'CREATED'),
-    (2, 4, 1, 'CREATED'),
-    (3, 1, 1, 'CREATED'),
-    (3, 2, 1, 'CREATED'),
-    (3, 3, 1, 'CREATED'),
-    (3, 4, 1, 'CREATED'),
-    (4, 1, 1, 'CREATED'),
-    (4, 2, 1, 'CREATED'),
-    (4, 3, 1, 'CREATED'),
+values (1, 1, 1, 'CREATED'),
+       (1, 2, 1, 'CREATED'),
+       (1, 3, 1, 'CREATED'),
+       (1, 4, 1, 'CREATED'),
+       (2, 1, 1, 'CREATED'),
+       (2, 2, 1, 'CREATED'),
+       (2, 3, 1, 'CREATED'),
+       (2, 4, 1, 'CREATED'),
+       (3, 1, 1, 'CREATED'),
+       (3, 2, 1, 'CREATED'),
+       (3, 3, 1, 'CREATED'),
+       (3, 4, 1, 'CREATED'),
+       (4, 1, 1, 'CREATED'),
+       (4, 2, 1, 'CREATED'),
+       (4, 3, 1, 'CREATED'),
 
-    (1, 1, 2, 'CREATED'),
-    (1, 2, 2, 'CREATED'),
-    (1, 3, 2, 'CREATED'),
-    (1, 4, 2, 'CREATED'),
-    (2, 1, 2, 'CREATED'),
-    (2, 2, 2, 'CREATED'),
-    (2, 3, 2, 'CREATED'),
-    (2, 4, 2, 'CREATED'),
-    (3, 1, 2, 'CREATED'),
-    (3, 2, 2, 'CREATED'),
-    (3, 3, 2, 'CREATED'),
-    (3, 4, 2, 'CREATED'),
-    (4, 1, 2, 'CREATED'),
-    (4, 2, 2, 'CREATED'),
-    (4, 3, 2, 'CREATED');
+       (1, 1, 2, 'CREATED'),
+       (1, 2, 2, 'CREATED'),
+       (1, 3, 2, 'CREATED'),
+       (1, 4, 2, 'CREATED'),
+       (2, 1, 2, 'CREATED'),
+       (2, 2, 2, 'CREATED'),
+       (2, 3, 2, 'CREATED'),
+       (2, 4, 2, 'CREATED'),
+       (3, 1, 2, 'CREATED'),
+       (3, 2, 2, 'CREATED'),
+       (3, 3, 2, 'CREATED'),
+       (3, 4, 2, 'CREATED'),
+       (4, 1, 2, 'CREATED'),
+       (4, 2, 2, 'CREATED'),
+       (4, 3, 2, 'CREATED');
 
 insert into clazz(courseSemesterId, staffId, clazzName, clazzDesc, clazzSize, status)
 values (1, 1, 'Class 1 Ielts 101', null, 15, 'CREATED'),
@@ -2459,3 +2479,78 @@ values (1, 1, 'CREATED'),
 
        (3, 3, 'CREATED'),
        (3, 4, 'CREATED');
+
+INSERT INTO clazz_member(clazzId, userId, status)
+VALUES (1, 1, 'CREATED'),
+       (2, 1, 'CREATED'),
+       (3, 1, 'CREATED'),
+       (4, 1, 'CREATED'),
+       (5, 1, 'CREATED'),
+       (6, 1, 'CREATED'),
+       (7, 1, 'CREATED'),
+       (1, 7, 'CREATED'),
+       (2, 7, 'CREATED'),
+       (3, 7, 'CREATED'),
+       (4, 7, 'CREATED'),
+       (5, 7, 'CREATED'),
+       (6, 7, 'CREATED'),
+       (7, 7, 'CREATED');
+
+INSERT INTO test(courseId, testName, testType, testImg, testDesc, timeLimit,
+                 numQuestion, questionType, minScore, testWeight, totalScore, status)
+VALUES (1, 'ielts 101', 'FIFTEEN_MINUTE', NULL, 'ESSAY',    15,  2, 'ESSAY',    1, 1, NULL, 'CREATED'),
+       (1, 'ielts 101', 'MIDTERM',        NULL, 'ESSAY',    45,  1, 'ESSAY',    1, 3, NULL, 'CREATED'),
+       (1, 'ielts 101', 'FINAL',          NULL, 'MULTIPLE', 120, 5, 'MULTIPLE', 4, 5, NULL, 'CREATED');
+
+INSERT INTO question(testId, questionType, questionDesc, questionPrompt, questionScore, status)
+VALUES (1, 'ESSAY', 'Write something about your family (200 word)',
+        NULL, 1, 'CREATED'),
+       (1, 'ESSAY', 'Write about the reason why we should have a pet (300 word)',
+        NULL, 1, 'CREATED'),
+       (2, 'ESSAY', 'Write about the US president, how and why he is winner in 2021 (500 word)',
+        NULL, 1, 'CREATED'),
+
+       (3, 'MULTIPLE', 'Does he have math on Friday? - Yes, he _______________.',
+        'Choose the option that best fits each of the blanks.', 1, 'CREATED'),
+       (3, 'MULTIPLE', 'My class finishes at half _______________ ten.',
+        'Choose the option that best fits each of the blanks.', 1, 'CREATED'),
+       (3, 'MULTIPLE', '_______________ do you go to school? - By bike.',
+        'Choose the option that best fits each of the blanks.', 1, 'CREATED'),
+       (3, 'MULTIPLE', 'I take a bus to school every day, but I am _______________ to school now.',
+        'Choose the option that best fits each of the blanks.', 1, 'CREATED'),
+       (3, 'MULTIPLE', '_______________ a truck in front of the store.',
+        'Choose the option that best fits each of the blanks.', 1, 'CREATED');
+
+INSERT INTO answer(questionId, answerDesc, answerScore, isCorrect, status)
+VALUES (4, 'is',        0, false, 'CREATED'),
+       (4, 'does',      1, true,  'CREATED'),
+       (4, 'doesn\'t',  0, false, 'CREATED'),
+       (5, 'to',        0, false, 'CREATED'),
+       (5, 'pass',      1, true,  'CREATED'),
+       (5, 'past',      0, false, 'CREATED'),
+       (6, 'What',      0, false, 'CREATED'),
+       (6, 'How',       1, true,  'CREATED'),
+       (6, 'Why',       0, false, 'CREATED'),
+       (7, 'walking',   1, true,  'CREATED'),
+       (7, 'walk',      0, false, 'CREATED'),
+       (8, 'These is',  1, true,  'CREATED'),
+       (8, 'These are', 0, false, 'CREATED'),
+       (8, 'Those are', 0, false, 'CREATED');
+
+INSERT INTO clazz_test(clazzId, testId, openFrom, openTo, status)
+VALUES (1, 1, '2023-08-18 09:56:41', '2023-09-18 09:56:41', 'CREATED'),
+       (1, 2, '2023-08-18 09:56:41', '2023-09-18 09:56:41', 'CREATED'),
+       (1, 3, '2023-08-18 09:56:41', '2023-09-18 09:56:41', 'CREATED');
+
+INSERT INTO member_test_record(memberId, clazzTestId, startAt, submitAt, score, status)
+VALUES (8, 1, '2023-08-18 10:17:31', '2023-08-18 10:18:47', 5, 'DONE'),
+       (9, 3, '2023-08-18 10:19:53', '2023-08-18 10:20:11', 4, 'DONE');
+
+INSERT INTO test_record(memberTestRecordId, questionId, answerId, answerTxt, score, status)
+VALUES (1, 1, NULL, 'My sister is a doctor.',     0, 'CREATED'),
+       (1, 2, NULL, 'Don\'t buy it if you poor.', 1, 'CREATED'),
+       (2, 4, 3,    NULL,                         0, 'CREATED'),
+       (2, 5, 5,    NULL,                         1, 'CREATED'),
+       (2, 6, 8,    NULL,                         1, 'CREATED'),
+       (2, 7, 11,   NULL,                         0, 'CREATED'),
+       (2, 8, 14,   NULL,                         0, 'CREATED');
