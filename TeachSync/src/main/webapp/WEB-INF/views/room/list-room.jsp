@@ -46,7 +46,7 @@
 <!-- ================================================== Main Body ================================================== -->
 <div class="row ts-bg-white border ts-border-teal rounded-3 pt-3 px-5 mx-2 mb-3">
     <div class="col-12 d-flex justify-content-between align-items-center mb-3">
-        <h4 class="mb-0">Phòng: </h4>
+        <h4 class="mb-0">Danh sách phòng tại cơ sở ${center.centerName}  </h4>
 
         <c:if test="${isAdmin}">
             <a href="/add-room" class="btn btn-success">Thêm mới</a>
