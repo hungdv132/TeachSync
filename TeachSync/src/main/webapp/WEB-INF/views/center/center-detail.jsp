@@ -67,7 +67,10 @@
   <div class="col-sm-12 col-md-8 mb-3">
     <p>Địa chỉ: ${center.address.addressString}</p>
     <p>Chuyên môn: ${center.centerType.stringValueVie}</p>
-    <p>Số phòng: ${center.centerSize} phòng</p>
+    <p>Số phòng:<a href = "/list-room?id=${center.id}">
+      ${center.centerSize} phòng học
+    </a></p>
+
     <p>Mô tả: <br>${center.centerDesc}</p>
   </div>
 

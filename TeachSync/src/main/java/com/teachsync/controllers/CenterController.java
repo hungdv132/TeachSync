@@ -154,28 +154,6 @@ public class CenterController {
         return "center/center-detail";
     }
 
-    @GetMapping("/list-room")
-    public String roomListPage(
-            Model model,
-            @RequestParam Long id
-    ){
-        try{
-            CenterReadDTO centerReadDTO = centerService.getDTOById(id,null);
-            List<RoomReadDTO> roomList = roomService.getAllDTOByCenterId(centerReadDTO.getId(),null);
-            model.addAttribute("roomList",roomList);
-        }catch (Exception e){
-
-        }
-
-        return "center/list-room";
-    }
-
-    @GetMapping("/room-detail")
-    public String roomDetailPage(
-    ){
-
-        return "center/room-detail";
-    }
 
 
 
