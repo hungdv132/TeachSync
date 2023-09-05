@@ -692,6 +692,7 @@ CREATE TABLE IF NOT EXISTS `teachsync`.`clazz`
     `clazzName`        VARCHAR(45) NOT NULL,
     `clazzDesc`        LONGTEXT    NULL DEFAULT NULL,
     `clazzSize`        INT         NOT NULL COMMENT 'Số học sinh tối đa',
+    `statusClazz`      varchar(45) DEFAULT NULL,
     `status`           VARCHAR(45) NOT NULL,
     `createdAt`        DATETIME    NULL DEFAULT NULL,
     `createdBy`        BIGINT      NULL DEFAULT NULL,
@@ -767,6 +768,7 @@ CREATE TABLE IF NOT EXISTS `teachsync`.`clazz_schedule`
     `id`           BIGINT      NOT NULL AUTO_INCREMENT,
     `clazzId`      BIGINT      NOT NULL,
     `roomId`       BIGINT      NOT NULL COMMENT 'Phòng mặc định của lớp',
+    `schedulecaId` bigint NOT NULL,
     `scheduleType` VARCHAR(45) NOT NULL COMMENT '2_4_6, 3_5_7, T7_CN, CUSTOM, ...',
     `startDate`    DATE        NOT NULL,
     `endDate`      DATE        NOT NULL,
@@ -783,12 +785,16 @@ CREATE TABLE IF NOT EXISTS `teachsync`.`clazz_schedule`
     INDEX `fk_clazz_schedule_room_idx` (`roomId` ASC) VISIBLE,
     INDEX `fk_clazz_schedule_user_createdBy_idx` (`createdBy` ASC) VISIBLE,
     INDEX `fk_clazz_schedule_user_updatedBy_idx` (`updatedBy` ASC) VISIBLE,
+    INDEX `fk_clazz_schedule_schedulcat_idx` (`schedulecaId` ASC) VISIBLE,
     CONSTRAINT `fk_clazz_schedule_room`
         FOREIGN KEY (`roomId`)
             REFERENCES `teachsync`.`room` (`id`),
     CONSTRAINT `fk_clazz_schedule_clazz`
         FOREIGN KEY (`clazzId`)
             REFERENCES `teachsync`.`clazz` (`id`),
+    CONSTRAINT `fk_clazz_schedule_schedulcat`
+        FOREIGN KEY (`schedulecaId`)
+            REFERENCES `teachsync`.`schedulecat` (`id`),
     CONSTRAINT `fk_clazz_schedule_user_createdBy`
         FOREIGN KEY (`createdBy`)
             REFERENCES `teachsync`.`user` (`id`),
@@ -1379,3 +1385,15 @@ CREATE TABLE `test_session` (
 SET SQL_MODE = @OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS = @OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS = @OLD_UNIQUE_CHECKS;
+
+DROP TABLE IF EXISTS `schedulecat`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `schedulecat` (
+                               `id` bigint NOT NULL,
+                               `name` varchar(45) DEFAULT NULL COMMENT 'Name of Category, for example T2; T2, T4,T6; etc.',
+                               `description` longtext COMMENT 'T2 is  weekly Monthday; etc.',
+                               PRIMARY KEY (`id`),
+                               UNIQUE KEY `id_UNIQUE` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;

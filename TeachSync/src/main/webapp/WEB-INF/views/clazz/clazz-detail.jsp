@@ -30,7 +30,7 @@
       <c:if test="${isAdmin}">
         <c:url var="addClazz" value="/add-clazz">
           <c:param name="id" value="${clazz.id}"/>
-          <c:param name="option" value="add"/>
+          <c:param name="option" value="edit"/>
         </c:url>
         <a href="${addClazz}" class="btn btn-warning">Sửa</a>
       </c:if>
@@ -45,6 +45,10 @@
     <p>Học kỳ: ${clazz.courseSemester.semester.semesterAlias} - ${clazz.courseSemester.semester.semesterName}</p>
   
     <p>Miêu tả: ${clazz.clazzDesc}</p>
+
+    <c:if test="${isAdmin}">
+    <p>Trạng thái: ${statusLabelMap[clazz.statusClazz]}</p>
+    </c:if>
     
     <p>Dung lượng học sinh: ${clazz.clazzSize}</p>
   

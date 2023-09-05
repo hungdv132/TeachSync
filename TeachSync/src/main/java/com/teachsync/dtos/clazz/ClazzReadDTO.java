@@ -34,6 +34,8 @@ public class ClazzReadDTO extends BaseReadDTO {
 
     private String clazzDesc;
 
+    private String statusClazz;
+
     private Integer clazzSize;
 
     private ClazzScheduleReadDTO clazzSchedule;

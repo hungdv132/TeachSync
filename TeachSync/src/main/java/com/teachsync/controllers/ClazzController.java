@@ -34,6 +34,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import static com.teachsync.utils.enums.DtoOption.*;
+import static com.teachsync.utils.enums.Status.DEPLOY_CLAZZ;
 
 @Controller
 public class ClazzController {
@@ -95,11 +96,11 @@ public class ClazzController {
 
         return response;
     }
-    
+
     @GetMapping("/clazz")
     public String clazzListPage(
             Model model,
-            @ModelAttribute("mess") String mess){
+            @ModelAttribute("mess") String mess) {
         try {
             Page<ClazzReadDTO> dtoPage =
                     clazzService.getPageDTOAll(
@@ -114,7 +115,13 @@ public class ClazzController {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
+        //map option status
+        Map<String, String> statusLabelMap = new HashMap<>();
+        statusLabelMap.put("CREATED_CLAZZ", "Đang khởi tạo");
+        statusLabelMap.put("DEPLOY_CLAZZ", "Đang triển khai");
+        statusLabelMap.put("NOT_ENOUGH_CLAZZ", "Không đủ xếp lớp");
+        statusLabelMap.put("FINISH_CLAZZ", "Đã hoàn thành");
+        model.addAttribute("statusLabelMap", statusLabelMap);
         model.addAttribute("mess", mess);
         return "clazz/list-clazz";
     }
@@ -134,12 +141,22 @@ public class ClazzController {
             e.printStackTrace();
         }
 
+        //map option status
+        Map<String, String> statusLabelMap = new HashMap<>();
+        statusLabelMap.put("CREATED_CLAZZ", "Đang khởi tạo");
+        statusLabelMap.put("DEPLOY_CLAZZ", "Đang triển khai");
+        statusLabelMap.put("NOT_ENOUGH_CLAZZ", "Không đủ xếp lớp");
+        statusLabelMap.put("FINISH_CLAZZ", "Đã hoàn thành");
+        model.addAttribute("statusLabelMap", statusLabelMap);
+
+
         return "clazz/clazz-detail";
     }
 
     @GetMapping("/add-clazz")
     public String addClazzPage(
             Model model,
+            RedirectAttributes redirect,
             @RequestParam(value = "id", required = false) Long clazzId,
             @RequestParam("option") String option) {
 
@@ -148,9 +165,9 @@ public class ClazzController {
             ClazzReadDTO clazzReadDTO = null;
             if (Objects.nonNull(clazzId)) {
                 clazzReadDTO =
-                        clazzService.getDTOById(clazzId, 
+                        clazzService.getDTOById(clazzId,
                                 List.of(COURSE_SEMESTER, STAFF, USER));
-                
+
                 model.addAttribute("clazz", clazzReadDTO);
             }
 
@@ -187,6 +204,13 @@ public class ClazzController {
             model.addAttribute("staffList", staffDTOList);
 
             model.addAttribute("option", option);
+            //map option status
+            Map<String, String> statusLabelMap = new HashMap<>();
+            statusLabelMap.put("CREATED_CLAZZ", "Đang khởi tạo");
+            statusLabelMap.put("DEPLOY_CLAZZ", "Đang triển khai");
+            statusLabelMap.put("NOT_ENOUGH_CLAZZ", "Không đủ xếp lớp");
+            statusLabelMap.put("FINISH_CLAZZ", "Đã hoàn thành");
+            model.addAttribute("statusLabelMap", statusLabelMap);
         } catch (Exception e) {
             e.printStackTrace();
             /* Log Error or return error msg */
@@ -275,7 +299,9 @@ public class ClazzController {
             return response;
         }
 
-        response.put("view", "/clazz-detail?id=" + readDTO.getId());
+        //  response.put("view", "/clazz-detail?id=" + readDTO.getId());
+        response.put("view", "/clazz");
+        //  return "redirect:/clazz";
         return response;
     }
 
@@ -284,7 +310,7 @@ public class ClazzController {
             @SessionAttribute(value = "user", required = false) UserReadDTO userDTO,
             HttpServletRequest request,
             Model model,
-            RedirectAttributes redirect) {
+            RedirectAttributes redirect) throws Exception {
         //check login
         if (ObjectUtils.isEmpty(userDTO)) {
             redirect.addAttribute("mess", "Làm ơn đăng nhập");
@@ -295,7 +321,22 @@ public class ClazzController {
             redirect.addAttribute("mess", "bạn không đủ quyền");
             return "redirect:/";
         }
-        Long Id = Long.parseLong(request.getParameter("Id"));
+        Long Id = Long.parseLong(request.getParameter("id"));
+
+        if (Objects.nonNull(Id)) {
+            ClazzReadDTO clazzReadDTO =
+                    clazzService.getDTOById(Id,
+                            List.of(COURSE_SEMESTER, STAFF, USER));
+
+            model.addAttribute("clazz", clazzReadDTO);
+            if (!ObjectUtils.isEmpty(clazzReadDTO.getStatusClazz()) && clazzReadDTO.getStatusClazz().equals(DEPLOY_CLAZZ.getStringValue())) {
+                redirect.addAttribute("mess", "Lớp học đang triển khai không thể thao tác");
+                return "redirect:/clazz";
+            }
+
+        }
+
+
         String result = clazzService.deleteClazz(Id);
         if (result.equals("success")) {
             redirect.addAttribute("mess", "Xóa class room thành công");
