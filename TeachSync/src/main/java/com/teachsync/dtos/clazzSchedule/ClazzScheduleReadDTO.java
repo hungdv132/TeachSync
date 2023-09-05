@@ -24,6 +24,8 @@ public class ClazzScheduleReadDTO extends BaseReadDTO {
 
     private Long roomId;
 
+    private Long schedulecaId;
+
     private String roomName;
 
     private ScheduleType scheduleType;
