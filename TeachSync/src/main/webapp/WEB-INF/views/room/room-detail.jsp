@@ -1,59 +1,29 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
+<!DOCTYPE html>
 <html lang="vi" dir="ltr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>Room detail</title>
+  <title>Chi tiết Cơ Sở</title>
 
   <link rel="stylesheet" href="../../../resources/css/bootstrap-5.3.0/bootstrap.css">
-  <link rel="stylesheet" href="../../../resources/css/certificate_style.css">
+
+  <link rel="stylesheet" href="../../../resources/css/teachsync_style.css">
+
   <script src="../../../resources/js/jquery/jquery-3.6.3.js"></script>
   <script src="../../../resources/js/bootstrap-5.3.0/bootstrap.bundle.js"></script>
+
   <script src="../../../resources/js/common.js"></script>
-  <style>
-    .detail-container {
-      display: flex;
-      align-items: flex-start;
-      padding: 20px;
-    }
-
-    #centerImage {
-      width: 550px;
-      height: auto;
-      object-fit: cover;
-      border-radius: 10px;
-      margin-right: 20px;
-    }
-
-    .info-container {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-start;
-      margin-left: 40px;
-    }
-
-    h2 {
-      font-size: 24px;
-      margin-top: 0;
-    }
-
-    p {
-      font-size: 18px;
-      margin-top: 10px;
-      margin-bottom: 0;
-    }
-  </style>
 </head>
 <body class="min-vh-100 container-fluid d-flex flex-column ts-bg-white-subtle">
 <!-- ================================================== Header ===================================================== -->
 <%@ include file="/WEB-INF/fragments/header.jspf" %>
-
 <!-- ================================================== Header ===================================================== -->
 
-<!-- ================================================== Main Body ================================================== -->
+
 <!-- ================================================== Breadcrumb ================================================= -->
 <div class="row ts-bg-white border ts-border-teal rounded-3 mx-2 mb-3">
   <div class="col">
@@ -64,35 +34,49 @@
             <i class="bi-house-door"></i>&nbsp;Trang chủ
           </a>
         </li>
-        <li class="breadcrumb-item" aria-current="page">
-          <a href="/center">
-            Phòng học
-          </a>
+        <li class="breadcrumb-item">
+          <a href="/center">Danh sách Cơ Sở</a>
         </li>
         <li class="breadcrumb-item active" aria-current="page">
-          TeachSync Doi Can
+          Chi tiết Cơ sở
         </li>
       </ol>
     </nav>
   </div>
 </div>
-
-
 <!-- ================================================== Breadcrumb ================================================= -->
 
 
-<div class="detail-container">
-  <img src="https://baochauelec.com/cdn/images/phong-hoc-1.jpg" id="centerImage">
-  <div class="info-container">
-    <h2 id="centerName">Phòng 101</h2>
-    <p id="functionInfo">Loại phòng: CLASSROOM</p>
-    <p id="centerAddress">Sức chứa: 30 người</p>
+<!-- ================================================== Main Body ================================================== -->
+<div class="row ts-bg-white border ts-border-teal rounded-3 pt-3 px-5 mx-2 mb-3">
+  <div class="col-12 d-flex justify-content-between align-items-center mb-3">
+    <h4 class="mb-0">${room.roomName}</h4>
 
-
+    <c:if test="${isAdmin}">
+      <a href="/edit-room?id=${center.id}" class="btn btn-warning">Chỉnh sửa</a>
+    </c:if>
   </div>
+
+  <!-- Center Img -->
+  <div class="col-sm-12 col-md-4 mb-3">
+    <img src="${empty center.centerImg ? '../../../resources/img/no-img.jpg' : center.centerImg}" alt="courseImg"
+         class="rounded-2 border ts-border-blue w-100 h-auto mb-3">
+  </div>
+
+  <!-- Center detail -->
+  <div class="col-sm-12 col-md-8 mb-3">
+    <p>Tên phòng: ${room.roomName}</p>
+    <p>Cơ sở: ${center.centerName}</p>
+    <p>Loại phòng: ${room.roomType}</p>
+    <p>Sức chứa: ${room.roomSize} người</p>
+
+    <p>Mô tả: <br>${room.roomDesc}</p>
+  </div>
+
 </div>
 
 <!-- ================================================== Main Body ================================================== -->
+
 
 <!-- ================================================== Footer ===================================================== -->
 <%@ include file="/WEB-INF/fragments/footer.jspf" %>

@@ -1,9 +1,10 @@
 package com.teachsync.utils.enums;
 
 public enum StaffType {
-    LEADER("LEADER"),
+    MANAGER("MANAGER"),
     TEACHER("TEACHER"),
-    DEAN("DEAN");
+    ACCOUNTANT("ACCOUNTANT"),
+    EMPLOYEE("EMPLOYEE");
 
     private final String stringValue;
 
