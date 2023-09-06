@@ -2414,10 +2414,16 @@ values (1, 1, 'Class 1 Ielts 101', null, 15, 'CREATED'),
 
        (12, 2, 'Class 1 Eng gr 2', null, 25, 'CREATED');
 
-insert into clazz_schedule(clazzId, roomId, scheduleType, startDate, endDate, slot, sessionStart, sessionEnd, status)
-values (1, 1, 'MON_WED_FRI', '2023-06-10', '2023-08-10', 1, '07:00:00', '08:30:00', 'CREATED'),
-       (2, 3, 'TUE_THU_SAT', '2023-06-10', '2023-08-10', 3, '10:30:00', '12:00:00', 'CREATED'),
-       (9, 3, 'TUE_THU_SAT', '2023-09-15', '2023-12-15', 3, '10:30:00', '12:00:00', 'CREATED');
+INSERT INTO `teachsync`.`schedulecat` (`name`, `description`, `status`)
+VALUES 	('T2,T4,T6', 'T2,T4,T6 hàng tuần', 'CREATED'),
+          ('T3,T5,T7', 'T3,T5,T7 hàng tuần', 'CREATED'),
+          ('T7, CN', 'T7,CN hàng tuần', 'CREATED'),
+          ('T2', 'T2 hàng tuần', 'CREATED');
+
+insert into clazz_schedule(clazzId, roomId, schedulecaId, scheduleType, startDate, endDate, slot, sessionStart, sessionEnd, status)
+values (1, 1, 1, 'SCHEDULE', '2023-06-10', '2023-08-10', 1, '07:00:00', '08:30:00', 'CREATED'),
+       (2, 3, 2, 'SCHEDULE_REVIEW', '2023-06-10', '2023-08-10', 3, '10:30:00', '12:00:00', 'CREATED'),
+       (9, 3, 3, 'TEST_SCHEDULE', '2023-09-15', '2023-12-15', 3, '10:30:00', '12:00:00', 'CREATED');
 
 insert into session(roomId, scheduleId, staffId, slot, sessionStart, sessionEnd, status)
 values (1, 1, 1, 1, '2023-06-12 07:00:00', '2023-06-12 08:30:00', 'CREATED'),
