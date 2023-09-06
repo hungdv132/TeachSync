@@ -269,6 +269,39 @@ CREATE TABLE IF NOT EXISTS `teachsync`.`staff`
 
 
 -- -----------------------------------------------------
+-- Table `teachsync`.`free_time`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `teachsync`.`free_time`;
+
+CREATE TABLE IF NOT EXISTS `teachsync`.`free_time`
+(
+    `id`        BIGINT      NOT NULL AUTO_INCREMENT,
+    `staffId`   BIGINT      NOT NULL,
+    `weekDay`   VARCHAR(45) NOT NULL,
+    `slot`      LONGTEXT    NOT NULL,
+    `status`    VARCHAR(45) NOT NULL,
+    `createdAt` DATETIME    NULL DEFAULT NULL,
+    `createdBy` BIGINT      NULL DEFAULT NULL,
+    `updatedAt` DATETIME    NULL DEFAULT NULL,
+    `updatedBy` BIGINT      NULL DEFAULT NULL,
+    PRIMARY KEY (`id`),
+    INDEX `fk_free_time_staff_idx` (`staffId` ASC) VISIBLE,
+    INDEX `fk_free_time_user_createdBy_idx` (`createdBy` ASC) VISIBLE,
+    INDEX `fk_free_time_user_updatedBy_idx` (`updatedBy` ASC) VISIBLE,
+    CONSTRAINT `fk_free_time_staff`
+        FOREIGN KEY (`staffId`)
+            REFERENCES `teachsync`.`staff` (`id`),
+    CONSTRAINT `fk_free_time_user_createdBy`
+        FOREIGN KEY (`createdBy`)
+            REFERENCES `teachsync`.`user` (`id`),
+    CONSTRAINT `fk_free_time_user_updatedBy`
+        FOREIGN KEY (`updatedBy`)
+            REFERENCES `teachsync`.`user` (`id`)
+)
+    ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
 -- Table `teachsync`.`course`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `teachsync`.`course`;
@@ -758,6 +791,40 @@ CREATE TABLE IF NOT EXISTS `teachsync`.`clazz_member`
 
 
 -- -----------------------------------------------------
+-- Table `teachsync`.`schedule_category`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `teachsync`.`schedule_category`;
+
+CREATE TABLE IF NOT EXISTS `teachsync`.`schedule_category`
+(
+    `id`           BIGINT      NOT NULL AUTO_INCREMENT,
+    `categoryName` VARCHAR(45) NOT NULL COMMENT 'T2, T4, T6; T3, T5, T7; T7, CN; CUSTOM, ...',
+    `atMon`        BIT(1)      NOT NULL,
+    `atTue`        BIT(1)      NOT NULL,
+    `atWed`        BIT(1)      NOT NULL,
+    `atThu`        BIT(1)      NOT NULL,
+    `atFri`        BIT(1)      NOT NULL,
+    `atSat`        BIT(1)      NOT NULL,
+    `atSun`        BIT(1)      NOT NULL,
+    `status`       VARCHAR(45) NOT NULL,
+    `createdAt`    DATETIME    NULL DEFAULT NULL,
+    `createdBy`    BIGINT      NULL DEFAULT NULL,
+    `updatedAt`    DATETIME    NULL DEFAULT NULL,
+    `updatedBy`    BIGINT      NULL DEFAULT NULL,
+    PRIMARY KEY (`id`),
+    INDEX `fk_schedule_category_user_createdBy_idx` (`createdBy` ASC) VISIBLE,
+    INDEX `fk_schedule_category_user_updatedBy_idx` (`updatedBy` ASC) VISIBLE,
+    CONSTRAINT `fk_schedule_category_user_createdBy`
+        FOREIGN KEY (`createdBy`)
+            REFERENCES `teachsync`.`user` (`id`),
+    CONSTRAINT `fk_schedule_category_user_updatedBy`
+        FOREIGN KEY (`updatedBy`)
+            REFERENCES `teachsync`.`user` (`id`)
+)
+    ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
 -- Table `teachsync`.`clazz_schedule`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `teachsync`.`clazz_schedule`;
@@ -789,6 +856,9 @@ CREATE TABLE IF NOT EXISTS `teachsync`.`clazz_schedule`
     CONSTRAINT `fk_clazz_schedule_clazz`
         FOREIGN KEY (`clazzId`)
             REFERENCES `teachsync`.`clazz` (`id`),
+    CONSTRAINT `fk_clazz_schedule_schedule_category`
+        FOREIGN KEY (`clazzId`)
+            REFERENCES `teachsync`.`schedule_category` (`id`),
     CONSTRAINT `fk_clazz_schedule_user_createdBy`
         FOREIGN KEY (`createdBy`)
             REFERENCES `teachsync`.`user` (`id`),
