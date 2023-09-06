@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ScheduleCaReadDTO extends BaseReadDTO {
 
-    private String roomDesc;
+    private String scheduleDesc;
 
-    private String roomName;
+    private String scheduleName;
 }

@@ -1,8 +1,6 @@
 package com.teachsync.services.scheduleCategory;
 
-import com.teachsync.dtos.clazzSchedule.ClazzScheduleReadDTO;
 import com.teachsync.dtos.scheduleCategory.ScheduleCaReadDTO;
-import com.teachsync.entities.ClazzSchedule;
 import com.teachsync.entities.ScheduleCategory;
 import com.teachsync.repositories.ScheduleCateRepository;
 import com.teachsync.utils.MiscUtil;
@@ -15,7 +13,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
+import java.util.*;
 
 @Service
 public class ScheduleCateServiceImpl implements ScheduleCateService{
@@ -78,7 +76,34 @@ public class ScheduleCateServiceImpl implements ScheduleCateService{
 
     /* =================================================== WRAPPER ================================================== */
     @Override
-    public Page<ScheduleCaReadDTO> wrapPageDTO(Page<ScheduleCategory> scheduleCategoryPage, Collection<DtoOption> options) throws Exception {
+    public ScheduleCaReadDTO wrapDTO(ScheduleCategory scheduleCategory, Collection<DtoOption> options) throws Exception {
+        ScheduleCaReadDTO dto = mapper.map(scheduleCategory, ScheduleCaReadDTO.class);
+
+
+        return dto;
+    }
+
+    @Override
+    public List<ScheduleCaReadDTO> wrapListDTO(
+            Collection<ScheduleCategory> scheduleCategoryCollection, Collection<DtoOption> options) throws Exception {
+        List<ScheduleCaReadDTO> dtoList = new ArrayList<>();
+
+        ScheduleCaReadDTO dto;
+
+
+
+        for (ScheduleCategory scheduleCategory : scheduleCategoryCollection) {
+            dto = mapper.map(scheduleCategory, ScheduleCaReadDTO.class);
+
+
+            dtoList.add(dto);
+        }
+
+        return dtoList;
+    }
+
+    @Override
+    public Page<ScheduleCaReadDTO> wrapPageDTO(
         Page<ScheduleCategory> scheduleCategoryPage, Collection<DtoOption> options) throws Exception {
             return new PageImpl<>(
                     wrapListDTO(scheduleCategoryPage.getContent(), options),

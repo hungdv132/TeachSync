@@ -15,10 +15,11 @@ import lombok.*;
 @Table(name = "schedulecat")
 public class ScheduleCategory extends BaseEntity{
 
-    @Lob
-    @Column(name = "name", nullable = true, length = 45)
-    private String roomDesc;
 
+    @Column(name = "name", nullable = true, length = 45)
+    private String scheduleName;
+
+    @Lob
     @Column(name = "description", nullable = true, length = -1)
-    private String roomName;
+    private String scheduleDesc;
 }
