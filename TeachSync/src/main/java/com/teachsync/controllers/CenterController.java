@@ -172,7 +172,7 @@ public class CenterController {
         }
 
         if (!userDTO.getRoleId().equals(Constants.ROLE_ADMIN)) {
-            redirect.addAttribute("mess", "bạn không đủ quyền");
+            redirect.addAttribute("mess", "Bạn không đủ quyền");
             return "redirect:/index";
         }
 

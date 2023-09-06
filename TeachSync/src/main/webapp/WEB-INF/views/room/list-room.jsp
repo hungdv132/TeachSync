@@ -54,7 +54,7 @@
     </div>
 
     <c:forEach var="room" items="${roomList}">
-        <a href="/room-detail?id=${room.id}" class="col-sm-12 col-md-4 mb-3">
+        <a href="/room-detail?id=${room.id}" class="col-sm-12 col-md-3 mb-3">
             <div class="rounded-3 border ts-border-teal pt-3 px-3">
                 <h4>${room.roomName}</h4>
                 <img src="https://images.unsplash.com/photo-1580582932707-520aed937b7b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1932&q=80" alt="courseImg"

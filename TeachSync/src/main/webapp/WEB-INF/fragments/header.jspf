@@ -182,7 +182,6 @@
               </a>
               <ul class="dropdown-menu">
                 <li><a class="dropdown-item ts-txt-hover-blue" href="/center">Cơ sở</a></li>
-                <li><a class="dropdown-item ts-txt-hover-blue" href="/room">Phòng học</a></li>
               </ul>
             </li>
 
