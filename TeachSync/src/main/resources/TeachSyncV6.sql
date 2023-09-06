@@ -1390,7 +1390,7 @@ DROP TABLE IF EXISTS `schedulecat`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `schedulecat` (
-                               `id` bigint NOT NULL,
+                               `id` bigint NOT NULL AUTO_INCREMENT,
                                `name` varchar(45) DEFAULT NULL COMMENT 'Name of Category, for example T2; T2, T4,T6; etc.',
                                `description` longtext COMMENT 'T2 is  weekly Monthday; etc.',
                                `status`       VARCHAR(45) NOT NULL,
