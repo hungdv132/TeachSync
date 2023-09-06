@@ -45,21 +45,41 @@
                             </c:forEach>
                         </select>
                     </div>
+
                 </div>
             </div>
         </div>
 
 
         <div class="form-group mb-3">
-            <label class="dropdown">Kiểu lịch học: <br>
+            <label class="dropdown">Loại lịch học: <br>
                 <select class="btn btn-secondary dropdown-toggle"
                         id="selScheduleType" name="scheduleType">
-                    <option value="${ScheduleType.MON_WED_FRI}">${ScheduleType.MON_WED_FRI.stringValueVie}</option>
-                    <option value="${ScheduleType.TUE_THU_SAT}">${ScheduleType.TUE_THU_SAT.stringValueVie}</option>
-                    <option value="${ScheduleType.SAT_SUN}">${ScheduleType.SAT_SUN.stringValueVie}</option>
+                    <option value="${ScheduleType.SCHEDULE}">${ScheduleType.SCHEDULE.stringValueVie}</option>
+                    <option value="${ScheduleType.SCHEDULE_REVIEW}">${ScheduleType.SCHEDULE_REVIEW.stringValueVie}</option>
+                    <option value="${ScheduleType.TEST_SCHEDULE}">${ScheduleType.TEST_SCHEDULE.stringValueVie}</option>
+                    <option value="${ScheduleType.SCHEDULE_OF_EXTRACURRICULAR_ACTIVITIES}">${ScheduleType.SCHEDULE_OF_EXTRACURRICULAR_ACTIVITIES.stringValueVie}</option>
+                    <option value="${ScheduleType.CONFERENCE_CALENDAR}">${ScheduleType.CONFERENCE_CALENDAR.stringValueVie}</option>
                 </select>
             </label>
         </div>
+
+        <div class="row mb-3">
+            <div class="col-12">
+                <div class="d-flex align-items-center">
+                    <p class="ms-5 mb-0">Tên phòng</p>
+                    <div class="dropdown ms-3">
+                        <select class="btn btn-secondary dropdown-toggle"
+                                id="selScheduleCaId" name="schedulecaId">
+                            <c:forEach items="${scheduleCateList}" var="scheduleCate">
+                                <option value="${scheduleCate.id}">${scheduleCate.scheduleDesc}</option>
+                            </c:forEach>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="form-group">
             <label>Thời gian bắt đầu</label>
             <input type="date" class="form-control" min="${semester.startDate}" max="${semester.endDate}"
@@ -75,7 +95,7 @@
         <div class="form-group mb-3">
             <label>Tiết:
                 <input type="number" min="1" max="8" class="ms-3" placeholder="Nhập tiết"
-                       id="txtSlot"  name="slot" onchange="updateSessionTime()">
+                       id="txtSlot" name="slot" onchange="updateSessionTime()">
             </label>
             <p>Thời gian: <span id="txtSlotStart"></span> - <span id="txtSlotEnd"></span>
             </p>

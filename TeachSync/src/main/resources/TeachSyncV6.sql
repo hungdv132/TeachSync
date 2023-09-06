@@ -1393,6 +1393,11 @@ CREATE TABLE `schedulecat` (
                                `id` bigint NOT NULL,
                                `name` varchar(45) DEFAULT NULL COMMENT 'Name of Category, for example T2; T2, T4,T6; etc.',
                                `description` longtext COMMENT 'T2 is  weekly Monthday; etc.',
+                               `status`       VARCHAR(45) NOT NULL,
+                               `createdAt`    DATETIME    NULL DEFAULT NULL,
+                               `createdBy`    BIGINT      NULL DEFAULT NULL,
+                               `updatedAt`    DATETIME    NULL DEFAULT NULL,
+                               `updatedBy`    BIGINT      NULL DEFAULT NULL,
                                PRIMARY KEY (`id`),
                                UNIQUE KEY `id_UNIQUE` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

@@ -1,10 +1,12 @@
 package com.teachsync.utils.enums;
 
 public enum ScheduleType {
-    MON_WED_FRI("MON_WED_FRI", "Mon, Wed, Fri", "T2, T4, T6"),
-    TUE_THU_SAT("TUE_THU_SAT", "Tue, Wed, Fri", "T3, T5, T7"),
-    SAT_SUN("SAT_SUN", "Sat, Sun", "T7, CN"),
-    CUSTOM("CUSTOM", "Other", "Khác");
+    SCHEDULE("SCHEDULE", "SCHEDULE", "Lịch Học"),
+    SCHEDULE_REVIEW("SCHEDULE_REVIEW", "SCHEDULE REVIEW", "Lịch Ôn Tập"),
+    TEST_SCHEDULE("TEST_SCHEDULE", "TEST SCHEDULE", "Lịch Thi"),
+    SCHEDULE_OF_EXTRACURRICULAR_ACTIVITIES("SCHEDULE_OF_EXTRACURRICULAR_ACTIVITIES", "SCHEDULE OF EXTRACURRICULAR ACTIVITIES", "Lịch Sinh Hoạt Ngoại Khoá"),
+    CONFERENCE_CALENDAR("CONFERENCE_CALENDAR", "CONFERENCE CALENDAR", "Lịch Hội Thảo");
+
 
     private final String stringValue;
     private final String stringValueEng;
