@@ -2307,9 +2307,9 @@ values ('student', '$2a$10$2muXk6hqYaoTLnXWCszDaeDE71FGa2hJkh3QPaGKJLRJ77bm6GFJW
        ('staff', '$2a$10$2muXk6hqYaoTLnXWCszDaeDE71FGa2hJkh3QPaGKJLRJ77bm6GFJW', 5, null, 'Test Staff', 'OTHER',
         'test.staff@gmail.com', null, null, null, null, 'CREATED'),
        ('teacher2', '$2a$10$2muXk6hqYaoTLnXWCszDaeDE71FGa2hJkh3QPaGKJLRJ77bm6GFJW', 3, null, 'Test Teacher2', 'OTHER',
-        'test.teacher2@gmail.com', null, null, null, null, 'CREATED');
+        'test.teacher2@gmail.com', null, null, null, null, 'CREATED'),
         ('thanhnvhe140127', '$2a$10$2muXk6hqYaoTLnXWCszDaeDE71FGa2hJkh3QPaGKJLRJ77bm6GFJW', 3, null, 'Nguyen Van Thanh', 'OTHER',
-        'test.teacher2@gmail.com', null, null, null, null, 'CREATED');
+        'test.teacher21@gmail.com', null, null, null, null, 'CREATED');
 --     Password = 123456789
 
 insert into center(addressId, centerName, centerType, centerDesc, centerSize, status)
@@ -2414,10 +2414,12 @@ values (1, 1, 'Class 1 Ielts 101', null, 15, 'CREATED'),
 
        (12, 2, 'Class 1 Eng gr 2', null, 25, 'CREATED');
 
-insert into clazz_schedule(clazzId, roomId, scheduleType, startDate, endDate, slot, sessionStart, sessionEnd, status)
-values (1, 1, 'MON_WED_FRI', '2023-06-10', '2023-08-10', 1, '07:00:00', '08:30:00', 'CREATED'),
-       (2, 3, 'TUE_THU_SAT', '2023-06-10', '2023-08-10', 3, '10:30:00', '12:00:00', 'CREATED'),
-       (9, 3, 'TUE_THU_SAT', '2023-09-15', '2023-12-15', 3, '10:30:00', '12:00:00', 'CREATED');
+INSERT INTO `schedulecat` VALUES (1,'t2','t2','CREATED',NULL,NULL,NULL,NULL);
+
+insert into clazz_schedule(clazzId, roomId,schedulecaId, scheduleType, startDate, endDate, slot, sessionStart, sessionEnd, status)
+values (1, 1,1, 'MON_WED_FRI', '2023-06-10', '2023-08-10', 1, '07:00:00', '08:30:00', 'CREATED'),
+       (2, 3,1, 'TUE_THU_SAT', '2023-06-10', '2023-08-10', 3, '10:30:00', '12:00:00', 'CREATED'),
+       (9, 3,1, 'TUE_THU_SAT', '2023-09-15', '2023-12-15', 3, '10:30:00', '12:00:00', 'CREATED');
 
 insert into session(roomId, scheduleId, staffId, slot, sessionStart, sessionEnd, status)
 values (1, 1, 1, 1, '2023-06-12 07:00:00', '2023-06-12 08:30:00', 'CREATED'),
