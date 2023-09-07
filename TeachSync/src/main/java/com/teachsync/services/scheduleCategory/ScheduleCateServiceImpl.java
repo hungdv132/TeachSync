@@ -1,7 +1,6 @@
 package com.teachsync.services.scheduleCategory;
 
 import com.teachsync.dtos.scheduleCategory.ScheduleCaReadDTO;
-import com.teachsync.entities.ClazzSchedule;
 import com.teachsync.entities.ScheduleCategory;
 import com.teachsync.repositories.ScheduleCateRepository;
 import com.teachsync.utils.MiscUtil;

@@ -20,7 +20,4 @@ public interface ClazzScheduleRepository extends JpaRepository<ClazzSchedule, Lo
     Optional<ClazzSchedule> findByIdAndStatusNot(long id, Status status);
     List<ClazzSchedule> findAllByIdInAndStatusNot(Collection<Long> idCollection, Status status);
 
-    /* clazzId */
-    Optional<ClazzSchedule> findByClazzIdAndStatusNot(Long clazzId, Status status);
-    List<ClazzSchedule> findAllByClazzIdInAndStatusNot(Collection<Long> clazzIdCollection, Status status);
 }
