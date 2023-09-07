@@ -103,8 +103,10 @@ public class ScheduleController {
             List<RoomReadDTO> roomReadDTOList = roomService.getAllDTOByCenterId(centerReadDTO.getId(), null);
             model.addAttribute("roomList", roomReadDTOList);
 
+            ScheduleCaReadDTO scheduleCaReadDTO = clazzReadDTO.getClazzSchedule().getScheduleDesc();
+
             /*Schedule Category List*/
-            List<ScheduleCaReadDTO> scheduleCateDTOList = (List<ScheduleCaReadDTO>) scheduleCateService.getDTOById(clazzReadDTO.getClazzSchedule().getSchedulecaId(), null);
+            List<ScheduleCaReadDTO> scheduleCateDTOList = (List<ScheduleCaReadDTO>) scheduleCateService.getDTOById(scheduleCaReadDTO.getId(), null);
             model.addAttribute("scheduleCateList", scheduleCateDTOList);
 
         } catch (Exception e) {
@@ -217,8 +219,10 @@ public class ScheduleController {
             List<RoomReadDTO> roomReadDTOList = roomService.getAllDTOByCenterId(centerReadDTO.getId(), null);
             model.addAttribute("roomList", roomReadDTOList);
 
+            ScheduleCaReadDTO scheduleCaReadDTO = clazzReadDTO.getClazzSchedule().getScheduleDesc();
+
             /*Schedule Category List*/
-            List<ScheduleCaReadDTO> scheduleCateDTOList = (List<ScheduleCaReadDTO>) scheduleCateService.getDTOById(clazzReadDTO.getClazzSchedule().getSchedulecaId(), null);
+            List<ScheduleCaReadDTO> scheduleCateDTOList = (List<ScheduleCaReadDTO>) scheduleCateService.getDTOById(scheduleCaReadDTO.getId(), null);
             model.addAttribute("scheduleCateList", scheduleCateDTOList);
 
         } catch (Exception e) {

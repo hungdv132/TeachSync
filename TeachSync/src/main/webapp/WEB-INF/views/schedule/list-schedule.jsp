@@ -51,7 +51,7 @@
                     <td>${request.clazzName}</td>
                     <td>${clazzSchedule.roomName}</td>
                     <td>${clazzSchedule.scheduleType.stringValueVie}</td>
-                    <td>${clazzSchedule.schedulecaName}</td>
+                    <td>${clazzSchedule.scheduleDesc}</td>
                     <td>${clazzSchedule.startDate}</td>
                     <td>${clazzSchedule.endDate}</td>
                     <td>${clazzSchedule.slot}</td>

@@ -1,6 +1,7 @@
 package com.teachsync.services.scheduleCategory;
 
 import com.teachsync.dtos.scheduleCategory.ScheduleCaReadDTO;
+import com.teachsync.entities.ClazzSchedule;
 import com.teachsync.entities.ScheduleCategory;
 import com.teachsync.repositories.ScheduleCateRepository;
 import com.teachsync.utils.MiscUtil;
@@ -56,22 +57,42 @@ public class ScheduleCateServiceImpl implements ScheduleCateService{
 
     @Override
     public Page<ScheduleCaReadDTO> getPageDTOAll(Pageable paging, Collection<DtoOption> options) throws Exception {
-        return null;
+        Page<ScheduleCategory> scheduleCategoryPage = getPageAll(paging);
+
+        if (scheduleCategoryPage == null) {
+            return null;
+        }
+
+        return wrapPageDTO(scheduleCategoryPage, options);
     }
 
     @Override
     public ScheduleCategory getById(Long id) throws Exception {
-        return null;
+        return scheduleCateRepository
+                .findByIdAndStatusNot(id, Status.DELETED)
+                .orElse(null);
     }
 
     @Override
     public ScheduleCaReadDTO getDTOById(Long id) throws Exception {
-        return null;
+        ScheduleCategory scheduleCategory = getById(id);
+
+        if (scheduleCategory == null) {
+            return null;
+        }
+
+        return wrapDTO(scheduleCategory, null);
     }
 
     @Override
     public ScheduleCaReadDTO getDTOById(Long id, Collection<DtoOption> options) throws Exception {
-        return null;
+        ScheduleCategory scheduleCategory = getById(id);
+
+        if (scheduleCategory == null) {
+            return null;
+        }
+
+        return wrapDTO(scheduleCategory, options);
     }
 
     /* =================================================== WRAPPER ================================================== */

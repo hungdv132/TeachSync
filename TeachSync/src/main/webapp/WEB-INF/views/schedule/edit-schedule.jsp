@@ -120,6 +120,7 @@
 <script id="script1">
     $("#selRoomId").val(${schedule.roomId});
     $("#selScheduleType").val('${schedule.scheduleType}');
+    $("#selScheduleCaId").val('${schedule.schedulecaId}');
     $("#script1").remove();
 
 </script>
