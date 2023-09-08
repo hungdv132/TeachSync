@@ -16,9 +16,17 @@ public enum Status {
     ALLOWED_REDO("ALLOWED_REDO", "Allowing redo", "Cho phép làm lại"),
     SUSPENDED("SUSPENDED", "Suspended", "Tạm ngưng"),
 
+    //status of clazz
+    CREATED_CLAZZ("CREATED_CLAZZ", "created_clazz", "Đang khởi tạo"),
+    DEPLOY_CLAZZ("DEPLOY_CLAZZ", "deploy_clazz", "Đang triển khai"),
+    NOT_ENOUGH_CLAZZ("NOT_ENOUGH_CLAZZ", "not_enough_clazz", "Không đủ xếp lớp"),
+    FINISH_CLAZZ("FINISH_CLAZZ", "finish_clazz", "Đã hoàn thành"),
+
     CREATED("CREATED", "created", "Đã tạo"),
     UPDATED("UPDATED", "updated", "Đã cập nhập"),
     DELETED("DELETED", "deleted", "Đã xóa");
+
+
 
     private final String stringValue;
     private final String stringValueEng;

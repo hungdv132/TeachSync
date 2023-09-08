@@ -93,7 +93,8 @@ public class RoomServiceImpl implements RoomService {
     /* =================================================== WRAPPER ================================================== */
     @Override
     public RoomReadDTO wrapDTO(Room room, Collection<DtoOption> options) throws Exception {
-        return null;
+        RoomReadDTO dto = mapper.map(room, RoomReadDTO.class);
+        return dto;
     }
     @Override
     public List<RoomReadDTO> wrapListDTO(Collection<Room> roomCollection, Collection<DtoOption> options) throws Exception {

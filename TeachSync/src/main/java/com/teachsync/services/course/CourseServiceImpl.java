@@ -433,10 +433,6 @@ public class CourseServiceImpl implements CourseService {
 
         /* Add Dependency */
         if (options != null && !options.isEmpty()) {
-            if (options.contains(DtoOption.CLAZZ_LIST)) {
-//                dto.setClazzList();
-            }
-
             if (options.contains(DtoOption.MATERIAL_LIST)) {
 //                dto.setMaterialList();
             }
@@ -471,10 +467,6 @@ public class CourseServiceImpl implements CourseService {
 
             for (Course course : courseCollection) {
                 courseIdSet.add(course.getId());
-            }
-
-            if (options.contains(DtoOption.CLAZZ_LIST)) {
-//                dto.setClazzList();
             }
 
             if (options.contains(DtoOption.MATERIAL_LIST)) {

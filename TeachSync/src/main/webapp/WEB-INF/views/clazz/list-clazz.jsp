@@ -36,6 +36,7 @@
       <th scope="col">Khóa học</th>
       <th scope="col">Học kỳ</th>
       <c:if test="${isAdmin}">
+        <th scope="col">Trạng thái</th>
         <th scope="col">Chức năng</th>
       </c:if>
     </tr>
@@ -48,6 +49,7 @@
         <td>${clazzDTO.courseSemester.courseAlias} - ${clazzDTO.courseSemester.courseName}</td>
         <td>${clazzDTO.courseSemester.semester.semesterAlias}</td>
         <c:if test="${isAdmin}">
+          <td>${statusLabelMap[clazzDTO.statusClazz]}</td>
           <td>
             <a href="/add-clazz?id=${clazzDTO.id}&option=edit">
               <button type="button" class="btn btn-success">Sửa</button>

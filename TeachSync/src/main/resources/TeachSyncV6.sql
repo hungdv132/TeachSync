@@ -725,6 +725,7 @@ CREATE TABLE IF NOT EXISTS `teachsync`.`clazz`
     `clazzName`        VARCHAR(45) NOT NULL,
     `clazzDesc`        LONGTEXT    NULL DEFAULT NULL,
     `clazzSize`        INT         NOT NULL COMMENT 'Số học sinh tối đa',
+    `statusClazz`      varchar(45) DEFAULT NULL,
     `status`           VARCHAR(45) NOT NULL,
     `createdAt`        DATETIME    NULL DEFAULT NULL,
     `createdBy`        BIGINT      NULL DEFAULT NULL,
@@ -824,6 +825,23 @@ CREATE TABLE IF NOT EXISTS `teachsync`.`schedule_category`
     ENGINE = InnoDB;
 
 
+DROP TABLE IF EXISTS `schedulecat`;
+
+CREATE TABLE `schedulecat`
+(
+    `id`           BIGINT      NOT NULL AUTO_INCREMENT,
+    `name`         VARCHAR(45) NULL DEFAULT NULL COMMENT 'Name of Category, for example T2; T2, T4,T6; etc.',
+    `description`  LONGTEXT    NULL DEFAULT NULL COMMENT 'T2 is weekly Monthday; etc.',
+    `status`       VARCHAR(45) NOT NULL,
+    `createdAt`    DATETIME    NULL DEFAULT NULL,
+    `createdBy`    BIGINT      NULL DEFAULT NULL,
+    `updatedAt`    DATETIME    NULL DEFAULT NULL,
+    `updatedBy`    BIGINT      NULL DEFAULT NULL,
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `id_UNIQUE` (`id`)
+)
+    ENGINE = InnoDB;
+
 -- -----------------------------------------------------
 -- Table `teachsync`.`clazz_schedule`
 -- -----------------------------------------------------
@@ -834,6 +852,7 @@ CREATE TABLE IF NOT EXISTS `teachsync`.`clazz_schedule`
     `id`           BIGINT      NOT NULL AUTO_INCREMENT,
     `clazzId`      BIGINT      NOT NULL,
     `roomId`       BIGINT      NOT NULL COMMENT 'Phòng mặc định của lớp',
+    `schedulecaId` BIGINT      NOT NULL,
     `scheduleType` VARCHAR(45) NOT NULL COMMENT '2_4_6, 3_5_7, T7_CN, CUSTOM, ...',
     `startDate`    DATE        NOT NULL,
     `endDate`      DATE        NOT NULL,
@@ -850,15 +869,22 @@ CREATE TABLE IF NOT EXISTS `teachsync`.`clazz_schedule`
     INDEX `fk_clazz_schedule_room_idx` (`roomId` ASC) VISIBLE,
     INDEX `fk_clazz_schedule_user_createdBy_idx` (`createdBy` ASC) VISIBLE,
     INDEX `fk_clazz_schedule_user_updatedBy_idx` (`updatedBy` ASC) VISIBLE,
+    INDEX `fk_clazz_schedule_schedulcat_idx` (`schedulecaId` ASC) VISIBLE,
     CONSTRAINT `fk_clazz_schedule_room`
         FOREIGN KEY (`roomId`)
             REFERENCES `teachsync`.`room` (`id`),
     CONSTRAINT `fk_clazz_schedule_clazz`
         FOREIGN KEY (`clazzId`)
             REFERENCES `teachsync`.`clazz` (`id`),
+/* Alt
     CONSTRAINT `fk_clazz_schedule_schedule_category`
-        FOREIGN KEY (`clazzId`)
+        FOREIGN KEY (`scheduleCategoryId`)
             REFERENCES `teachsync`.`schedule_category` (`id`),
+*/
+    CONSTRAINT `fk_clazz_schedule_schedulcat`
+        FOREIGN KEY (`schedulecaId`)
+            REFERENCES `teachsync`.`schedulecat` (`id`),
+
     CONSTRAINT `fk_clazz_schedule_user_createdBy`
         FOREIGN KEY (`createdBy`)
             REFERENCES `teachsync`.`user` (`id`),
@@ -962,7 +988,7 @@ CREATE TABLE IF NOT EXISTS `teachsync`.`homework`
     `homeworkName`    VARCHAR(45) NOT NULL COMMENT 'Bài dịch số 2',
     `homeworkDesc`    LONGTEXT    NULL DEFAULT NULL COMMENT 'Dịch đoạn văn trong file Word đính kèm. (Nộp bài qua file dưới dạng Word, không được dùng file ảnh)',
     `homeworkDoc`     LONGTEXT    NULL DEFAULT NULL COMMENT 'Link to file attachment',
-    `homeworkContent` MEDIUMBLOB  NULL DEFAULT NULL COMMENT 'File attachment store in DB',
+    `homeworkContent` LONGTEXT    NULL DEFAULT NULL COMMENT 'File attachment store in DB',
     `openAt`          DATETIME    NULL DEFAULT NULL COMMENT 'Thời gian mở xem bài và nộp bài',
     `deadline`        DATETIME    NULL DEFAULT NULL COMMENT 'Hạn chót nộp bài',
     `status`          VARCHAR(45) NOT NULL,
@@ -1289,6 +1315,8 @@ CREATE TABLE IF NOT EXISTS `teachsync`.`news`
 (
     `id`          BIGINT      NOT NULL AUTO_INCREMENT,
     `authorId`    BIGINT      NOT NULL,
+    `clazzId`     BIGINT      NULL DEFAULT NULL COMMENT 'Tin tức dành riêng cho lớp',
+    `newsType`    VARCHAR(45) NOT NULL COMMENT 'Loại news Internal, External',
     `newsTitle`   VARCHAR(45) NOT NULL,
     `newsContent` MEDIUMBLOB  NULL DEFAULT NULL,
     `newsLink`    LONGTEXT    NULL DEFAULT NULL,
@@ -1425,7 +1453,6 @@ CREATE TABLE IF NOT EXISTS `teachsync`.`application_detail`
             REFERENCES `teachsync`.`user` (`id`)
 )
     ENGINE = InnoDB;
-
 
 SET SQL_MODE = @OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS = @OLD_FOREIGN_KEY_CHECKS;

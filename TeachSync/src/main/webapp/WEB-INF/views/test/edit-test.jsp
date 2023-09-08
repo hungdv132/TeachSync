@@ -75,67 +75,70 @@
 <%@ include file="/WEB-INF/fragments/header.jspf" %>
 
 <h1>Sửa bài test</h1>
+<form action="/update-answer" method="get">
+    <label for="question-type">Môn học:</label>
+    <input type="hidden" name="idTest" id="idTest" value="${test.id}">
 
-<label for="question-type">Môn học:</label>
-<input type="hidden" name="idTest" id="idTest">
-<select name="courseId" id="selCourseId">
-  <c:forEach var="courseDTO" items="${courseList}">
-    <option value="${courseDTO.id}">
-      <c:out value="${courseDTO.courseName}"/>
-    </option>
-  </c:forEach>
-</select>
+    <select name="courseId" id="selCourseId">
+        <c:forEach var="courseDTO" items="${courseList}">
+            <option value="${courseDTO.id}">
+                <c:out value="${courseDTO.courseName}"/>
+            </option>
+        </c:forEach>
+    </select>
 
-<label for="question-type">Loại kiểm tra:</label>
-<select name="testType" id="selTestType">
-  <option value="FIFTEEN_MINUTE">15 phút</option>
-  <option value="MIDTERM">Giữa kỳ</option>
-  <option value="FINAL">Cuối kỳ</option>
-</select>
+    <label for="question-type">Loại kiểm tra:</label>
+    <select name="testType" id="selTestType">
+        <option value="FIFTEEN_MINUTE">15 phút</option>
+        <option value="MIDTERM">Giữa kỳ</option>
+        <option value="FINAL">Cuối kỳ</option>
+    </select>
 
-<label>Thời gian:</label>
-<input type="number" id="timeLimit" name="timeLimit" min="1" value="${test.timeLimit}" required>
+    <label>Thời gian:</label>
+    <input type="number" id="timeLimit" name="timeLimit" min="1" value="${test.timeLimit}" required>
 
-<label for="question-type">Loại câu hỏi:</label>
-<select id="question-type" name="questionType" disabled>
-  <option value="ESSAY">Tự luận</option>
-  <option value="MULTIPLE">Trắc nghiệm</option>
-</select>
+    <label for="question-type">Loại câu hỏi:</label>
+    <select id="question-type" name="questionType" disabled>
+        <option value="ESSAY">Tự luận</option>
+        <option value="MULTIPLE">Trắc nghiệm</option>
+    </select>
 
-<div class="container">
-  <div class="left">
-    <table>
-      <thead>
-      <tr>
-        <th>Câu hỏi</th>
-      </tr>
-      </thead>
-      <tbody>
-      <c:forEach var="qs" items="${questionAnswer}">
-        <tr>
-          <td>
-            <a onclick="displayQuestion('${qs.key.questionDesc}', '${qs.value}' , '${qs.key.questionType}')">
-                <c:out value="${qs.key.questionDesc}"/>
-            </a>
-          </td>
-        </tr>
-      </c:forEach>
-      </tbody>
-    </table>
-  </div>
-  
-  <div class="right">
-    <form action="/update-answer" method="post">
-      <!-- Content for the right div -->
-      <label>Câu hỏi:</label>
-      <textarea id="multipleChoiceQuestion" name="questionAll"></textarea>
-      <input type="hidden" name="idQuestion" id="idQuestion">
-      <br>
-      <div id="checkEssay" style="display: none"></div>
-      <input type="submit" value="Submit">
-    </form>
-  </div>
-</div>
+    <div class="container">
+        <div class="left">
+            <table>
+                <thead>
+                <tr>
+                    <th>Câu hỏi</th>
+                </tr>
+                </thead>
+                <tbody>
+                <c:forEach var="qs" items="${questionAnswer}">
+                    <tr>
+                        <td>
+                            <a onclick="displayQuestion('${qs.key.questionDesc}', '${qs.key.id}',null , '${qs.key.questionType}')">
+                                <c:out value="${qs.key.questionDesc}"/>
+                            </a>
+                        </td>
+                    </tr>
+                </c:forEach>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="right">
+
+            <!-- Content for the right div -->
+            <label>Câu hỏi:</label>
+            <textarea id="multipleChoiceQuestion" name="questionAll"></textarea>
+            <input type="hidden" name="idQuestion" id="idQuestion">
+            <br>
+            <div id="checkEssay" style="display: none"></div>
+            <input type="submit" value="Submit">
+
+        </div>
+
+    </div>
+</form>
 
 
 <script id="script1">
@@ -149,7 +152,8 @@
 <script>
     var questionsArea = document.getElementById("multipleChoiceQuestion");
     var idQuestion = document.getElementById("idQuestion");
-    function displayQuestion(questionDesc, idQuestionInput,lstAnswer, type) {
+
+    function displayQuestion(questionDesc, idQuestionInput, lstAnswer, type) {
         questionsArea.innerHTML = questionDesc;
         idQuestion.value = idQuestionInput;
         var element = document.getElementById("checkEssay");

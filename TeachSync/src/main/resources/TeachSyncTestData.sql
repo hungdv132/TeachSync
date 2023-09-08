@@ -2420,24 +2420,30 @@ values (1, 1, 1, 'CREATED'),
        (4, 3, 2, 'CREATED');
 
 insert into clazz(courseSemesterId, staffId, clazzName, clazzDesc, clazzSize, status)
-values (1, 1, 'Class 1 Ielts 101', null, 15, 'CREATED'),
-       (2, 1, 'Class 2 Ielts 101', null, 15, 'CREATED'),
+values (1,  1, 'ILT101 - 01', null, 15, 'CREATED'),
+       (2,  1, 'ILT101 - 02', null, 15, 'CREATED'),
 
-       (5, 1, 'Class 1 Eng gr 1', null, 30, 'CREATED'),
-       (6, 1, 'Class 2 Eng gr 1', null, 30, 'CREATED'),
+       (5,  1, 'ENG001 - 01', null, 30, 'CREATED'),
+       (6,  1, 'ENG001 - 01', null, 30, 'CREATED'),
 
-       (9, 2, 'Class 1 Eng gr 2', null, 30, 'CREATED'),
-       (10, 2, 'Class 2 Eng gr 2', null, 30, 'CREATED'),
+       (9,  2, 'ENG002 - 01', null, 30, 'CREATED'),
+       (10, 2, 'ENG002 - 02', null, 30, 'CREATED'),
 
-       (13, 2, 'Class 1 Eng gr 3', null, 25, 'CREATED'),
-       (14, 2, 'Class 2 Eng gr 3', null, 25, 'CREATED'),
+       (13, 2, 'ENG003 - 01', null, 25, 'CREATED'),
+       (14, 2, 'ENG003 - 02', null, 25, 'CREATED'),
 
-       (12, 2, 'Class 1 Eng gr 2', null, 25, 'CREATED');
+       (12, 2, 'ENG002 - 01', null, 25, 'CREATED');
 
-insert into clazz_schedule(clazzId, roomId, scheduleType, startDate, endDate, slot, sessionStart, sessionEnd, status)
-values (1, 1, 'MON_WED_FRI', '2023-06-10', '2023-08-10', 1, '07:00:00', '08:30:00', 'CREATED'),
-       (2, 3, 'TUE_THU_SAT', '2023-06-10', '2023-08-10', 3, '10:30:00', '12:00:00', 'CREATED'),
-       (9, 3, 'TUE_THU_SAT', '2023-09-15', '2023-12-15', 3, '10:30:00', '12:00:00', 'CREATED');
+INSERT INTO schedulecat (`name`, `description`, `status`)
+VALUES ('T2,T4,T6', 'T2,T4,T6 hàng tuần', 'CREATED'),
+       ('T3,T5,T7', 'T3,T5,T7 hàng tuần', 'CREATED'),
+       ('T7, CN',   'T7,CN hàng tuần',    'CREATED'),
+       ('T2',       'T2 hàng tuần',       'CREATED');
+
+insert into clazz_schedule(clazzId, roomId, schedulecaId, scheduleType, startDate, endDate, slot, sessionStart, sessionEnd, status)
+values (1, 1, 1, 'SCHEDULE', '2023-06-10', '2023-08-10', 1, '07:00:00', '08:30:00', 'CREATED'),
+       (2, 3, 2, 'SCHEDULE', '2023-06-10', '2023-08-10', 3, '10:30:00', '12:00:00', 'CREATED'),
+       (9, 3, 3, 'SCHEDULE', '2023-09-15', '2023-12-15', 3, '10:30:00', '12:00:00', 'CREATED');
 
 insert into session(roomId, scheduleId, staffId, slot, sessionStart, sessionEnd, status)
 values (1, 1, 1, 1, '2023-06-12 07:00:00', '2023-06-12 08:30:00', 'CREATED'),
@@ -2554,3 +2560,18 @@ VALUES (1, 1, NULL, 'My sister is a doctor.',     0, 'CREATED'),
        (2, 6, 8,    NULL,                         1, 'CREATED'),
        (2, 7, 11,   NULL,                         0, 'CREATED'),
        (2, 8, 14,   NULL,                         0, 'CREATED');
+
+INSERT INTO homework(clazzId, homeworkName, homeworkDesc, homeworkDoc, homeworkContent, openAt, deadline, status)
+VALUES (1, 'bai tap 1 ', 'bai tap 1 ',
+        'https://zingmp3.vn/album/V-Pop-Hits-Thap-Nien-2010-Noo-Phuoc-Thinh-Huong-Tram-ERIK-Dong-Nhi/ZECE0ZD6.html', NULL,
+        '2023-08-14 02:07:00', '2023-08-19 02:07:00', 'CREATED'),
+       (1, 'demo up file', 'demo up file',
+        'https://zingmp3.vn/album/V-Pop-Hits-Thap-Nien-2010-Noo-Phuoc-Thinh-Huong-Tram-ERIK-Dong-Nhi/ZECE0ZD6.html', '',
+        '2023-08-15 19:26:00', '2023-08-30 19:26:00', 'CREATED'),
+       (1, 'demo upload file 2 ', 'demo upload file 2 ',
+        'https://zingmp3.vn/album/V-Pop-Hits-Thap-Nien-2010-Noo-Phuoc-Thinh-Huong-Tram-ERIK-Dong-Nhi/ZECE0ZD6.html', '',
+        '2023-08-08 19:27:00', '2023-08-23 19:27:00', 'CREATED'),
+       (1, 'demo-file 3', 'demo-file 3',
+        'https://zingmp3.vn/album/V-Pop-Hits-Thap-Nien-2010-Noo-Phuoc-Thinh-Huong-Tram-ERIK-Dong-Nhi/ZECE0ZD6.html',
+        'https://firebasestorage.googleapis.com/v0/b/teachsync.appspot.com/o/1692620909241-f.txt?alt=media&token=c10c5aca-1c63-4a68-994c-d2f1cd57e620',
+        '2023-08-15 19:28:00', '2023-08-22 19:28:00', 'CREATED');
