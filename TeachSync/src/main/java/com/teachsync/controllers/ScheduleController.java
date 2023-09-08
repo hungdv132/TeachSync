@@ -9,6 +9,7 @@ import com.teachsync.dtos.clazzSchedule.ClazzScheduleUpdateDTO;
 import com.teachsync.dtos.course.CourseReadDTO;
 import com.teachsync.dtos.courseSemester.CourseSemesterReadDTO;
 import com.teachsync.dtos.room.RoomReadDTO;
+import com.teachsync.dtos.scheduleCategory.ScheduleCaReadDTO;
 import com.teachsync.dtos.semester.SemesterReadDTO;
 import com.teachsync.dtos.user.UserReadDTO;
 
@@ -21,6 +22,7 @@ import com.teachsync.services.clazzSchedule.ClazzScheduleService;
 import com.teachsync.services.course.CourseService;
 import com.teachsync.services.courseSemester.CourseSemesterService;
 import com.teachsync.services.room.RoomService;
+import com.teachsync.services.scheduleCategory.ScheduleCateService;
 import com.teachsync.services.semester.SemesterService;
 import com.teachsync.utils.Constants;
 import com.teachsync.utils.MiscUtil;
@@ -67,6 +69,9 @@ public class ScheduleController {
     private CourseSemesterService courseSemesterService;
 
     @Autowired
+    private ScheduleCateService scheduleCateService;
+
+    @Autowired
     private MiscUtil miscUtil;
 
     /* =================================================== CREATE =================================================== */
@@ -97,6 +102,11 @@ public class ScheduleController {
             /* Room List */
             List<RoomReadDTO> roomReadDTOList = roomService.getAllDTOByCenterId(centerReadDTO.getId(), null);
             model.addAttribute("roomList", roomReadDTOList);
+
+            /*Schedule Category List*/
+            List<ScheduleCaReadDTO> scheduleCateDTOList = (List<ScheduleCaReadDTO>) scheduleCateService.getDTOById(clazzReadDTO.getClazzSchedule().getSchedulecaId(), null);
+            model.addAttribute("scheduleCateList", scheduleCateDTOList);
+
         } catch (Exception e) {
             e.printStackTrace();
             /* Log Error or return error msg */
@@ -206,6 +216,10 @@ public class ScheduleController {
             /* Room List */
             List<RoomReadDTO> roomReadDTOList = roomService.getAllDTOByCenterId(centerReadDTO.getId(), null);
             model.addAttribute("roomList", roomReadDTOList);
+
+            /*Schedule Category List*/
+            List<ScheduleCaReadDTO> scheduleCateDTOList = (List<ScheduleCaReadDTO>) scheduleCateService.getDTOById(clazzReadDTO.getClazzSchedule().getSchedulecaId(), null);
+            model.addAttribute("scheduleCateList", scheduleCateDTOList);
 
         } catch (Exception e) {
             e.printStackTrace();

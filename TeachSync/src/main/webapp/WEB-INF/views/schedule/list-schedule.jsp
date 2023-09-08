@@ -29,6 +29,7 @@
             <th scope="col">ID</th>
             <th scope="col">Tên lớp</th>
             <th scope="col">Tên phòng</th>
+            <th scope="col">Loại lịch học</th>
             <th scope="col">Kiểu lịch học</th>
             <th scope="col">Thời gian bắt đầu</th>
             <th scope="col">Thời gian kết thúc</th>
@@ -50,6 +51,7 @@
                     <td>${request.clazzName}</td>
                     <td>${clazzSchedule.roomName}</td>
                     <td>${clazzSchedule.scheduleType.stringValueVie}</td>
+                    <td>${clazzSchedule.schedulecaName}</td>
                     <td>${clazzSchedule.startDate}</td>
                     <td>${clazzSchedule.endDate}</td>
                     <td>${clazzSchedule.slot}</td>

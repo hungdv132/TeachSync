@@ -23,6 +23,9 @@ public class ClazzSchedule extends BaseEntity {
     @Column(name = "roomId", nullable = false)
     private Long roomId;
 
+    @Column(name = "schedulecaId", nullable = false)
+    private Long schedulecaId;
+
     @Column(name = "scheduleType", nullable = false, length = 45)
     private ScheduleType scheduleType;
 

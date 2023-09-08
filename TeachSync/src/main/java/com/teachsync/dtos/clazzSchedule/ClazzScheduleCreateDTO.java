@@ -19,6 +19,8 @@ public class ClazzScheduleCreateDTO extends BaseCreateDTO {
 
     private Long roomId;
 
+    private Long schedulecaId;
+
     private ScheduleType scheduleType;
 
     private LocalDate startDate;

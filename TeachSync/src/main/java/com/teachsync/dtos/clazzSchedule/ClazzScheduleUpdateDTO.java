@@ -19,6 +19,8 @@ public class ClazzScheduleUpdateDTO extends BaseUpdateDTO {
 
     private Long roomId;
 
+    private Long schedulecaId;
+
     private ScheduleType scheduleType;
 
     private LocalDate startDate;
