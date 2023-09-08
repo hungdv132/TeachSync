@@ -104,8 +104,8 @@ public class ScheduleController {
             model.addAttribute("roomList", roomReadDTOList);
 
             /*Schedule Category List*/
-//            List<ScheduleCaReadDTO> scheduleCateDTOList = scheduleCateService.getDTOById(clazzScheduleReadDTO.getSchedulecaId(), null);
-//            model.addAttribute("scheduleCateList", scheduleCateDTOList);
+            List<ScheduleCaReadDTO> scheduleCateDTOList = (List<ScheduleCaReadDTO>) scheduleCateService.getDTOById(clazzReadDTO.getClazzSchedule().getSchedulecaId(), null);
+            model.addAttribute("scheduleCateList", scheduleCateDTOList);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -218,8 +218,8 @@ public class ScheduleController {
             model.addAttribute("roomList", roomReadDTOList);
 
             /*Schedule Category List*/
-//            List<ScheduleCaReadDTO> scheduleCateDTOList = scheduleCateService.getDTOById(clazzScheduleReadDTO.getSchedulecaId(), null);
-//            model.addAttribute("scheduleCateList", scheduleCateDTOList);
+            List<ScheduleCaReadDTO> scheduleCateDTOList = (List<ScheduleCaReadDTO>) scheduleCateService.getDTOById(clazzReadDTO.getClazzSchedule().getSchedulecaId(), null);
+            model.addAttribute("scheduleCateList", scheduleCateDTOList);
 
         } catch (Exception e) {
             e.printStackTrace();
