@@ -36,7 +36,8 @@
       </c:if>
     </div>
   
-    <p>Cơ sở: ${clazz.courseSemester.center.centerName}</p>
+    <p>abc</p>
+
     
     <p>Giáo viên: ${clazz.staff.user.fullName}</p>
     
