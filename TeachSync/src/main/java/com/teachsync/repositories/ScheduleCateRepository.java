@@ -1,6 +1,7 @@
 package com.teachsync.repositories;
 
 import com.teachsync.entities.ClazzSchedule;
+import com.teachsync.entities.Room;
 import com.teachsync.entities.ScheduleCategory;
 import com.teachsync.utils.enums.Status;
 import org.springframework.data.domain.Page;
@@ -18,4 +19,6 @@ public interface ScheduleCateRepository extends JpaRepository<ClazzSchedule, Lon
     /* id */
     Optional<ScheduleCategory> findByIdAndStatusNot(long id, Status status);
     List<ScheduleCategory> findAllByIdInAndStatusNot(Collection<Long> idCollection, Status status);
+
+    List<ScheduleCategory> getAllBySchedulecaIdAndStatusNot(Long SchedulecaId, Status status);
 }

@@ -73,26 +73,34 @@ public class ScheduleCateServiceImpl implements ScheduleCateService{
     }
 
     @Override
-    public ScheduleCaReadDTO getDTOById(Long id) throws Exception {
-        ScheduleCategory scheduleCategory = getById(id);
+    public List<ScheduleCategory> getAllByIdIn(Collection<Long> idCollection) throws Exception {
+        List<ScheduleCategory> scheduleCategorieList =
+                scheduleCateRepository.findAllByIdInAndStatusNot(idCollection, Status.DELETED);
+        if (scheduleCategorieList.isEmpty()) {
+            return null; }
 
-        if (scheduleCategory == null) {
-            return null;
-        }
-
-        return wrapDTO(scheduleCategory, null);
+        return scheduleCategorieList;
     }
 
     @Override
-    public ScheduleCaReadDTO getDTOById(Long id, Collection<DtoOption> options) throws Exception {
-        ScheduleCategory scheduleCategory = getById(id);
+    public List<ScheduleCategory> getAllByScheduleCaId(Long id) throws Exception {
+        List<ScheduleCategory> scheduleCategorieList =
+                scheduleCateRepository.getAllBySchedulecaIdAndStatusNot(id, Status.DELETED);
+        if (scheduleCategorieList.isEmpty()) {
+            return null; }
 
-        if (scheduleCategory == null) {
+        return scheduleCategorieList;
+    }
+
+    @Override
+    public List<ScheduleCaReadDTO> getAllDTOByScheduleCaId(Long id, Collection<DtoOption> options) throws Exception {
+        List<ScheduleCategory> scheduleCategorieList = getAllByScheduleCaId(id);
+        if (scheduleCategorieList.isEmpty()){
             return null;
         }
-
-        return wrapDTO(scheduleCategory, options);
+        return wrapListDTO(scheduleCategorieList,options);
     }
+
 
     /* =================================================== WRAPPER ================================================== */
     @Override
