@@ -20,6 +20,7 @@ public class PaymentUpdateDTO extends BaseUpdateDTO {
     private Long payerId;
     private Long requestId;
     private PaymentType paymentType;
+    private String paymentDesc;
     private Double paymentAmount;
     private LocalDateTime paymentAt;
     private byte[] paymentDoc;

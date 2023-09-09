@@ -118,7 +118,7 @@
       <i class="bi-chevron-left"></i>
     </button>
     
-    Page: <c:out value="${pageNo + 1}"/> &sol; <c:out value="${pageTotal}"/>
+    Page: <c:out value="${not empty pageNo ? pageNo + 1 : 1}"/> &sol; <c:out value="${not empty pageTotal ? pageTotal : 1}"/>
     
     <button type="button" class="btn btn-secondary mx-2" onclick="toPage(${pageNo + 1})">
       <i class="bi-chevron-right"></i>

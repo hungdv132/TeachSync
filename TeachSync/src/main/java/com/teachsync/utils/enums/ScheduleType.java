@@ -7,7 +7,6 @@ public enum ScheduleType {
     SCHEDULE_OF_EXTRACURRICULAR_ACTIVITIES("SCHEDULE_OF_EXTRACURRICULAR_ACTIVITIES", "SCHEDULE OF EXTRACURRICULAR ACTIVITIES", "Lịch Sinh Hoạt Ngoại Khoá"),
     CONFERENCE_CALENDAR("CONFERENCE_CALENDAR", "CONFERENCE CALENDAR", "Lịch Hội Thảo");
 
-
     private final String stringValue;
     private final String stringValueEng;
     private final String stringValueVie;
