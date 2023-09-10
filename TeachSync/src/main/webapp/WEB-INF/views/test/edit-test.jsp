@@ -68,6 +68,12 @@
         #optionsContainer {
             margin-top: 10px;
         }
+
+        #questions-container {
+            border-top: 1px solid #ccc;
+            margin-top: 20px;
+            padding-top: 20px;
+        }
     </style>
 </head>
 <body>
@@ -115,7 +121,8 @@
                 <c:forEach var="qs" items="${questionAnswer}">
                     <tr>
                         <td>
-                            <a onclick="displayQuestion('${qs.key.questionDesc}', '${qs.key.id}',null , '${qs.key.questionType}')">
+                            <a href="#"
+                               onclick="displayQuestion('${qs.key.questionDesc}', '${qs.key.id}',null , '${qs.key.questionType}', '${qs.value}')">
                                 <c:out value="${qs.key.questionDesc}"/>
                             </a>
                         </td>
@@ -132,7 +139,8 @@
             <textarea id="multipleChoiceQuestion" name="questionAll"></textarea>
             <input type="hidden" name="idQuestion" id="idQuestion">
             <br>
-            <div id="checkEssay" style="display: none"></div>
+            <div id="questions-container"></div>
+            <div id="checkEssay"></div>
             <input type="submit" value="Submit">
 
         </div>
@@ -153,14 +161,64 @@
     var questionsArea = document.getElementById("multipleChoiceQuestion");
     var idQuestion = document.getElementById("idQuestion");
 
-    function displayQuestion(questionDesc, idQuestionInput, lstAnswer, type) {
+    function displayQuestion(questionDesc, idQuestionInput, lstAnswer, type, value) {
+        // Loại bỏ "[" và "]" từ chuỗi
+        value = value.replace("[", "").replace("]", "");
+
+// Phân tích chuỗi thành mảng đối tượng
+        var mangDoiTuong = JSON.parse("[" + value + "]");
         questionsArea.innerHTML = questionDesc;
         idQuestion.value = idQuestionInput;
         var element = document.getElementById("checkEssay");
-        if (type == "multipleChoice") {
-            element.style.display = "block";
-        } else {
-            element.style.display = "none";
+        element.innerHTML = ""; // Xóa toàn bộ nội dung trong element trước khi thêm phần tử mới.
+        var z = 1;
+        for (let x of mangDoiTuong) {
+            var questionLabel = document.createElement("label");
+            questionLabel.textContent = "Câu hỏi " + (z) + ":";
+            z = z + 1;
+            console.log("đây là " + i);
+            element.appendChild(questionLabel);
+        }
+    }
+
+
+    function generateMultipleChoiceQuestions(numQuestions) {
+        questionsContainer.innerHTML = "";
+
+        for (var i = 0; i < numQuestions; i++) {
+            var questionDiv = document.createElement("div");
+            questionDiv.className = "question";
+
+            var questionLabel = document.createElement("label");
+            questionLabel.textContent = "Câu hỏi " + (i + 1) + ":";
+
+            var questionInput = document.createElement("textarea");
+            questionInput.name = "multipleChoiceQuestion" + i;
+            questionInput.required = true;
+
+            var numOptionsLabel = document.createElement("label");
+            numOptionsLabel.textContent = "Số lượng đáp án:";
+
+            var numOptionsInput = document.createElement("input");
+            numOptionsInput.type = "number";
+            numOptionsInput.name = "numOptions" + i;
+            numOptionsInput.min = "2";
+            numOptionsInput.required = true;
+
+            var answerContainer = document.createElement("div");
+            answerContainer.className = "answer-container";
+
+            questionDiv.appendChild(questionLabel);
+            questionDiv.appendChild(questionInput);
+            questionDiv.appendChild(numOptionsLabel);
+            questionDiv.appendChild(numOptionsInput);
+            questionDiv.appendChild(answerContainer);
+
+            numOptionsInput.addEventListener("change", function () {
+                generateAnswerOptions(this);
+            });
+
+            questionsContainer.appendChild(questionDiv);
         }
     }
 </script>

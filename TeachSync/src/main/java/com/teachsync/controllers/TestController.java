@@ -221,7 +221,9 @@ public class TestController {
             List<Question> lstQuestion = questionRepository.findAllByTestId(test.getId());
             HashMap<Question, List<Answer>> hm = new HashMap<>();
             for (Question qs : lstQuestion) {
+                qs.setQuestionDesc(qs.getQuestionDesc().replace('\r',' ').replace('\n',' '));
                 hm.put(qs, answerRepository.findAllByQuestionId(qs.getId()));
+                System.out.println(qs.getQuestionDesc());
             }
             List<Course> lst = courseRepository.findAllByStatusNot(Status.DELETED);
             model.addAttribute("lstCourse", lst);
