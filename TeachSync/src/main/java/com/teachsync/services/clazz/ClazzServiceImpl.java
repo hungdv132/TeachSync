@@ -265,22 +265,22 @@ public class ClazzServiceImpl implements ClazzService {
         if (clazzDTOList == null) {
             return new HashMap<>(); }
 
-        Map<Long, List<ClazzReadDTO>> scheduleIdClazzDTOListMap = new HashMap<>();
-        long scheduleId;
+        Map<Long, List<ClazzReadDTO>> courseSemesterIdClazzDTOListMap = new HashMap<>();
+        long courseSemesterId;
         List<ClazzReadDTO> tmpList;
         for (ClazzReadDTO dto : clazzDTOList) {
-            scheduleId = dto.getCourseSemesterId();
+            courseSemesterId = dto.getCourseSemesterId();
 
-            tmpList = scheduleIdClazzDTOListMap.get(scheduleId);
+            tmpList = courseSemesterIdClazzDTOListMap.get(courseSemesterId);
             if (tmpList == null) {
-                scheduleIdClazzDTOListMap.put(scheduleId, new ArrayList<>(Collections.singletonList(dto)));
+                courseSemesterIdClazzDTOListMap.put(courseSemesterId, new ArrayList<>(List.of(dto)));
             } else {
                 tmpList.add(dto);
-                scheduleIdClazzDTOListMap.put(scheduleId, tmpList);
+                courseSemesterIdClazzDTOListMap.put(courseSemesterId, tmpList);
             }
         }
 
-        return scheduleIdClazzDTOListMap;
+        return courseSemesterIdClazzDTOListMap;
     }
 
     /* =================================================== UPDATE =================================================== */

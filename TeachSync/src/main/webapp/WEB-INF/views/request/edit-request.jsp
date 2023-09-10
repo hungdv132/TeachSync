@@ -70,6 +70,8 @@
     <p class="mb-3"><c:out value="${request.requestDesc}" escapeXml="false"/></p>
   </div>
   
+  <c:set var="status" value="${request.status}"/>
+  
   <c:if test="${request.requestType.equals(RequestType.ENROLL)}">
     <!-- Request detail -->
     <div class="col-sm-12 col-md-6 mb-3">
@@ -121,87 +123,102 @@
         </p>
       </div>
     </div>
+    
+    <c:set var="statusResovled" value="${status.equals(Status.APPROVED) or status.equals(Status.DENIED)}"/>
+    <c:set var="statusOngoing" value="${status.equals(Status.PENDING_PAYMENT) or status.equals(Status.AWAIT_CONFIRM)}"/>
   
     <c:if test="${isStudent}">
-      <form action="/edit-request/enroll" method="POST"
-            id="formUpdateEnrollStudent" class="col-sm-12 col-md-6 mb-3">
-        <input type="hidden" name="id" value="${request.id}">
+      <c:if test="${statusOngoing}">
+        <!-- Nếu Request chưa được duyệt, thì cho edit -->
+        <form action="/edit-request/enroll" method="POST"
+              id="formUpdateEnrollStudent" class="col-sm-12 col-md-6 mb-3">
+          <input type="hidden" name="id" value="${request.id}">
         
-        <div class="row mb-3">
-          <div class="col-6">
-            <img src="../../../resources/img/QRCode.jpg" alt="QR code" class="rounded-4 border ts-border-teal w-100 h-auto">
-          </div>
-          <div class="col-6">
-            <h6 class="mb-1">Thông tin chuyển khoản: </h6>
-            <p class="mb-3">VIETCOMBANK <br>
-               123 456 789 123 456 789 <br>
-               Teach Sync Edu Inc
-            </p>
+          <div class="row mb-3">
+            <div class="col-6">
+              <img src="../../../resources/img/QRCode.jpg" alt="QR code"
+                   class="rounded-4 border ts-border-teal w-100 h-auto">
+            </div>
+            <div class="col-6">
+              <h6 class="mb-1">Thông tin chuyển khoản: </h6>
+              <p class="mb-3">VIETCOMBANK <br>
+                              123 456 789 123 456 789 <br>
+                              Teach Sync Edu Inc
+              </p>
             
-            <h6 class="mb-1">Nội dung chuyển khoản: </h6>
-            <p class="mb-3"><c:out value="${request.requestName}"/></p>
+              <h6 class="mb-1">Nội dung chuyển khoản: </h6>
+              <p class="mb-3"><c:out value="${request.requestName}"/></p>
             
-            <h6 class="mb-1">Khoản cần chuyển: </h6>
-            <p class="mb-3"><fmt:formatNumber value="${currentPrice.finalPrice}" type="currency"/></p>
+              <h6 class="mb-1">Khoản cần chuyển: </h6>
+              <p class="mb-3"><fmt:formatNumber value="${currentPrice.finalPrice}" type="currency"/></p>
+            </div>
           </div>
-        </div>
-  
-        <label class="w-100 overflow-hidden mb-3"><h6 class="mb-1">Chứng từ chuyển khoản: </h6>
-          <c:if test="${not empty request.contentLink}">
-            <a href="${request.contentLink}" onclick="window.open(this.href, '_blank'); return false;"
-               id="hrefPaymentInfo" class="text-nowrap">
-              <c:out value="${request.contentLink}"/>
-            </a>
-            <button type="button" class="btn btn-warning mt-3"
-                    id="btnEditPaymentInfoStudent" onclick="editPaymentInfoStudent()">Chỉnh</button>
-          </c:if>
+        
+          <label class="w-100 overflow-hidden mb-3"><h6 class="mb-1">Chứng từ chuyển khoản: </h6>
+            <c:if test="${not empty request.contentLink}">
+              <a href="${request.contentLink}" onclick="window.open(this.href, '_blank'); return false;"
+                 id="hrefPaymentInfo" class="text-nowrap">
+                <c:out value="${request.contentLink}"/>
+              </a>
+              <button type="button" class="btn btn-warning mt-3"
+                      id="btnEditPaymentInfoStudent" onclick="editPaymentInfoStudent()">Chỉnh
+              </button>
+            </c:if>
           
-          <input type="file" class="w-100 mt-3" required="required"
-                 id="filePaymentInfoStudent" name="file">
-        </label>
+            <input type="file" class="w-100 mt-3" required="required"
+                   id="filePaymentInfoStudent" name="file">
+          </label>
         
-        <input type="hidden" value="${not empty request.contentLink ? request.contentLink : null}"
-               id="hidPaymentInfoStudent" name="paymentInfo">
+          <input type="hidden" value="${not empty request.contentLink ? request.contentLink : null}"
+                 id="hidPaymentInfoStudent" name="paymentInfo">
+        
+          <div class="w-100 d-flex justify-content-center">
+            <button type="button" class="btn btn-primary w-45"
+                    id="btnUpdateRequestEnrollStudent" onclick="updateRequestEnroll('student')">Lưu
+            </button>
+          
+            <c:if test="${not empty request.contentLink}">
+              <button id="btnCancelEditPaymentInfoStudent" class="btn btn-danger w-45 ms-2 visually-hidden"
+                      onclick="cancelEditPaymentInfoStudent()">Hủy
+              </button>
+            </c:if>
+          </div>
+        
+          <script>
+              let hasTransfer = ${not empty request.contentLink};
+              if (hasTransfer) {
+                  hideById("filePaymentInfoStudent");
+                  disableById("filePaymentInfoStudent");
+
+                  hideById("btnUpdateRequestEnrollStudent");
+              }
+
+              function editPaymentInfoStudent() {
+                  hideById("hrefPaymentInfo");
+                  showById("filePaymentInfoStudent");
+                  enableById("filePaymentInfoStudent");
+
+                  hideById("btnEditPaymentInfoStudent");
+                  showById("btnUpdateRequestEnrollStudent");
+                  showById("btnCancelEditPaymentInfoStudent");
+              }
+
+              function cancelEditPaymentInfoStudent() {
+                  showById("hrefPaymentInfo");
+                  hideById("filePaymentInfoStudent");
+                  disableById("filePaymentInfoStudent");
+
+                  showById("btnEditPaymentInfoStudent");
+                  hideById("btnUpdateRequestEnrollStudent");
+                  hideById("btnCancelEditPaymentInfoStudent");
+              }
+          </script>
+        </form>
+      </c:if>
   
-        <div class="w-100 d-flex justify-content-center">
-          <button type="button" class="btn btn-primary w-45"
-                  id="btnUpdateRequestEnrollStudent" onclick="updateRequestEnroll('student')">Lưu</button>
-
-          <c:if test="${not empty request.contentLink}">
-            <button id="btnCancelEditPaymentInfoStudent" class="btn btn-danger w-45 ms-2 visually-hidden"
-                    onclick="cancelEditPaymentInfoStudent()">Hủy</button>
-          </c:if>
-        </div>
-        
-        <script>
-            let hasTransfer = ${not empty request.contentLink};
-            if (hasTransfer) {
-                hideById("filePaymentInfoStudent");
-                disableById("filePaymentInfoStudent");
-                
-                hideById("btnUpdateRequestEnrollStudent");
-            }
-
-            function editPaymentInfoStudent() {
-                hideById("hrefPaymentInfo");
-                showById("filePaymentInfoStudent");
-                enableById("filePaymentInfoStudent");
-                
-                hideById("btnEditPaymentInfoStudent");
-                showById("btnUpdateRequestEnrollStudent");
-                showById("btnCancelEditPaymentInfoStudent");
-            }
-            function cancelEditPaymentInfoStudent() {
-                showById("hrefPaymentInfo");
-                hideById("filePaymentInfoStudent");
-                disableById("filePaymentInfoStudent");
-
-                showById("btnEditPaymentInfoStudent");
-                hideById("btnUpdateRequestEnrollStudent");
-                hideById("btnCancelEditPaymentInfoStudent");
-            }
-        </script>
-      </form>
+      <c:if test="${statusResovled}">
+        <!-- Nếu Request đã được duyệt, thì ko cho edit -->
+      </c:if>
     </c:if>
   
     <c:if test="${isAdmin}">
@@ -226,7 +243,8 @@
         </label>
         
         <label class="w-100 mb-3">Ghi chú: <br>
-          <textarea id="txtAPaymentDesc" name="paymentDesc" class="w-100" rows="3" style="resize: none" required></textarea>
+          <textarea id="txtAPaymentDesc" name="paymentDesc" class="w-100" rows="3" style="resize: none"
+                    required></textarea>
         </label>
         
         <!-- Approve payment detail -->
@@ -240,9 +258,9 @@
   
           <label class="col-6 mb-3">Số tiền đóng: <br>
             <span class="input-vnd right">
-            <input type="number" min="${currentPrice.finalPrice}" max="${currentPrice.finalPrice}" required
-                   id="numPaymentAmount" name="paymentAmount" class="w-100" value="${currentPrice.finalPrice}">
-          </span>
+          <input type="number" min="${currentPrice.finalPrice}" max="${currentPrice.finalPrice}" required
+                 id="numPaymentAmount" name="paymentAmount" class="w-100" value="${currentPrice.finalPrice}">
+        </span>
           </label>
   
           <label class="col-6 mb-3">Đóng vào lúc: <br>
@@ -260,43 +278,85 @@
         <div class="w-100 d-flex justify-content-center">
           <button type="button" class="btn btn-primary w-50" onclick="updateRequestEnroll('admin')">Lưu</button>
         </div>
-        
-        <script>
-            let hasTransfer = ${not empty request.contentLink};
-            let transferAt = "${not empty request.updatedAt ? request.updatedAt : ''}";
-            
-            let datetimePaymentAt = $("#datetimePaymentAt");
-            
-            if (hasTransfer) {
-                datetimePaymentAt.val(transferAt);
-                $("#selPaymentType").val("${PaymentType.TRANSFER}");
-                $("#selPaymentType option[value='${PaymentType.CASH}']")
-                    .prop("disabled", true).prop("hidden", true);
-            } else {
-                let now = new Date();
-                let month = (now.getMonth() + 1).toString().padStart(2, '0');
-                let day = now.getDate().toString().padStart(2, '0');
-                let hour = now.getHours().toString().padStart(2, '0');
-                let minute = now.getMinutes().toString().padStart(2, '0');
-                let datetime = now.getFullYear() + '-' + month + '-' + day + 'T' + hour + ':' + minute;
-                datetimePaymentAt.val(datetime);
-            }
 
-            function togglePaymentForm() {
-                let paymentStatus = $("#selPaymentStatus").val();
-                switch (paymentStatus) {
-                    case "APPROVED":
-                        showById("divApproved");
-                        enableAllFormElementIn("divApproved");
-                        break;
-                    case "DENIED":
-                        hideById("divApproved");
-                        disableAllFormElementIn("divApproved");
-                        break
-                }
-            }
-        </script>
-      </form>
+        <c:if test="${statusOngoing}">
+          <!-- Nếu Request chưa được duyệt, thì cho edit -->
+          <script>
+              let hasTransfer = ${not empty request.contentLink};
+              let transferAt = "${not empty request.updatedAt ? request.updatedAt : ''}";
+              
+              let datetimePaymentAt = $("#datetimePaymentAt");
+              
+              if (hasTransfer) {
+                  datetimePaymentAt.val(transferAt);
+                  $("#selPaymentType").val("${PaymentType.TRANSFER}");
+                  $("#selPaymentType option[value='${PaymentType.CASH}']")
+                      .prop("disabled", true).prop("hidden", true);
+              } else {
+                  let now = new Date();
+                  let month = (now.getMonth() + 1).toString().padStart(2, '0');
+                  let day = now.getDate().toString().padStart(2, '0');
+                  let hour = now.getHours().toString().padStart(2, '0');
+                  let minute = now.getMinutes().toString().padStart(2, '0');
+                  let datetime = now.getFullYear() + '-' + month + '-' + day + 'T' + hour + ':' + minute;
+                  datetimePaymentAt.val(datetime);
+              }
+  
+              function togglePaymentForm() {
+                  let paymentStatus = $("#selPaymentStatus").val();
+                  switch (paymentStatus) {
+                      case "APPROVED":
+                          showById("divApproved");
+                          enableAllFormElementIn("divApproved");
+                          break;
+                      case "DENIED":
+                          hideById("divApproved");
+                          disableAllFormElementIn("divApproved");
+                          break
+                  }
+              }
+          </script>
+        </c:if>
+        
+        <c:if test="${statusResovled}">
+          <!-- Nếu Request đã được duyệt, thì ko cho edit -->
+          <script>
+              let hasTransfer = ${not empty request.contentLink};
+              let transferAt = "${not empty request.updatedAt ? request.updatedAt : ''}";
+
+              let datetimePaymentAt = $("#datetimePaymentAt");
+
+              if (hasTransfer) {
+                  datetimePaymentAt.val(transferAt);
+                  $("#selPaymentType").val("${PaymentType.TRANSFER}");
+                  $("#selPaymentType option[value='${PaymentType.CASH}']")
+                      .prop("disabled", true).prop("hidden", true);
+              } else {
+                  let now = new Date();
+                  let month = (now.getMonth() + 1).toString().padStart(2, '0');
+                  let day = now.getDate().toString().padStart(2, '0');
+                  let hour = now.getHours().toString().padStart(2, '0');
+                  let minute = now.getMinutes().toString().padStart(2, '0');
+                  let datetime = now.getFullYear() + '-' + month + '-' + day + 'T' + hour + ':' + minute;
+                  datetimePaymentAt.val(datetime);
+              }
+
+              function togglePaymentForm() {
+                  let paymentStatus = $("#selPaymentStatus").val();
+                  switch (paymentStatus) {
+                      case "APPROVED":
+                          showById("divApproved");
+                          enableAllFormElementIn("divApproved");
+                          break;
+                      case "DENIED":
+                          hideById("divApproved");
+                          disableAllFormElementIn("divApproved");
+                          break
+                  }
+              }
+          </script>
+        </c:if>
+  </form>
     </c:if>
   </c:if>
   
@@ -305,7 +365,6 @@
     
     </div>
   </c:if>
-  
 </div>
 <!-- ================================================== Main Body ================================================== -->
 
