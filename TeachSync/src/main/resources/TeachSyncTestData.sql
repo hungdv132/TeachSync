@@ -2381,10 +2381,10 @@ values (1, 'Ielts 101', 'You have complete the Ielts 101 course', 'CREATED'),
        (4, 'Eng 3', 'You have complete the Eng 3 course', 'CREATED');
 
 insert into semester(semesterName, semesterAlias, semesterDesc, semesterType, startDate, endDate, status)
-values ('Spring 23', 'SP23', 'Spring 23', 'SEASON', '2023-01-05', '2023-03-05', 'CREATED'),
-       ('Summer 23', 'SU23', 'Summer 23', 'SEASON', '2023-03-10', '2023-06-10', 'CREATED'),
-       ('Fall 23', 'FA23', 'Fall 23', 'SEASON', '2023-06-15', '2023-09-15', 'CREATED'),
-       ('Winter 23', 'WI23', 'Winter 23', 'SEASON', '2023-09-15', '2023-12-15', 'CREATED');
+values ('Spring 23', 'SP23', 'Spring 23', 'SEASON', '2023-02-05', '2023-04-05', 'CREATED'),
+       ('Summer 23', 'SU23', 'Summer 23', 'SEASON', '2023-04-10', '2023-07-10', 'CREATED'),
+       ('Fall 23', 'FA23', 'Fall 23', 'SEASON', '2023-07-15', '2023-10-15', 'CREATED'),
+       ('Winter 23', 'WI23', 'Winter 23', 'SEASON', '2023-10-20', '2024-01-20', 'CREATED');
 
 insert into course_semester(courseId, semesterId, centerId, status)
 values (1, 1, 1, 'CREATED'),
@@ -2441,23 +2441,24 @@ VALUES ('T2,T4,T6', 'T2,T4,T6 hàng tuần', 'CREATED'),
        ('T2',       'T2 hàng tuần',       'CREATED');
 
 insert into clazz_schedule(clazzId, roomId, schedulecaId, scheduleType, startDate, endDate, slot, sessionStart, sessionEnd, status)
-values (1, 1, 1, 'SCHEDULE', '2023-06-10', '2023-08-10', 1, '07:00:00', '08:30:00', 'CREATED'),
-       (2, 3, 2, 'SCHEDULE', '2023-06-10', '2023-08-10', 3, '10:30:00', '12:00:00', 'CREATED'),
-       (9, 3, 3, 'SCHEDULE', '2023-09-15', '2023-12-15', 3, '10:30:00', '12:00:00', 'CREATED');
+values (1, 1, 1, 'SCHEDULE', '2023-07-15', '2023-10-15', 1, '07:00:00', '08:30:00', 'CREATED'),
+       (2, 3, 2, 'SCHEDULE', '2023-07-15', '2023-10-15', 3, '10:30:00', '12:00:00', 'CREATED'),
+       (9, 3, 3, 'SCHEDULE', '2023-10-20', '2024-01-20', 3, '10:30:00', '12:00:00', 'CREATED');
 
 insert into session(roomId, scheduleId, staffId, slot, sessionStart, sessionEnd, status)
-values (1, 1, 1, 1, '2023-06-12 07:00:00', '2023-06-12 08:30:00', 'CREATED'),
-       (1, 1, 1, 1, '2023-06-14 07:00:00', '2023-06-14 08:30:00', 'CREATED'),
-       (1, 1, 1, 1, '2023-06-16 07:00:00', '2023-06-16 08:30:00', 'CREATED'),
-       (1, 1, 1, 1, '2023-06-19 07:00:00', '2023-06-19 08:30:00', 'CREATED'),
-       (1, 1, 1, 1, '2023-06-21 07:00:00', '2023-06-21 08:30:00', 'CREATED'),
-       (1, 1, 1, 1, '2023-06-23 07:00:00', '2023-06-23 08:30:00', 'CREATED'),
-       (1, 1, 1, 1, '2023-06-26 07:00:00', '2023-06-26 08:30:00', 'CREATED'),
-       (1, 1, 1, 1, '2023-06-28 07:00:00', '2023-06-28 08:30:00', 'CREATED'),
-       (1, 1, 1, 1, '2023-06-30 07:00:00', '2023-06-30 08:30:00', 'CREATED'),
-       (1, 1, 1, 1, '2023-07-03 07:00:00', '2023-07-03 08:30:00', 'CREATED'),
-       (1, 1, 1, 1, '2023-07-05 07:00:00', '2023-07-05 08:30:00', 'CREATED'),
-       (1, 1, 1, 1, '2023-07-07 07:00:00', '2023-07-07 08:30:00', 'CREATED');
+values
+       (1, 1, 1, 1, '2023-07-18 07:00:00', '2023-07-18 08:30:00', 'CREATED'),
+       (1, 1, 1, 1, '2023-07-20 07:00:00', '2023-07-20 08:30:00', 'CREATED'),
+       (1, 1, 1, 1, '2023-07-22 07:00:00', '2023-07-22 08:30:00', 'CREATED'),
+       (1, 1, 1, 1, '2023-07-25 07:00:00', '2023-07-25 08:30:00', 'CREATED'),
+       (1, 1, 1, 1, '2023-07-27 07:00:00', '2023-07-27 08:30:00', 'CREATED'),
+       (1, 1, 1, 1, '2023-07-29 07:00:00', '2023-07-29 08:30:00', 'CREATED'),
+       (1, 1, 1, 1, '2023-08-02 07:00:00', '2023-08-02 08:30:00', 'CREATED'),
+       (1, 1, 1, 1, '2023-08-04 07:00:00', '2023-08-04 08:30:00', 'CREATED'),
+       (1, 1, 1, 1, '2023-08-06 07:00:00', '2023-08-06 08:30:00', 'CREATED'),
+       (1, 1, 1, 1, '2023-08-09 07:00:00', '2023-08-09 08:30:00', 'CREATED'),
+       (1, 1, 1, 1, '2023-08-11 07:00:00', '2023-08-11 08:30:00', 'CREATED'),
+       (1, 1, 1, 1, '2023-08-13 07:00:00', '2023-08-13 08:30:00', 'CREATED');
 
 insert into material(materialName, materialImg, materialLink, materialContent, materialType, isFree, status)
 values ('Report1 template', '',
