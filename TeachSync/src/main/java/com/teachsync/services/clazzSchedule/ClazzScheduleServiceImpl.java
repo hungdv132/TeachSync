@@ -3,14 +3,17 @@ package com.teachsync.services.clazzSchedule;
 import com.teachsync.dtos.clazzSchedule.ClazzScheduleCreateDTO;
 import com.teachsync.dtos.clazzSchedule.ClazzScheduleReadDTO;
 import com.teachsync.dtos.clazzSchedule.ClazzScheduleUpdateDTO;
+import com.teachsync.dtos.scheduleCategory.ScheduleCaReadDTO;
 import com.teachsync.entities.Clazz;
 import com.teachsync.entities.ClazzSchedule;
 import com.teachsync.entities.Room;
+import com.teachsync.entities.ScheduleCategory;
 import com.teachsync.repositories.ClazzRepository;
 import com.teachsync.repositories.ClazzScheduleRepository;
 import com.teachsync.repositories.RoomRepository;
 import com.teachsync.services.clazz.ClazzService;
 import com.teachsync.services.room.RoomService;
+import com.teachsync.services.scheduleCategory.ScheduleCateService;
 import com.teachsync.utils.MiscUtil;
 import com.teachsync.utils.enums.DtoOption;
 import com.teachsync.utils.enums.Status;
@@ -53,6 +56,9 @@ public class ClazzScheduleServiceImpl implements ClazzScheduleService {
 
     @Autowired
     private MiscUtil miscUtil;
+
+    @Autowired
+    private ScheduleCateService scheduleCateService;
 
     private Logger logger = LoggerFactory.getLogger(ClazzScheduleServiceImpl.class);
 
@@ -330,6 +336,11 @@ public class ClazzScheduleServiceImpl implements ClazzScheduleService {
                 Room room = roomService.getById(dto.getRoomId());
                 dto.setRoomName(room.getRoomName());
             }
+
+            if (options.contains(DtoOption.SCHEDULE_CAT)) {
+                ScheduleCaReadDTO scheduleCategory = scheduleCateService.getDTOById(dto.getSchedulecaId());
+                dto.setScheduleCategory(scheduleCategory);
+            }
         }
 
         return dto;
@@ -344,14 +355,18 @@ public class ClazzScheduleServiceImpl implements ClazzScheduleService {
 
         Map<Long, String> clazzIdClazzNameMap = new HashMap<>();
         Map<Long, String> roomIdRoomNameMap = new HashMap<>();
+        Map<Long, ScheduleCaReadDTO> scheduleIdScheduleDescMap = new HashMap<>();
+
 
         if (options != null && !options.isEmpty()) {
             Set<Long> clazzIdSet = new HashSet<>();
             Set<Long> roomIdSet = new HashSet<>();
+            Set<Long> scheduleCategoryIdSet = new HashSet<>();
 
             for (ClazzSchedule clazzSchedule : clazzScheduleCollection) {
                 clazzIdSet.add(clazzSchedule.getClazzId());
                 roomIdSet.add(clazzSchedule.getRoomId());
+                scheduleCategoryIdSet.add(clazzSchedule.getSchedulecaId());
             }
 
             if (options.contains(DtoOption.CLAZZ_NAME)) {
@@ -360,6 +375,10 @@ public class ClazzScheduleServiceImpl implements ClazzScheduleService {
 
             if (options.contains(DtoOption.ROOM_NAME)) {
                 roomIdRoomNameMap = roomService.mapRoomIdRoomNameByIdIn(roomIdSet);
+            }
+
+            if (options.contains(DtoOption.SCHEDULE_CAT)) {
+                scheduleIdScheduleDescMap = scheduleCateService.mapScheduleIdScheduleDescByIdIn(scheduleCategoryIdSet);
             }
         }
 
@@ -370,6 +389,8 @@ public class ClazzScheduleServiceImpl implements ClazzScheduleService {
             dto.setClazzName(clazzIdClazzNameMap.get(clazzSchedule.getClazzId()));
 
             dto.setRoomName(roomIdRoomNameMap.get(clazzSchedule.getRoomId()));
+
+            dto.setScheduleCategory(scheduleIdScheduleDescMap.get(clazzSchedule.getSchedulecaId()));
 
             dtoList.add(dto);
         }

@@ -108,5 +108,8 @@ public enum DtoOption {
     /** Payment */
     REQUEST,
     /** Payment */
-    PAYER;
+    PAYER,
+
+    /** Schedule category */
+    SCHEDULE_CAT;
 }
