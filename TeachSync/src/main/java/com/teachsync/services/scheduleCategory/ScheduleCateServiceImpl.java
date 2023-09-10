@@ -1,5 +1,6 @@
 package com.teachsync.services.scheduleCategory;
 
+import com.teachsync.dtos.BaseReadDTO;
 import com.teachsync.dtos.scheduleCategory.ScheduleCaReadDTO;
 import com.teachsync.entities.ScheduleCategory;
 import com.teachsync.repositories.ScheduleCateRepository;
@@ -12,8 +13,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 public class ScheduleCateServiceImpl implements ScheduleCateService{
@@ -66,10 +70,39 @@ public class ScheduleCateServiceImpl implements ScheduleCateService{
     }
 
     @Override
+    public List<ScheduleCategory> getAll() throws Exception {
+
+        List<ScheduleCategory> scheduleCategoryList =
+                scheduleCateRepository.findAllByStatusNot(Status.DELETED);
+
+        if (scheduleCategoryList.isEmpty()) {
+            return null;
+        }
+
+        return scheduleCategoryList;
+    }
+
+    @Override
+    public List<ScheduleCaReadDTO> getAllDTO() throws Exception {
+        List<ScheduleCategory> scheduleCategoryList = getAll();
+
+        if (scheduleCategoryList == null) {
+            return null;
+        }
+
+        return wrapListDTO(scheduleCategoryList, null);
+    }
+
+    @Override
     public ScheduleCategory getById(Long id) throws Exception {
         return scheduleCateRepository
                 .findByIdAndStatusNot(id, Status.DELETED)
                 .orElse(null);
+    }
+
+    @Override
+    public ScheduleCaReadDTO getDTOById(Long id) throws Exception {
+        return wrapDTO(getById(id), null);
     }
 
     @Override
@@ -83,29 +116,34 @@ public class ScheduleCateServiceImpl implements ScheduleCateService{
     }
 
     @Override
-    public List<ScheduleCategory> getAllByScheduleCaId(Long id) throws Exception {
-        List<ScheduleCategory> scheduleCategorieList =
-                scheduleCateRepository.getAllBySchedulecaIdAndStatusNot(id, Status.DELETED);
-        if (scheduleCategorieList.isEmpty()) {
-            return null; }
-
-        return scheduleCategorieList;
+    public List<ScheduleCaReadDTO> getAllDTOByIdIn(Collection<Long> idCollection) throws Exception {
+        return wrapListDTO(getAllByIdIn(idCollection),null);
     }
+
+    
 
     @Override
-    public List<ScheduleCaReadDTO> getAllDTOByScheduleCaId(Long id, Collection<DtoOption> options) throws Exception {
-        List<ScheduleCategory> scheduleCategorieList = getAllByScheduleCaId(id);
-        if (scheduleCategorieList.isEmpty()){
-            return null;
-        }
-        return wrapListDTO(scheduleCategorieList,options);
+    public Map<Long, ScheduleCaReadDTO> mapScheduleIdScheduleDescByIdIn(Collection<Long> idCollection) throws Exception {
+        List<ScheduleCaReadDTO> scheduleCategoryList = getAllDTOByIdIn(idCollection);
+
+        if (ObjectUtils.isEmpty(scheduleCategoryList)) {
+            return new HashMap<>(); }
+
+        return scheduleCategoryList.stream()
+                .collect(Collectors.toMap(BaseReadDTO::getId, Function.identity()));
     }
+    
 
 
     /* =================================================== WRAPPER ================================================== */
     @Override
     public ScheduleCaReadDTO wrapDTO(ScheduleCategory scheduleCategory, Collection<DtoOption> options) throws Exception {
+        if (scheduleCategory == null){
+            return null;
+        }
+
         ScheduleCaReadDTO dto = mapper.map(scheduleCategory, ScheduleCaReadDTO.class);
+
 
 
         return dto;
@@ -118,6 +156,9 @@ public class ScheduleCateServiceImpl implements ScheduleCateService{
 
         ScheduleCaReadDTO dto;
 
+        if (scheduleCategoryCollection == null){
+            return null;
+        }
 
 
         for (ScheduleCategory scheduleCategory : scheduleCategoryCollection) {

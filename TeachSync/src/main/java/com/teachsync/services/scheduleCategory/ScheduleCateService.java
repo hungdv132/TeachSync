@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 public interface ScheduleCateService {
     /* =================================================== READ ===================================================== */
@@ -20,13 +21,21 @@ public interface ScheduleCateService {
     Page<ScheduleCaReadDTO> getPageDTOAll(Pageable paging) throws Exception;
     Page<ScheduleCaReadDTO> getPageDTOAll(Pageable paging, Collection<DtoOption> options) throws Exception;
 
+    List<ScheduleCategory> getAll() throws Exception;
+
+    List<ScheduleCaReadDTO> getAllDTO() throws Exception;
+
     /* id */
     ScheduleCategory getById(Long id) throws Exception;
 
+    ScheduleCaReadDTO getDTOById(Long id) throws Exception;
+
     List<ScheduleCategory> getAllByIdIn(Collection<Long> idCollection) throws Exception;
 
-    List<ScheduleCategory> getAllByScheduleCaId(Long id) throws Exception;
-    List<ScheduleCaReadDTO> getAllDTOByScheduleCaId(Long id, Collection<DtoOption> options) throws Exception;
+    List<ScheduleCaReadDTO> getAllDTOByIdIn(Collection<Long> idCollection) throws Exception;
+
+
+    Map<Long, ScheduleCaReadDTO> mapScheduleIdScheduleDescByIdIn(Collection<Long> idCollection) throws Exception;
 
     /* =================================================== WRAPPER ================================================== */
 

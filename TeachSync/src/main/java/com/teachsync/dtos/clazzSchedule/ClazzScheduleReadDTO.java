@@ -29,7 +29,7 @@ public class ClazzScheduleReadDTO extends BaseReadDTO {
 
     private Long schedulecaId;
 
-    private ScheduleCaReadDTO scheduleDesc;
+    private ScheduleCaReadDTO scheduleCategory;
 
     private ScheduleType scheduleType;
 

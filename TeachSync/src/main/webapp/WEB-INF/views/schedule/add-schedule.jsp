@@ -67,7 +67,7 @@
         <div class="row mb-3">
             <div class="col-12">
                 <div class="d-flex align-items-center">
-                    <p class="ms-5 mb-0">Tên phòng</p>
+                    <p class="ms-5 mb-0">Loại lịch học</p>
                     <div class="dropdown ms-3">
                         <select class="btn btn-secondary dropdown-toggle"
                                 id="selScheduleCaId" name="schedulecaId">
