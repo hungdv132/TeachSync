@@ -1,6 +1,7 @@
 package com.teachsync.dtos.clazzSchedule;
 
 import com.teachsync.dtos.BaseReadDTO;
+import com.teachsync.dtos.scheduleCategory.ScheduleCaReadDTO;
 import com.teachsync.utils.enums.ScheduleType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -28,7 +29,7 @@ public class ClazzScheduleReadDTO extends BaseReadDTO {
 
     private Long schedulecaId;
 
-    private String schedulecaName;
+    private ScheduleCaReadDTO scheduleCategory;
 
     private ScheduleType scheduleType;
 
