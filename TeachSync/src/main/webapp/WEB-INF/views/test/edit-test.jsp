@@ -82,16 +82,16 @@
 
 <h1>Sửa bài test</h1>
 <form action="/update-answer" method="get">
-    <label for="question-type">Môn học:</label>
+<%--    <label for="question-type">Môn học:</label>--%>
     <input type="hidden" name="idTest" id="idTest" value="${test.id}">
 
-    <select name="courseId" id="selCourseId">
-        <c:forEach var="courseDTO" items="${courseList}">
-            <option value="${courseDTO.id}">
-                <c:out value="${courseDTO.courseName}"/>
-            </option>
-        </c:forEach>
-    </select>
+<%--    <select name="courseId" id="selCourseId">--%>
+<%--        <c:forEach var="courseDTO" items="${courseList}">--%>
+<%--            <option value="${courseDTO.id}">--%>
+<%--                <c:out value="${courseDTO.courseName}"/>--%>
+<%--            </option>--%>
+<%--        </c:forEach>--%>
+<%--    </select>--%>
 
     <label for="question-type">Loại kiểm tra:</label>
     <select name="testType" id="selTestType">
@@ -103,11 +103,11 @@
     <label>Thời gian:</label>
     <input type="number" id="timeLimit" name="timeLimit" min="1" value="${test.timeLimit}" required>
 
-    <label for="question-type">Loại câu hỏi:</label>
-    <select id="question-type" name="questionType" disabled>
-        <option value="ESSAY">Tự luận</option>
-        <option value="MULTIPLE">Trắc nghiệm</option>
-    </select>
+<%--    <label for="question-type">Loại câu hỏi:</label>--%>
+<%--    <select id="question-type" name="questionType" disabled>--%>
+<%--        <option value="ESSAY">Tự luận</option>--%>
+<%--        <option value="MULTIPLE">Trắc nghiệm</option>--%>
+<%--    </select>--%>
 
     <div class="container">
         <div class="left">
@@ -122,7 +122,8 @@
                     <tr>
                         <td>
                             <a href="#"
-                               onclick="displayQuestion('${qs.key.questionDesc}', '${qs.key.id}',null , '${qs.key.questionType}', '${qs.value}')">
+                                <%--                               onclick="displayQuestion('${qs.key.questionDesc}', '${qs.key.id}',null , '${qs.key.questionType}', ${qs.value})">--%>
+                               onclick="displayQuestion(${qs.key.id}, '${qs.key.questionDesc}', '${qs.key.questionType}')">
                                 <c:out value="${qs.key.questionDesc}"/>
                             </a>
                         </td>
@@ -161,65 +162,186 @@
     var questionsArea = document.getElementById("multipleChoiceQuestion");
     var idQuestion = document.getElementById("idQuestion");
 
-    function displayQuestion(questionDesc, idQuestionInput, lstAnswer, type, value) {
-        // Loại bỏ "[" và "]" từ chuỗi
-        value = value.replace("[", "").replace("]", "");
+    // function displayQuestion(questionDesc, idQuestionInput, lstAnswer, type, value) {
+    //
+    //     questionsArea.innerHTML = questionDesc;
+    //     idQuestion.value = idQuestionInput;
+    //     var element = document.getElementById("checkEssay");
+    // element.innerHTML = ""; // Xóa toàn bộ nội dung trong element trước khi thêm phần tử mới.
+    //     var z = 1;
+    //     for (let x of value) {
+    //         var questionLabel = document.createElement("label");
+    //         questionLabel.textContent = "Câu hỏi " + (z) + ":";
+    //         z = z + 1;
+    //         console.log("đây là " + i);
+    //         element.appendChild(questionLabel);
+    //     }
+    // }
 
-// Phân tích chuỗi thành mảng đối tượng
-        var mangDoiTuong = JSON.parse("[" + value + "]");
-        questionsArea.innerHTML = questionDesc;
-        idQuestion.value = idQuestionInput;
-        var element = document.getElementById("checkEssay");
-        element.innerHTML = ""; // Xóa toàn bộ nội dung trong element trước khi thêm phần tử mới.
-        var z = 1;
-        for (let x of mangDoiTuong) {
-            var questionLabel = document.createElement("label");
-            questionLabel.textContent = "Câu hỏi " + (z) + ":";
-            z = z + 1;
-            console.log("đây là " + i);
-            element.appendChild(questionLabel);
+    function displayQuestion(qsId, questionDesc, questionType) {
+        idQuestion.value = qsId;
+        if (questionType == "ESSAY") {
+            questionsArea.innerHTML = questionDesc;
+
+        } else {
+            $.ajax({
+                type: "GET",
+                url: "/api/getLstAnswer?questionId=" + qsId,
+                success: function (response) {
+                    questionsArea.innerHTML = questionDesc;
+                    var element = document.getElementById("checkEssay");
+                    element.innerHTML = ""; // Xóa toàn bộ nội dung trong element trước khi thêm phần tử mới.
+
+                    var i = 1;
+                    for (let x of response) {
+                        var tempDiv = document.createElement("div")
+                        tempDiv.id = "idDivAnswer" + x.id;
+                        var answerInput = document.createElement("input");
+                        answerInput.type = "text";
+                        answerInput.name = "newAnswer" + x.id;
+                        answerInput.id = "newAnswer" + x.id;
+                        answerInput.value = x.answerDesc;
+                        answerInput.disabled = true;
+                        var isCorrectCheckbox = document.createElement("input");
+                        isCorrectCheckbox.type = "checkbox";
+                        isCorrectCheckbox.id = "isCorrect" + x.id;
+                        isCorrectCheckbox.name = "isCorrect" + x.id;
+                        isCorrectCheckbox.checked = x.isCorrect;
+                        isCorrectCheckbox.disabled = true;
+
+                        var deleteButton = document.createElement("button");
+                        deleteButton.textContent = "Xóa"; // Đặt văn bản của nút là "Xóa"
+                        deleteButton.addEventListener("click", function (event) {
+                            event.preventDefault();
+                            deleteAnswer(x.id, qsId, questionDesc)
+                        });
+
+                        var editButton = document.createElement("button");
+                        editButton.textContent = "Sửa";
+                        editButton.addEventListener("click", function (event) {
+                            event.preventDefault(); // Ngăn chặn hành vi mặc định của nút "Sửa"
+                            editAnswer(x.id, "newAnswer" + x.id, "isCorrect" + x.id, qsId, questionDesc)
+                        });
+
+
+                        var lineBreak = document.createElement('br');
+                        answerInput.required = true;
+                        console.log(x.answerDesc);
+                        tempDiv.appendChild(answerInput);
+                        tempDiv.appendChild(isCorrectCheckbox);
+                        tempDiv.appendChild(deleteButton);
+                        tempDiv.appendChild(editButton)
+                        tempDiv.appendChild(lineBreak);
+
+                        element.appendChild(tempDiv);
+
+
+                    }
+                    var tempDiv2 = document.createElement("div")
+                    var addNewAnswer = document.createElement("button");
+                    addNewAnswer.textContent = "Thêm mới";
+                    addNewAnswer.id = "tempBt";
+                    addNewAnswer.addEventListener("click", function (event) {
+                        event.preventDefault();
+                        var newInput = document.createElement("input");
+                        newInput.type = "text";
+                        newInput.id = "newInput";
+
+                        var isCorrectCheckbox = document.createElement("input");
+                        isCorrectCheckbox.type = "checkbox";
+                        isCorrectCheckbox.name = "isCorrectNew";
+
+                        var saveNewAnswer = document.createElement("button");
+                        saveNewAnswer.textContent = "Thêm";
+                        saveNewAnswer.addEventListener("click", function (event) {
+                            event.preventDefault();
+                            addAnswer(qsId, newInput.value, isCorrectCheckbox.checked, questionDesc);
+                        });
+
+                        tempDiv2.appendChild(newInput);
+                        tempDiv2.appendChild(isCorrectCheckbox);
+                        tempDiv2.appendChild(saveNewAnswer);
+                        var rm = document.getElementById("tempBt");
+                        rm.remove();
+
+
+                    });
+                    tempDiv2.appendChild(addNewAnswer);
+                    element.appendChild(tempDiv2);
+                }
+
+
+            })
         }
+
+    }
+
+    function editAnswer(answerId, textName, buttonName, qsId, questionDesc) {
+        var txt = document.getElementById(textName);
+        var bt = document.getElementById(buttonName);
+
+        var element = document.getElementById("idDivAnswer" + answerId);
+        txt.disabled = false;
+        bt.disabled = false;
+        var editButton = document.createElement("button");
+        editButton.textContent = "Lưu";
+        editButton.addEventListener("click", function (event) {
+            event.preventDefault();
+            saveAnswer(answerId, txt.value, bt.checked, qsId, questionDesc)
+        });
+
+        element.appendChild(editButton);
+
     }
 
 
-    function generateMultipleChoiceQuestions(numQuestions) {
-        questionsContainer.innerHTML = "";
+    function saveAnswer(id, content, tr, qsId, questionDesc) {
+        var dataToSend = {
+            id: id,
+            content: content,
+            isTrue: tr
+        };
+        $.ajax({
+            type: "POST",
+            url: "/api/editAnswer",
+            data: dataToSend, // Truyền dữ liệu vào request
+            success: function (response) {
+                displayQuestion(qsId, questionDesc);
+            },
 
-        for (var i = 0; i < numQuestions; i++) {
-            var questionDiv = document.createElement("div");
-            questionDiv.className = "question";
+        })
+    }
 
-            var questionLabel = document.createElement("label");
-            questionLabel.textContent = "Câu hỏi " + (i + 1) + ":";
+    function deleteAnswer(id, qsId, questionDesc) {
+        var dataToSend = {
+            id: id
+        };
+        $.ajax({
+            type: "POST",
+            url: "/api/deleteAnswer",
+            data: dataToSend, // Truyền dữ liệu vào request
+            success: function (response) {
+                displayQuestion(qsId, questionDesc);
+            },
 
-            var questionInput = document.createElement("textarea");
-            questionInput.name = "multipleChoiceQuestion" + i;
-            questionInput.required = true;
+        })
+    }
 
-            var numOptionsLabel = document.createElement("label");
-            numOptionsLabel.textContent = "Số lượng đáp án:";
+    function addAnswer(qsId, answerDesc, isCorrect, questionDesc) {
+        var dataToSend = {
+            id: qsId,
+            answerDesc: answerDesc,
+            isCorrect: isCorrect
+        };
+        $.ajax({
+            type: "POST",
+            url: "/api/addNewAnswer",
+            data: dataToSend, // Truyền dữ liệu vào request
+            success: function (response) {
+                displayQuestion(qsId, questionDesc);
+            },
 
-            var numOptionsInput = document.createElement("input");
-            numOptionsInput.type = "number";
-            numOptionsInput.name = "numOptions" + i;
-            numOptionsInput.min = "2";
-            numOptionsInput.required = true;
-
-            var answerContainer = document.createElement("div");
-            answerContainer.className = "answer-container";
-
-            questionDiv.appendChild(questionLabel);
-            questionDiv.appendChild(questionInput);
-            questionDiv.appendChild(numOptionsLabel);
-            questionDiv.appendChild(numOptionsInput);
-            questionDiv.appendChild(answerContainer);
-
-            numOptionsInput.addEventListener("change", function () {
-                generateAnswerOptions(this);
-            });
-
-            questionsContainer.appendChild(questionDiv);
-        }
+        })
     }
 </script>
 </body>
