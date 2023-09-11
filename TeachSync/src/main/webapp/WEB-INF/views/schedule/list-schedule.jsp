@@ -50,8 +50,8 @@
                 <c:if test="${not empty clazzSchedule}">
                     <td>${request.clazzName}</td>
                     <td>${clazzSchedule.roomName}</td>
+                    <td>${clazzSchedule.scheduleCategory.scheduleDesc}</td>
                     <td>${clazzSchedule.scheduleType.stringValueVie}</td>
-                    <td>${clazzSchedule.schedulecaName}</td>
                     <td>${clazzSchedule.startDate}</td>
                     <td>${clazzSchedule.endDate}</td>
                     <td>${clazzSchedule.slot}</td>
@@ -70,11 +70,11 @@
 
                 <c:if test="${empty clazzSchedule}">
                     <td>${request.clazzName}</td>
-                    <td>Chưa</td>
-                    <td>Chưa</td>
-                    <td>Chưa</td>
-                    <td>Chưa</td>
-                    <td>Chưa</td>
+                    <td>?</td>
+                    <td>?</td>
+                    <td>?</td>
+                    <td>?</td>
+                    <td>?</td>
 
                     <c:if test="${isAdmin}">
                         <td>

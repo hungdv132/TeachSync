@@ -91,7 +91,7 @@ public class ScheduleController {
 
         try {
             /* Clazz */
-            ClazzReadDTO clazzReadDTO = clazzService.getDTOById(clazzId, List.of(COURSE_SEMESTER, SEMESTER, CENTER));
+            ClazzReadDTO clazzReadDTO = clazzService.getDTOById(clazzId, List.of(CLAZZ_SCHEDULE,COURSE_SEMESTER, SEMESTER, CENTER,SCHEDULE_CAT));
             model.addAttribute("clazz", clazzReadDTO);
 
             /* Semester (max, min for startDtae & endDate) */
@@ -104,7 +104,7 @@ public class ScheduleController {
             model.addAttribute("roomList", roomReadDTOList);
 
             /*Schedule Category List*/
-            List<ScheduleCaReadDTO> scheduleCateDTOList = (List<ScheduleCaReadDTO>) scheduleCateService.getDTOById(clazzReadDTO.getClazzSchedule().getSchedulecaId(), null);
+            List<ScheduleCaReadDTO> scheduleCateDTOList = scheduleCateService.getAllDTO();
             model.addAttribute("scheduleCateList", scheduleCateDTOList);
 
         } catch (Exception e) {
@@ -165,7 +165,7 @@ public class ScheduleController {
                 }
 
                 Pageable paging = miscUtil.makePaging(pageNo, 10, "id", true);
-                dtoPage = clazzService.getPageDTOAll(paging, List.of(CLAZZ_SCHEDULE, ROOM_NAME));
+                dtoPage = clazzService.getPageDTOAll(paging, List.of(CLAZZ_SCHEDULE, ROOM_NAME, SCHEDULE_CAT));
 
                 if (dtoPage != null) {
                     model.addAttribute("clazzList", dtoPage.getContent());
@@ -201,7 +201,7 @@ public class ScheduleController {
         try {
             /* Clazz */
             ClazzReadDTO clazzReadDTO =
-                    clazzService.getDTOById(clazzId, List.of(CLAZZ_SCHEDULE, COURSE_SEMESTER, SEMESTER, CENTER));
+                    clazzService.getDTOById(clazzId, List.of(CLAZZ_SCHEDULE, COURSE_SEMESTER, SEMESTER, CENTER, SCHEDULE_CAT));
             model.addAttribute("clazz", clazzReadDTO);
 
             /* Semester (max, min for startDtae & endDate) */
@@ -218,7 +218,7 @@ public class ScheduleController {
             model.addAttribute("roomList", roomReadDTOList);
 
             /*Schedule Category List*/
-            List<ScheduleCaReadDTO> scheduleCateDTOList = (List<ScheduleCaReadDTO>) scheduleCateService.getDTOById(clazzReadDTO.getClazzSchedule().getSchedulecaId(), null);
+            List<ScheduleCaReadDTO> scheduleCateDTOList = scheduleCateService.getAllDTO();
             model.addAttribute("scheduleCateList", scheduleCateDTOList);
 
         } catch (Exception e) {
