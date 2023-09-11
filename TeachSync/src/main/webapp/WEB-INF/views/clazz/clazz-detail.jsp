@@ -132,8 +132,8 @@
                  id="score-tab-pane" aria-labelledby="score-tab">
                 <c:forEach items="${homeworkList}" var="homework">
                     <c:forEach items="${homework.memberHomeworkRecordList}" var="record">
-                        <p>bài tập của ${record.member.userFullName}   </p>
-                        <p>điểm ${record.score}   </p>
+                        <p>${record.name}   </p>
+                        <p>Điểm ${record.score}   </p>
                         <br>
                     </c:forEach>
                 </c:forEach>
