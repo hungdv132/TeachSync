@@ -71,6 +71,17 @@ public class NewsServiceImpl implements NewsService{
     }
 
     @Override
+    public List<NewsReadDTO> getAllNewsByClazz(Long clazzId) {
+        List<News> list = newsRepository.findAllByClazzIdAndStatusNot(clazzId, Status.DELETED);
+        List<NewsReadDTO> dtoList = new ArrayList<>();
+        for (News news : list) {
+            NewsReadDTO dto = mapper.map(news, NewsReadDTO.class);
+            dtoList.add(dto);
+        }
+        return dtoList;
+    }
+
+    @Override
     public NewsReadDTO wrapDTO(News news) throws Exception {
         NewsReadDTO dto = mapper.map(news, NewsReadDTO.class);
 

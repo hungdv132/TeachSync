@@ -5,6 +5,8 @@ import com.teachsync.dtos.user.UserReadDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 public interface HomeworkService {
 
     Page<HomeworkReadDTO> getPageAll(Pageable paging,UserReadDTO userDTO) throws Exception;
@@ -12,6 +14,8 @@ public interface HomeworkService {
     HomeworkReadDTO findById(Long id) throws Exception;
 
     HomeworkReadDTO findById(Long id,UserReadDTO userDTO) throws Exception;
+
+    List<HomeworkReadDTO> getAllByClazzId(Long clazzId);
 
     void addHomework(HomeworkReadDTO homeworkReadDTO, UserReadDTO userDTO) throws Exception;
 

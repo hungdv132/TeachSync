@@ -21,4 +21,6 @@ public interface NewsRepository extends JpaRepository<News, Long> {
     /* id */
     Optional<News> findByIdAndStatusNot(Long id, Status status);
     List<News> findAllByIdInAndStatusNot(Collection<Long> idCollection, Status status);
+
+    List<News> findAllByClazzIdAndStatusNot(Long clazzId, Status status);
 }

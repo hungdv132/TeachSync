@@ -5,6 +5,8 @@ import com.teachsync.dtos.clazz.ClazzCreateDTO;
 import com.teachsync.dtos.clazz.ClazzReadDTO;
 import com.teachsync.dtos.clazz.ClazzUpdateDTO;
 import com.teachsync.dtos.course.CourseReadDTO;
+import com.teachsync.dtos.homework.HomeworkReadDTO;
+import com.teachsync.dtos.news.NewsReadDTO;
 import com.teachsync.dtos.semester.SemesterReadDTO;
 import com.teachsync.dtos.staff.StaffReadDTO;
 import com.teachsync.dtos.user.UserReadDTO;
@@ -13,6 +15,8 @@ import com.teachsync.services.center.CenterService;
 import com.teachsync.services.clazz.ClazzService;
 import com.teachsync.services.course.CourseService;
 import com.teachsync.services.courseSemester.CourseSemesterService;
+import com.teachsync.services.homework.HomeworkService;
+import com.teachsync.services.news.NewsService;
 import com.teachsync.services.semester.SemesterService;
 import com.teachsync.services.staff.StaffService;
 import com.teachsync.utils.Constants;
@@ -54,6 +58,12 @@ public class ClazzController {
 
     @Autowired
     private ModelMapper mapper;
+
+    @Autowired
+    NewsService newsService;
+
+    @Autowired
+    HomeworkService homeworkService;
 
     @GetMapping("/api/clazz")
     @ResponseBody
@@ -135,7 +145,14 @@ public class ClazzController {
                     clazzService.getDTOById(
                             clazzId,
                             List.of(STAFF, USER, COURSE_SEMESTER, SEMESTER, COURSE_NAME, COURSE_ALIAS, CENTER));
+            //get news of class
+            List<NewsReadDTO> newsReadDTOList = newsService.getAllNewsByClazz(clazzDTO.getId());
+            //get homework of class
+            //get score of class
+            List<HomeworkReadDTO> homeworkReadDTOList = homeworkService.getAllByClazzId(clazzDTO.getId());
 
+            model.addAttribute("homeworkList", homeworkReadDTOList);
+            model.addAttribute("newsList", newsReadDTOList);
             model.addAttribute("clazz", clazzDTO);
         } catch (Exception e) {
             e.printStackTrace();

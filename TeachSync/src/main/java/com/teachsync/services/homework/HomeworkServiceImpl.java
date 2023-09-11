@@ -108,7 +108,7 @@ public class HomeworkServiceImpl implements HomeworkService {
         HomeworkReadDTO homeworkReadDTO = mapper.map(homework, HomeworkReadDTO.class);
         Clazz clazz = clazzRepository.findById(homeworkReadDTO.getClazzId()).orElseThrow(() -> new Exception("không tìm lớp học"));
         homeworkReadDTO.setClazzName(clazz.getClazzName());
-        List<MemberHomeworkRecord> memberHomeworkRecordList = memberHomeworkRecordRepository.findAllByStatusNotAndAndCreatedBy(Status.DELETED, userDTO.getId());
+        List<MemberHomeworkRecord> memberHomeworkRecordList = memberHomeworkRecordRepository.findAllByStatusNotAndCreatedBy(Status.DELETED, userDTO.getId());
         List<MemberHomeworkRecordReadDTO> homeworkRecordReadDTOList = new ArrayList<>();
         for (MemberHomeworkRecord memberHomeworkRecord : memberHomeworkRecordList) {
             MemberHomeworkRecordReadDTO memberHomeworkRecordReadDTO = mapper.map(memberHomeworkRecord, MemberHomeworkRecordReadDTO.class);
@@ -116,6 +116,27 @@ public class HomeworkServiceImpl implements HomeworkService {
         }
         homeworkReadDTO.setMemberHomeworkRecordList(homeworkRecordReadDTOList);
         return homeworkReadDTO;
+    }
+
+    @Override
+    public List<HomeworkReadDTO> getAllByClazzId(Long clazzId) {
+        List<Homework> listHomeWork = homeworkRepository.findAllByClazzIdAndStatusNot(clazzId,Status.DELETED);
+        List<HomeworkReadDTO> listHomeworkReadDTO = new ArrayList<>();
+        for(Homework item : listHomeWork){
+            HomeworkReadDTO homeworkReadDTO = mapper.map(item, HomeworkReadDTO.class);
+
+            //find homewordk record
+            List<MemberHomeworkRecord> memberHomeworkRecordList = memberHomeworkRecordRepository.findAllByStatusNotAndHomeworkId(Status.DELETED, item.getId());
+            List<MemberHomeworkRecordReadDTO> homeworkRecordReadDTOList = new ArrayList<>();
+            for (MemberHomeworkRecord memberHomeworkRecord : memberHomeworkRecordList) {
+                MemberHomeworkRecordReadDTO memberHomeworkRecordReadDTO = mapper.map(memberHomeworkRecord, MemberHomeworkRecordReadDTO.class);
+                homeworkRecordReadDTOList.add(memberHomeworkRecordReadDTO);
+            }
+
+            homeworkReadDTO.setMemberHomeworkRecordList(homeworkRecordReadDTOList);
+            listHomeworkReadDTO.add(homeworkReadDTO);
+        }
+        return listHomeworkReadDTO;
     }
 
     @Override
