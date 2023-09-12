@@ -8,10 +8,10 @@ import com.teachsync.dtos.priceLog.PriceLogCreateDTO;
 import com.teachsync.dtos.priceLog.PriceLogReadDTO;
 import com.teachsync.dtos.priceLog.PriceLogUpdateDTO;
 import com.teachsync.dtos.test.TestReadDTO;
-import com.teachsync.entities.BaseEntity;
-import com.teachsync.entities.Course;
-import com.teachsync.entities.PriceLog;
+import com.teachsync.entities.*;
+import com.teachsync.repositories.CourseMaterialRepository;
 import com.teachsync.repositories.CourseRepository;
+import com.teachsync.repositories.MaterialRepository;
 import com.teachsync.repositories.PriceLogRepository;
 import com.teachsync.services.priceLog.PriceLogService;
 import com.teachsync.services.test.TestService;
@@ -35,6 +35,12 @@ import java.util.stream.Collectors;
 public class CourseServiceImpl implements CourseService {
     @Autowired
     private CourseRepository courseRepository;
+
+    @Autowired
+    private CourseMaterialRepository courseMaterialRepository;
+
+    @Autowired
+    private MaterialRepository materialRepository;
 
     @Autowired
     private PriceLogService priceLogService;
@@ -434,7 +440,13 @@ public class CourseServiceImpl implements CourseService {
         /* Add Dependency */
         if (options != null && !options.isEmpty()) {
             if (options.contains(DtoOption.MATERIAL_LIST)) {
-//                dto.setMaterialList();
+                List<CourseMaterial> courseMaterialList = courseMaterialRepository.findAllByCourseIdAndStatusNot(dto.getId(),Status.DELETED);
+                Collection<Long> idCollection = new ArrayList<>(courseMaterialList.size());
+                for(CourseMaterial item : courseMaterialList){
+                    idCollection.add(item.getMaterialId());
+                }
+                List<Material> materialList = materialRepository.findAllByIdInAndStatusNot(idCollection,Status.DELETED);
+                dto.setMaterialList(materialList);
             }
 
             if (options.contains(DtoOption.TEST_LIST)) {

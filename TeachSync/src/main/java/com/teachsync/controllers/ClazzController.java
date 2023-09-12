@@ -150,10 +150,13 @@ public class ClazzController {
             //get homework of class
             //get score of class
             List<HomeworkReadDTO> homeworkReadDTOList = homeworkService.getAllByClazzId(clazzDTO.getId());
+            //get course
+            CourseReadDTO courseReadDTO = courseService.getDTOById(clazzDTO.getCourseSemester().getCourseId(), List.of(MATERIAL_LIST));
 
             model.addAttribute("homeworkList", homeworkReadDTOList);
             model.addAttribute("newsList", newsReadDTOList);
             model.addAttribute("clazz", clazzDTO);
+            model.addAttribute("material", courseReadDTO.getMaterialList());
         } catch (Exception e) {
             e.printStackTrace();
         }

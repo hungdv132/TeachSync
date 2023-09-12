@@ -148,7 +148,10 @@
             <!-- Tab Material TabPane -->
             <div class="tab-pane fade" role="tabpanel"
                  id="material-tab-pane" aria-labelledby="material-tab">
-                <p>đây là Material</p>
+                <c:forEach items="${material}" var="material">
+                    <p>${material.materialName} : ${material.materialLink}  </p>
+                    <br>
+                </c:forEach>
             </div>
         </div>
     </div>
