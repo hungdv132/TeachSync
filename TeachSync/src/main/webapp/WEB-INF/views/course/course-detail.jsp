@@ -161,7 +161,7 @@
             <c:if test="${!isAdmin}">
               <div class="card-footer text-center">
                 <p class="card-text text-danger">
-                  Khóa học này hiện chưa có kỳ học nào sắp tới để đăng ký
+                  Khóa học này kỳ tới hiện chưa có lịch dạy để đăng ký, xin vui lòng quay lại sau
                 </p>
               </div>
             </c:if>
@@ -169,7 +169,7 @@
             <c:if test="${isAdmin}">
               <div class="card-footer text-center">
                 <p class="card-text text-danger">
-                  Khóa học này hiện chưa có kỳ học nào sắp tới để đăng ký
+                  Khóa học này kỳ tới hiện chưa có lịch dạy để đăng ký
                 </p>
                 <a href="/add-clazz" class="btn btn-primary w-25">Thêm lớp</a>
               </div>

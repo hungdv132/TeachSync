@@ -8,18 +8,24 @@ import com.teachsync.dtos.course.CourseReadDTO;
 import com.teachsync.dtos.semester.SemesterReadDTO;
 import com.teachsync.dtos.staff.StaffReadDTO;
 import com.teachsync.dtos.user.UserReadDTO;
+import com.teachsync.entities.BaseEntity;
+import com.teachsync.entities.ClazzMember;
 import com.teachsync.entities.CourseSemester;
+import com.teachsync.entities.Staff;
 import com.teachsync.services.center.CenterService;
 import com.teachsync.services.clazz.ClazzService;
+import com.teachsync.services.clazzMember.ClazzMemberService;
 import com.teachsync.services.course.CourseService;
 import com.teachsync.services.courseSemester.CourseSemesterService;
 import com.teachsync.services.semester.SemesterService;
 import com.teachsync.services.staff.StaffService;
 import com.teachsync.utils.Constants;
+import com.teachsync.utils.MiscUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -28,10 +34,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.teachsync.utils.enums.DtoOption.*;
 import static com.teachsync.utils.enums.Status.DEPLOY_CLAZZ;
@@ -41,6 +45,8 @@ public class ClazzController {
     @Autowired
     private ClazzService clazzService;
 
+    @Autowired
+    private ClazzMemberService clazzMemberService;
     @Autowired
     private CourseService courseService;
     @Autowired
@@ -53,8 +59,10 @@ public class ClazzController {
     private StaffService staffService;
 
     @Autowired
-    private ModelMapper mapper;
+    private MiscUtil miscUtil;
 
+    /* =================================================== API ====================================================== */
+    /** Return JSON */
     @GetMapping("/api/clazz")
     @ResponseBody
     public Map<String, Object> getClazzList(
@@ -97,15 +105,69 @@ public class ClazzController {
         return response;
     }
 
+    /* TODO: move to StaffController */
+    @GetMapping("/api/staff")
+    @ResponseBody
+    public Map<String, Object> getStaffList(
+            @RequestParam Long centerId) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            List<StaffReadDTO> staffDTOList =
+                    staffService.getAllDTOByCenterId(centerId, List.of(USER));
+            response.put("staffList", staffDTOList);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return response;
+    }
+
+    
+    /* =================================================== READ ===================================================== */
     @GetMapping("/clazz")
     public String clazzListPage(
             Model model,
-            @ModelAttribute("mess") String mess) {
+            @ModelAttribute("mess") String mess,
+            @RequestParam(value = "pageNo", required = false) Integer pageNo,
+            @SessionAttribute(value = "user", required = false) UserReadDTO userDTO) {
         try {
-            Page<ClazzReadDTO> dtoPage =
-                    clazzService.getPageDTOAll(
-                            null,
-                            List.of(COURSE_SEMESTER, SEMESTER, COURSE_NAME, COURSE_ALIAS, CENTER));
+            Page<ClazzReadDTO> dtoPage = null;
+
+            if (Objects.isNull(userDTO)) {
+                /* Chưa login */
+                return "redirect:/index";
+            }
+
+            if (pageNo == null || pageNo < 0) {
+                pageNo = 0;
+            }
+
+            Pageable pageable = miscUtil.makePaging(pageNo, 10, "id", true);
+
+            Long roleId = userDTO.getRoleId();
+            if (roleId.equals(Constants.ROLE_STUDENT)) {
+                List<ClazzMember> clazzMemberList = clazzMemberService.getAllByUserId(userDTO.getId());
+                Set<Long> clazzIdSet = clazzMemberList.stream().map(ClazzMember::getClazzId).collect(Collectors.toSet());
+
+                /* TODO: lọc clazz nào học xong rồi ẩn hay hiện hay sort */
+
+                dtoPage = clazzService.getPageDTOAllByIdIn(
+                        pageable, clazzIdSet,
+                        List.of(COURSE_SEMESTER, SEMESTER, COURSE_NAME, COURSE_ALIAS, CENTER));
+            } else if (roleId.equals(Constants.ROLE_TEACHER)) {
+                List<Staff> staffList = staffService.getAllByUserId(userDTO.getId());
+                Set<Long> staffIdSet = staffList.stream().map(BaseEntity::getId).collect(Collectors.toSet());
+
+                /* TODO: lọc clazz nào dạy xong rồi ẩn hay hiện hay sort */
+
+                dtoPage = clazzService.getPageDTOAllByStaffIdIn(
+                        pageable, staffIdSet,
+                        List.of(COURSE_SEMESTER, SEMESTER, COURSE_NAME, COURSE_ALIAS, CENTER));
+            } else if (roleId.equals(Constants.ROLE_ADMIN)) {
+                dtoPage = clazzService.getPageDTOAll(
+                        pageable,
+                        List.of(COURSE_SEMESTER, SEMESTER, COURSE_NAME, COURSE_ALIAS, CENTER));
+            }
 
             if (dtoPage != null) {
                 model.addAttribute("clazzList", dtoPage.getContent());
@@ -115,6 +177,7 @@ public class ClazzController {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
         //map option status
         Map<String, String> statusLabelMap = new HashMap<>();
         statusLabelMap.put("CREATED_CLAZZ", "Đang khởi tạo");
@@ -153,6 +216,8 @@ public class ClazzController {
         return "clazz/clazz-detail";
     }
 
+
+    /* =================================================== CREATE =================================================== */
     @GetMapping("/add-clazz")
     public String addClazzPage(
             Model model,
@@ -219,23 +284,6 @@ public class ClazzController {
         return "clazz/add-clazz";
     }
 
-    /* TODO: move to Staff restController */
-    @GetMapping("/api/staff")
-    @ResponseBody
-    public Map<String, Object> getStaffList(
-            @RequestParam Long centerId) {
-        Map<String, Object> response = new HashMap<>();
-        try {
-            List<StaffReadDTO> staffDTOList =
-                    staffService.getAllDTOByCenterId(centerId, List.of(USER));
-            response.put("staffList", staffDTOList);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return response;
-    }
-
     @PostMapping(value = "/add-clazz", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public Map<String, Object> addClazz(
@@ -269,6 +317,8 @@ public class ClazzController {
         return response;
     }
 
+
+    /* =================================================== UPDATE =================================================== */
     @PutMapping(value = "/edit-clazz", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public Map<String, Object> editClazz(
@@ -305,6 +355,8 @@ public class ClazzController {
         return response;
     }
 
+
+    /* =================================================== DELETE =================================================== */
     @GetMapping("/delete-clazz")
     public String deleteClazz(
             @SessionAttribute(value = "user", required = false) UserReadDTO userDTO,
