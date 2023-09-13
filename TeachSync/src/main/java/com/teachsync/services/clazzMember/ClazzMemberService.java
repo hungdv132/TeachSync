@@ -41,8 +41,8 @@ public interface ClazzMemberService {
     List<ClazzMemberReadDTO> getAllDTOByUserId(Long userId, Collection<DtoOption> options) throws Exception;
 
     List<ClazzMember> getAllByUserIdIn(Collection<Long> userIdCollection) throws Exception;
-    List<ClazzMemberReadDTO> getAllDTOByUserIdIn(Collection<Long> userIdCollection
-            , Collection<DtoOption> options) throws Exception;
+    List<ClazzMemberReadDTO> getAllDTOByUserIdIn(
+            Collection<Long> userIdCollection, Collection<DtoOption> options) throws Exception;
 
     /* clazzId & userId */
     ClazzMember getByClazzIdAndUserId(Long clazzId, Long userId) throws Exception;
