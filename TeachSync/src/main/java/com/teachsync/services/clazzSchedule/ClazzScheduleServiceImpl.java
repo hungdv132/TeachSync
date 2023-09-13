@@ -306,20 +306,6 @@ public class ClazzScheduleServiceImpl implements ClazzScheduleService {
 
 
 
-    /* =================================================== DELETE =================================================== */
-    @Override
-    public String deleteClazzSchedule(Long Id) {
-        try{
-            ClazzSchedule clazzSchedule = clazzScheduleRepository.findById(Id).orElseThrow(() -> new Exception("Không tìm thấy lớp học"));
-            clazzSchedule.setStatus(Status.DELETED);
-            clazzScheduleRepository.saveAndFlush(clazzSchedule);
-            return "success";
-        }catch (Exception e){
-            logger.error("Error when deleteClazz  : " + e.getMessage());
-            return "error";
-        }
-    }
-
     /* =================================================== WRAPPER ================================================== */
     @Override
     public ClazzScheduleReadDTO wrapDTO(ClazzSchedule clazzSchedule, Collection<DtoOption> options) throws Exception {

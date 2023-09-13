@@ -258,33 +258,4 @@ public class ScheduleController {
     }
 
 
-
-    /* =================================================== DELETE =================================================== */
-    @GetMapping("/delete-clazzSchedule")
-    public String deleteClazzSchedule(
-            @SessionAttribute(value = "user", required = false) UserReadDTO userDTO,
-            HttpServletRequest request,
-            Model model,
-            RedirectAttributes redirect) {
-        //check login
-        if (ObjectUtils.isEmpty(userDTO)) {
-            redirect.addAttribute("mess", "Làm ơn đăng nhập");
-            return "redirect:/";
-        }
-
-        if (!userDTO.getRoleId().equals(Constants.ROLE_ADMIN)) {
-            redirect.addAttribute("mess", "bạn không đủ quyền");
-            return "redirect:/";
-        }
-        Long Id = Long.parseLong(request.getParameter("Id"));
-        String result = clazzScheduleService.deleteClazzSchedule(Id);
-        if (result.equals("success")) {
-            redirect.addAttribute("mess", "Xóa class schedule thành công");
-            return "redirect:/schedule";
-        } else {
-            model.addAttribute("mess", "Xóa class schedule thất bại");
-            return "schedule/add-schedule";
-        }
-    }
-
 }
