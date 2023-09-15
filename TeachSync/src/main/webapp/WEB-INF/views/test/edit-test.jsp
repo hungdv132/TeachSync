@@ -16,42 +16,67 @@
 
     <script src="../../../resources/js/common.js"></script>
     <style>
-        /* Áp dụng CSS để tùy chỉnh giao diện form */
+        /* Add your custom CSS styles here */
+
+        /* Apply a background color to the body */
+        body {
+            background-color: #f0f0f0;
+        }
+
+        /* Style the header */
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 10px;
+            text-align: center;
+        }
+
+        /* Style the page title */
+        h1 {
+            font-size: 24px;
+            margin-top: 20px;
+            color: #333;
+        }
+
+        /* Style the form */
+        form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Style the container */
         .container {
             display: flex;
             width: 100%;
+            margin-top: 20px;
         }
 
-        .left {
+        /* Style the left and right columns */
+        .left, .right {
             width: 50%;
             box-sizing: border-box;
             padding: 10px;
         }
 
-        .right {
-            width: 50%;
-            box-sizing: border-box;
-            padding: 10px;
-        }
-
+        /* Style the table */
         table {
             border-collapse: collapse;
             width: 100%;
         }
 
         table, th, td {
-            border: 1px solid black;
-            padding: 5px;
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
         }
 
-        /* Additional styles for better appearance */
-        h1 {
-            margin-top: 20px;
-        }
-
+        /* Style the labels and form elements */
         label {
             display: block;
             margin-top: 10px;
+            font-weight: bold;
         }
 
         select, input[type="number"], textarea {
@@ -65,14 +90,28 @@
             resize: vertical;
         }
 
-        #optionsContainer {
-            margin-top: 10px;
+        /* Style the buttons */
+        input[type="submit"], button {
+            background-color: #333;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 4px;
         }
 
-        #questions-container {
-            border-top: 1px solid #ccc;
-            margin-top: 20px;
-            padding-top: 20px;
+        input[type="submit"]:hover, button:hover {
+            background-color: #555;
+        }
+
+        /* Style the links */
+        a {
+            text-decoration: none;
+            color: #007bff;
+        }
+
+        a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
@@ -81,7 +120,7 @@
 <%@ include file="/WEB-INF/fragments/header.jspf" %>
 
 <h1>Sửa bài test</h1>
-<form action="/update-answer" method="get">
+<form action="/update-answer" method="post">
 <%--    <label for="question-type">Môn học:</label>--%>
     <input type="hidden" name="idTest" id="idTest" value="${test.id}">
 
@@ -181,14 +220,14 @@
     function displayQuestion(qsId, questionDesc, questionType) {
         idQuestion.value = qsId;
         if (questionType == "ESSAY") {
-            questionsArea.innerHTML = questionDesc;
+            questionsArea.value = questionDesc;
 
         } else {
             $.ajax({
                 type: "GET",
                 url: "/api/getLstAnswer?questionId=" + qsId,
                 success: function (response) {
-                    questionsArea.innerHTML = questionDesc;
+                    questionsArea.value = questionDesc;
                     var element = document.getElementById("checkEssay");
                     element.innerHTML = ""; // Xóa toàn bộ nội dung trong element trước khi thêm phần tử mới.
 

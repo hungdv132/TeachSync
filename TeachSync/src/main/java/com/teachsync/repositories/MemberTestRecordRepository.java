@@ -20,6 +20,7 @@ public interface MemberTestRecordRepository extends JpaRepository<MemberTestReco
 
     /* memberId & clazzTestId */
     Optional<MemberTestRecord> findByMemberIdAndClazzTestIdAndStatusNot(Long memberId, Long clazzTestId, Status status);
+    List<MemberTestRecord> findByMemberIdAndClazzTestIdAndStatusIn(Long memberId, Long clazzTestId, List<Status> status);
 
     Optional<MemberTestRecord> findAllByIdAndStatus(Long id, Status status);
 
