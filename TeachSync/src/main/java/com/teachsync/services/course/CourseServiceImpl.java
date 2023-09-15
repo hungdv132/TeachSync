@@ -363,7 +363,7 @@ public class CourseServiceImpl implements CourseService {
 
         return wrapDTO(course, null);
     }
-    
+
 
     /* =================================================== DELETE =================================================== */
     @Override
@@ -371,7 +371,7 @@ public class CourseServiceImpl implements CourseService {
     public void deleteCourse(Long Id, Long userId) throws Exception {
         Course course = courseRepository.findById(Id).orElseThrow(() -> new Exception("không tìm thấy khóa học"));
         PriceLog priceLog = priceLogRepository.findByCourseIdAndValidBetweenAndStatusNot(
-                Id, LocalDateTime.now(), Status.DELETED)
+                        Id, LocalDateTime.now(), Status.DELETED)
                 .orElseThrow(() -> new Exception("không tìm thấy giá khóa học"));
         priceLog.setStatus(Status.DELETED);
         priceLog.setUpdatedBy(userId);
@@ -433,10 +433,6 @@ public class CourseServiceImpl implements CourseService {
 
         /* Add Dependency */
         if (options != null && !options.isEmpty()) {
-            if (options.contains(DtoOption.CLAZZ_LIST)) {
-//                dto.setClazzList();
-            }
-
             if (options.contains(DtoOption.MATERIAL_LIST)) {
 //                dto.setMaterialList();
             }
@@ -471,10 +467,6 @@ public class CourseServiceImpl implements CourseService {
 
             for (Course course : courseCollection) {
                 courseIdSet.add(course.getId());
-            }
-
-            if (options.contains(DtoOption.CLAZZ_LIST)) {
-//                dto.setClazzList();
             }
 
             if (options.contains(DtoOption.MATERIAL_LIST)) {

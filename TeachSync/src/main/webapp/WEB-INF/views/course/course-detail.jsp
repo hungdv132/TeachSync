@@ -54,6 +54,7 @@
 
 <!-- ================================================== Main Body ================================================== -->
 <div class="row ts-bg-white border ts-border-teal rounded-3 pt-3 mx-2 mb-3">
+  <!--Detail -->
   <div class="col-12 mb-3">
     <div class="row gy-3">
       <div class="col-sm-12 col-md-3 px-sm-3 pe-md-0">
@@ -106,29 +107,56 @@
             <p class="card-text">
               <c:out value="${course.courseDesc}"/>
             </p>
-            
-            <!-- Course schedule -->
-          
           </div>
           
-          
+          <%-- Có lịch --%>
           <c:if test="${hasLatestSchedule}">
-            <c:if test="${isGuest}">
-              <div class="card-footer text-center">
-                <a href="/sign-in" class="btn btn-primary w-25">Đăng ký học</a>
-              </div>
+            <%-- Có lớp --%>
+            <c:if test="${hasClazz}">
+              <c:if test="${isGuest}">
+                <div class="card-footer text-center">
+                  <a href="/sign-in" class="btn btn-primary w-25">Đăng ký học</a>
+                </div>
+              </c:if>
+              
+              <c:if test="${isStudent}">
+                <div class="card-footer text-center">
+                  <c:url var="enrollLink" value="enroll">
+                    <c:param name="id" value="${course.id}"/>
+                  </c:url>
+                  <a href="${enrollLink}" class="btn btn-primary w-25">Đăng ký học</a>
+                </div>
+              </c:if>
+              
+              <c:if test="${isAdmin}">
+                <div class="card-footer text-center">
+                  <a href="/add-clazz" class="btn btn-primary w-25">Thêm lớp</a>
+                </div>
+              </c:if>
             </c:if>
             
-            <c:if test="${isStudent}">
-              <div class="card-footer text-center">
-                <c:url var="enrollLink" value="enroll">
-                  <c:param name="id" value="${course.id}"/>
-                </c:url>
-                <a href="${enrollLink}" class="btn btn-primary w-25">Đăng ký học</a>
-              </div>
+            <%-- Ko lớp --%>
+            <c:if test="${!hasClazz}">
+              <c:if test="${!isAdmin}">
+                <div class="card-footer text-center">
+                  <p class="card-text text-danger">
+                    Khóa học này kỳ tới có lịch dạy nhưng chưa xếp lớp, xin vui lòng quay lại sau
+                  </p>
+                </div>
+              </c:if>
+              
+              <c:if test="${isAdmin}">
+                <div class="card-footer text-center">
+                  <p class="card-text text-danger">
+                    Khóa học này kỳ tới có lịch dạy nhưng chưa xếp lớp
+                  </p>
+                  <a href="/add-clazz" class="btn btn-primary w-25">Thêm lớp</a>
+                </div>
+              </c:if>
             </c:if>
           </c:if>
           
+          <%-- Ko lịch --%>
           <c:if test="${!hasLatestSchedule}">
             <c:if test="${!isAdmin}">
               <div class="card-footer text-center">
@@ -150,24 +178,75 @@
         
         </div>
       </div>
-      
-      <%--      <c:if test="${isAdmin}">--%>
-      <%--        <div class="col-12 border-top ts-border-teal">--%>
-      <%--          <h5 class="d-flex justify-content-between align-items-center">--%>
-      <%--            <span>Lịch sử giá cả: </span>--%>
-      <%--            --%>
-      <%--          </h5>--%>
-      <%--          --%>
-      <%--          <c:forEach var="price" items="${}">--%>
-      <%--            <div class=" ">--%>
-      <%--              --%>
-      <%--            </div>--%>
-      <%--          </c:forEach>--%>
-      <%--          --%>
-      <%--        </div>--%>
-      <%--      </c:if>--%>
     </div>
   </div>
+  
+  <!-- Dependency -->
+  <div class="col-12 mb-3">
+    <!-- Course dependency tab -->
+    <ul class="nav nav-tabs align-items-center" id="courseDependencyTab" role="tablist">
+      <!-- Tab Certificate -->
+      <li class="nav-item" role="presentation">
+        <button type="button" class="nav-link ts-txt-grey ts-txt-hover-blue active"
+                data-bs-toggle="tab" role="tab" aria-selected="true"
+                id="certificate-tab" data-bs-target="#certificate-tab-pane" aria-controls="certificate-tab-pane">
+          Bằng cấp
+        </button>
+      </li>
+      
+      <c:if test="${!isGuest}">
+        <!-- Tab Material -->
+        <li class="nav-item" role="presentation">
+          <button type="button" class="nav-link ts-txt-grey ts-txt-hover-blue"
+                  data-bs-toggle="tab" role="tab" aria-selected="false"
+                  id="material-tab" data-bs-target="#material-tab-pane" aria-controls="material-tab-pane">
+            Tài liệu
+          </button>
+        </li>
+      </c:if>
+      
+      <c:if test="${isTeacher || isAdmin}">
+        <!-- Tab Test -->
+        <li class="nav-item" role="presentation">
+          <button type="button" class="nav-link ts-txt-grey ts-txt-hover-blue"
+                  data-bs-toggle="tab" role="tab" aria-selected="false"
+                  id="test-tab" data-bs-target="#test-tab-pane" aria-controls="test-tab-pane">
+            Bài kiểm tra
+          </button>
+        </li>
+      </c:if>
+    </ul>
+    
+    <!-- Course dependency tab content -->
+    <div class="tab-content border border-top-0 rounded-bottom-3 pt-3 px-3" id="semesterTabContent">
+      <!-- Tab Certificate TabPane -->
+      <div class="tab-pane fade active show" role="tabpanel"
+           id="certificate-tab-pane" aria-labelledby="certificate-tab">
+        <p>Bằng cấp 1: <a href="https://firebase.xcvbkjsbvdlj">https://firebase.xcvbkjsbvdlj</a></p>
+      </div>
+      
+      <!-- Tab Material TabPane -->
+      <div class="tab-pane fade" role="tabpanel"
+           id="material-tab-pane" aria-labelledby="material-tab">
+        <p>E-Book: <a href="https://firebase.xcvbkjsbvdlj">https://firebase.xcvbkjsbvdlj</a></p>
+        
+        <p>NYT article: <a href="https://firebase.xcvbkjsbvdlj">https://firebase.xcvbkjsbvdlj</a></p>
+      </div>
+      
+      <!-- Tab Test TabPane -->
+      <div class="tab-pane fade" role="tabpanel"
+           id="test-tab-pane" aria-labelledby="test-tab">
+        <p>Bài 1: <a href="https://firebase.xcvbkjsbvdlj">https://firebase.xcvbkjsbvdlj</a></p>
+        
+        <p>Bài 2: <a href="https://firebase.xcvbkjsbvdlj">https://firebase.xcvbkjsbvdlj</a></p>
+        
+        <p>Bài 3: <a href="https://firebase.xcvbkjsbvdlj">https://firebase.xcvbkjsbvdlj</a></p>
+        
+        <p>Bài 4: <a href="https://firebase.xcvbkjsbvdlj">https://firebase.xcvbkjsbvdlj</a></p>
+      </div>
+    </div>
+  </div>
+
 </div>
 <!-- ================================================== Main Body ================================================== -->
 

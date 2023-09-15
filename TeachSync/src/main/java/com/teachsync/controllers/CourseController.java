@@ -1,11 +1,14 @@
 package com.teachsync.controllers;
 
+import com.teachsync.dtos.BaseReadDTO;
+import com.teachsync.dtos.clazz.ClazzReadDTO;
 import com.teachsync.dtos.course.CourseCreateDTO;
 import com.teachsync.dtos.course.CourseReadDTO;
 import com.teachsync.dtos.course.CourseUpdateDTO;
 import com.teachsync.dtos.courseSemester.CourseSemesterReadDTO;
 import com.teachsync.dtos.user.UserReadDTO;
 import com.teachsync.entities.Course;
+import com.teachsync.services.clazz.ClazzService;
 import com.teachsync.services.course.CourseService;
 import com.teachsync.services.courseSemester.CourseSemesterService;
 import com.teachsync.utils.Constants;
@@ -21,10 +24,8 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.teachsync.utils.Constants.*;
 import static com.teachsync.utils.enums.DtoOption.*;
@@ -36,7 +37,6 @@ public class CourseController {
 
     @Autowired
     private CourseSemesterService courseSemesterService;
-
     @Autowired
     private MiscUtil miscUtil;
 
@@ -155,7 +155,7 @@ public class CourseController {
                     options = List.of(MATERIAL_LIST, TEST_LIST, CURRENT_PRICE);
 
                 } else if (userDTO.getRoleId().equals(ROLE_ADMIN)) {
-                    options = List.of(MATERIAL_LIST, TEST_LIST, CLAZZ_LIST, CURRENT_PRICE);
+                    options = List.of(MATERIAL_LIST, TEST_LIST, CURRENT_PRICE);
                 }
             }
 
@@ -167,13 +167,27 @@ public class CourseController {
             }
 
             List<CourseSemesterReadDTO> courseSemesterList =
-                    courseSemesterService.getAllLatestDTOByCourseId(courseId, null);
+                    courseSemesterService.getAllLatestDTOByCourseId(courseId, List.of(CLAZZ_LIST));
 
             model.addAttribute("course", courseDTO);
-            model.addAttribute(
-                    "hasLatestSchedule",
-                    (courseSemesterList != null && !courseSemesterList.isEmpty()));
 
+            boolean hasLatestSchedule = !ObjectUtils.isEmpty(courseSemesterList);
+            model.addAttribute("hasLatestSchedule", hasLatestSchedule);
+
+            boolean hasClazz = false;
+            if (hasLatestSchedule) {
+                List<ClazzReadDTO> clazzDTOList = new ArrayList<>();
+                List<ClazzReadDTO> tmpClazzDTOlist = new ArrayList<>();
+                for (CourseSemesterReadDTO courseSemester : courseSemesterList) {
+                    tmpClazzDTOlist = courseSemester.getClazzList();
+                    if (!ObjectUtils.isEmpty(tmpClazzDTOlist)) {
+                        clazzDTOList.addAll(tmpClazzDTOlist);
+                    }
+                }
+                hasClazz = !ObjectUtils.isEmpty(clazzDTOList);
+            }
+
+            model.addAttribute("hasClazz", hasClazz);
         } catch (Exception e) {
             e.printStackTrace();
             model.addAttribute("errorMsg", "Server error, please try again later");

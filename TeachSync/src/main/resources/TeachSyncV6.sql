@@ -269,6 +269,39 @@ CREATE TABLE IF NOT EXISTS `teachsync`.`staff`
 
 
 -- -----------------------------------------------------
+-- Table `teachsync`.`free_time`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `teachsync`.`free_time`;
+
+CREATE TABLE IF NOT EXISTS `teachsync`.`free_time`
+(
+    `id`        BIGINT      NOT NULL AUTO_INCREMENT,
+    `staffId`   BIGINT      NOT NULL,
+    `weekDay`   VARCHAR(45) NOT NULL,
+    `slot`      LONGTEXT    NOT NULL,
+    `status`    VARCHAR(45) NOT NULL,
+    `createdAt` DATETIME    NULL DEFAULT NULL,
+    `createdBy` BIGINT      NULL DEFAULT NULL,
+    `updatedAt` DATETIME    NULL DEFAULT NULL,
+    `updatedBy` BIGINT      NULL DEFAULT NULL,
+    PRIMARY KEY (`id`),
+    INDEX `fk_free_time_staff_idx` (`staffId` ASC) VISIBLE,
+    INDEX `fk_free_time_user_createdBy_idx` (`createdBy` ASC) VISIBLE,
+    INDEX `fk_free_time_user_updatedBy_idx` (`updatedBy` ASC) VISIBLE,
+    CONSTRAINT `fk_free_time_staff`
+        FOREIGN KEY (`staffId`)
+            REFERENCES `teachsync`.`staff` (`id`),
+    CONSTRAINT `fk_free_time_user_createdBy`
+        FOREIGN KEY (`createdBy`)
+            REFERENCES `teachsync`.`user` (`id`),
+    CONSTRAINT `fk_free_time_user_updatedBy`
+        FOREIGN KEY (`updatedBy`)
+            REFERENCES `teachsync`.`user` (`id`)
+)
+    ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
 -- Table `teachsync`.`course`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `teachsync`.`course`;
@@ -459,8 +492,8 @@ CREATE TABLE IF NOT EXISTS `teachsync`.`question`
     `testId`         BIGINT       NOT NULL,
     `questionType`   VARCHAR(255) NOT NULL COMMENT 'MULTIPLE, ESSAY, ...',
     `questionDesc`   LONGTEXT     NOT NULL COMMENT 'VD: Last night I think I ___ a ghost when I was going to the bathroom.',
-    `questionPrompt` VARCHAR(45)  COMMENT 'VD: Chọn câu trả lời đúng nhất để điền vào chỗ trống',
-    `questionScore` DOUBLE       NOT NULL,
+    `questionPrompt` VARCHAR(255) NULL DEFAULT NULL COMMENT 'VD: Chọn câu trả lời đúng nhất để điền vào chỗ trống',
+    `questionScore`  DOUBLE       NOT NULL,
     `status`         VARCHAR(45)  NOT NULL,
     `createdAt`      DATETIME     NULL DEFAULT NULL,
     `createdBy`      BIGINT       NULL DEFAULT NULL,
@@ -759,6 +792,57 @@ CREATE TABLE IF NOT EXISTS `teachsync`.`clazz_member`
 
 
 -- -----------------------------------------------------
+-- Table `teachsync`.`schedule_category`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `teachsync`.`schedule_category`;
+
+CREATE TABLE IF NOT EXISTS `teachsync`.`schedule_category`
+(
+    `id`           BIGINT      NOT NULL AUTO_INCREMENT,
+    `categoryName` VARCHAR(45) NOT NULL COMMENT 'T2, T4, T6; T3, T5, T7; T7, CN; CUSTOM, ...',
+    `atMon`        BIT(1)      NOT NULL,
+    `atTue`        BIT(1)      NOT NULL,
+    `atWed`        BIT(1)      NOT NULL,
+    `atThu`        BIT(1)      NOT NULL,
+    `atFri`        BIT(1)      NOT NULL,
+    `atSat`        BIT(1)      NOT NULL,
+    `atSun`        BIT(1)      NOT NULL,
+    `status`       VARCHAR(45) NOT NULL,
+    `createdAt`    DATETIME    NULL DEFAULT NULL,
+    `createdBy`    BIGINT      NULL DEFAULT NULL,
+    `updatedAt`    DATETIME    NULL DEFAULT NULL,
+    `updatedBy`    BIGINT      NULL DEFAULT NULL,
+    PRIMARY KEY (`id`),
+    INDEX `fk_schedule_category_user_createdBy_idx` (`createdBy` ASC) VISIBLE,
+    INDEX `fk_schedule_category_user_updatedBy_idx` (`updatedBy` ASC) VISIBLE,
+    CONSTRAINT `fk_schedule_category_user_createdBy`
+        FOREIGN KEY (`createdBy`)
+            REFERENCES `teachsync`.`user` (`id`),
+    CONSTRAINT `fk_schedule_category_user_updatedBy`
+        FOREIGN KEY (`updatedBy`)
+            REFERENCES `teachsync`.`user` (`id`)
+)
+    ENGINE = InnoDB;
+
+
+DROP TABLE IF EXISTS `schedulecat`;
+
+CREATE TABLE `schedulecat`
+(
+    `id`           BIGINT      NOT NULL AUTO_INCREMENT,
+    `name`         VARCHAR(45) NULL DEFAULT NULL COMMENT 'Name of Category, for example T2; T2, T4,T6; etc.',
+    `description`  LONGTEXT    NULL DEFAULT NULL COMMENT 'T2 is weekly Monthday; etc.',
+    `status`       VARCHAR(45) NOT NULL,
+    `createdAt`    DATETIME    NULL DEFAULT NULL,
+    `createdBy`    BIGINT      NULL DEFAULT NULL,
+    `updatedAt`    DATETIME    NULL DEFAULT NULL,
+    `updatedBy`    BIGINT      NULL DEFAULT NULL,
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `id_UNIQUE` (`id`)
+)
+    ENGINE = InnoDB;
+
+-- -----------------------------------------------------
 -- Table `teachsync`.`clazz_schedule`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `teachsync`.`clazz_schedule`;
@@ -768,7 +852,7 @@ CREATE TABLE IF NOT EXISTS `teachsync`.`clazz_schedule`
     `id`           BIGINT      NOT NULL AUTO_INCREMENT,
     `clazzId`      BIGINT      NOT NULL,
     `roomId`       BIGINT      NOT NULL COMMENT 'Phòng mặc định của lớp',
-    `schedulecaId` bigint NOT NULL,
+    `schedulecaId` BIGINT      NOT NULL,
     `scheduleType` VARCHAR(45) NOT NULL COMMENT '2_4_6, 3_5_7, T7_CN, CUSTOM, ...',
     `startDate`    DATE        NOT NULL,
     `endDate`      DATE        NOT NULL,
@@ -792,9 +876,15 @@ CREATE TABLE IF NOT EXISTS `teachsync`.`clazz_schedule`
     CONSTRAINT `fk_clazz_schedule_clazz`
         FOREIGN KEY (`clazzId`)
             REFERENCES `teachsync`.`clazz` (`id`),
+/* Alt
+    CONSTRAINT `fk_clazz_schedule_schedule_category`
+        FOREIGN KEY (`scheduleCategoryId`)
+            REFERENCES `teachsync`.`schedule_category` (`id`),
+*/
     CONSTRAINT `fk_clazz_schedule_schedulcat`
         FOREIGN KEY (`schedulecaId`)
             REFERENCES `teachsync`.`schedulecat` (`id`),
+
     CONSTRAINT `fk_clazz_schedule_user_createdBy`
         FOREIGN KEY (`createdBy`)
             REFERENCES `teachsync`.`user` (`id`),
@@ -898,7 +988,7 @@ CREATE TABLE IF NOT EXISTS `teachsync`.`homework`
     `homeworkName`    VARCHAR(45) NOT NULL COMMENT 'Bài dịch số 2',
     `homeworkDesc`    LONGTEXT    NULL DEFAULT NULL COMMENT 'Dịch đoạn văn trong file Word đính kèm. (Nộp bài qua file dưới dạng Word, không được dùng file ảnh)',
     `homeworkDoc`     LONGTEXT    NULL DEFAULT NULL COMMENT 'Link to file attachment',
-    `homeworkContent` LONGTEXT  NULL DEFAULT NULL COMMENT 'File attachment store in DB',
+    `homeworkContent` LONGTEXT    NULL DEFAULT NULL COMMENT 'File attachment store in DB',
     `openAt`          DATETIME    NULL DEFAULT NULL COMMENT 'Thời gian mở xem bài và nộp bài',
     `deadline`        DATETIME    NULL DEFAULT NULL COMMENT 'Hạn chót nộp bài',
     `status`          VARCHAR(45) NOT NULL,
@@ -1064,23 +1154,23 @@ CREATE TABLE IF NOT EXISTS `teachsync`.`test_record`
     INDEX `fk_test_record_member_test_record_idx` (`memberTestRecordId` ASC) VISIBLE,
     INDEX `fk_test_record_user_createdBy_idx` (`createdBy` ASC) VISIBLE,
     INDEX `fk_test_record_user_updatedBy_idx` (`updatedBy` ASC) VISIBLE,
-    CONSTRAINT `fk_test_record_answer` 
-        FOREIGN KEY (`answerId`) 
+    CONSTRAINT `fk_test_record_answer`
+        FOREIGN KEY (`answerId`)
             REFERENCES `teachsync`.`answer` (`id`),
-    CONSTRAINT `fk_test_record_question` 
-        FOREIGN KEY (`questionId`) 
+    CONSTRAINT `fk_test_record_question`
+        FOREIGN KEY (`questionId`)
             REFERENCES `teachsync`.`question` (`id`),
-    CONSTRAINT `fk_test_record_member_test_record` 
-        FOREIGN KEY (`memberTestRecordId`) 
+    CONSTRAINT `fk_test_record_member_test_record`
+        FOREIGN KEY (`memberTestRecordId`)
             REFERENCES `teachsync`.`member_test_record` (`id`),
-    CONSTRAINT `fk_test_record_user_createdBy` 
-        FOREIGN KEY (`createdBy`) 
+    CONSTRAINT `fk_test_record_user_createdBy`
+        FOREIGN KEY (`createdBy`)
             REFERENCES `teachsync`.`user` (`id`),
-    CONSTRAINT `fk_test_record_user_updatedBy` 
-        FOREIGN KEY (`updatedBy`) 
+    CONSTRAINT `fk_test_record_user_updatedBy`
+        FOREIGN KEY (`updatedBy`)
             REFERENCES `teachsync`.`user` (`id`)
-) 
-        ENGINE = InnoDB;
+)
+    ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
@@ -1140,6 +1230,7 @@ CREATE TABLE IF NOT EXISTS `teachsync`.`payment`
     `payerId`        BIGINT      NOT NULL,
     `requestId`      BIGINT      NOT NULL,
     `paymentType`    VARCHAR(45) NOT NULL,
+    `paymentDesc`    LONGTEXT    NULL DEFAULT NULL,
     `paymentAmount`  DOUBLE      NOT NULL,
     `paymentAt`      DATETIME    NOT NULL,
     `paymentDoc`     MEDIUMBLOB  NULL DEFAULT NULL,
@@ -1224,6 +1315,8 @@ CREATE TABLE IF NOT EXISTS `teachsync`.`news`
 (
     `id`          BIGINT      NOT NULL AUTO_INCREMENT,
     `authorId`    BIGINT      NOT NULL,
+    `clazzId`     BIGINT      NULL DEFAULT NULL COMMENT 'Tin tức dành riêng cho lớp',
+    `newsType`    VARCHAR(45) NOT NULL COMMENT 'Loại news Internal, External',
     `newsTitle`   VARCHAR(45) NOT NULL,
     `newsContent` MEDIUMBLOB  NULL DEFAULT NULL,
     `newsLink`    LONGTEXT    NULL DEFAULT NULL,
@@ -1361,44 +1454,6 @@ CREATE TABLE IF NOT EXISTS `teachsync`.`application_detail`
 )
     ENGINE = InnoDB;
 
-
-
-
-
-CREATE TABLE `test_session` (
-                                `id` bigint NOT NULL AUTO_INCREMENT,
-                                `userid` bigint NOT NULL,
-                                `username` varchar(100) NOT NULL,
-                                `testid` bigint DEFAULT NULL,
-                                `subject` varchar(200) DEFAULT NULL,
-                                `class` varchar(45) DEFAULT NULL,
-                                `start_date` datetime DEFAULT NULL,
-                                `submit_date` datetime DEFAULT NULL,
-                                `status` bigint NOT NULL,
-                                `update_date` datetime DEFAULT NULL,
-                                `user_update` varchar(200) DEFAULT NULL,
-                                PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
-
-
 SET SQL_MODE = @OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS = @OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS = @OLD_UNIQUE_CHECKS;
-
-DROP TABLE IF EXISTS `schedulecat`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `schedulecat` (
-                               `id` bigint NOT NULL AUTO_INCREMENT,
-                               `name` varchar(45) DEFAULT NULL COMMENT 'Name of Category, for example T2; T2, T4,T6; etc.',
-                               `description` longtext COMMENT 'T2 is  weekly Monthday; etc.',
-                               `status`       VARCHAR(45) NOT NULL,
-                               `createdAt`    DATETIME    NULL DEFAULT NULL,
-                               `createdBy`    BIGINT      NULL DEFAULT NULL,
-                               `updatedAt`    DATETIME    NULL DEFAULT NULL,
-                               `updatedBy`    BIGINT      NULL DEFAULT NULL,
-                               PRIMARY KEY (`id`),
-                               UNIQUE KEY `id_UNIQUE` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;

@@ -135,8 +135,9 @@ public class RequestController {
 
             CourseSemesterReadDTO courseSemesterDTO = clazzDTO.getCourseSemester();
 
-            String requestName = "Học sinh '" + userDTO.getId() +
-                    "' xin nhập học Lớp '" + clazzDTO.getId() + "'.";
+            String requestName = "hoc sinh '" + userDTO.getId() +
+                    "' xin hoc lop '" + clazzDTO.getId() +
+                    "' mon '" + clazzDTO.getCourseSemester().getCourseId() + "'";
             createDTO.setRequestName(requestName);
 
             String requestDesc = "Học sinh '" + userDTO.getFullName() +
@@ -306,15 +307,15 @@ public class RequestController {
                     throw new IllegalArgumentException(
                             "Cập nhập thất bại. Đây không phải là đơn của bạn.");
                 }
-                
+
                 RequestUpdateDTO updateDTO = modelMapper.map(requestDTO, RequestUpdateDTO.class);
 
                 updateDTO.setContentLink(paymentInfoLink);
                 updateDTO.setStatus(Status.AWAIT_CONFIRM);
                 updateDTO.setUpdatedBy(currentUserId);
-                
+
                 requestService.updateRequestByDTO(updateDTO);
-                
+
             } else if (roleId.equals(Constants.ROLE_ADMIN)) {
                 /* Admin xác nhận thanh toán Request. Chấp nhận hoặc từ chối với chứng cứ */
                 requestDTO = requestService.getDTOById(
@@ -332,10 +333,6 @@ public class RequestController {
                 updateDTO.setResolverId(currentUserId);
                 updateDTO.setStatus(paymentStatus);
 
-                /* Thêm mô tả cho  */
-                updateDTO.setRequestDesc(
-                        updateDTO.getRequestDesc().concat("<br>").concat(paymentDesc));
-
                 switch (paymentStatus) {
                     case APPROVED -> {
                         /* Xác nhận thanh toán */
@@ -343,6 +340,7 @@ public class RequestController {
                         paymentCreateDTO.setPayerId(requestDTO.getRequesterId());
                         paymentCreateDTO.setRequestId(requestId);
                         paymentCreateDTO.setPaymentType(paymentType);
+                        paymentCreateDTO.setPaymentDesc(paymentDesc);
                         paymentCreateDTO.setPaymentAmount(paymentAmount);
                         paymentCreateDTO.setPaymentAt(paymentAt);
                         paymentCreateDTO.setPaymentDocLink(paymentInfoLink);
