@@ -127,14 +127,14 @@
                   <a href="${enrollLink}" class="btn btn-primary w-25">Đăng ký học</a>
                 </div>
               </c:if>
-  
+              
               <c:if test="${isAdmin}">
                 <div class="card-footer text-center">
                   <a href="/add-clazz" class="btn btn-primary w-25">Thêm lớp</a>
                 </div>
               </c:if>
             </c:if>
-  
+            
             <%-- Ko lớp --%>
             <c:if test="${!hasClazz}">
               <c:if test="${!isAdmin}">
@@ -144,7 +144,7 @@
                   </p>
                 </div>
               </c:if>
-  
+              
               <c:if test="${isAdmin}">
                 <div class="card-footer text-center">
                   <p class="card-text text-danger">
@@ -155,7 +155,7 @@
               </c:if>
             </c:if>
           </c:if>
-  
+          
           <%-- Ko lịch --%>
           <c:if test="${!hasLatestSchedule}">
             <c:if test="${!isAdmin}">
@@ -193,7 +193,7 @@
           Bằng cấp
         </button>
       </li>
-
+      
       <c:if test="${!isGuest}">
         <!-- Tab Material -->
         <li class="nav-item" role="presentation">
@@ -204,7 +204,7 @@
           </button>
         </li>
       </c:if>
-  
+      
       <c:if test="${isTeacher || isAdmin}">
         <!-- Tab Test -->
         <li class="nav-item" role="presentation">
@@ -216,7 +216,7 @@
         </li>
       </c:if>
     </ul>
-  
+    
     <!-- Course dependency tab content -->
     <div class="tab-content border border-top-0 rounded-bottom-3 pt-3 px-3" id="semesterTabContent">
       <!-- Tab Certificate TabPane -->
@@ -224,12 +224,12 @@
            id="certificate-tab-pane" aria-labelledby="certificate-tab">
         <p>Bằng cấp 1: <a href="https://firebase.xcvbkjsbvdlj">https://firebase.xcvbkjsbvdlj</a></p>
       </div>
-    
+      
       <!-- Tab Material TabPane -->
       <div class="tab-pane fade" role="tabpanel"
            id="material-tab-pane" aria-labelledby="material-tab">
         <p>E-Book: <a href="https://firebase.xcvbkjsbvdlj">https://firebase.xcvbkjsbvdlj</a></p>
-  
+        
         <p>NYT article: <a href="https://firebase.xcvbkjsbvdlj">https://firebase.xcvbkjsbvdlj</a></p>
       </div>
       
@@ -237,16 +237,16 @@
       <div class="tab-pane fade" role="tabpanel"
            id="test-tab-pane" aria-labelledby="test-tab">
         <p>Bài 1: <a href="https://firebase.xcvbkjsbvdlj">https://firebase.xcvbkjsbvdlj</a></p>
-    
+        
         <p>Bài 2: <a href="https://firebase.xcvbkjsbvdlj">https://firebase.xcvbkjsbvdlj</a></p>
-    
+        
         <p>Bài 3: <a href="https://firebase.xcvbkjsbvdlj">https://firebase.xcvbkjsbvdlj</a></p>
-    
+        
         <p>Bài 4: <a href="https://firebase.xcvbkjsbvdlj">https://firebase.xcvbkjsbvdlj</a></p>
       </div>
     </div>
   </div>
-  
+
 </div>
 <!-- ================================================== Main Body ================================================== -->
 

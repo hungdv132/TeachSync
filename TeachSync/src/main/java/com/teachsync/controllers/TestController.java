@@ -33,10 +33,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.SessionAttribute;
+import org.springframework.web.bind.annotation.*;
 
 import javax.security.auth.Subject;
 import java.nio.file.AccessDeniedException;
@@ -221,7 +218,9 @@ public class TestController {
             List<Question> lstQuestion = questionRepository.findAllByTestId(test.getId());
             HashMap<Question, List<Answer>> hm = new HashMap<>();
             for (Question qs : lstQuestion) {
+                qs.setQuestionDesc(qs.getQuestionDesc().replace('\r', ' ').replace('\n', ' '));
                 hm.put(qs, answerRepository.findAllByQuestionId(qs.getId()));
+                System.out.println(qs.getQuestionDesc());
             }
             List<Course> lst = courseRepository.findAllByStatusNot(Status.DELETED);
             model.addAttribute("lstCourse", lst);
@@ -255,26 +254,27 @@ public class TestController {
             return "redirect:/";
         }
 
-        Long idQuestion = Long.parseLong(idQuestionS);
-//        TODO: This function is update answer, not update test, or else rename function
-        Test test = testRepository.findById(idTest).orElse(null);
-
-        if (testType.equals("FIFTEEN_MINUTE")) {
-            test.setMinScore(1.0);
-            test.setTestWeight(1);
-        } else if (testType.equals("MIDTERM")) {
-            test.setMinScore(1.0);
-            test.setTestWeight(3);
-        } else {
-            test.setMinScore(4.0);
-            test.setTestWeight(5);
-        }
-        test.setStatus(Status.UPDATED);
-        test.setTimeLimit(timeLimit);
-//        test.setCourseId(Long.parseLong(courseName));
-        testRepository.save(test);
-
         try {
+            Long idQuestion = Long.parseLong(idQuestionS);
+//        TODO: This function is update answer, not update test, or else rename function
+            Test test = testRepository.findById(idTest).orElse(null);
+
+            if (testType.equals("FIFTEEN_MINUTE")) {
+                test.setMinScore(1.0);
+                test.setTestWeight(1);
+            } else if (testType.equals("MIDTERM")) {
+                test.setMinScore(1.0);
+                test.setTestWeight(3);
+            } else {
+                test.setMinScore(4.0);
+                test.setTestWeight(5);
+            }
+            test.setStatus(Status.UPDATED);
+            test.setTimeLimit(timeLimit);
+//        test.setCourseId(Long.parseLong(courseName));
+            testRepository.save(test);
+
+
             Question question = questionService.getById(idQuestion);
             if (question == null) {
                 throw new IllegalArgumentException("Update error. No Question found with id: " + idQuestion);
@@ -282,33 +282,32 @@ public class TestController {
             question.setQuestionDesc(questionAll);
             questionRepository.save(question);
 
-//            if (questionType.equals("MULTIPLE")) {
-//                answerService.deleteAllByQuestionId(question.getId());
-//
-//                int numAnswer = Integer.parseInt(requestParams.get("numOfOptions"));
-//
-//                List<AnswerCreateDTO> answerCreateDTOList = new ArrayList<>();
-//                for (int i = 1; i < numAnswer; i++) {
-//                    AnswerCreateDTO answerCreateDTO = new AnswerCreateDTO();
-//                    answerCreateDTO.setQuestionId(question.getId());
-//                    answerCreateDTO.setAnswerDesc(requestParams.get("answer" + i));
-//                    answerCreateDTO.setIsCorrect(requestParams.get("correctAnswer" + i) != null);
-//                    answerCreateDTO.setCreatedBy(userDTO.getId());
-//
-//                    answerCreateDTOList.add(answerCreateDTO);
-//                }
-//
-//                answerService.createBulkAnswerByDTO(answerCreateDTOList);
-//            } else {
-//
-//            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        try {
+            Test test = testRepository.findAllById(Collections.singleton(idTest)).get(0);
+            List<Question> lstQuestion = questionRepository.findAllByTestId(test.getId());
+            HashMap<Question, List<Answer>> hm = new HashMap<>();
+            for (Question qs : lstQuestion) {
+                qs.setQuestionDesc(qs.getQuestionDesc().replace('\r', ' ').replace('\n', ' '));
+                hm.put(qs, answerRepository.findAllByQuestionId(qs.getId()));
+                System.out.println(qs.getQuestionDesc());
+            }
+            List<Course> lst = courseRepository.findAllByStatusNot(Status.DELETED);
+            model.addAttribute("lstCourse", lst);
+            model.addAttribute("testType", test.getTestType().getStringValue());
+            model.addAttribute("questionType", test.getTestDesc());
+
+            model.addAttribute("test", test);
+
+            model.addAttribute("questionAnswer", hm);
+            System.out.println("size cua hashmap: " + hm.size());
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        // Redirect to a success page or do any other necessary actions
-
-        return "redirect:/";
+        return "test/edit-test";
     }
 
     @GetMapping("/tests")
@@ -675,4 +674,38 @@ public class TestController {
     }
 
 
+    @GetMapping("/api/getLstAnswer")
+    @ResponseBody
+    public List<Answer> getListAnswer(@RequestParam Long questionId) {
+        List<Answer> lst = answerRepository.findAllByQuestionIdAndStatusNot(questionId, Status.DELETED);
+        return lst;
+    }
+
+    @PostMapping("/api/editAnswer")
+    @ResponseBody
+    public boolean editAnswer(@RequestParam Long id, @RequestParam String content, @RequestParam boolean isTrue) {
+        Answer answer = answerRepository.findByIdAndStatusNot(id, Status.DELETED).orElse(null);
+        answer.setAnswerDesc(content);
+        answer.setIsCorrect(isTrue);
+        answerRepository.save(answer);
+        return true;
+    }
+
+    @PostMapping("api/deleteAnswer")
+    @ResponseBody
+    public boolean changeStatusAnswerToDelete(@RequestParam Long id) {
+        Answer answer = answerRepository.findByIdAndStatusNot(id, Status.DELETED).orElse(null);
+        answer.setStatus(Status.DELETED);
+        answerRepository.save(answer);
+        return true;
+    }
+
+    @PostMapping("api/addNewAnswer")
+    @ResponseBody
+    public boolean addNewAnswer(@RequestParam Long id, @RequestParam String answerDesc, @RequestParam boolean isCorrect) {
+        Answer answer = new Answer(id, answerDesc, 1.0, isCorrect);
+        answer.setStatus(Status.CREATED);
+        answerRepository.save(answer);
+        return true;
+    }
 }

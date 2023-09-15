@@ -363,15 +363,15 @@ public class CourseServiceImpl implements CourseService {
 
         return wrapDTO(course, null);
     }
-    
+
 
     /* =================================================== DELETE =================================================== */
     @Override
     @Transactional
-    public void deleteCourse(Long Id, Long userId) throws Exception {
-        Course course = courseRepository.findById(Id).orElseThrow(() -> new Exception("không tìm thấy khóa học"));
+    public void deleteCourse(Long id, Long userId) throws Exception {
+        Course course = courseRepository.findById(id).orElseThrow(() -> new Exception("không tìm thấy khóa học"));
         PriceLog priceLog = priceLogRepository.findByCourseIdAndValidBetweenAndStatusNot(
-                Id, LocalDateTime.now(), Status.DELETED)
+                        id, LocalDateTime.now(), Status.DELETED)
                 .orElseThrow(() -> new Exception("không tìm thấy giá khóa học"));
         priceLog.setStatus(Status.DELETED);
         priceLog.setUpdatedBy(userId);
