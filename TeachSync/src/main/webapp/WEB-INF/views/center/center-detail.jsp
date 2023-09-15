@@ -70,6 +70,9 @@
     <p>Số phòng:<a href = "/list-room?id=${center.id}">
       ${center.centerSize} phòng học
     </a></p>
+    <c:if test="${isAdmin}">
+      <a href="/list-staff?id=${center.id}" class="btn btn-primary">Danh sách nhân viên</a>
+    </c:if>
 
     <p>Mô tả: <br>${center.centerDesc}</p>
   </div>

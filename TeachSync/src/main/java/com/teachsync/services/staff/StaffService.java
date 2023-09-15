@@ -1,6 +1,10 @@
 package com.teachsync.services.staff;
 
+import com.teachsync.dtos.center.CenterReadDTO;
+import com.teachsync.dtos.center.CenterUpdateDTO;
 import com.teachsync.dtos.staff.StaffReadDTO;
+import com.teachsync.dtos.staff.StaffUpdateDTO;
+import com.teachsync.entities.Center;
 import com.teachsync.entities.Staff;
 import com.teachsync.utils.enums.DtoOption;
 import org.springframework.data.domain.Page;
@@ -38,7 +42,8 @@ public interface StaffService {
 
 
     /* =================================================== UPDATE =================================================== */
-
+    Staff updateStaff(Staff staff) throws Exception;
+    StaffReadDTO updateStaffByDTO(StaffUpdateDTO updateDTO) throws Exception;
     
     /* =================================================== DELETE =================================================== */
 

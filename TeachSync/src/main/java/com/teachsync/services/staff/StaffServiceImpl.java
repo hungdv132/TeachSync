@@ -3,7 +3,9 @@ package com.teachsync.services.staff;
 import com.teachsync.dtos.BaseReadDTO;
 import com.teachsync.dtos.center.CenterReadDTO;
 import com.teachsync.dtos.staff.StaffReadDTO;
+import com.teachsync.dtos.staff.StaffUpdateDTO;
 import com.teachsync.dtos.user.UserReadDTO;
+import com.teachsync.entities.Center;
 import com.teachsync.entities.Staff;
 import com.teachsync.repositories.StaffRepository;
 import com.teachsync.services.center.CenterService;
@@ -176,8 +178,41 @@ public class StaffServiceImpl implements StaffService {
 
 
 
-    /* =================================================== UPDATE =================================================== */
 
+
+    /* =================================================== UPDATE =================================================== */
+    @Override
+    public Staff updateStaff(Staff staff) throws Exception {
+        Staff oldStaff = getById(staff.getId());
+        if(oldStaff == null){
+            throw new IllegalArgumentException("Loi update - khong tim thay staff id");
+        }
+        staff.setCreatedAt(oldStaff.getCreatedAt());
+        staff.setCreatedBy(oldStaff.getCreatedBy());
+
+        /* Validate input */
+
+        /* Check FK */
+        /* No FK */
+
+        /* Update to DB */
+        staff = staffRepository.saveAndFlush(staff);
+
+        return staff;
+    }
+
+    @Override
+    public StaffReadDTO updateStaffByDTO(StaffUpdateDTO updateDTO) throws Exception {
+        Staff staff = mapper.map(updateDTO,Staff.class);
+
+        staff = updateStaff(staff);
+
+        /* create dependencies */
+
+        /* update dependencies */
+
+        return wrapDTO(staff,null);
+    }
 
     /* =================================================== DELETE =================================================== */
 

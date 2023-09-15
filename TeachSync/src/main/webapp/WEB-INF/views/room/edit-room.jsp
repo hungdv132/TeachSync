@@ -90,7 +90,7 @@
 
         <!-- Room desc -->
         <label class="w-100 mb-3">
-          Miêu tả về Cơ Sở: <br/>
+          Miêu tả về phòng học: <br/>
           <textarea class="w-100" style="resize: none" rows="3"
                     id="roomDesc" name="roomDesc" >${room.roomDesc}</textarea>
         </label>
