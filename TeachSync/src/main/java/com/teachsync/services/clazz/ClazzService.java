@@ -31,6 +31,10 @@ public interface ClazzService {
     ClazzReadDTO getDTOById(Long id) throws Exception;
     ClazzReadDTO getDTOById(Long id, Collection<DtoOption> options) throws Exception;
 
+    Page<Clazz> getPageAllByIdIn(Pageable paging, Collection<Long> idCollection) throws Exception;
+    Page<ClazzReadDTO> getPageDTOAllByIdIn(
+            Pageable paging, Collection<Long> idCollection, Collection<DtoOption> options) throws Exception;
+
     List<Clazz> getAllByIdIn(Collection<Long> idCollection) throws Exception;
     Map<Long, String> mapClazzIdClazzNameByIdIn(Collection<Long> idCollection) throws Exception;
     List<ClazzReadDTO> getAllDTOByIdIn(Collection<Long> idCollection, Collection<DtoOption> options) throws Exception;
@@ -46,6 +50,11 @@ public interface ClazzService {
             Collection<Long> courseSemesterIdCollection, Collection<DtoOption> options) throws Exception;
     Map<Long, List<ClazzReadDTO>> mapCourseSemesterIdListDTOByCourseSemesterIdIn(
             Collection<Long> courseSemesterIdCollection, Collection<DtoOption> options) throws Exception;
+
+    /* staffId */
+    Page<Clazz> getPageAllByStaffIdIn(Pageable paging, Collection<Long> staffIdCollection) throws Exception;
+    Page<ClazzReadDTO> getPageDTOAllByStaffIdIn(
+            Pageable paging, Collection<Long> staffIdCollection, Collection<DtoOption> options) throws Exception;
 
 
     /* =================================================== UPDATE =================================================== */

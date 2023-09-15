@@ -166,6 +166,33 @@ public class ClazzServiceImpl implements ClazzService {
     }
 
     @Override
+    public Page<Clazz> getPageAllByIdIn(Pageable paging, Collection<Long> idCollection) throws Exception {
+        if (paging == null) {
+            paging = miscUtil.defaultPaging();
+        }
+
+        Page<Clazz> clazzPage =
+                clazzRepository.findAllByIdInAndStatusNot(idCollection, Status.DELETED, paging);
+
+        if (clazzPage.isEmpty()) {
+            return null;
+        }
+
+        return clazzPage;
+    }
+    @Override
+    public Page<ClazzReadDTO> getPageDTOAllByIdIn(
+            Pageable paging, Collection<Long> idCollection, Collection<DtoOption> options) throws Exception {
+        Page<Clazz> clazzPage = getPageAllByIdIn(paging, idCollection);
+
+        if (clazzPage == null) {
+            return null;
+        }
+
+        return wrapPageDTO(clazzPage, options);
+    }
+
+    @Override
     public List<Clazz> getAllByIdIn(Collection<Long> idCollection) throws Exception {
         List<Clazz> clazzList =
                 clazzRepository.findAllByIdInAndStatusNot(idCollection, Status.DELETED);
@@ -281,6 +308,34 @@ public class ClazzServiceImpl implements ClazzService {
         }
 
         return scheduleIdClazzDTOListMap;
+    }
+
+    /* staffId */
+    @Override
+    public Page<Clazz> getPageAllByStaffIdIn(Pageable paging, Collection<Long> staffIdCollection) throws Exception {
+        if (paging == null) {
+            paging = miscUtil.defaultPaging();
+        }
+
+        Page<Clazz> clazzPage =
+                clazzRepository.findAllByStaffIdInAndStatusNot(staffIdCollection, Status.DELETED, paging);
+
+        if (clazzPage.isEmpty()) {
+            return null;
+        }
+
+        return clazzPage;
+    }
+    @Override
+    public Page<ClazzReadDTO> getPageDTOAllByStaffIdIn(
+            Pageable paging, Collection<Long> staffIdCollection, Collection<DtoOption> options) throws Exception {
+        Page<Clazz> clazzPage = getPageAllByStaffIdIn(paging, staffIdCollection);
+
+        if (clazzPage == null) {
+            return null;
+        }
+
+        return wrapPageDTO(clazzPage, options);
     }
 
     /* =================================================== UPDATE =================================================== */

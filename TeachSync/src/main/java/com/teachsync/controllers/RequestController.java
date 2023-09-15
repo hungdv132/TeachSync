@@ -155,7 +155,7 @@ public class RequestController {
             return "redirect:" + referer;
         }
 
-        return "redirect:/request-detail?id=" + requestDTO.getId();
+        return "redirect:/edit-request?id=" + requestDTO.getId();
     }
 
 

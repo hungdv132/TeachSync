@@ -50,8 +50,6 @@ public interface ClazzScheduleService {
     ClazzSchedule updateClazzSchedule(ClazzSchedule clazzSchedule) throws Exception;
     ClazzScheduleReadDTO updateClazzScheduleByDTO(ClazzScheduleUpdateDTO updateDTO) throws Exception;
 
-    /* =================================================== DELETE =================================================== */
-    String deleteClazzSchedule(Long Id);
 
     /* =================================================== WRAPPER ================================================== */
     ClazzScheduleReadDTO wrapDTO(ClazzSchedule clazzSchedule, Collection<DtoOption> options) throws Exception;
