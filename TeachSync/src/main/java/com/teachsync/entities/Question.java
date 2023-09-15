@@ -28,7 +28,7 @@ public class Question extends BaseEntity {
     @Column(name = "questionDesc", nullable = false, length = -1)
     private String questionDesc;
 
-    @Column(name = "questionPrompt", nullable = false, length = 45)
+    @Column(name = "questionPrompt", nullable = true, length = 255)
     private String questionPrompt;
 
     @Column(name = "questionScore", nullable = false)
