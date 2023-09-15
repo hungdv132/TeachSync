@@ -106,14 +106,14 @@ public class ClazzServiceImpl implements ClazzService {
         if (paging == null) {
             paging = miscUtil.defaultPaging();
         }
-        
+
         Page<Clazz> clazzPage =
                 clazzRepository.findAllByStatusNot(Status.DELETED, paging);
-        
+
         if (clazzPage.isEmpty()) {
             return null;
         }
-        
+
         return clazzPage;
     }
     @Override
@@ -123,7 +123,7 @@ public class ClazzServiceImpl implements ClazzService {
         if (clazzPage == null) {
             return null;
         }
-        
+
         return wrapPageDTO(clazzPage, null);
     }
     @Override
@@ -163,6 +163,33 @@ public class ClazzServiceImpl implements ClazzService {
         }
 
         return wrapDTO(clazz, options);
+    }
+
+    @Override
+    public Page<Clazz> getPageAllByIdIn(Pageable paging, Collection<Long> idCollection) throws Exception {
+        if (paging == null) {
+            paging = miscUtil.defaultPaging();
+        }
+
+        Page<Clazz> clazzPage =
+                clazzRepository.findAllByIdInAndStatusNot(idCollection, Status.DELETED, paging);
+
+        if (clazzPage.isEmpty()) {
+            return null;
+        }
+
+        return clazzPage;
+    }
+    @Override
+    public Page<ClazzReadDTO> getPageDTOAllByIdIn(
+            Pageable paging, Collection<Long> idCollection, Collection<DtoOption> options) throws Exception {
+        Page<Clazz> clazzPage = getPageAllByIdIn(paging, idCollection);
+
+        if (clazzPage == null) {
+            return null;
+        }
+
+        return wrapPageDTO(clazzPage, options);
     }
 
     @Override
@@ -265,22 +292,50 @@ public class ClazzServiceImpl implements ClazzService {
         if (clazzDTOList == null) {
             return new HashMap<>(); }
 
-        Map<Long, List<ClazzReadDTO>> scheduleIdClazzDTOListMap = new HashMap<>();
-        long scheduleId;
+        Map<Long, List<ClazzReadDTO>> courseSemesterIdClazzDTOListMap = new HashMap<>();
+        long courseSemesterId;
         List<ClazzReadDTO> tmpList;
         for (ClazzReadDTO dto : clazzDTOList) {
-            scheduleId = dto.getCourseSemesterId();
+            courseSemesterId = dto.getCourseSemesterId();
 
-            tmpList = scheduleIdClazzDTOListMap.get(scheduleId);
+            tmpList = courseSemesterIdClazzDTOListMap.get(courseSemesterId);
             if (tmpList == null) {
-                scheduleIdClazzDTOListMap.put(scheduleId, new ArrayList<>(Collections.singletonList(dto)));
+                courseSemesterIdClazzDTOListMap.put(courseSemesterId, new ArrayList<>(List.of(dto)));
             } else {
                 tmpList.add(dto);
-                scheduleIdClazzDTOListMap.put(scheduleId, tmpList);
+                courseSemesterIdClazzDTOListMap.put(courseSemesterId, tmpList);
             }
         }
 
-        return scheduleIdClazzDTOListMap;
+        return courseSemesterIdClazzDTOListMap;
+    }
+
+    /* staffId */
+    @Override
+    public Page<Clazz> getPageAllByStaffIdIn(Pageable paging, Collection<Long> staffIdCollection) throws Exception {
+        if (paging == null) {
+            paging = miscUtil.defaultPaging();
+        }
+
+        Page<Clazz> clazzPage =
+                clazzRepository.findAllByStaffIdInAndStatusNot(staffIdCollection, Status.DELETED, paging);
+
+        if (clazzPage.isEmpty()) {
+            return null;
+        }
+
+        return clazzPage;
+    }
+    @Override
+    public Page<ClazzReadDTO> getPageDTOAllByStaffIdIn(
+            Pageable paging, Collection<Long> staffIdCollection, Collection<DtoOption> options) throws Exception {
+        Page<Clazz> clazzPage = getPageAllByStaffIdIn(paging, staffIdCollection);
+
+        if (clazzPage == null) {
+            return null;
+        }
+
+        return wrapPageDTO(clazzPage, options);
     }
 
     /* =================================================== UPDATE =================================================== */

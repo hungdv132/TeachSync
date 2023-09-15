@@ -2,6 +2,7 @@ package com.teachsync.services.courseSemester;
 
 import com.teachsync.dtos.BaseReadDTO;
 import com.teachsync.dtos.center.CenterReadDTO;
+import com.teachsync.dtos.clazz.ClazzReadDTO;
 import com.teachsync.dtos.course.CourseReadDTO;
 import com.teachsync.dtos.courseSemester.CourseSemesterReadDTO;
 import com.teachsync.dtos.semester.SemesterReadDTO;
@@ -9,6 +10,7 @@ import com.teachsync.entities.*;
 import com.teachsync.repositories.CourseSemesterRepository;
 import com.teachsync.repositories.SemesterRepository;
 import com.teachsync.services.center.CenterService;
+import com.teachsync.services.clazz.ClazzService;
 import com.teachsync.services.course.CourseService;
 import com.teachsync.services.semester.SemesterService;
 import com.teachsync.utils.MiscUtil;
@@ -32,7 +34,10 @@ public class CourseSemesterServiceImpl implements CourseSemesterService {
     private CourseSemesterRepository courseSemesterRepository;
     @Autowired
     private SemesterRepository semesterRepository;
-    
+
+    @Lazy
+    @Autowired
+    private ClazzService clazzService;
     @Lazy
     @Autowired
     private CourseService courseService;
@@ -155,7 +160,7 @@ public class CourseSemesterServiceImpl implements CourseSemesterService {
                 semesterList.stream()
                         .map(BaseEntity::getId)
                         .collect(Collectors.toSet());
-        
+
         List<CourseSemester> courseSemesterList = getAllByCourseIdAndSemesterIdIn(courseId, semesterIdSet);
 
         if (courseSemesterList == null) {
@@ -378,6 +383,11 @@ public class CourseSemesterServiceImpl implements CourseSemesterService {
                 Semester semester = semesterService.getById(semesterId);
                 dto.setSemesterAlias(semester.getSemesterAlias());
             }
+
+            if (options.contains(DtoOption.CLAZZ_LIST)) {
+                List<ClazzReadDTO> clazzList = clazzService.getAllDTOByCourseSemesterId(courseSemester.getId(), options);
+                dto.setClazzList(clazzList);
+            }
         }
 
         return dto;
@@ -400,12 +410,16 @@ public class CourseSemesterServiceImpl implements CourseSemesterService {
         Map<Long, String> semesterIdSemesterNameMap = new HashMap<>();
         Map<Long, String> semesterIdSemesterAliasMap = new HashMap<>();
 
+        Map<Long, List<ClazzReadDTO>> courseSemesterIdClazzDTOListMap = new HashMap<>();
+
         if (options != null && !options.isEmpty()) {
+            Set<Long> courseSemesterIdSet = new HashSet<>();
             Set<Long> courseIdSet = new HashSet<>();
             Set<Long> centerIdSet = new HashSet<>();
             Set<Long> SemesterIdSet = new HashSet<>();
 
             for (CourseSemester courseSemester : courseSemesterCollection) {
+                courseSemesterIdSet.add(courseSemester.getId());
                 courseIdSet.add(courseSemester.getCourseId());
                 centerIdSet.add(courseSemester.getCenterId());
                 SemesterIdSet.add(courseSemester.getSemesterId());
@@ -437,6 +451,11 @@ public class CourseSemesterServiceImpl implements CourseSemesterService {
             if (options.contains(DtoOption.SEMESTER_ALIAS)) {
                 semesterIdSemesterAliasMap = semesterService.mapIdSemesterAliasByIdIn(SemesterIdSet);
             }
+
+            if (options.contains(DtoOption.CLAZZ_LIST)) {
+                courseSemesterIdClazzDTOListMap =
+                        clazzService.mapCourseSemesterIdListDTOByCourseSemesterIdIn(courseSemesterIdSet, options);
+            }
         }
 
         for (CourseSemester courseSemester : courseSemesterCollection) {
@@ -453,6 +472,8 @@ public class CourseSemesterServiceImpl implements CourseSemesterService {
             dto.setSemester(semesterIdSemesterDTOMap.get(courseSemester.getSemesterId()));
             dto.setSemesterName(semesterIdSemesterNameMap.get(courseSemester.getSemesterId()));
             dto.setSemesterAlias(semesterIdSemesterAliasMap.get(courseSemester.getSemesterId()));
+
+            dto.setClazzList(courseSemesterIdClazzDTOListMap.get(courseSemester.getId()));
 
             dtoList.add(dto);
         }

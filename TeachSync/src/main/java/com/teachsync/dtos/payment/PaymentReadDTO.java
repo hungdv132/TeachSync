@@ -26,6 +26,8 @@ public class PaymentReadDTO extends BaseReadDTO {
 
     private PaymentType paymentType;
 
+    private String paymentDesc;
+
     private Double paymentAmount;
 
     private LocalDateTime paymentAt;
