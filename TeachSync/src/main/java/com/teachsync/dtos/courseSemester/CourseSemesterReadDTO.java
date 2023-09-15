@@ -24,7 +24,7 @@ public class CourseSemesterReadDTO extends BaseReadDTO {
     private String courseName;
     private String courseAlias;
     private CourseReadDTO course;
-    
+
     private Long centerId;
     private String centerName;
     private CenterReadDTO center;

@@ -27,8 +27,8 @@ public class Clazz extends BaseEntity {
     @Column(name = "clazzDesc", nullable = true, length = -1)
     private String clazzDesc;
 
-//    @Column(name = "statusClazz", nullable = true, length = -1)
-//    private String statusClazz;
+    @Column(name = "statusClazz", nullable = true, length = -1)
+    private String statusClazz;
 
     @Column(name = "clazzSize", nullable = false)
     private Integer clazzSize;

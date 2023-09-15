@@ -61,9 +61,6 @@
                             <a href="/edit-schedule?id=${request.id}">
                                 <button type="button" class="btn btn-warning">Sửa</button>
                             </a>
-                            <a href="/delete-schedule?id=${request.id}">
-                                <button type="button" class="btn btn-danger">Xóa</button>
-                            </a>
                         </td>
                     </c:if>
                 </c:if>
