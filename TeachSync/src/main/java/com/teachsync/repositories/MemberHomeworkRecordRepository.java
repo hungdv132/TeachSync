@@ -10,9 +10,9 @@ import java.util.List;
 @Repository
 public interface MemberHomeworkRecordRepository extends JpaRepository<MemberHomeworkRecord, Long> {
 
-    List<MemberHomeworkRecord> findAllByStatusNot(Status status);
+    List<MemberHomeworkRecord> findAllByStatusNotOrderByCreatedAtDesc(Status status);
 
-    List<MemberHomeworkRecord> findAllByStatusNotAndCreatedBy(Status status,Long memberId);
+    List<MemberHomeworkRecord> findAllByStatusNotAndCreatedByOrderByCreatedAtDesc(Status status,Long memberId);
 
-    List<MemberHomeworkRecord> findAllByStatusNotAndHomeworkId(Status status,Long memberId);
+    List<MemberHomeworkRecord> findAllByStatusNotAndHomeworkIdOrderByCreatedAtDesc(Status status,Long memberId);
 }

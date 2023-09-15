@@ -92,7 +92,7 @@ public class HomeworkServiceImpl implements HomeworkService {
         HomeworkReadDTO homeworkReadDTO = mapper.map(homework, HomeworkReadDTO.class);
         Clazz clazz = clazzRepository.findById(homeworkReadDTO.getClazzId()).orElseThrow(() -> new Exception("không tìm lớp học"));
         homeworkReadDTO.setClazzName(clazz.getClazzName());
-        List<MemberHomeworkRecord> memberHomeworkRecordList = memberHomeworkRecordRepository.findAllByStatusNot(Status.DELETED);
+        List<MemberHomeworkRecord> memberHomeworkRecordList = memberHomeworkRecordRepository.findAllByStatusNotOrderByCreatedAtDesc(Status.DELETED);
         List<MemberHomeworkRecordReadDTO> homeworkRecordReadDTOList = new ArrayList<>();
         for (MemberHomeworkRecord memberHomeworkRecord : memberHomeworkRecordList) {
             MemberHomeworkRecordReadDTO memberHomeworkRecordReadDTO = mapper.map(memberHomeworkRecord, MemberHomeworkRecordReadDTO.class);
@@ -108,7 +108,7 @@ public class HomeworkServiceImpl implements HomeworkService {
         HomeworkReadDTO homeworkReadDTO = mapper.map(homework, HomeworkReadDTO.class);
         Clazz clazz = clazzRepository.findById(homeworkReadDTO.getClazzId()).orElseThrow(() -> new Exception("không tìm lớp học"));
         homeworkReadDTO.setClazzName(clazz.getClazzName());
-        List<MemberHomeworkRecord> memberHomeworkRecordList = memberHomeworkRecordRepository.findAllByStatusNotAndCreatedBy(Status.DELETED, userDTO.getId());
+        List<MemberHomeworkRecord> memberHomeworkRecordList = memberHomeworkRecordRepository.findAllByStatusNotAndCreatedByOrderByCreatedAtDesc(Status.DELETED, userDTO.getId());
         List<MemberHomeworkRecordReadDTO> homeworkRecordReadDTOList = new ArrayList<>();
         for (MemberHomeworkRecord memberHomeworkRecord : memberHomeworkRecordList) {
             MemberHomeworkRecordReadDTO memberHomeworkRecordReadDTO = mapper.map(memberHomeworkRecord, MemberHomeworkRecordReadDTO.class);
@@ -126,7 +126,7 @@ public class HomeworkServiceImpl implements HomeworkService {
             HomeworkReadDTO homeworkReadDTO = mapper.map(item, HomeworkReadDTO.class);
 
             //find homewordk record
-            List<MemberHomeworkRecord> memberHomeworkRecordList = memberHomeworkRecordRepository.findAllByStatusNotAndHomeworkId(Status.DELETED, item.getId());
+            List<MemberHomeworkRecord> memberHomeworkRecordList = memberHomeworkRecordRepository.findAllByStatusNotAndHomeworkIdOrderByCreatedAtDesc(Status.DELETED, item.getId());
             List<MemberHomeworkRecordReadDTO> homeworkRecordReadDTOList = new ArrayList<>();
             for (MemberHomeworkRecord memberHomeworkRecord : memberHomeworkRecordList) {
                 MemberHomeworkRecordReadDTO memberHomeworkRecordReadDTO = mapper.map(memberHomeworkRecord, MemberHomeworkRecordReadDTO.class);
