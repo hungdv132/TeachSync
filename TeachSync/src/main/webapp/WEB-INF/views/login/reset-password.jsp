@@ -28,8 +28,8 @@
       <lottie-player
           src="https://assets4.lottiefiles.com/datafiles/XRVoUu3IX4sGWtiC3MPpFnJvZNq7lVWDCa8LSqgS/profile.json"
           background="transparent" speed="1" style="justify-content: center;" loop autoplay></lottie-player>
-      <input type="password" name="password" id="password" placeholder="&#xf007;  password"/>
-      <input type="password" placeholder="&#xf023;  new password" oninput="checkPasswordMatch(this);"/>
+      <input type="password" name="password" id="password" placeholder="&#xf007;  Password"/>
+      <input type="password" placeholder="&#xf023;  Confirm your new password" oninput="checkPasswordMatch(this);"/>
       <c:if test="${msg ne null}">
         <p class="txt-pink my-2"><c:out value="${msg}"/></p>
       </c:if>
