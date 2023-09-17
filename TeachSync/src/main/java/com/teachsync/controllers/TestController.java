@@ -74,6 +74,9 @@ public class TestController {
     private ClazzMemberService clazzMemberService;
 
     @Autowired
+    private ClazzController clazzController;
+
+    @Autowired
     private ClazzRepository clazzRepository;
 
     @Autowired
@@ -409,7 +412,7 @@ public class TestController {
 
 //            MemberTestRecord memberTestRecord = memberTestRecordService.getByMemberIdAndClazzTestId(member.getId(), clazzTestId);
             List<MemberTestRecord> mtr = memberTestRecordRepository.findByMemberIdAndClazzTestIdAndStatusIn(member.getId(), clazzTestId, lstStt);
-            if (mtr != null) {
+            if (mtr != null && mtr.size() > 0) {
                 System.out.println("Người dùng này đang làm bài");
                 return "redirect:/";
             }
@@ -756,5 +759,22 @@ public class TestController {
         answer.setStatus(Status.CREATED);
         answerRepository.save(answer);
         return true;
+    }
+
+    @GetMapping("/updateStatusTest")
+    public String updateStatusTest(Model model,@RequestParam Long status, @RequestParam Long idClazz, @RequestParam Long idTest) {
+        if (status == 0) {
+            ClazzTest clazzTest = new ClazzTest();
+            clazzTest.setClazzId(idClazz);
+            clazzTest.setTestId(idTest);
+            clazzTest.setStatus(Status.CREATED);
+            clazzTest.setOpenFrom(LocalDateTime.now());
+            clazzTestRepository.save(clazzTest);
+        } else if (status == 1){
+            ClazzTest clazzTest = clazzTestRepository.findByClazzIdAndTestIdAndStatusNot(idClazz,idTest,Status.DELETED).orElse(null);
+            clazzTest.setOpenTo(LocalDateTime.now());
+            clazzTestRepository.save(clazzTest);
+        }
+        return clazzController.clazzDetailPage(model, idClazz);
     }
 }

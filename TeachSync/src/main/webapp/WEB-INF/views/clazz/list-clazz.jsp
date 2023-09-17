@@ -54,9 +54,7 @@
             <a href="/add-clazz?id=${clazzDTO.id}&option=edit">
               <button type="button" class="btn btn-success">Sửa</button>
             </a>
-            <a href="/delete-clazz?id=${clazzDTO.id}">
-              <button type="button" class="btn btn-danger">Xóa</button>
-            </a>
+              <button type="button" class="btn btn-danger" onclick="confirmDelete(${clazzDTO.id})">Xóa</button>
           </td>
         </c:if>
       </tr>
@@ -71,6 +69,16 @@
 <%@ include file="/WEB-INF/fragments/footer.jspf" %>
 <!-- ================================================== Footer ===================================================== -->
 </body>
+<script>
+  function confirmDelete(clazzId) {
+    var result = confirm("Bạn có chắc muốn xóa lớp học này?");
+    if (result) {
+      // Nếu người dùng nhấn "Yes", chuyển họ đến trang xóa lớp học với thông tin clazzId
+      window.location.href = "/delete-clazz?id=" + clazzId;
+    }
+    // Nếu người dùng nhấn "No", không thực hiện gì cả
+  }
+</script>
 <script>
     var mess = '${mess}'
     if (mess != '') {
