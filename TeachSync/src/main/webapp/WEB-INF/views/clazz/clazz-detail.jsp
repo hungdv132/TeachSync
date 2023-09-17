@@ -104,6 +104,15 @@
                 </button>
             </li>
 
+            <!-- Tab test -->
+            <li class="nav-item" role="presentation">
+                <button type="button" class="nav-link ts-txt-grey ts-txt-hover-blue"
+                        data-bs-toggle="tab" role="tab" aria-selected="false"
+                        id="test-tab" data-bs-target="#test-tab-pane" aria-controls="test-tab-pane">
+                    Bài kiểm tra
+                </button>
+            </li>
+
         </ul>
 
         <!-- Clazz dependency tab content -->
@@ -132,7 +141,7 @@
                  id="score-tab-pane" aria-labelledby="score-tab">
                 <c:forEach items="${homeworkList}" var="homework">
                     <c:forEach items="${homework.memberHomeworkRecordList}" var="record">
-                        <p>${record.name}   </p>
+                        <p>${record.name} </p>
                         <p>Điểm ${record.score}   </p>
                         <br>
                     </c:forEach>
@@ -152,6 +161,54 @@
                     <p>${material.materialName} : ${material.materialLink}  </p>
                     <br>
                 </c:forEach>
+            </div>
+
+            <div class="tab-pane fade" role="tabpanel"
+                 id="test-tab-pane" aria-labelledby="test-tab">
+
+                <c:if test="${sessionScope.user.roleId eq 1}">
+                    <c:forEach items="${clazz.testList}" var="tests">
+                        <c:if test="${tests.test.testType == 'FIFTEEN_MINUTE'}">
+                            <a href="/take-test?clazzId=${clazz.id}&clazzTestId=${tests.id}">Bài kiểm tra 15 phút</a>
+                        </c:if>
+                        <c:if test="${tests.test.testType == 'MIDTERM'}">
+                            <a href="/take-test?clazzId=${clazz.id}&clazzTestId=${tests.id}">Bài kiểm tra giữa kỳ</a>
+                        </c:if>
+                        <c:if test="${tests.test.testType == 'FINAL'}">
+                            <a href="/take-test?clazzId=${clazz.id}&clazzTestId=${tests.id}">Bài kiểm tra cuối kỳ</a>
+                        </c:if>
+                        <c:if test="${tests.test.questionType == 'ESSAY'}">
+                            <p>Loại kiểm tra: Tự luận</p>
+                        </c:if>
+                        <c:if test="${tests.test.questionType == 'MULTIPLE'}">
+                            <p>Loại kiểm tra: Trắc nghiệm</p>
+                        </c:if>
+                        <p>Trạng thái: ${tests.inTime}</p>
+                        <br>
+                    </c:forEach>
+                </c:if>
+                <c:if test="${sessionScope.user.roleId eq 3}">
+                    <c:forEach items="${lstTestTeacher}" var="tests">
+                        <c:if test="${tests.testType == 'FIFTEEN_MINUTE'}">
+                            <a href="/test-score?idClazz=${clazz.id}&idTest=${tests.id}">Bài kiểm tra 15 phút</a>
+                        </c:if>
+                        <c:if test="${tests.testType == 'MIDTERM'}">
+                            <a href="/test-score?idClazz=${clazz.id}&idTest=${tests.id}">Bài kiểm tra giữa kỳ</a>
+                        </c:if>
+                        <c:if test="${tests.testType == 'FINAL'}">
+                            <a href="/test-score?idClazz=${clazz.id}&idTest=${tests.id}">Bài kiểm tra cuối kỳ</a>
+                        </c:if>
+                        <c:if test="${tests.questionType == 'ESSAY'}">
+                            <p>Loại kiểm tra: Tự luận</p>
+                        </c:if>
+                        <c:if test="${tests.questionType == 'MULTIPLE'}">
+                            <p>Loại kiểm tra: Trắc nghiệm</p>
+                        </c:if>
+                        <br>
+                    </c:forEach>
+                </c:if>
+
+
             </div>
         </div>
     </div>

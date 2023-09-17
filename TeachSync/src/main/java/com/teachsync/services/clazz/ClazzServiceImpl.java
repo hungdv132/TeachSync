@@ -15,6 +15,7 @@ import com.teachsync.repositories.ClazzRepository;
 import com.teachsync.repositories.CourseSemesterRepository;
 import com.teachsync.services.clazzMember.ClazzMemberService;
 import com.teachsync.services.clazzSchedule.ClazzScheduleService;
+import com.teachsync.services.clazzTest.ClazzTestService;
 import com.teachsync.services.courseSemester.CourseSemesterService;
 import com.teachsync.services.staff.StaffService;
 import com.teachsync.utils.MiscUtil;
@@ -48,6 +49,8 @@ public class ClazzServiceImpl implements ClazzService {
     private StaffService staffService;
     @Autowired
     private CourseSemesterRepository courseSemesterRepository;
+    @Autowired
+    private ClazzTestService clazzTestService;
 
     @Autowired
     private ModelMapper mapper;
@@ -445,6 +448,7 @@ public class ClazzServiceImpl implements ClazzService {
 
             if (options.contains(DtoOption.TEST_LIST)) {
 //            TODO: dto.setTestList();
+                dto.setTestList(clazzTestService.getAllDTOByClazzId(clazz.getId(), options));
             }
         }
 

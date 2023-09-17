@@ -409,7 +409,7 @@ public class TestController {
 
 //            MemberTestRecord memberTestRecord = memberTestRecordService.getByMemberIdAndClazzTestId(member.getId(), clazzTestId);
             List<MemberTestRecord> mtr = memberTestRecordRepository.findByMemberIdAndClazzTestIdAndStatusIn(member.getId(), clazzTestId, lstStt);
-            if (mtr != null) {
+            if (mtr != null && mtr.size()>0) {
                 System.out.println("Người dùng này đang làm bài");
                 return "redirect:/";
             }
