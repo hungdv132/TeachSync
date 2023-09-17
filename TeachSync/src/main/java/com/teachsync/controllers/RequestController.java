@@ -307,15 +307,15 @@ public class RequestController {
                     throw new IllegalArgumentException(
                             "Cập nhập thất bại. Đây không phải là đơn của bạn.");
                 }
-                
+
                 RequestUpdateDTO updateDTO = modelMapper.map(requestDTO, RequestUpdateDTO.class);
 
                 updateDTO.setContentLink(paymentInfoLink);
                 updateDTO.setStatus(Status.AWAIT_CONFIRM);
                 updateDTO.setUpdatedBy(currentUserId);
-                
+
                 requestService.updateRequestByDTO(updateDTO);
-                
+
             } else if (roleId.equals(Constants.ROLE_ADMIN)) {
                 /* Admin xác nhận thanh toán Request. Chấp nhận hoặc từ chối với chứng cứ */
                 requestDTO = requestService.getDTOById(

@@ -160,7 +160,7 @@ public class CourseSemesterServiceImpl implements CourseSemesterService {
                 semesterList.stream()
                         .map(BaseEntity::getId)
                         .collect(Collectors.toSet());
-        
+
         List<CourseSemester> courseSemesterList = getAllByCourseIdAndSemesterIdIn(courseId, semesterIdSet);
 
         if (courseSemesterList == null) {

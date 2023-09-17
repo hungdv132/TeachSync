@@ -57,7 +57,7 @@ public interface CourseService {
 
     /* =================================================== DELETE =================================================== */
 
-    void deleteCourse(Long Id, Long userId) throws Exception;
+    void deleteCourse(Long id, Long userId) throws Exception;
 
     /* =================================================== WRAPPER ================================================== */
     @Deprecated

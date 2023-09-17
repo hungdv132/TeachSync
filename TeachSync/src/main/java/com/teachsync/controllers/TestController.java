@@ -33,10 +33,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.SessionAttribute;
+import org.springframework.web.bind.annotation.*;
 
 import javax.security.auth.Subject;
 import java.nio.file.AccessDeniedException;
@@ -212,16 +209,18 @@ public class TestController {
             @RequestParam("id") Long testId,
             @SessionAttribute(value = "user", required = false) UserReadDTO userDTO) {
 
-//        if (userDTO == null || userDTO.getRoleId().equals(Constants.ROLE_ADMIN)) {
-//            return "redirect:/";
-//        }
+        if (userDTO == null || !userDTO.getRoleId().equals(Constants.ROLE_ADMIN)) {
+            return "redirect:/";
+        }
 
         try {
             Test test = testRepository.findAllById(Collections.singleton(testId)).get(0);
             List<Question> lstQuestion = questionRepository.findAllByTestId(test.getId());
             HashMap<Question, List<Answer>> hm = new HashMap<>();
             for (Question qs : lstQuestion) {
+                qs.setQuestionDesc(qs.getQuestionDesc().replace('\r', ' ').replace('\n', ' '));
                 hm.put(qs, answerRepository.findAllByQuestionId(qs.getId()));
+                System.out.println(qs.getQuestionDesc());
             }
             List<Course> lst = courseRepository.findAllByStatusNot(Status.DELETED);
             model.addAttribute("lstCourse", lst);
@@ -239,7 +238,7 @@ public class TestController {
         return "test/edit-test";
     }
 
-    @GetMapping("/update-answer")
+    @PostMapping("/update-answer")
     public String updateAnswer(
             Model model,
             @RequestParam("idTest") Long idTest,
@@ -255,26 +254,27 @@ public class TestController {
             return "redirect:/";
         }
 
-        Long idQuestion = Long.parseLong(idQuestionS);
-//        TODO: This function is update answer, not update test, or else rename function
-        Test test = testRepository.findById(idTest).orElse(null);
-
-        if (testType.equals("FIFTEEN_MINUTE")) {
-            test.setMinScore(1.0);
-            test.setTestWeight(1);
-        } else if (testType.equals("MIDTERM")) {
-            test.setMinScore(1.0);
-            test.setTestWeight(3);
-        } else {
-            test.setMinScore(4.0);
-            test.setTestWeight(5);
-        }
-        test.setStatus(Status.UPDATED);
-        test.setTimeLimit(timeLimit);
-//        test.setCourseId(Long.parseLong(courseName));
-        testRepository.save(test);
-
         try {
+            Long idQuestion = Long.parseLong(idQuestionS);
+//        TODO: This function is update answer, not update test, or else rename function
+            Test test = testRepository.findById(idTest).orElse(null);
+
+            if (testType.equals("FIFTEEN_MINUTE")) {
+                test.setMinScore(1.0);
+                test.setTestWeight(1);
+            } else if (testType.equals("MIDTERM")) {
+                test.setMinScore(1.0);
+                test.setTestWeight(3);
+            } else {
+                test.setMinScore(4.0);
+                test.setTestWeight(5);
+            }
+            test.setStatus(Status.UPDATED);
+            test.setTimeLimit(timeLimit);
+//        test.setCourseId(Long.parseLong(courseName));
+            testRepository.save(test);
+
+
             Question question = questionService.getById(idQuestion);
             if (question == null) {
                 throw new IllegalArgumentException("Update error. No Question found with id: " + idQuestion);
@@ -282,39 +282,43 @@ public class TestController {
             question.setQuestionDesc(questionAll);
             questionRepository.save(question);
 
-//            if (questionType.equals("MULTIPLE")) {
-//                answerService.deleteAllByQuestionId(question.getId());
-//
-//                int numAnswer = Integer.parseInt(requestParams.get("numOfOptions"));
-//
-//                List<AnswerCreateDTO> answerCreateDTOList = new ArrayList<>();
-//                for (int i = 1; i < numAnswer; i++) {
-//                    AnswerCreateDTO answerCreateDTO = new AnswerCreateDTO();
-//                    answerCreateDTO.setQuestionId(question.getId());
-//                    answerCreateDTO.setAnswerDesc(requestParams.get("answer" + i));
-//                    answerCreateDTO.setIsCorrect(requestParams.get("correctAnswer" + i) != null);
-//                    answerCreateDTO.setCreatedBy(userDTO.getId());
-//
-//                    answerCreateDTOList.add(answerCreateDTO);
-//                }
-//
-//                answerService.createBulkAnswerByDTO(answerCreateDTOList);
-//            } else {
-//
-//            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        try {
+            Test test = testRepository.findAllById(Collections.singleton(idTest)).get(0);
+            List<Question> lstQuestion = questionRepository.findAllByTestId(test.getId());
+            HashMap<Question, List<Answer>> hm = new HashMap<>();
+            for (Question qs : lstQuestion) {
+                qs.setQuestionDesc(qs.getQuestionDesc().replace('\r', ' ').replace('\n', ' '));
+                hm.put(qs, answerRepository.findAllByQuestionId(qs.getId()));
+                System.out.println(qs.getQuestionDesc());
+            }
+            List<Course> lst = courseRepository.findAllByStatusNot(Status.DELETED);
+            model.addAttribute("lstCourse", lst);
+            model.addAttribute("testType", test.getTestType().getStringValue());
+            model.addAttribute("questionType", test.getTestDesc());
+
+            model.addAttribute("test", test);
+
+            model.addAttribute("questionAnswer", hm);
+            System.out.println("size cua hashmap: " + hm.size());
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        // Redirect to a success page or do any other necessary actions
-
-        return "redirect:/";
+        return "test/edit-test";
     }
 
     @GetMapping("/tests")
-    public String listTestPage(@RequestParam(value = "page", required = false) Integer page, Model model) {
+    public String listTestPage(@RequestParam(value = "page", required = false) Integer page, Model model,
+                               @SessionAttribute(value = "user", required = false) UserReadDTO userDTO) {
         /* Test thuộc về Course, nhưng nếu muốn làm bài thì phải dùng ClazzTest nối tới Clazz và ClazzMember
         để biết có học lớp môn này không để cho phép làm */
+
+        if (userDTO == null || !userDTO.getRoleId().equals(Constants.ROLE_ADMIN)) {
+            return "redirect:/";
+        }
 
         try {
             if (page == null || page < 0) {
@@ -338,7 +342,11 @@ public class TestController {
     public String searchByCourse(
             @RequestParam(value = "page", required = false) Integer page,
             @RequestParam("searchText") String courseName,
-            Model model) {
+            Model model,
+            @SessionAttribute(value = "user", required = false) UserReadDTO userDTO) {
+        if (userDTO == null || !userDTO.getRoleId().equals(Constants.ROLE_ADMIN)) {
+            return "redirect:/";
+        }
         if (page == null) {
             page = 0;
         }
@@ -368,7 +376,7 @@ public class TestController {
         try {
             ClazzMember member = clazzMemberService.getByClazzIdAndUserId(clazzId, userDTO.getId());
             if (member == null) {
-                throw new AccessDeniedException("Bạn không phải là thành viên của lớp học này để làm bài này.");
+                return "redirect:/";
             }
 
             ClazzTestReadDTO clazzTestDTO =
@@ -395,17 +403,19 @@ public class TestController {
             model.addAttribute("idMember", member.getId());
             model.addAttribute("test", testDTO);
             model.addAttribute("hmQA", lstQs);
+            List<Status> lstStt = new ArrayList<>();
+            lstStt.add(Status.DONE);
+            lstStt.add(Status.ONGOING);
 
-            MemberTestRecord memberTestRecord =
-                    memberTestRecordService.getByMemberIdAndClazzTestId(member.getId(), clazzTestId);
-
-            if (memberTestRecord != null) {
-                /* Đã làm bài, không cho làm nữa */
+//            MemberTestRecord memberTestRecord = memberTestRecordService.getByMemberIdAndClazzTestId(member.getId(), clazzTestId);
+            List<MemberTestRecord> mtr = memberTestRecordRepository.findByMemberIdAndClazzTestIdAndStatusIn(member.getId(), clazzTestId, lstStt);
+            if (mtr != null) {
+                System.out.println("Người dùng này đang làm bài");
                 return "redirect:/";
             }
 
             /* Bắt đầu làm bài và lưu thời gian làm */
-            memberTestRecord = new MemberTestRecord();
+            MemberTestRecord memberTestRecord = new MemberTestRecord();
 
             memberTestRecord.setMemberId(member.getId());
             memberTestRecord.setClazzTestId(clazzTestDTO.getId());
@@ -494,7 +504,10 @@ public class TestController {
     }
 
     @GetMapping("/test-session")
-    public String listTestSession(@RequestParam(value = "page", required = false) Integer page, Model model, HttpSession session) {
+    public String listTestSession(@RequestParam(value = "page", required = false) Integer page, Model model, @SessionAttribute(value = "user", required = false) UserReadDTO userDTO) {
+        if (userDTO == null || !userDTO.getRoleId().equals(Constants.ROLE_ADMIN)) {
+            return "redirect:/";
+        }
         if (page == null || page < 0) {
             page = 0;
         }
@@ -520,7 +533,10 @@ public class TestController {
             @RequestParam(value = "page", required = false) Integer page,
             @RequestParam("searchText") String name,
             @RequestParam("searchType") String searchType,
-            Model model) throws Exception {
+            Model model, @SessionAttribute(value = "user", required = false) UserReadDTO userDTO) throws Exception {
+        if (userDTO == null || !userDTO.getRoleId().equals(Constants.ROLE_ADMIN)) {
+            return "redirect:/";
+        }
         if (page == null || page < 0) {
             page = 0;
         }
@@ -568,7 +584,9 @@ public class TestController {
             @RequestParam("idSession") Long idSession,
             @RequestParam("newStatus") String newStatus,
             @SessionAttribute(value = "user", required = false) UserReadDTO userDTO) {
-        UserReadDTO user = (UserReadDTO) session.getAttribute("user");
+        if (userDTO == null || !userDTO.getRoleId().equals(Constants.ROLE_ADMIN)) {
+            return "redirect:/";
+        }
 
 
 //        TestSession testSession = testSessionRepository.findById(Long.parseLong(idSession)).orElse(null);
@@ -580,7 +598,7 @@ public class TestController {
         }
 
         mtr.setUpdatedAt(LocalDateTime.now());
-        mtr.setUpdatedBy(user.getId());
+        mtr.setUpdatedBy(userDTO.getId());
 
         memberTestRecordRepository.save(mtr);
 
@@ -604,7 +622,11 @@ public class TestController {
             Model model,
             HttpSession session,
             @RequestParam("idClazz") Long idClazz,
-            @RequestParam("idTest") Long idTest) {
+            @RequestParam("idTest") Long idTest,
+            @SessionAttribute(value = "user", required = false) UserReadDTO userDTO) {
+        if (userDTO == null || !userDTO.getRoleId().equals(Constants.ROLE_TEACHER)) {
+            return "redirect:/";
+        }
         try {
             ClazzTestReadDTO clazzTestDTO =
                     clazzTestService.getDTOByClazzIdAndTestId(idClazz, idTest, List.of(TEST));
@@ -632,7 +654,11 @@ public class TestController {
     @GetMapping("/mark-essay")
     public String markEssay(Model model,
                             HttpSession session,
-                            @RequestParam("memberTestRecordId") Long memberTestRecordId) {
+                            @RequestParam("memberTestRecordId") Long memberTestRecordId,
+                            @SessionAttribute(value = "user", required = false) UserReadDTO userDTO) {
+        if (userDTO == null || !userDTO.getRoleId().equals(Constants.ROLE_TEACHER)) {
+            return "redirect:/";
+        }
 
         MemberTestRecord mtr = memberTestRecordRepository.findAllByIdAndStatus(memberTestRecordId, Status.DONE).orElse(null);
         List<TestRecord> testRecords = testRecordRepository.findAllByMemberTestRecordId(memberTestRecordId);
@@ -675,4 +701,60 @@ public class TestController {
     }
 
 
+    @GetMapping("/api/getLstAnswer")
+    @ResponseBody
+    public List<Answer> getListAnswer(@RequestParam Long questionId) {
+        List<Answer> lst = answerRepository.findAllByQuestionIdAndStatusNot(questionId, Status.DELETED);
+        return lst;
+    }
+
+    @PostMapping("/api/editAnswer")
+    @ResponseBody
+    public boolean editAnswer(@RequestParam Long id, @RequestParam String content, @RequestParam boolean isTrue) {
+        Answer answer = answerRepository.findByIdAndStatusNot(id, Status.DELETED).orElse(null);
+        answer.setAnswerDesc(content);
+        List<Answer> lstAnswer = answerRepository.findAllByQuestionIdAndStatusNot(answer.getQuestionId(), Status.DELETED);
+        if (isTrue) {
+            List<Answer> lstTr = lstAnswer.stream().map(answer1 -> {
+                if (answer1.getIsCorrect()) {
+                    answer1.setIsCorrect(false);
+                }
+                return answer1;
+            }).collect(Collectors.toList());
+
+            answerRepository.saveAll(lstTr);
+        }
+        answer.setIsCorrect(isTrue);
+        answerRepository.save(answer);
+        return true;
+    }
+
+    @PostMapping("api/deleteAnswer")
+    @ResponseBody
+    public boolean changeStatusAnswerToDelete(@RequestParam Long id) {
+        Answer answer = answerRepository.findByIdAndStatusNot(id, Status.DELETED).orElse(null);
+        answer.setStatus(Status.DELETED);
+        answerRepository.save(answer);
+        return true;
+    }
+
+    @PostMapping("api/addNewAnswer")
+    @ResponseBody
+    public boolean addNewAnswer(@RequestParam Long id, @RequestParam String answerDesc, @RequestParam boolean isCorrect) {
+        Answer answer = new Answer(id, answerDesc, 1.0, isCorrect);
+        List<Answer> lstAnswer = answerRepository.findAllByQuestionIdAndStatusNot(answer.getQuestionId(), Status.DELETED);
+        if (isCorrect) {
+            List<Answer> lstTr = lstAnswer.stream().map(answer1 -> {
+                if (answer1.getIsCorrect()) {
+                    answer1.setIsCorrect(false);
+                }
+                return answer1;
+            }).collect(Collectors.toList());
+
+            answerRepository.saveAll(lstTr);
+        }
+        answer.setStatus(Status.CREATED);
+        answerRepository.save(answer);
+        return true;
+    }
 }

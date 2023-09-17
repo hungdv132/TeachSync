@@ -106,14 +106,14 @@ public class ClazzServiceImpl implements ClazzService {
         if (paging == null) {
             paging = miscUtil.defaultPaging();
         }
-        
+
         Page<Clazz> clazzPage =
                 clazzRepository.findAllByStatusNot(Status.DELETED, paging);
-        
+
         if (clazzPage.isEmpty()) {
             return null;
         }
-        
+
         return clazzPage;
     }
     @Override
@@ -123,7 +123,7 @@ public class ClazzServiceImpl implements ClazzService {
         if (clazzPage == null) {
             return null;
         }
-        
+
         return wrapPageDTO(clazzPage, null);
     }
     @Override
