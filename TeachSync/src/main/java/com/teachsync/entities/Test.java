@@ -2,10 +2,7 @@ package com.teachsync.entities;
 
 import com.teachsync.utils.enums.QuestionType;
 import com.teachsync.utils.enums.TestType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Lob;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 
 @NoArgsConstructor
@@ -51,4 +48,7 @@ public class Test extends BaseEntity {
 
     @Column(name = "totalScore", nullable = true, precision = 0)
     private Double totalScore;
+
+    @Transient
+    private int statusTeacherTest;
 }

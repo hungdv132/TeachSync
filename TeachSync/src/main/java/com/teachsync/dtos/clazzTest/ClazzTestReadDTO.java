@@ -21,4 +21,5 @@ public class ClazzTestReadDTO extends BaseReadDTO {
     private TestReadDTO test;
     private LocalDateTime openFrom;
     private LocalDateTime openTo;
+    private String inTime;
 }

@@ -18,6 +18,8 @@ import lombok.NoArgsConstructor;
 public class NewsReadDTO extends BaseReadDTO {
     private Long id;
 
+    private Long clazzId;
+
     private String newsTitle;
 
     private String newsDesc;
