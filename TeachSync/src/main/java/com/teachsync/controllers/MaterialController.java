@@ -99,9 +99,9 @@ public class MaterialController {
 
         try {
 
-//            /* List Course (môn nào) */
-//            List<CourseReadDTO> courseDTOList = courseService.getAllDTO(null);
-//            model.addAttribute("courseList", courseDTOList);
+            /* List Course (môn nào) */
+            List<CourseReadDTO> courseDTOList = courseService.getAllDTO(null);
+            model.addAttribute("courseList", courseDTOList);
 
             MaterialReadDTO material = materialService.getDTOById(materialId, null);
             model.addAttribute("material", material);
@@ -158,8 +158,8 @@ public class MaterialController {
 
         try {
 
-//            List<CourseReadDTO> courseDTOList = courseService.getAllDTO(null);
-//            model.addAttribute("courseList", courseDTOList);
+            List<CourseReadDTO> courseDTOList = courseService.getAllDTO(null);
+            model.addAttribute("courseList", courseDTOList);
 
             MaterialReadDTO material = materialService.getDTOById(materialId, null);
             model.addAttribute("material", material);
@@ -226,11 +226,11 @@ public class MaterialController {
 
     @GetMapping("/material-detail")
     public String getDetailById(
-            @RequestParam(name = "id") Long courseId,
+            @RequestParam(name = "id") Long materialId,
             Model model,
             @SessionAttribute(name = "user", required = false) UserReadDTO userDTO) {
         try {
-            MaterialReadDTO material = materialService.getDTOById(courseId, null);
+            MaterialReadDTO material = materialService.getDTOById(materialId, null);
 
             if (material == null) {
                 /* Not found by Id */
