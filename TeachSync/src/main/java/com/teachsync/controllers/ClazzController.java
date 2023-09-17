@@ -13,6 +13,7 @@ import com.teachsync.dtos.staff.StaffReadDTO;
 import com.teachsync.dtos.test.TestReadDTO;
 import com.teachsync.dtos.user.UserReadDTO;
 import com.teachsync.entities.*;
+import com.teachsync.repositories.ClazzTestRepository;
 import com.teachsync.repositories.TestRepository;
 import com.teachsync.services.center.CenterService;
 import com.teachsync.services.clazz.ClazzService;
@@ -27,7 +28,6 @@ import com.teachsync.utils.Constants;
 import com.teachsync.utils.MiscUtil;
 import com.teachsync.utils.enums.Status;
 import jakarta.servlet.http.HttpServletRequest;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -65,6 +65,8 @@ public class ClazzController {
     private StaffService staffService;
     @Autowired
     private TestRepository testRepository;
+    @Autowired
+    private ClazzTestRepository clazzTestRepository;
 
     @Autowired
     private MiscUtil miscUtil;
@@ -231,13 +233,23 @@ public class ClazzController {
                 clT.setTest(testReadDTO);
                 if (clT.getOpenFrom().compareTo(LocalDateTime.now()) < 0 && clT.getOpenTo() == null) {
                     clT.setInTime("Đang mở");
-                } else if (clT.getOpenTo() != null && clT.getOpenTo().compareTo(LocalDateTime.now()) < 0){
+                } else if (clT.getOpenTo() != null && clT.getOpenTo().compareTo(LocalDateTime.now()) < 0) {
                     clT.setInTime("Đã kết thúc");
                 }
             }
 
             List<Test> lstTestTeacher = testRepository.findAllByCourseIdAndStatusNot(clazzDTO.getCourseSemester().getCourseId(), Status.DELETED);
 
+            for (Test t : lstTestTeacher) {
+                ClazzTest clazzTest = clazzTestRepository.findByClazzIdAndTestIdAndStatusNot(clazzId, t.getId(), Status.DELETED).orElse(null);
+                if (clazzTest == null) {
+                    t.setStatusTeacherTest(0);
+                } else if(clazzTest !=null && clazzTest.getOpenTo() == null){
+                    t.setStatusTeacherTest(1);
+                } else {
+                    t.setStatusTeacherTest(2);
+                }
+            }
 
             model.addAttribute("homeworkList", homeworkReadDTOList);
             model.addAttribute("newsList", newsReadDTOList);

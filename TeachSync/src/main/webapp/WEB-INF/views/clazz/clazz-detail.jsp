@@ -204,6 +204,23 @@
                         <c:if test="${tests.questionType == 'MULTIPLE'}">
                             <p>Loại kiểm tra: Trắc nghiệm</p>
                         </c:if>
+                        <c:if test="${tests.statusTeacherTest == 0}">
+                            <a href="/updateStatusTest?status=0&idClazz=${clazz.id}&idTest=${tests.id}" class="btn btn-outline-primary mr-2">
+                                <i class="fas fa-plus"></i>Mở bài thi
+                            </a>
+<%--                            <a href="/updateStatusTest?status=0&idClazz=${clazz.id}&idTest=${tests.id}">Mở bài thi</a>--%>
+                        </c:if>
+                        <c:if test="${tests.statusTeacherTest == 1}">
+                            <a href="/updateStatusTest?status=1&idClazz=${clazz.id}&idTest=${tests.id}" class="btn btn-outline-primary mr-2">
+                                <i class="fas fa-plus"></i>Đóng bài thi
+                            </a>
+<%--                            <a href="/updateStatusTest?status=1&idClazz=${clazz.id}&idTest=${tests.id}">Đóng bài thi</a>--%>
+                        </c:if>
+                        <c:if test="${tests.statusTeacherTest == 2}">
+                            <a>Bài thi đã kết thúc</a>
+                        </c:if>
+                        <br>
+                        <br>
                         <br>
                     </c:forEach>
                 </c:if>
