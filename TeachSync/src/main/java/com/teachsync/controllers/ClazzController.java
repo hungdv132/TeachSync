@@ -13,7 +13,9 @@ import com.teachsync.dtos.staff.StaffReadDTO;
 import com.teachsync.dtos.test.TestReadDTO;
 import com.teachsync.dtos.user.UserReadDTO;
 import com.teachsync.entities.*;
+import com.teachsync.repositories.ClazzMemberRepository;
 import com.teachsync.repositories.ClazzTestRepository;
+import com.teachsync.repositories.MemberTestRecordRepository;
 import com.teachsync.repositories.TestRepository;
 import com.teachsync.services.center.CenterService;
 import com.teachsync.services.clazz.ClazzService;
@@ -67,6 +69,10 @@ public class ClazzController {
     private TestRepository testRepository;
     @Autowired
     private ClazzTestRepository clazzTestRepository;
+    @Autowired
+    private MemberTestRecordRepository memberTestRecordRepository;
+    @Autowired
+    private ClazzMemberRepository clazzMemberRepository;
 
     @Autowired
     private MiscUtil miscUtil;
@@ -244,7 +250,7 @@ public class ClazzController {
                 ClazzTest clazzTest = clazzTestRepository.findByClazzIdAndTestIdAndStatusNot(clazzId, t.getId(), Status.DELETED).orElse(null);
                 if (clazzTest == null) {
                     t.setStatusTeacherTest(0);
-                } else if(clazzTest !=null && clazzTest.getOpenTo() == null){
+                } else if (clazzTest != null && clazzTest.getOpenTo() == null) {
                     t.setStatusTeacherTest(1);
                 } else {
                     t.setStatusTeacherTest(2);
@@ -453,5 +459,43 @@ public class ClazzController {
             model.addAttribute("mess", "Xóa class room thất bại");
             return "clazz/add-clazz";
         }
+    }
+
+
+    @PostMapping("/finish-class")
+    public String finishClass(Model model,
+                              @RequestParam(value = "id", required = false) Long clazzId,
+                              @RequestParam(value = "courseId", required = false) Long courseId) throws Exception {
+        List<ClazzMember> clazzMemberList = clazzMemberService.getAllByClazzId(clazzId);
+        for (ClazzMember clazzMember : clazzMemberList) {
+            List<Test> listTest = testRepository.findAllByCourseIdAndStatusNot(courseId, Status.DELETED);
+            long totalScore = 0;
+            long totalWeight = 0;
+            for (Test test : listTest) {
+                totalWeight = totalWeight + test.getTestWeight();
+            }
+            for (Test test : listTest) {
+
+                ClazzTest clazzTest = clazzTestRepository.findByClazzIdAndTestIdAndStatusNot(clazzId, test.getId(), Status.DELETED).orElse(null);
+                if (clazzTest == null) {
+                    System.out.println("Bài test chưa bắt đầu. Không cho kết thúc");
+                    return "redirect:/";
+                }
+                MemberTestRecord memberTestRecord = memberTestRecordRepository.findByMemberIdAndClazzTestIdAndStatusNot(clazzMember.getId(), clazzTest.getTestId(), Status.DELETED).orElse(null);
+                if (memberTestRecord.getScore() < test.getMinScore()) {
+                    clazzMember.setIsPassed(false);
+                }
+                totalScore = (long) (totalScore + memberTestRecord.getScore() * (test.getTestWeight() / totalWeight));
+
+            }
+            clazzMember.setScore((double) totalScore);
+            if (totalScore < 5) {
+                clazzMember.setIsPassed(false);
+            } else if (clazzMember.getIsPassed() == null && totalScore >= 5){
+                clazzMember.setIsPassed(true);
+            }
+                clazzMemberRepository.save(clazzMember);
+        }
+        return "redirect:/";
     }
 }
