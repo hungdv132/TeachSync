@@ -122,7 +122,7 @@
 
 <div class="row ts-bg-white border ts-border-teal rounded-3 pt-3 mx-2 mb-3">
   <c:if test="${isAdmin}">
-    <a>
+    <a href="/add-user">
       <button type="button" class="btn btn-primary">Thêm mới nhân viên</button>
     </a>
   </c:if>
@@ -140,8 +140,8 @@
     <c:forEach var="user" items="${listUser}">
       <tr>
         <th scope="row">${user.id}</th>
-        <td><a href="/user-detail?id=${user.id}"><img src="${user.userAvatar}" alt="avatar"
-                                                      class="rounded-1 border ts-border-yellow w-25 h-auto"></a></td>
+        <td><a href="/user-detail?id=${user.id}"><img src="${empty user.userAvatar ? '../../resources/img/unset_avatar.jpg' : user.userAvatar}" alt="avatar"
+                                                      class="rounded-1 border ts-border-yellow w-20 h-auto"></a></td>
         <td><a style="font-weight: bold;" href="/user-detail?id=${user.id}">${user.fullName}</a></td>
         <td>${user.username}</td>
         <td>${user.status}</td>
@@ -150,7 +150,7 @@
             <a href="/user-detail?id=${user.id}">
               <button type="button" class="btn btn-success">Sửa</button>
             </a>
-            <a href="/user-staff?id=${user.id}">
+            <a href="/user-detail?id=${user.id}">
               <button type="button" class="btn btn-danger">Xóa</button>
             </a>
           </td>

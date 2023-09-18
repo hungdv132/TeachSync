@@ -177,7 +177,7 @@
         <label class="col-4 mb-3">Xã/Phường: <br/>
           <select class="w-100 py-1" disabled="disabled"
                   id="selWard" name="unitId">
-            <option value="0" disabled>- Xin Chọn -</option>
+            <option value="0">- Xin Chọn -</option>
             <c:forEach items="${wardList}" var="ward">
               <option value="${ward.id}">${ward.unitName}</option>
             </c:forEach>
@@ -186,7 +186,7 @@
         <label class="col-4 mb-3">Quận/Huyện: <br/>
           <select class="w-100 py-1" disabled="disabled"
                   id="selDistrict" onchange="updateSelLocationUnit(3)">
-            <option value="0" disabled>- Xin Chọn -</option>
+            <option value="0">- Xin Chọn -</option>
             <c:forEach items="${districtList}" var="district">
               <option value="${district.id}">${district.unitName}</option>
             </c:forEach>
@@ -197,7 +197,7 @@
         <label class="col-4 mb-3">Tỉnh/TP trung ương: <br/>
           <select class="w-100 py-1" disabled="disabled"
                   id="selProvince" onchange="updateSelLocationUnit(2)">
-            <option value="0" disabled>- Xin Chọn -</option>
+            <option value="0">- Xin Chọn -</option>
             <c:forEach items="${provinceList}" var="province">
               <option value="${province.id}">${province.unitName}</option>
             </c:forEach>
@@ -206,7 +206,7 @@
         <label class="col-4 mb-3">Quốc gia: <br/>
           <select class="w-100 py-1" disabled="disabled"
                   id="selCountry" onchange="updateSelLocationUnit(1)">
-            <option value="0" disabled>- Xin Chọn -</option>
+            <option value="0">- Xin Chọn -</option>
             <c:forEach items="${countryList}" var="country">
               <option value="${country.id}">${country.unitName}</option>
             </c:forEach>

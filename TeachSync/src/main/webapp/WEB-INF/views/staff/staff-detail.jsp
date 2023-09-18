@@ -96,12 +96,6 @@
                            id="txtPassword" required="required" disabled="disabled">
                 </label>
 
-                <!-- Old Password -->
-                <label id="lblTxtOldPassword" class="col-4 mb-3 visually-hidden">Mật Khẩu cũ: <br>
-                    <input type="password" class="w-100" minlength="5" maxlength="45"
-                           id="txtOldPassword" required="required" disabled="disabled">
-                </label>
-
                 <p id="txtAccountMsg" class="visually-hidden"></p>
 
                 <div class="col-12">
@@ -162,20 +156,25 @@
 
             <!-- Staff type, center -->
 
-            <h5 class="card-header ts-txt-blue border-top ts-border-blue">Thông tin cá nhân</h5>
-            <form action="/staff-detail/detail" method="POST"
+            <h5 class="card-header ts-txt-blue border-top ts-border-blue">Cơ Sở Hiện Tại và Chức Vụ</h5>
+            <form action="/staff-detail/staffCenter" method="POST"
                   id="formStaffCenter" class="card-body row" >
                 <input type="hidden" name="staffId" value="${staff.id}">
 
                 <label class="col-sm-6 col-md-4 mb-3">Trung tâm: <br>
                     <select class="w-100 py-1" disabled="disabled"
                             id="selCenter" name="centerId">
-                        <option value="${Gender.OTHER}">${Gender.OTHER.stringValueVie}</option>
-                        <option value="${Gender.MALE}">${Gender.MALE.stringValueVie}</option>
-                        <option value="${Gender.FEMALE}">${Gender.FEMALE.stringValueVie}</option>
+                        <option value="">1</option>
+                        <option value="">2</option>
+                        <option value="">3</option>
                     </select>
                 </label>
-
+                <select name="centerId" id="centerIdSel" class="btn btn-secondary dropdown-toggle"
+                        onchange="refreshStaff()">
+                    <c:forEach items="${centerList}" var="center">
+                        <option value="${center.id}"> ${center.centerName}</option>
+                    </c:forEach>
+                </select>
                 <label class="col-sm-6 col-md-4 mb-3">Chức vụ: <br>
                     <select class="w-100 py-1" disabled="disabled"
                             id="selStaffType" name="staffType">
@@ -321,6 +320,11 @@
         "gender" : $("#selGender").val()
     };
 
+    const staffCenter = {
+        "center": $("#selCenter").val(),
+        "staffType": $("#selStaffType").val()
+    };
+
     const address = {
         "addressNo": "${address.addressNo}",
         "street": "${address.street}",
@@ -345,6 +349,7 @@
         cancelEditAccount();
         cancelEditUserDetail();
         cancelEditUserAddress();
+        cancelEditStaffCenter();
     }
     async function updateUserAvatar() {
         let file = $('#fileImg').prop("files")[0];
@@ -406,6 +411,7 @@
         cancelEditUserAvatar();
         cancelEditUserDetail();
         cancelEditUserAddress();
+        cancelEditStaffCenter()
     }
     async function updateAccount(type) {
         let txtAccountMsg = $("#txtAccountMsg");
@@ -422,14 +428,6 @@
                 option = "/username";
                 break;
             case "password":
-                if (request["password"] === request["oldPassword"]) {
-                    txtAccountMsg
-                        .addClass("text-danger")
-                        .removeClass("text-success visually-hidden")
-                        .text("Mật khẩu mới giống mật khẩu cũ.");
-                    return;
-                }
-
                 option = "/password";
                 break;
         }
@@ -491,6 +489,7 @@
         cancelEditUserAvatar();
         cancelEditAccount();
         cancelEditUserAddress();
+        cancelEditStaffCenter()
     }
 
     function cancelEditUserDetail() {
@@ -506,7 +505,30 @@
         $("#selGender").val(userDetail['gender']);
     }
 
+    /* Staff Center*/
+    function editStaffCenter() {
+        enableAllInputIn("formStaffCenter");
+        enableAllSelectIn("formStaffCenter");
+        hideById("btnEditStaffCenter");
+        showById("btnUpdateStaffCenter");
+        showById("btnCancelEditStaffCenter");
 
+        cancelEditUserAvatar();
+        cancelEditAccount();
+        cancelEditUserDetail();
+        cancelEditUserAddress();
+    }
+
+    function cancelEditStaffCenter() {
+        disableAllInputIn("formStaffCenter");
+        disableAllSelectIn("formStaffCenter");
+        showById("btnEditStaffCenter");
+        hideById("btnUpdateStaffCanter");
+        hideById("btnCancelEditStaffCenter");
+
+        $("#selCenter").val(staffCenter['staffCenter']);
+        $("#selStaffType").val(staffCenter['staffType']);
+    }
     /* Address */
     function editUserAddress() {
         enableAllInputIn("formAddress");

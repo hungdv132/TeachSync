@@ -36,9 +36,9 @@
               id="formAvatar" class="card ts-bg-white border ts-border-teal rounded-3 text-center mb-3">
 
             <!-- Avatar -->
-            <h5 class="card-header ts-txt-blue ts-border-blue"><c:out value="${user.username}"/></h5>
+            <h5 class="card-header ts-txt-blue ts-border-blue"><c:out value="${user1.username}"/></h5>
             <div class="card-body">
-                <img src="${empty user.userAvatar ? '../../resources/img/unset_avatar.jpg' : user.userAvatar}" alt="avatar"
+                <img src="${empty user1.userAvatar ? '../../resources/img/unset_avatar.jpg' : user1.userAvatar}" alt="avatar"
                      id="imgUserAvatar" class="rounded-circle border ts-border-teal mb-3" width="180" height="180">
 
                 <div id="divAvatarInput" class="visually-hidden mb-3">
@@ -87,7 +87,7 @@
                 <!-- Username -->
                 <label id="lblTxtUsername" class="col-4 mb-3 visually-hidden">Tên Tài Khoản: <br>
                     <input type="text" class="w-100" minlength="5" maxlength="45" required="required"
-                           id="txtUsername" value="${user.username}" disabled="disabled">
+                           id="txtUsername" value="${user1.username}" disabled="disabled">
                 </label>
 
                 <!-- New Password -->
@@ -118,23 +118,24 @@
             <h5 class="card-header ts-txt-blue border-top ts-border-blue">Thông tin cá nhân</h5>
             <form action="/user-detail/detail" method="POST"
                   id="formDetail" class="card-body row" >
+                <input type="hidden" name="userId" value="${user1.id}">
                 <!-- FullName -->
                 <label class="col-sm-6 col-md-4 mb-3">Họ và tên: <br>
                     <input type="text" class="w-100" minlength="1" maxlength="255" required="required" disabled="disabled"
-                           id="txtFullName" name="fullName" value="${user.fullName}">
+                           id="txtFullName" name="fullName" value="${user1.fullName}">
                 </label>
 
                 <!-- Email -->
                 <label class="col-sm-6 col-md-4 mb-3">Email: <br>
                     <input type="email" class="w-100" disabled="disabled"
-                           id="txtEmail" name="email" value="${user.email}">
+                           id="txtEmail" name="email" value="${user1.email}">
                 </label>
 
                 <!-- Phone -->
                 <label class="col-sm-6 col-md-4 mb-3">Số điện thoại: <br>
                     <input type="tel" class="w-100" minlength="10" maxlength="10" pattern="^\d{10}$"
                            placeholder="0XXXXXXXXX" disabled="disabled"
-                           id="txtPhone" name="phone" value="${user.phone}">
+                           id="txtPhone" name="phone" value="${user1.phone}">
                 </label>
 
                 <!-- Gender -->
@@ -160,7 +161,7 @@
 
             <!-- User Address -->
             <h5 class="card-header ts-txt-blue border-top ts-border-blue">Địa chỉ</h5>
-            <form action="/edit-profile/address" method="post"
+            <form action="/user-detail/address" method="post"
                   id="formAddress" class="card-body row">
 
                 <!-- AddressNo, Street -->
@@ -177,7 +178,7 @@
                 <label class="col-4 mb-3">Xã/Phường: <br/>
                     <select class="w-100 py-1" disabled="disabled"
                             id="selWard" name="unitId">
-                        <option value="0" disabled>- Xin Chọn -</option>
+                        <option value="0" >- Xin Chọn -</option>
                         <c:forEach items="${wardList}" var="ward">
                             <option value="${ward.id}">${ward.unitName}</option>
                         </c:forEach>
@@ -186,7 +187,7 @@
                 <label class="col-4 mb-3">Quận/Huyện: <br/>
                     <select class="w-100 py-1" disabled="disabled"
                             id="selDistrict" onchange="updateSelLocationUnit(3)">
-                        <option value="0" disabled>- Xin Chọn -</option>
+                        <option value="0" >- Xin Chọn -</option>
                         <c:forEach items="${districtList}" var="district">
                             <option value="${district.id}">${district.unitName}</option>
                         </c:forEach>
@@ -197,7 +198,7 @@
                 <label class="col-4 mb-3">Tỉnh/TP trung ương: <br/>
                     <select class="w-100 py-1" disabled="disabled"
                             id="selProvince" onchange="updateSelLocationUnit(2)">
-                        <option value="0" disabled>- Xin Chọn -</option>
+                        <option value="0" >- Xin Chọn -</option>
                         <c:forEach items="${provinceList}" var="province">
                             <option value="${province.id}">${province.unitName}</option>
                         </c:forEach>
@@ -206,7 +207,7 @@
                 <label class="col-4 mb-3">Quốc gia: <br/>
                     <select class="w-100 py-1" disabled="disabled"
                             id="selCountry" onchange="updateSelLocationUnit(1)">
-                        <option value="0" disabled>- Xin Chọn -</option>
+                        <option value="0" >- Xin Chọn -</option>
                         <c:forEach items="${countryList}" var="country">
                             <option value="${country.id}">${country.unitName}</option>
                         </c:forEach>
@@ -396,7 +397,7 @@
 
         await $.ajax({
             type: "PUT",
-            url: "/api/edit-profile" + option,
+            url: "/api/user-detail" + option,
             data: JSON.stringify(request),
             contentType: "application/json",
             success: function (response) {

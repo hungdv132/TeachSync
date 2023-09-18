@@ -250,7 +250,7 @@ public class CenterController {
 
 
     /* =================================================== API ====================================================== */
-    /* TODO: move to addressController or LocationUnitCOntroller */
+    /* TODO: move to addressController or LocationUnitController */
     @GetMapping(value = "api/refresh-location-unit", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public Map<Integer, List<LocationUnit>> refreshLocationUnit(
