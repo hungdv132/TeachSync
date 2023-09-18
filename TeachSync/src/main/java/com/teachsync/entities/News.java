@@ -33,4 +33,9 @@ public class News extends BaseEntity {
     @Lob
     @Column(name = "newsDesc", nullable = true, length = -1)
     private String newsDesc;
+
+    @Column(name = "newsType", nullable = true, length = -1)
+    private String newsType;
+
+
 }

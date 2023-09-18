@@ -220,6 +220,20 @@
     }
 
     var numOptions = numOptionsInput.value;
+    var selectedCheckbox = null;
+
+    // Tạo sự kiện lắng nghe cho các checkbox
+    function handleCheckboxChange(event) {
+      // Đặt tất cả checkbox về false trước
+      var checkboxes = answerContainer.querySelectorAll("input[type='checkbox']");
+      checkboxes.forEach(function (checkbox) {
+        checkbox.checked = false;
+      });
+
+      // Đặt checkbox được chọn
+      event.target.checked = true;
+      selectedCheckbox = event.target;
+    }
 
     for (var i = 0; i < numOptions; i++) {
       var answerLabel = document.createElement("label");
@@ -234,6 +248,7 @@
       var isCorrectCheckbox = document.createElement("input");
       isCorrectCheckbox.type = "checkbox";
       isCorrectCheckbox.name = "isCorrect" + numOptionsInput.name.slice(-1) + "-" + i;
+      isCorrectCheckbox.addEventListener("change", handleCheckboxChange);
 
       var answerWrapper = document.createElement("div");
       answerWrapper.className = "answer";

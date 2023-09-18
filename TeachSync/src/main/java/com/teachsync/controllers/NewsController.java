@@ -58,9 +58,10 @@ public class NewsController {
 
         User user1 = userRepository.findById(user.getId()).orElse(null);
 
-        News news = new News(user1.getId(),null, title, null, content, description);
+        News news = new News(user1.getId(), null, title, null, content, description, null);
         LocalDateTime date = LocalDateTime.now();
         news.setStatus(Status.CREATED);
+        news.setNewsType("External");
         news.setCreatedAt(date);
         news.setCreatedBy(user.getId());
 
@@ -88,7 +89,7 @@ public class NewsController {
 
     @PostMapping("/submiteditnews")
     public String submitEditNews(Model model, HttpSession session,
-                                 @RequestParam String idNews,
+                                 @RequestParam Long idNews,
                                  @RequestParam String title,
                                  @RequestParam String description,
                                  @RequestParam String content) {
@@ -101,12 +102,18 @@ public class NewsController {
 
         User user1 = userRepository.findById(user.getId()).orElse(null);
 
-        News news = new News(user1.getId(),null, title, null, content, description);
-        news.setId(Long.parseLong(idNews));
-        news.setStatus(Status.UPDATED);
-        news.setUpdatedBy(user.getId());
+        News newsUpdate = newsRepository.findAllById(idNews);
+        newsUpdate.setStatus(Status.UPDATED);
+        newsUpdate.setNewsTitle(title);
+        newsUpdate.setNewsLink(content);
+        newsUpdate.setNewsDesc(description);
+        newsUpdate.setUpdatedBy(user.getId());
+//        News news = new News(user1.getId(), null, title, null, content, description, );
+//        news.setId(Long.parseLong(idNews));
+//        news.setStatus(Status.UPDATED);
+//        news.setUpdatedBy(user.getId());
 
-        newsRepository.save(news);
+        newsRepository.save(newsUpdate);
         return "redirect:/";
     }
 
