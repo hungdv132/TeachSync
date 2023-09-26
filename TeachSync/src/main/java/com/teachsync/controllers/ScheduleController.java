@@ -11,6 +11,9 @@ import com.teachsync.dtos.courseSemester.CourseSemesterReadDTO;
 import com.teachsync.dtos.room.RoomReadDTO;
 import com.teachsync.dtos.scheduleCategory.ScheduleCaReadDTO;
 import com.teachsync.dtos.semester.SemesterReadDTO;
+import com.teachsync.dtos.session.SessionCreateDTO;
+import com.teachsync.dtos.session.SessionReadDTO;
+import com.teachsync.dtos.session.SessionUpdateDTO;
 import com.teachsync.dtos.user.UserReadDTO;
 
 import com.teachsync.entities.ClazzSchedule;
@@ -24,6 +27,7 @@ import com.teachsync.services.courseSemester.CourseSemesterService;
 import com.teachsync.services.room.RoomService;
 import com.teachsync.services.scheduleCategory.ScheduleCateService;
 import com.teachsync.services.semester.SemesterService;
+import com.teachsync.services.session.SessionService;
 import com.teachsync.utils.Constants;
 import com.teachsync.utils.MiscUtil;
 import jakarta.servlet.http.HttpServletRequest;
@@ -36,6 +40,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -57,16 +62,19 @@ public class ScheduleController {
     private RoomService roomService;
 
     @Autowired
-    private CourseService courseService;
+    private SessionService sessionService;
 
-    @Autowired
-    private CenterService centerService;
-
-    @Autowired
-    private SemesterService semesterService;
-
-    @Autowired
-    private CourseSemesterService courseSemesterService;
+//    @Autowired
+//    private CourseService courseService;
+//
+//    @Autowired
+//    private CenterService centerService;
+//
+//    @Autowired
+//    private SemesterService semesterService;
+//
+//    @Autowired
+//    private CourseSemesterService courseSemesterService;
 
     @Autowired
     private ScheduleCateService scheduleCateService;
@@ -117,24 +125,31 @@ public class ScheduleController {
 
     @PostMapping("/add-schedule")
     public String addClazzSchedule(
-            Model model,
             @ModelAttribute ClazzScheduleCreateDTO createDTO,
+            @ModelAttribute List<SessionCreateDTO> sessionCreateDTOList,
             @SessionAttribute(value = "user", required = false) UserReadDTO userDTO,
             RedirectAttributes redirect) throws Exception {
-
         //check login
         if (ObjectUtils.isEmpty(userDTO)) {
             redirect.addAttribute("mess", "Làm ơn đăng nhập");
             return "redirect:/index";
         }
-
         if (!userDTO.getRoleId().equals(Constants.ROLE_ADMIN)) {
             redirect.addAttribute("mess", "bạn không đủ quyền");
             return "redirect:/index";
         }
 
         try {
-            clazzScheduleService.createClazzScheduleByDTO(createDTO);
+            /* Create Schedule */
+            ClazzScheduleReadDTO clazzScheduleReadDTO = clazzScheduleService.createClazzScheduleByDTO(createDTO);
+
+            /* Create Session */
+            sessionCreateDTOList =
+                    sessionCreateDTOList.stream()
+                            .peek(sessionCreateDTO -> sessionCreateDTO.setScheduleId(clazzScheduleReadDTO.getId()))
+                            .toList();
+
+            sessionService.createBulkSessionByDTO(sessionCreateDTOList);
         } catch (Exception e) {
             e.printStackTrace();
             return "redirect:/add-schedule";
@@ -231,8 +246,8 @@ public class ScheduleController {
 
     @PostMapping("/edit-schedule")
     public String editClazzSchedule(
-            Model model,
             @ModelAttribute ClazzScheduleUpdateDTO updateDTO,
+            @ModelAttribute List<SessionUpdateDTO> sessionUpdateDTOList,
             @SessionAttribute(value = "user", required = false) UserReadDTO userDTO,
             RedirectAttributes redirect) throws Exception {
 
@@ -248,7 +263,26 @@ public class ScheduleController {
         }
 
         try {
-            clazzScheduleService.updateClazzScheduleByDTO(updateDTO);
+            ClazzSchedule oldSchedule = clazzScheduleService.getById(updateDTO.getId());
+
+            /* Update Schedule */
+            ClazzScheduleReadDTO clazzScheduleReadDTO = clazzScheduleService.updateClazzScheduleByDTO(updateDTO);
+
+            if (!oldSchedule.getSlot().equals(updateDTO.getSlot())
+                    || !oldSchedule.getSchedulecaId().equals(updateDTO.getSchedulecaId())) {
+//                /* Delete future Session */
+//                sessionService.deleteAllByScheduleIdAndAfter(oldSchedule.getId(), LocalDateTime.now());
+
+                /* Update Session */
+//                sessionUpdateDTOList =
+//                        sessionUpdateDTOList.stream()
+//                                .peek(sessionCreateDTO -> sessionCreateDTO.setScheduleId(clazzScheduleReadDTO.getId()))
+//                                .toList();
+
+                sessionService.updateBulkSessionByDTO(sessionUpdateDTOList);
+            }
+
+
         } catch (Exception e) {
             e.printStackTrace();
             return "redirect:/edit-schedule";

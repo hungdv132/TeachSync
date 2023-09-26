@@ -18,31 +18,35 @@ public interface ClazzScheduleService {
 
     ClazzSchedule createClazzSchedule(ClazzSchedule clazzSchedule) throws Exception;
     ClazzScheduleReadDTO createClazzScheduleByDTO(ClazzScheduleCreateDTO createDTO) throws Exception;
-    
+
+
     /* =================================================== READ ===================================================== */
     Page<ClazzSchedule> getPageAll(Pageable paging) throws Exception;
     @Deprecated
     Page<ClazzScheduleReadDTO> getPageDTOAll(Pageable paging) throws Exception;
     Page<ClazzScheduleReadDTO> getPageDTOAll(Pageable paging, Collection<DtoOption> options) throws Exception;
 
-
     /* id */
+    Boolean existsById(Long id) throws Exception;
     ClazzSchedule getById(Long id) throws Exception;
-    @Deprecated
-    ClazzScheduleReadDTO getDTOById(Long id) throws Exception;
     ClazzScheduleReadDTO getDTOById(Long id, Collection<DtoOption> options) throws Exception;
 
+    Boolean existsAllByIdIn(Collection<Long> idCollection) throws Exception;
+    List<ClazzSchedule> getAllByIdIn(Collection<Long> idCollection) throws Exception;
+    List<ClazzScheduleReadDTO> getAllDTOByIdIn(Collection<Long> idCollection, Collection<DtoOption> options) throws Exception;
+    Map<Long, ClazzScheduleReadDTO> mapIdDTOByIdIn(
+            Collection<Long> idCollection, Collection<DtoOption> options) throws Exception;
 
     /* clazzId */
     ClazzSchedule getByClazzId(Long clazzId) throws Exception;
     ClazzScheduleReadDTO getDTOByClazzId(Long clazzId, Collection<DtoOption> options) throws Exception;
 
-    /* clazzId */
     List<ClazzSchedule> getAllByClazzIdIn(Collection<Long> clazzIdCollection) throws Exception;
     List<ClazzScheduleReadDTO> getAllDTOByClazzIdIn(
             Collection<Long> clazzIdCollection, Collection<DtoOption> options) throws Exception;
     Map<Long, ClazzScheduleReadDTO> mapClazzIdDTOByClazzIdIn(
             Collection<Long> clazzIdCollection, Collection<DtoOption> options) throws Exception;
+
 
     /* =================================================== UPDATE =================================================== */
     String editClazzSchedule(ClazzScheduleUpdateDTO updateDTO);

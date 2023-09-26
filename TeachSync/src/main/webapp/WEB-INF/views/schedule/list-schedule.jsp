@@ -29,11 +29,11 @@
             <th scope="col">ID</th>
             <th scope="col">Tên lớp</th>
             <th scope="col">Tên phòng</th>
-            <th scope="col">Loại lịch học</th>
-            <th scope="col">Kiểu lịch học</th>
+            <th scope="col">Tiết</th>
+            <th scope="col">Lịch học</th>
+<%--            <th scope="col">Kiểu lịch học</th>--%>
             <th scope="col">Thời gian bắt đầu</th>
             <th scope="col">Thời gian kết thúc</th>
-            <th scope="col">Tiết</th>
 
             <c:if test="${isAdmin}">
                 <th scope="col">Chức năng</th>
@@ -50,11 +50,11 @@
                 <c:if test="${not empty clazzSchedule}">
                     <td>${request.clazzName}</td>
                     <td>${clazzSchedule.roomName}</td>
+                    <td>${clazzSchedule.slot}</td>
                     <td>${clazzSchedule.scheduleCategory.scheduleDesc}</td>
-                    <td>${clazzSchedule.scheduleType.stringValueVie}</td>
+<%--                    <td>${clazzSchedule.scheduleType.stringValueVie}</td>--%>
                     <td>${clazzSchedule.startDate}</td>
                     <td>${clazzSchedule.endDate}</td>
-                    <td>${clazzSchedule.slot}</td>
 
                     <c:if test="${isAdmin}">
                         <td>
@@ -67,11 +67,11 @@
 
                 <c:if test="${empty clazzSchedule}">
                     <td>${request.clazzName}</td>
-                    <td>?</td>
-                    <td>?</td>
-                    <td>?</td>
-                    <td>?</td>
-                    <td>?</td>
+                    <td>Thiếu</td>
+                    <td>Thiếu</td>
+                    <td>Thiếu</td>
+                    <td>Thiếu</td>
+                    <td>Thiếu</td>
 
                     <c:if test="${isAdmin}">
                         <td>

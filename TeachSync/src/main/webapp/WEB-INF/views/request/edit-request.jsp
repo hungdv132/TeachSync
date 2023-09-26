@@ -110,7 +110,7 @@
         
         <h6 class="mb-1">Lớp: <c:out value="${request.clazz.clazzName}"/></h6>
         <p class="col-6 mb-1">
-          Lịch học: <c:out value="${clazzSchedule.scheduleType.stringValueVie}"/>
+          Lịch học: <c:out value="${clazzSchedule.scheduleCategory.scheduleName}"/>
         </p>
         <p class="col-6 mb-1">
           Tiết: <c:out value="${clazzSchedule.slot}"/>

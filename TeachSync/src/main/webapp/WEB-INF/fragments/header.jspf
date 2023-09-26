@@ -7,7 +7,9 @@
 <c:set var="isGuest" value="${empty user}"/>
 <c:set var="isStudent" value="${((!isGuest) && (user.roleId eq Constants.ROLE_STUDENT))}"/>
 <c:set var="isParent"  value="${((!isGuest) && (user.roleId eq Constants.ROLE_PARENTS))}"/>
+
 <c:set var="isTeacher" value="${((!isGuest) && (user.roleId eq Constants.ROLE_TEACHER))}"/>
+
 <c:set var="isAdmin"   value="${((!isGuest) && (user.roleId eq Constants.ROLE_ADMIN))}"/>
 
 <header class="row bg-white sticky-top border-bottom ts-border-teal mb-3">
@@ -45,12 +47,12 @@
             </li>
 
             <!-- Promotion -->
-            <li class="nav-item">
-              <a href="/promotion" class="nav-link ts-txt-hover-blue">
-                <i class="bi-tags"></i>
-                &nbsp;Khuyến mãi
-              </a>
-            </li>
+<%--            <li class="nav-item">--%>
+<%--              <a href="/promotion" class="nav-link ts-txt-hover-blue">--%>
+<%--                <i class="bi-tags"></i>--%>
+<%--                &nbsp;Khuyến mãi--%>
+<%--              </a>--%>
+<%--            </li>--%>
 
             <!-- Material -->
             <li class="nav-item">

@@ -17,10 +17,13 @@ public interface ClazzScheduleRepository extends JpaRepository<ClazzSchedule, Lo
     Page<ClazzSchedule> findAllByStatusNot(Status status, Pageable pageable);
 
     /* id */
+    Boolean existsByIdAndStatusNot(long id, Status status);
     Optional<ClazzSchedule> findByIdAndStatusNot(long id, Status status);
+    Boolean existsByIdInAndStatusNot(Collection<Long> idCollection, Status status);
     List<ClazzSchedule> findAllByIdInAndStatusNot(Collection<Long> idCollection, Status status);
 
     /* clazzId */
+    Boolean existsByClazzIdAndStatusNot(Long clazzId, Status status);
     Optional<ClazzSchedule> findByClazzIdAndStatusNot(Long clazzId, Status status);
     List<ClazzSchedule> findAllByClazzIdInAndStatusNot(Collection<Long> clazzIdCollection, Status status);
 

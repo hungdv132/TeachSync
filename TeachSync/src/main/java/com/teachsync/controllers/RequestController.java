@@ -111,7 +111,7 @@ public class RequestController {
     @PostMapping("/add-request/enroll")
     public String addRequestEnroll(
             Model model,
-            @RequestParam Long clazzId,
+//            @RequestParam("clazzId") Long clazzId,
             @ModelAttribute RequestCreateDTO createDTO,
             @RequestHeader(value = "Referer", required = false) String referer,
             @SessionAttribute(name = "user", required = false) UserReadDTO userDTO) {
@@ -131,7 +131,9 @@ public class RequestController {
         RequestReadDTO requestDTO = null;
         try {
             ClazzReadDTO clazzDTO =
-                    clazzService.getDTOById(clazzId, List.of(COURSE_SEMESTER, COURSE_NAME, CENTER_NAME, SEMESTER_NAME));
+                    clazzService.getDTOById(
+                            createDTO.getClazzId(),
+                            List.of(COURSE_SEMESTER, COURSE_NAME, CENTER_NAME, SEMESTER_NAME));
 
             CourseSemesterReadDTO courseSemesterDTO = clazzDTO.getCourseSemester();
 
@@ -249,8 +251,8 @@ public class RequestController {
         try {
             RequestReadDTO requestDTO = requestService.getDTOById(
                     requestId,
-                    List.of(REQUESTER, PAYMENT, CLAZZ, CLAZZ_SCHEDULE, ROOM_NAME,
-                            COURSE_SEMESTER, SEMESTER, COURSE, CENTER, ADDRESS));
+                    List.of(REQUESTER, PAYMENT, CLAZZ, CLAZZ_SCHEDULE, SCHEDULE_CAT,
+                            ROOM_NAME, COURSE_SEMESTER, SEMESTER, COURSE, CENTER, ADDRESS));
 
             CourseReadDTO courseDTO = requestDTO.getClazz().getCourseSemester().getCourse();
 

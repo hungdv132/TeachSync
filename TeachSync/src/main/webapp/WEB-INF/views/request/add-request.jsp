@@ -70,7 +70,8 @@
     </label>
   
     <form action="/add-request/enroll" method="POST"
-          id="enrollForm" class="row visually-hidden">
+          id="enrollForm" class="row visually-hidden"
+          onsubmit="enableParamBeforeFormSubmit('enrollForm')">
       <input type="hidden" name="requesterId" value="${user.id}">
       <input type="hidden" name="requestType" value="${RequestType.ENROLL}">
       
@@ -155,6 +156,11 @@
           <label class="col-12 mb-1">Lớp học: <br/>
             <select id="selClazz" name="clazzId" class="w-100 py-1" onchange="loadClassDetail()">
               <option value="0" selected disabled hidden>- Xin chọn lớp học -</option>
+              <c:forEach var="clazzDTO" items="${clazzList}">
+                <option value="${clazzDTO.id}">
+                  <c:out value="${clazzDTO.clazzName}"/>
+                </option>
+              </c:forEach>
             </select>
             <b class="ts-txt-orange visually-hidden" id="selClazz404">
               Hiện không có lớp học nào trong khoảng Khóa học & Học kỳ & Cơ sở đã chọn
@@ -397,7 +403,7 @@
                     }
 
                     $("#txtClazzSchedule").removeClass("visually-hidden").empty()
-                        .append("Lịch học: <br/> " + scheduleType);
+                        .append("Lịch học: <br/> " + (((clazzDTO['clazzSchedule'])['scheduleType'])['scheduleCategory'])['scheduleName']);
 
                     $("#txtClazzSlot").removeClass("visually-hidden").empty()
                         .append("Tiết học: <br/> Tiết " + (clazzDTO['clazzSchedule'])['slot']);
@@ -425,58 +431,65 @@
             })
         }
     }
+
+    function enableParamBeforeFormSubmit(formId) {
+        enableAllFormElementIn(formId);
+
+        const form = document.getElementById(formId);
+        form.requestSubmit();
+    }
 </script>
 
 <script id="script1">
     <c:if test="${fromEnroll}">
-    $("#selRequestType").val("${RequestType.ENROLL}").prop('disabled', true);
-    toggleRequestForm();
-
-    /* Course */
-    $("#selCourse").val("${courseList.get(0).id}").prop('disabled', true);
-    $("#txtCoursePrice").append("${courseList.get(0).currentPrice.price} ₫");
-    let isPromotion = ${courseList.get(0).currentPrice.isPromotion};
-    if (isPromotion) {
-        $("#txtCourseDiscount").removeClass("visually-hidden")
-            .append("${courseList.get(0).currentPrice.promotionAmount}");
-        $("#txtCourseFinalPrice").removeClass("visually-hidden")
-            .append("${courseList.get(0).currentPrice.finalPrice} ₫");
-    }
-
-    /* Semester */
-    $("#selSemester").val("${semesterList.get(0).id}").prop('disabled', true);
-
-    <fmt:parseDate value="${semesterList.get(0).startDate}" type="date"
-                   pattern="yyyy-MM-dd" var="parsedStartDate" />
-    <fmt:parseDate value="${semesterList.get(0).endDate}" type="date"
-                   pattern="yyyy-MM-dd" var="parsedEndDate" />
+        $("#selRequestType").val("${RequestType.ENROLL}").prop('disabled', true);
+        toggleRequestForm();
     
-    $("#txtSemesterStart").append('<fmt:formatDate value="${parsedStartDate}" type="date" pattern="dd/MM/yyyy"/>');
-    $("#txtSemesterEnd").append('<fmt:formatDate value="${parsedEndDate}" type="date" pattern="dd/MM/yyyy"/>');
-
-    /* Center */
-    $("#selCenter").val("${centerList.get(0).id}").prop('disabled', true);
-    $("#txtCenterAddr").append("${centerList.get(0).address.addressString}");
-
-    /* Clazz */
-    $("#classDetail").removeClass("visually-hidden");
-    let selClazz = $("#selClazz");
-    selClazz.append('<option value="${clazzList.get(0).id}"><c:out value="${clazzList.get(0).clazzName}"/></option>')
-    selClazz.val("${clazzList.get(0).id}").prop('disabled', true);
-    $("#txtClazzSchedule").removeClass("visually-hidden").append("${clazzList.get(0).clazzSchedule.scheduleType.stringValueVie}");
-    $("#txtClazzSlot").removeClass("visually-hidden").append("Tiết ${clazzList.get(0).clazzSchedule.slot}");
-    $("#txtClazzFrom").removeClass("visually-hidden").append("${clazzList.get(0).clazzSchedule.sessionStart}");
-    $("#txtClazzTo").removeClass("visually-hidden").append("${clazzList.get(0).clazzSchedule.sessionEnd}");
-    $("#txtClazzRoom").removeClass("visually-hidden").append("${clazzList.get(0).clazzSchedule.roomName}");
-    $("#txtClazzTeacher").removeClass("visually-hidden").append("${clazzList.get(0).staff.user.fullName}");
-    let memberCount = ${empty clazzList.get(0).memberList ? 0 : clazzList.get(0).memberList.size()};
-    $("#txtClazzMember").removeClass("visually-hidden").append(memberCount + " / ${clazzList.get(0).clazzSize}");
-
-    $("#submitSection").empty()
-        .append('<button type="submit" class="btn btn-primary w-50">Gửi đơn</button>');
-    $("#changeClassForm").remove();
+        /* Course */
+        $("#selCourse").val("${courseList.get(0).id}").prop('disabled', true);
+        $("#txtCoursePrice").append("${courseList.get(0).currentPrice.price} ₫");
+        let isPromotion = ${courseList.get(0).currentPrice.isPromotion};
+        if (isPromotion) {
+            $("#txtCourseDiscount").removeClass("visually-hidden")
+                .append("${courseList.get(0).currentPrice.promotionAmount}");
+            $("#txtCourseFinalPrice").removeClass("visually-hidden")
+                .append("${courseList.get(0).currentPrice.finalPrice} ₫");
+        }
+    
+        /* Semester */
+        $("#selSemester").val("${semesterList.get(0).id}").prop('disabled', true);
+    
+        <fmt:parseDate value="${semesterList.get(0).startDate}" type="date"
+                       pattern="yyyy-MM-dd" var="parsedStartDate" />
+        <fmt:parseDate value="${semesterList.get(0).endDate}" type="date"
+                       pattern="yyyy-MM-dd" var="parsedEndDate" />
+        
+        $("#txtSemesterStart").append('<fmt:formatDate value="${parsedStartDate}" type="date" pattern="dd/MM/yyyy"/>');
+        $("#txtSemesterEnd").append('<fmt:formatDate value="${parsedEndDate}" type="date" pattern="dd/MM/yyyy"/>');
+    
+        /* Center */
+        $("#selCenter").val("${centerList.get(0).id}").prop('disabled', true);
+        $("#txtCenterAddr").append("${centerList.get(0).address.addressString}");
+    
+        /* Clazz */
+        $("#classDetail").removeClass("visually-hidden");
+        $("#selClazz").val("${clazzList.get(0).id}").prop('disabled', true);
+        
+        $("#txtClazzSchedule").removeClass("visually-hidden").append("${clazzList.get(0).clazzSchedule.scheduleType.stringValueVie}");
+        $("#txtClazzSlot").removeClass("visually-hidden").append("Tiết ${clazzList.get(0).clazzSchedule.slot}");
+        $("#txtClazzFrom").removeClass("visually-hidden").append("${clazzList.get(0).clazzSchedule.sessionStart}");
+        $("#txtClazzTo").removeClass("visually-hidden").append("${clazzList.get(0).clazzSchedule.sessionEnd}");
+        $("#txtClazzRoom").removeClass("visually-hidden").append("${clazzList.get(0).clazzSchedule.roomName}");
+        $("#txtClazzTeacher").removeClass("visually-hidden").append("${clazzList.get(0).staff.user.fullName}");
+        let memberCount = ${empty clazzList.get(0).memberList ? 0 : clazzList.get(0).memberList.size()};
+        $("#txtClazzMember").removeClass("visually-hidden").append(memberCount + " / ${clazzList.get(0).clazzSize}");
+    
+        $("#submitSection").empty()
+            .append('<button type="submit" class="btn btn-primary w-50">Gửi đơn</button>');
+        $("#changeClassForm").remove();
     </c:if>
-    $("#script1").remove(); /* Xóa thẻ <script> sau khi xong */
+    
+    // $("#script1").remove(); /* Xóa thẻ <script> sau khi xong */
 </script>
 <!-- ================================================== Script ===================================================== -->
 </body>

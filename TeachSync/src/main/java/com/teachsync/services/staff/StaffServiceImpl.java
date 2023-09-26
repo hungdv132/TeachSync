@@ -43,6 +43,11 @@ public class StaffServiceImpl implements StaffService {
     /* =================================================== READ ===================================================== */
     /* id */
     @Override
+    public Boolean existsById(Long id) throws Exception {
+        return staffRepository
+                .existsByIdAndStatusNot(id, Status.DELETED);
+    }
+    @Override
     public Staff getById(Long id) throws Exception {
         return staffRepository
                 .findByIdAndStatusNot(id, Status.DELETED)
@@ -59,6 +64,11 @@ public class StaffServiceImpl implements StaffService {
         return wrapDTO(staff, options);
     }
 
+    @Override
+    public Boolean existsAllByIdIn(Collection<Long> idCollection) throws Exception {
+        return staffRepository
+                .existsAllByIdInAndStatusNot(idCollection, Status.DELETED);
+    }
     @Override
     public List<Staff> getAllByIdIn(Collection<Long> idCollection) throws Exception {
         List<Staff> staffList =
