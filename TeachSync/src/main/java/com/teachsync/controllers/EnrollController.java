@@ -129,7 +129,7 @@ public class EnrollController {
             /* Clazz (Lớp được chọn) */
             ClazzReadDTO clazzDTO = clazzService.getDTOById(
                     clazzId,
-                    List.of(MEMBER_LIST, STAFF, USER, CLAZZ_SCHEDULE, ROOM_NAME,
+                    List.of(MEMBER_LIST, STAFF, USER, CLAZZ_SCHEDULE, SCHEDULE_CAT, ROOM_NAME,
                             COURSE_SEMESTER, CENTER, ADDRESS, SEMESTER, COURSE, CURRENT_PRICE));
             model.addAttribute("clazzList", List.of(clazzDTO));
 
@@ -143,8 +143,6 @@ public class EnrollController {
             model.addAttribute("centerList", List.of(clazzDTO.getCourseSemester().getCenter()));
 
             model.addAttribute("fromEnroll", true);
-            model.addAttribute("type", RequestType.ENROLL);
-
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -121,7 +121,8 @@ public class ClazzController {
         Map<String, Object> response = new HashMap<>();
         try {
             ClazzReadDTO clazzDTO =
-                    clazzService.getDTOById(clazzId, List.of(MEMBER_LIST, STAFF, USER, CLAZZ_SCHEDULE, ROOM_NAME, TEST_LIST));
+                    clazzService.getDTOById(clazzId, List.of(MEMBER_LIST, STAFF, USER, CLAZZ_SCHEDULE, SCHEDULE_CAT, ROOM_NAME, TEST_LIST));
+
             response.put("clazz", clazzDTO);
         } catch (Exception e) {
             e.printStackTrace();

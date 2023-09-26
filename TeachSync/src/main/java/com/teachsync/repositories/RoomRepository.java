@@ -14,8 +14,11 @@ import java.util.Optional;
 public interface RoomRepository extends JpaRepository<Room, Long> {
 
     /* id */
+    Boolean existsByIdAndStatusNot(Long id, Status status);
     Optional<Room> findByIdAndStatusNot(Long id, Status status);
+    Boolean existsAllByIdInAndStatusNot(Collection<Long> idCollection, Status status);
     List<Room> findAllByIdInAndStatusNot(Collection<Long> idCollection, Status status);
 
     List<Room> getAllByCenterIdAndStatusNot(Long centerId, Status status);
+    List<Room> getAllByCenterIdInAndStatusNot(Collection<Long> centerIdCollection, Status status);
 }

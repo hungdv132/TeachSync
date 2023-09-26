@@ -15,9 +15,11 @@ public interface StaffService {
 
     /* =================================================== READ ===================================================== */
     /* id */
+    Boolean existsById(Long id) throws Exception;
     Staff getById(Long id) throws Exception;
     StaffReadDTO getDTOById(Long id, Collection<DtoOption> options) throws Exception;
 
+    Boolean existsAllByIdIn(Collection<Long> idCollection) throws Exception;
     List<Staff> getAllByIdIn(Collection<Long> idCollection) throws Exception;
     List<StaffReadDTO> getAllDTOByIdIn(Collection<Long> idCollection, Collection<DtoOption> options) throws Exception;
     Map<Long, StaffReadDTO> mapIdDTOByIdIn(Collection<Long> idCollection, Collection<DtoOption> options) throws Exception;

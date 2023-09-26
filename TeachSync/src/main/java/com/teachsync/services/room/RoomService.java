@@ -15,16 +15,23 @@ public interface RoomService {
 
     /* =================================================== READ ===================================================== */
     /* id */
+    Boolean existsById(Long id) throws Exception;
     Room getById(Long id) throws Exception;
+    RoomReadDTO getDTOById(Long id, Collection<DtoOption> options) throws Exception;
 
+    Boolean existsAllByIdIn(Collection<Long> idCollection) throws Exception;
     List<Room> getAllByIdIn(Collection<Long> idCollection) throws Exception;
-
-    List<Room> getAllByCenterId(Long id) throws Exception;
-    List<RoomReadDTO> getAllDTOByCenterId(Long id, Collection<DtoOption> options) throws Exception;
-
     Map<Long, String> mapRoomIdRoomNameByIdIn(Collection<Long> idCollection) throws Exception;
+    List<RoomReadDTO> getAllDTOByIdIn(Collection<Long> idCollection, Collection<DtoOption> options) throws Exception;
+    Map<Long, RoomReadDTO> mapIdDTOByIdIn(Collection<Long> idCollection, Collection<DtoOption> options) throws Exception;
 
-    List<RoomReadDTO> getAllDTOByCenterId(Collection<Long> idCollection, Collection<DtoOption> options);
+    List<Room> getAllByCenterId(Long centerId) throws Exception;
+    List<RoomReadDTO> getAllDTOByCenterId(Long centerId, Collection<DtoOption> options) throws Exception;
+
+
+    List<Room> getAllByCenterIdIn(Collection<Long> centerIdCollection) throws Exception;
+    List<RoomReadDTO> getAllDTOByCenterIdIn(
+            Collection<Long> centerIdCollection, Collection<DtoOption> options) throws Exception;
 
     
     /* =================================================== UPDATE =================================================== */

@@ -1,8 +1,6 @@
 package com.teachsync.dtos.session;
+import com.teachsync.dtos.BaseCreateDTO;
 import com.teachsync.dtos.BaseReadDTO;
-import com.teachsync.dtos.clazzSchedule.ClazzScheduleReadDTO;
-import com.teachsync.dtos.room.RoomReadDTO;
-import com.teachsync.dtos.staff.StaffReadDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -17,17 +15,10 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class SessionReadDTO extends BaseReadDTO {
-    private Long scheduleId;
-    private ClazzScheduleReadDTO schedule;
-
+public class SessionCreateDTO extends BaseCreateDTO {
     private Long roomId;
-    private String roomName;
-    private RoomReadDTO room;
-
+    private Long scheduleId;
     private Long staffId;
-    private StaffReadDTO staff;
-
     private Integer slot;
     private LocalDateTime sessionStart;
     private LocalDateTime sessionEnd;

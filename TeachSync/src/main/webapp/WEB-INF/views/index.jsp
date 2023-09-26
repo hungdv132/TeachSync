@@ -24,9 +24,10 @@
 <!-- ================================================== Header ===================================================== -->
 
 
-<!-- ================================================== Breadcrumb ================================================= -->
-<div class="row ts-bg-white border ts-border-teal rounded-3 mx-2 mb-3">
-  <div class="col">
+<!-- ================================================== Main Body ================================================== -->
+<div class="row">
+  <!-- Breadcrumb -->
+  <div class="col-12 ts-bg-white border-top border-bottom ts-border-teal px-5 mb-3">
     <nav aria-label="breadcrumb">
       <ol class="breadcrumb ts-txt-sm ts-txt-bold my-2">
         <li class="breadcrumb-item">
@@ -34,25 +35,18 @@
             <i class="bi-house-door"></i>&nbsp;Trang chủ
           </a>
         </li>
-        <%--      <li class="breadcrumb-item">--%>
-        <%--      <a href="#">Second page</a>--%>
-        <%--      </li>--%>
-        <%--      <li class="breadcrumb-item active" aria-current="page">--%>
-        <%--      Current Page--%>
-        <%--      </li>--%>
       </ol>
     </nav>
   </div>
-</div>
+  
+  <c:set var="currentUri" value="${requestScope['jakarta.servlet.forward.request_uri']}"/>
+  <c:set var="queryString" value="${requestScope['jakarta.servlet.forward.query_string']}"/>
+  <c:set var="targetUrl" scope="session" value="${currentUri}${not empty queryString ? '?'.concat(queryString) : ''}"/>
+  <!-- Breadcrumb -->
 
-<c:set var="currentUri" value="${requestScope['jakarta.servlet.forward.request_uri']}"/>
-<c:set var="queryString" value="${requestScope['jakarta.servlet.forward.query_string']}"/>
-<c:set var="targetUrl" scope="session" value="${currentUri}${not empty queryString ? '?'.concat(queryString) : ''}"/>
-<!-- ================================================== Breadcrumb ================================================= -->
 
-<!-- ================================================== Main Body ================================================== -->
-<div class="row ts-bg-white border ts-border-teal rounded-3 pt-3 mx-2 mb-3">
-  <div class="col">
+  <!-- Content -->
+  <div class="col-12 ts-bg-white border-top border-bottom ts-border-teal mb-3 pt-3">
     <c:if test="${isGuest}">
       <%@ include file="/WEB-INF/fragments/guest/guest-home.jspf" %>
     </c:if>
@@ -96,18 +90,22 @@
     <br>
     <br>
   </div>
+  <!-- Content -->
 </div>
 <!-- ================================================== Main Body ================================================== -->
-
 
 <!-- ================================================== Footer ===================================================== -->
 <%@ include file="/WEB-INF/fragments/footer.jspf" %>
 <!-- ================================================== Footer ===================================================== -->
-</body>
+
+
+<!-- ================================================== Script ===================================================== -->
 <script>
-  var mess = '${mess}'
-  if (mess != '') {
-    alert(mess);
-  }
+    var mess = <c:out value="${mess}"/>
+    if (mess != '') {
+        alert(mess);
+    }
 </script>
+<!-- ================================================== Script ===================================================== -->
+</body>
 </html>

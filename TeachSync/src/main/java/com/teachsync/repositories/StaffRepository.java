@@ -14,7 +14,9 @@ public interface StaffRepository extends JpaRepository<Staff, Long> {
 
 
     /* id */
+    Boolean existsByIdAndStatusNot(Long id, Status status);
     Optional<Staff> findByIdAndStatusNot(Long id, Status status);
+    Boolean existsAllByIdInAndStatusNot(Collection<Long> idCollection, Status status);
     List<Staff> findAllByIdInAndStatusNot(Collection<Long> idCollection, Status status);
 
     /* centerId */

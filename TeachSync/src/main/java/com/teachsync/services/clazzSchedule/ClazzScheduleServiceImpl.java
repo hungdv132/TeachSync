@@ -1,5 +1,6 @@
 package com.teachsync.services.clazzSchedule;
 
+import com.teachsync.dtos.BaseReadDTO;
 import com.teachsync.dtos.clazzSchedule.ClazzScheduleCreateDTO;
 import com.teachsync.dtos.clazzSchedule.ClazzScheduleReadDTO;
 import com.teachsync.dtos.clazzSchedule.ClazzScheduleUpdateDTO;
@@ -93,13 +94,23 @@ public class ClazzScheduleServiceImpl implements ClazzScheduleService {
     @Override
     public ClazzSchedule createClazzSchedule(ClazzSchedule clazzSchedule) throws Exception {
         /* Validate input */
-        /* TODO: */
+        if (clazzSchedule.getSlot() < 1 || clazzSchedule.getSlot() > 9) {
+            throw new IllegalArgumentException("Update error. Slot must be from 1 to 9.");
+        }
+        if (clazzSchedule.getSessionStart().isAfter(clazzSchedule.getSessionEnd())) {
+            throw new IllegalArgumentException("Update error. Start cannot be after end.");
+        }
 
         /* Check FK */
         /* TODO: */
 
         /* Check duplicate */
-        /* TODO: */
+        if (clazzScheduleRepository.existsByClazzIdAndStatusNot(
+                clazzSchedule.getClazzId(),
+                Status.DELETED)) {
+            throw new IllegalArgumentException(
+                    "Create error. Already exists a schedule for Clazz with id: " + clazzSchedule.getClazzId());
+        }
 
         /* Create */
         clazzSchedule = clazzScheduleRepository.saveAndFlush(clazzSchedule);
@@ -115,8 +126,6 @@ public class ClazzScheduleServiceImpl implements ClazzScheduleService {
 
         return wrapDTO(clazzSchedule, null);
     }
-
-
 
 
     /* =================================================== READ ===================================================== */
@@ -158,25 +167,18 @@ public class ClazzScheduleServiceImpl implements ClazzScheduleService {
         return wrapPageDTO(clazzSchedulePage, options);
     }
 
-    /*id*/
+    /* id */
+    @Override
+    public Boolean existsById(Long id) throws Exception {
+        return clazzScheduleRepository
+                .existsByIdAndStatusNot(id, Status.DELETED);
+    }
     @Override
     public ClazzSchedule getById(Long id) throws Exception {
         return clazzScheduleRepository
                 .findByIdAndStatusNot(id, Status.DELETED)
                 .orElse(null);
     }
-
-    @Override
-    public ClazzScheduleReadDTO getDTOById(Long id) throws Exception {
-        ClazzSchedule clazzSchedule = getById(id);
-
-        if (clazzSchedule == null) {
-            return null;
-        }
-
-        return wrapDTO(clazzSchedule, null);
-    }
-
     @Override
     public ClazzScheduleReadDTO getDTOById(Long id, Collection<DtoOption> options) throws Exception {
         ClazzSchedule clazzSchedule = getById(id);
@@ -186,6 +188,46 @@ public class ClazzScheduleServiceImpl implements ClazzScheduleService {
         }
 
         return wrapDTO(clazzSchedule, options);
+    }
+
+    @Override
+    public Boolean existsAllByIdIn(Collection<Long> idCollection) throws Exception {
+        return clazzScheduleRepository
+                .existsByIdInAndStatusNot(idCollection, Status.DELETED);
+    }
+    @Override
+    public List<ClazzSchedule> getAllByIdIn(Collection<Long> idCollection) throws Exception {
+        List<ClazzSchedule> scheduleList =
+                clazzScheduleRepository.findAllByIdInAndStatusNot(idCollection, Status.DELETED);
+
+        if (scheduleList.isEmpty()) {
+            return null;
+        }
+
+        return scheduleList;
+    }
+    @Override
+    public List<ClazzScheduleReadDTO> getAllDTOByIdIn(
+            Collection<Long> idCollection, Collection<DtoOption> options) throws Exception {
+        List<ClazzSchedule> scheduleList = getAllByIdIn(idCollection);
+
+        if (scheduleList == null) {
+            return null;
+        }
+
+        return wrapListDTO(scheduleList, options);
+    }
+    @Override
+    public Map<Long, ClazzScheduleReadDTO> mapIdDTOByIdIn(
+            Collection<Long> idCollection, Collection<DtoOption> options) throws Exception {
+        List<ClazzScheduleReadDTO> scheduleList = getAllDTOByIdIn(idCollection, options);
+
+        if (scheduleList == null) {
+            return new HashMap<>();
+        }
+
+        return scheduleList.stream()
+                .collect(Collectors.toMap(BaseReadDTO::getId, Function.identity()));
     }
 
     /* clazzId */
@@ -239,8 +281,6 @@ public class ClazzScheduleServiceImpl implements ClazzScheduleService {
     }
 
 
-
-
     /* =================================================== UPDATE =================================================== */
     @Override
     @Transactional
@@ -274,14 +314,34 @@ public class ClazzScheduleServiceImpl implements ClazzScheduleService {
 
     @Override
     public ClazzSchedule updateClazzSchedule(ClazzSchedule clazzSchedule) throws Exception {
+        /* Check exists */
+        ClazzSchedule oldSchedule = getById(clazzSchedule.getId());
+        if (oldSchedule == null) {
+            throw new IllegalArgumentException("Update error. No Schedule found with id: " + clazzSchedule.getId());
+        }
+        clazzSchedule.setCreatedAt(oldSchedule.getCreatedAt());
+        clazzSchedule.setCreatedBy(oldSchedule.getCreatedBy());
+
         /* Validate input */
-        /* TODO: */
+        if (!oldSchedule.getClazzId().equals(clazzSchedule.getClazzId())) {
+            throw new IllegalArgumentException("Update error. Schedule does not allow change of clazzId");
+        }
+        if (clazzSchedule.getSlot() < 1 || clazzSchedule.getSlot() > 9) {
+            throw new IllegalArgumentException("Update error. Slot must be from 1 to 9.");
+        }
+        if (clazzSchedule.getSessionStart().isAfter(clazzSchedule.getSessionEnd())) {
+            throw new IllegalArgumentException("Update error. Start cannot be after end.");
+        }
 
         /* Check FK */
         /* TODO: */
 
         /* Check duplicate */
-        /* TODO: */
+        ClazzSchedule duplicateSchedule = getByClazzId(clazzSchedule.getClazzId());
+        if (!duplicateSchedule.getId().equals(clazzSchedule.getId())) {
+            throw new IllegalArgumentException(
+                    "Update error. Already exists a schedule for Clazz with id: " + clazzSchedule.getClazzId());
+        }
 
         /* Create */
         clazzSchedule = clazzScheduleRepository.saveAndFlush(clazzSchedule);
@@ -291,19 +351,16 @@ public class ClazzScheduleServiceImpl implements ClazzScheduleService {
 
     @Override
     public ClazzScheduleReadDTO updateClazzScheduleByDTO(ClazzScheduleUpdateDTO updateDTO) throws Exception {
-        ClazzSchedule oldClazzSchedule = getById(updateDTO.getId());
-        if(oldClazzSchedule == null){
-            throw new IllegalArgumentException("No Clazz Schedule Found With Id: " + updateDTO.getId());
-        }
-
         ClazzSchedule clazzSchedule = mapper.map(updateDTO, ClazzSchedule.class);
 
         clazzSchedule = updateClazzSchedule(clazzSchedule);
 
-        /* TODO: update clazzSchedule */
+        /* TODO: update cascade clazzSchedule */
         return wrapDTO(clazzSchedule, null);
     }
 
+
+    /* =================================================== DELETE =================================================== */
 
 
     /* =================================================== WRAPPER ================================================== */
@@ -312,7 +369,7 @@ public class ClazzScheduleServiceImpl implements ClazzScheduleService {
         ClazzScheduleReadDTO dto = mapper.map(clazzSchedule, ClazzScheduleReadDTO.class);
 
         /* Add Dependency */
-        if (options != null && !options.isEmpty()) {
+        if (!ObjectUtils.isEmpty(options)) {
             if (options.contains(DtoOption.CLAZZ_NAME)) {
                 Clazz clazz = clazzService.getById(dto.getClazzId());
                 dto.setClazzName(clazz.getClazzName());
@@ -344,7 +401,7 @@ public class ClazzScheduleServiceImpl implements ClazzScheduleService {
         Map<Long, ScheduleCaReadDTO> scheduleIdScheduleDescMap = new HashMap<>();
 
 
-        if (options != null && !options.isEmpty()) {
+        if (!ObjectUtils.isEmpty(options)) {
             Set<Long> clazzIdSet = new HashSet<>();
             Set<Long> roomIdSet = new HashSet<>();
             Set<Long> scheduleCategoryIdSet = new HashSet<>();
