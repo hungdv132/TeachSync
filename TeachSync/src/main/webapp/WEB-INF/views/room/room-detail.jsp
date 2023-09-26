@@ -53,14 +53,8 @@
     <h4 class="mb-0">${room.roomName}</h4>
 
     <c:if test="${isAdmin}">
-      <a href="/edit-room?id=${center.id}" class="btn btn-warning">Chỉnh sửa</a>
+      <a href="/edit-room?id=${room.id}" class="btn btn-warning">Chỉnh sửa</a>
     </c:if>
-  </div>
-
-  <!-- Center Img -->
-  <div class="col-sm-12 col-md-4 mb-3">
-    <img src="${empty center.centerImg ? '../../../resources/img/no-img.jpg' : center.centerImg}" alt="courseImg"
-         class="rounded-2 border ts-border-blue w-100 h-auto mb-3">
   </div>
 
   <!-- Center detail -->

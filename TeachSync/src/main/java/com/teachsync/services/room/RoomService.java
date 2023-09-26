@@ -1,6 +1,7 @@
 package com.teachsync.services.room;
 
 import com.teachsync.dtos.room.RoomReadDTO;
+import com.teachsync.dtos.room.RoomUpdateDTO;
 import com.teachsync.entities.Room;
 import com.teachsync.utils.enums.DtoOption;
 import org.springframework.data.domain.Page;
@@ -35,7 +36,8 @@ public interface RoomService {
 
     
     /* =================================================== UPDATE =================================================== */
-
+    Room updateRoom(Room room) throws Exception;
+    RoomReadDTO updateRoomByDTO(RoomUpdateDTO updateDTO) throws Exception;
 
     /* =================================================== DELETE =================================================== */
     

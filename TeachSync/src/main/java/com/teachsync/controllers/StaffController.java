@@ -3,25 +3,23 @@ package com.teachsync.controllers;
 import com.teachsync.dtos.address.AddressCreateDTO;
 import com.teachsync.dtos.address.AddressReadDTO;
 import com.teachsync.dtos.address.AddressUpdateDTO;
-import com.teachsync.dtos.center.CenterCreateDTO;
 import com.teachsync.dtos.center.CenterReadDTO;
-import com.teachsync.dtos.user.UserCreateDTO;
+import com.teachsync.dtos.staff.StaffReadDTO;
+import com.teachsync.dtos.staff.StaffUpdateDTO;
 import com.teachsync.dtos.user.UserReadDTO;
 import com.teachsync.dtos.user.UserUpdateAccountDTO;
 import com.teachsync.dtos.user.UserUpdateDTO;
 import com.teachsync.entities.LocationUnit;
-import com.teachsync.entities.User;
-import com.teachsync.repositories.UserRepository;
 import com.teachsync.services.address.AddressService;
+import com.teachsync.services.center.CenterService;
 import com.teachsync.services.locationUnit.LocationUnitService;
+import com.teachsync.services.staff.StaffService;
 import com.teachsync.services.user.UserService;
-import com.teachsync.utils.Constants;
+import com.teachsync.utils.enums.DtoOption;
 import com.teachsync.utils.enums.Gender;
 import jakarta.servlet.http.HttpSession;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -33,10 +31,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
 @Controller
-public class UserController {
+public class StaffController {
     @Autowired
-    UserRepository userRepository;
+    CenterService centerService;
+
+    @Autowired
+    StaffService staffService;
 
     @Autowired
     UserService userService;
@@ -50,166 +52,48 @@ public class UserController {
     @Autowired
     private ModelMapper mapper;
 
-    @GetMapping("add-user")
-    public String createUserPage(
+    @GetMapping("/list-staff")
+    public String staffListPage(
             Model model,
-            @SessionAttribute(value = "user", required = false) UserReadDTO userDTO,
-            RedirectAttributes redirect
+            @RequestParam Long id
     ){
-        //check login
-        if (ObjectUtils.isEmpty(userDTO)) {
-            redirect.addAttribute("mess", "Làm ơn đăng nhập");
-            return "redirect:/index";
-        }
-
-        if (!userDTO.getRoleId().equals(Constants.ROLE_ADMIN)) {
-            redirect.addAttribute("mess", "bạn không đủ quyền");
-            return "redirect:/index";
-        }
-
         try{
-            List<LocationUnit> countryList = locationUnitService.getAllByLevel(0);
-            model.addAttribute("countryList", countryList);
-            Long parentId = countryList.get(0).getId();
-            List<LocationUnit> provinceList = locationUnitService.getAllByParentId(parentId);
-            model.addAttribute("provinceList", provinceList);
+            CenterReadDTO centerReadDTO = centerService.getDTOById(id,null);
+            List<StaffReadDTO> staffList = staffService.getAllDTOByCenterId(centerReadDTO.getId(),null);
+            for(int i =0; i<staffList.size();i++){
+                UserReadDTO user = userService.getDTOById(staffList.get(i).getUserId(),null);
+                staffList.get(i).setUser(user);
+            }
 
-            parentId = provinceList.get(0).getId();
-            List<LocationUnit> districtList = locationUnitService.getAllByParentId(parentId);
-            model.addAttribute("districtList", districtList);
-
-            parentId = districtList.get(0).getId();
-            List<LocationUnit> wardList = locationUnitService.getAllByParentId(parentId);
-            model.addAttribute("wardList", wardList);
+            model.addAttribute("center", centerReadDTO);
+            model.addAttribute("staffList",staffList);
         }catch (Exception e){
             e.printStackTrace();
         }
 
-
-        return "user/add-user";
+        return "staff/list-staff";
     }
 
-    @PostMapping("add-user")
-    public String addCenter(
-            @ModelAttribute AddressCreateDTO addressCreateDTO,
-            @ModelAttribute UserCreateDTO userCreateDTO,
-            @SessionAttribute(value = "user", required = false) UserReadDTO userDTO,
-            RedirectAttributes redirect
-    ){
-
-        UserReadDTO userReadDTO = null;
-
-        if (ObjectUtils.isEmpty(userDTO)) {
-            redirect.addAttribute("mess", "Làm ơn đăng nhập");
-            return "redirect:/index";
-        }
-
-        if (!userDTO.getRoleId().equals(Constants.ROLE_ADMIN)) {
-            redirect.addAttribute("mess", "bạn không đủ quyền");
-            return "redirect:/index";
-        }
-
-        try{
-
-            addressCreateDTO.setCreatedBy(userDTO.getId());
-
-            AddressReadDTO addressReadDTO =
-                    addressService.createAddressByDTO(addressCreateDTO);
-
-            userCreateDTO.setAddressId(addressReadDTO.getId());
-
-            userReadDTO = userService.createUserByDTO(userCreateDTO);
-
-            userReadDTO.setAddress(addressReadDTO);
-
-        }catch (Exception e){
-            e.printStackTrace();
-
-        }
-        return "redirect:/center";
-    }
-    @GetMapping("list-user")
-    public String userListPage(Model model)  {
-
-        try{
-            List<User> listUser = userRepository.findAll();
-            model.addAttribute("listUser",listUser);
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        return "user/list-user";
-    }
-//    @GetMapping("/lst-user")
-//    public String lstUser(@RequestParam(value = "page", required = false) Integer page, Model model) {
-//        if (page == null) {
-//            page = 0;
-//        }
-//        if (page < 0) {
-//            page = 0;
-//        }
-//        PageRequest pageable = PageRequest.of(page, 3);
-//        Page<User> users = userRepository.findAllByOrderByCreatedAtDesc(pageable);
-//        model.addAttribute("lstUserSearch", users);
-//        model.addAttribute("pageNo", users.getPageable().getPageNumber());
-//        model.addAttribute("pageTotal", users.getTotalPages());
-//        return "user/list-user";
-//    }
-
-//    @GetMapping("/searchuserbyusername")
-//    public String searchUserByUserName(@RequestParam(value = "page", required = false) Integer page, @RequestParam("searchText") String name, Model model) {
-//        if (page == null) {
-//            page = 0;
-//        }
-//        if (page < 0) {
-//            page = 0;
-//        }
-//        PageRequest pageable = PageRequest.of(page, 3);
-//        Page<User> users = userRepository.findAllByUsernameContainingOrderByCreatedAtDesc(name, pageable);
-//        model.addAttribute("lstUserSearch", users);
-//        model.addAttribute("pageNo", users.getPageable().getPageNumber());
-//        model.addAttribute("pageTotal", users.getTotalPages());
-//        model.addAttribute("searchText", name);
-//        return "user/lst-user-search";
-//    }
-//
-//    @GetMapping("/lst-user-by-type")
-//    public String lstStudentUser(@RequestParam(value = "page", required = false) Integer page, @RequestParam(value = "searchText", required = false) String name,
-//                                 @RequestParam("type") Long typeUser, Model model) {
-//        if (page == null) {
-//            page = 0;
-//        }
-//        if (page < 0) {
-//            page = 0;
-//        }
-//        PageRequest pageable = PageRequest.of(page, 3);
-//        Page<User> users = userRepository.findAllByRoleId(typeUser,pageable);
-//        model.addAttribute("lstUserSearch", users);
-//        model.addAttribute("pageNo", users.getPageable().getPageNumber());
-//        model.addAttribute("pageTotal", users.getTotalPages());
-//        model.addAttribute("searchText", name);
-//        return "user/lst-user-search";
-//    }
-
-    @GetMapping("user-detail")
-    public String userPage(
+    @GetMapping("/staff-detail")
+    public String staffDetailPage(
+            Model model,
             Long id,
-            Model model,
             RedirectAttributes redirect,
-            @SessionAttribute(value = "user", required = false) UserReadDTO userDTO) {
+            @SessionAttribute(value = "user", required = false) UserReadDTO userDTO
+    ) {
 
         /* Check login */
-        if (ObjectUtils.isEmpty(userDTO)) {
+        if (ObjectUtils.isEmpty( userDTO)) {
             redirect.addAttribute("mess", "Làm ơn đăng nhập");
             return "redirect:/index";
         }
 
-
         try {
-            UserReadDTO userReadDTO = userService.getDTOById(id,null);
+            StaffReadDTO staffReadDTO = staffService.getDTOById(id, List.of(DtoOption.USER));
             List<LocationUnit> countryList = locationUnitService.getAllByLevel(0);
             model.addAttribute("countryList", countryList);
 
-            Long addressId = userReadDTO.getAddressId();
+            Long addressId = staffReadDTO.getUser().getAddressId();
             if (addressId != null) {
                 AddressReadDTO addressDTO = addressService.getDTOById(addressId, null);
                 model.addAttribute("address", addressDTO);
@@ -240,19 +124,18 @@ public class UserController {
                 List<LocationUnit> wardList = locationUnitService.getAllByParentId(parentId);
                 model.addAttribute("wardList", wardList);
             }
-            model.addAttribute("user1",userReadDTO);
+            model.addAttribute("staff",staffReadDTO);
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        return "user/user-detail";
+        return "staff/staff-detail";
     }
 
-    @PostMapping("/user-detail/{option}")
+    @PostMapping("/staff-detail/{option}")
     public String editProfile(
             @PathVariable("option") String option,
             RedirectAttributes redirect,
-            @RequestParam(value = "userId", required = false) Long userId,
+            @RequestParam(value = "staffId", required = false) Long staffId,
             @RequestParam(value = "userAvatar", required = false) String userAvatar,
             @RequestParam(value = "about", required = false) String about,
             @RequestParam(value = "fullName", required = false) String fullName,
@@ -272,8 +155,10 @@ public class UserController {
         }
 
         try {
-            UserReadDTO userReadDTO = userService.getDTOById(userId,null);
-            UserUpdateDTO userUpdateDTO = mapper.map(userReadDTO, UserUpdateDTO.class);
+            StaffReadDTO staffReadDTO = staffService.getDTOById(staffId,List.of(DtoOption.USER));
+            StaffUpdateDTO staffUpdateDTO = mapper.map(staffReadDTO,StaffUpdateDTO.class);
+            UserUpdateDTO userUpdateDTO = mapper.map(staffReadDTO.getUser(), UserUpdateDTO.class);
+            staffUpdateDTO.setUpdatedBy(userDTO.getId());
             userUpdateDTO.setUpdatedBy(userDTO.getId());
 
             switch (option) {
@@ -292,18 +177,18 @@ public class UserController {
                 case "address" -> {
                     AddressReadDTO addressReadDTO;
 
-                    if (userReadDTO.getAddressId() == null) {
+                    if (staffReadDTO.getUser().getAddressId() == null) {
                         AddressCreateDTO addressCreateDTO = new AddressCreateDTO();
                         addressCreateDTO.setAddressNo(addressNo);
                         addressCreateDTO.setStreet(street);
                         addressCreateDTO.setUnitId(unitId);
-                        addressCreateDTO.setCreatedBy(userDTO.getId());
+                        addressCreateDTO.setCreatedBy(staffReadDTO.getUser().getId());
 
                         addressReadDTO = addressService.createAddressByDTO(addressCreateDTO);
 
                         userUpdateDTO.setAddressId(addressReadDTO.getId());
                     } else {
-                        addressReadDTO = addressService.getDTOById(userReadDTO.getAddressId(), null);
+                        addressReadDTO = addressService.getDTOById(staffReadDTO.getUser().getAddressId(), null);
 
                         AddressUpdateDTO addressUpdateDTO = mapper.map(addressReadDTO, AddressUpdateDTO.class);
 
@@ -312,15 +197,17 @@ public class UserController {
                 }
             }
 
-            userService.updateDTOUser(userUpdateDTO);
+            staffReadDTO.setUser(userService.updateDTOUser(userUpdateDTO));
+            staffUpdateDTO.setUser(staffReadDTO.getUser());
+            staffService.updateStaffByDTO(staffUpdateDTO);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        return "redirect:/user-detail?id="+userId;
+        return "redirect:/staff-detail?id="+staffId;
     }
 
-    @PutMapping("/api/user-detail/{option}")
+    @PutMapping("/api/staff-detail/{option}")
     @ResponseBody
     public Map<String, String> editAccount(
             @PathVariable("option") String option,
@@ -368,8 +255,9 @@ public class UserController {
             return response;
         }
 
-        response.put("view", "/user-detail");
+        response.put("view", "/profile");
         return response;
     }
+
 
 }

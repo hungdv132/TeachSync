@@ -3,7 +3,9 @@ package com.teachsync.services.room;
 import com.teachsync.dtos.BaseReadDTO;
 import com.teachsync.dtos.center.CenterReadDTO;
 import com.teachsync.dtos.room.RoomReadDTO;
+import com.teachsync.dtos.room.RoomUpdateDTO;
 import com.teachsync.entities.BaseEntity;
+import com.teachsync.entities.Center;
 import com.teachsync.entities.Room;
 import com.teachsync.repositories.RoomRepository;
 import com.teachsync.services.center.CenterService;
@@ -36,6 +38,7 @@ public class RoomServiceImpl implements RoomService {
 
 
     /* =================================================== CREATE =================================================== */
+
 
 
     /* =================================================== READ ===================================================== */
@@ -143,8 +146,42 @@ public class RoomServiceImpl implements RoomService {
     }
 
 
-    /* =================================================== UPDATE =================================================== */
 
+
+    /* =================================================== UPDATE =================================================== */
+    @Override
+    public Room updateRoom(Room room) throws Exception {
+        Room oldRoom = getById(room.getId());
+        if(oldRoom == null){
+            throw new IllegalArgumentException("Loi update - khong tim thay center id");
+        }
+        room.setCreatedAt(oldRoom.getCreatedAt());
+        room.setCreatedBy(oldRoom.getCreatedBy());
+
+        /* Validate input */
+
+        /* Check FK */
+        /* No FK */
+
+        /* Update to DB */
+        room = roomRepository.saveAndFlush(room);
+
+        return room;
+    }
+
+    @Override
+    public RoomReadDTO updateRoomByDTO(RoomUpdateDTO updateDTO) throws Exception {
+        Room room = mapper.map(updateDTO,Room.class);
+
+        room = updateRoom(room);
+
+        /* create dependencies */
+
+        /* update dependencies */
+
+        return wrapDTO(room,null);
+
+    }
 
     /* =================================================== DELETE =================================================== */
 

@@ -103,7 +103,7 @@
                 <label class="w-100 mb-3">
                     Miêu tả về Cơ Sở: <br/>
                     <textarea class="w-100" style="resize: none" rows="3"
-                              id="txtDesc" name="centerDesc" >${center.centerDesc}</textarea>
+                              id="txtDesc" name="centerDesc" ></textarea>
                 </label>
 
                 <!-- Center address -->

@@ -1,7 +1,7 @@
 package com.teachsync.utils.enums;
 
 public enum Gender {
-    MALE("ENGLISH", "Male", "Nam"),
+    MALE("MALE", "Male", "Nam"),
     FEMALE("FEMALE", "Female", "Nữ"),
     OTHER("OTHER", "Other", "Khác");
 

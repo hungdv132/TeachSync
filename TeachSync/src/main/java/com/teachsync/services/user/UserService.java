@@ -14,6 +14,8 @@ import java.util.Map;
 public interface UserService {
     /* =================================================== CREATE =================================================== */
     User createUser(User user) throws Exception;
+
+    UserReadDTO createUserByDTO(UserCreateDTO userCreateDTO) throws Exception;
     UserReadDTO signupDTO(UserCreateDTO dto) throws Exception;
 
 

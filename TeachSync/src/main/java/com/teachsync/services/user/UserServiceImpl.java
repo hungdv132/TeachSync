@@ -7,6 +7,7 @@ import com.teachsync.dtos.user.UserCreateDTO;
 import com.teachsync.dtos.user.UserReadDTO;
 import com.teachsync.dtos.user.UserUpdateDTO;
 import com.teachsync.entities.BaseEntity;
+import com.teachsync.entities.Center;
 import com.teachsync.entities.Role;
 import com.teachsync.entities.User;
 import com.teachsync.repositories.UserRepository;
@@ -64,6 +65,18 @@ public class UserServiceImpl implements UserService {
         user = userRepository.saveAndFlush(user);
 
         return user;
+    }
+
+    @Override
+    public UserReadDTO createUserByDTO(UserCreateDTO userCreateDTO) throws Exception {
+        User user = mapper.map(userCreateDTO,User.class);
+
+        user = createUser(user);
+
+        /* create dependencies */
+
+
+        return wrapDTO(user);
     }
 
     @Override
