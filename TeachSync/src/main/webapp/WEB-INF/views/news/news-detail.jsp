@@ -78,6 +78,7 @@
                             <div class="card-body">
                                 <p class="card-text">
                                     <c:out value="${news.newsDesc}"/>
+                                    <c:out value="${news.newsLink}"/>
                                 </p>
                             </div>
 
