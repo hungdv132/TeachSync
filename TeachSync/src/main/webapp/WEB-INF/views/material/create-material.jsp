@@ -15,6 +15,12 @@
 
     <script src="../../resources/js/jquery/jquery-3.6.3.js"></script>
     <script src="../../resources/js/bootstrap-5.3.0/bootstrap.bundle.js"></script>
+
+    <!-- Import the SDKs you need -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+    <script src="../../../resources/js/firebase.js"></script>
+
     <script src="../../resources/js/common.js"></script>
 </head>
 <body class="min-vh-100 container-fluid d-flex flex-column ts-bg-white-subtle">
@@ -24,17 +30,17 @@
 
 <!-- ================================================== Main Body ================================================== -->
 <div class="row ts-bg-white border ts-border-teal rounded-3 pt-3 mx-2 mb-3">
-    <form action="/create-material" method="post">
+    <form onsubmit="addMaterial(event)" class="col-12 d-flex justify-content-center px-5 mb-3">
 
-        <%--        <p class="ms-5 mb-0">Tên khóa học</p>--%>
-        <%--        <div class="dropdown ms-3">--%>
-        <%--            <select class="btn btn-secondary dropdown-toggle"--%>
-        <%--                    id="selCourseId" name="courseId">--%>
-        <%--                <c:forEach items="${courseList}" var="course">--%>
-        <%--                    <option value="${course.id}"> ${course.courseName}</option>--%>
-        <%--                </c:forEach>--%>
-        <%--            </select>--%>
-        <%--        </div>--%>
+                <p class="ms-5 mb-0">Tên khóa học</p>
+                <div class="dropdown ms-3">
+                    <select class="btn btn-secondary dropdown-toggle"
+                            id="selCourseId" name="courseId">
+                        <c:forEach items="${courseList}" var="course">
+                            <option value="${course.id}"> ${course.courseName}</option>
+                        </c:forEach>
+                    </select>
+                </div>
 
 
         <div class="form-group">
@@ -53,19 +59,20 @@
                    class="form-control" placeholder="Nhập link tài liệu">
         </div>
 
-        <div class="form-group">
-            <label>Content tài liệu</label>
-            <input type="text" name="materialContent"
-                   id="txtMaterialContent"
-                   required
-                   class="form-control" placeholder="Nhập content tài liệu">
-        </div>
+        <input type="hidden" id="txtMaterialContent" name="materialContent">
 
-        <div class="form-group">
-            <label>Ảnh tài liệu</label>
+
+        <div class="col-sm-12 col-md-3 mb-3">
+            <label class="w-100 mb-1">Ảnh tài liệu:
+            <br/>
+            <img src="../../../resources/img/no-img.jpg" alt="materialImg" id="imgMaterialImg"
+                 class="rounded-2 border ts-border-blue w-100 h-auto mb-3">
+            <br/>
             <input type="file" name="materialImg"
-                   id="txtMaterialImg"
-                   class="form-control">
+                   id="fileImg" class="w-100"
+                   accept="image/*" onchange="updateImgFromInput('fileImg', 'imgMaterialImg', 0.75)">
+            </label>
+            <p class="ts-txt-italic ts-txt-sm mb-0">*Tối đa 0.75 MB</p>
         </div>
 
         <div class="form-group mb-3">
@@ -103,6 +110,38 @@
     var mess = '${mess}'
     if (mess != '') {
         alert(mess);
+    }
+
+    function addMaterial(event) {
+        event.preventDefault();
+
+        let file = $('#fileImg').prop("files")[0];
+
+        let imgURL = await uploadImageFileToFirebaseAndGetURL(file);
+
+
+        let createDTO = {
+            "materialName": $("#txtMaterialName").val(),
+            "materialLink": $("#txtMaterialLink").val(),
+            "materialImg": imgURL,
+            "materialContent": $("#txtMaterialContent").val(),
+            "materialType": $("#selMaterialType").val(),
+            "isFree": $("#chkisFree").val(),
+        }
+
+        $.ajax({
+            type: "POST",
+            data: JSON.stringify(createDTO),
+            url: "/create-material",
+            contentType: "application/json",
+            success: function(response) {
+                if (response['view'] != null) {
+                    location.href = response['view'];
+                }
+            }
+        })
+
+        return false;
     }
 </script>
 </body>

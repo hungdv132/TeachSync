@@ -25,6 +25,7 @@
 
 <!-- ================================================== Main Body ================================================== -->
 <div class="row ts-bg-white border ts-border-teal rounded-3 pt-3 mx-2 mb-3">
+
   <form action="/add-schedule" method="post">
     
     <div class="row">
@@ -80,6 +81,7 @@
     
     <button type="submit" class="btn btn-primary">Submit</button>
   </form>
+
 </div>
 <!-- ================================================== Main Body ================================================== -->
 

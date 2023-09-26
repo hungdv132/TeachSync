@@ -17,6 +17,9 @@ public class News extends BaseEntity {
     @Column(name = "authorId", nullable = false)
     private Long authorId;
 
+    @Column(name = "clazzId", nullable = true)
+    private Long clazzId;
+
     @Column(name = "newsTitle", nullable = false, length = 45)
     private String newsTitle;
 

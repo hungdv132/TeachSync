@@ -58,7 +58,7 @@ public class NewsController {
 
         User user1 = userRepository.findById(user.getId()).orElse(null);
 
-        News news = new News(user1.getId(), title, null, content, description);
+        News news = new News(user1.getId(),null, title, null, content, description);
         LocalDateTime date = LocalDateTime.now();
         news.setStatus(Status.CREATED);
         news.setCreatedAt(date);
@@ -101,7 +101,7 @@ public class NewsController {
 
         User user1 = userRepository.findById(user.getId()).orElse(null);
 
-        News news = new News(user1.getId(), title, null, content, description);
+        News news = new News(user1.getId(),null, title, null, content, description);
         news.setId(Long.parseLong(idNews));
         news.setStatus(Status.UPDATED);
         news.setUpdatedBy(user.getId());

@@ -16,6 +16,8 @@ public interface NewsService {
     News getById(Long id) throws Exception;
     NewsReadDTO getDTOById(Long id) throws Exception;
 
+    List<NewsReadDTO> getAllNewsByClazz(Long clazzId);
+
 
 
     /* =================================================== WRAPPER ================================================== */

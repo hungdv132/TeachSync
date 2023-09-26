@@ -341,8 +341,8 @@ public class ClazzMemberServiceImpl implements ClazzMemberService {
             dto.setClazz(clazzIdClazzDTOMap.get(clazzMember.getClazzId()));
             dto.setClazzName(clazzIdClazzNameMap.get(clazzMember.getClazzId()));
 
-            dto.setUser(userIdUserDTOMap.get(clazzMember.getClazzId()));
-            dto.setUserFullName(userIdUserFullNameMap.get(clazzMember.getClazzId()));
+            dto.setUser(userIdUserDTOMap.get(clazzMember.getUserId()));
+            dto.setUserFullName(userIdUserFullNameMap.get(clazzMember.getUserId()));
 
             dtoList.add(dto);
         }

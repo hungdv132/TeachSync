@@ -4,25 +4,32 @@ import com.teachsync.dtos.center.CenterReadDTO;
 import com.teachsync.dtos.clazz.ClazzCreateDTO;
 import com.teachsync.dtos.clazz.ClazzReadDTO;
 import com.teachsync.dtos.clazz.ClazzUpdateDTO;
+import com.teachsync.dtos.clazzTest.ClazzTestReadDTO;
 import com.teachsync.dtos.course.CourseReadDTO;
+import com.teachsync.dtos.homework.HomeworkReadDTO;
+import com.teachsync.dtos.news.NewsReadDTO;
 import com.teachsync.dtos.semester.SemesterReadDTO;
 import com.teachsync.dtos.staff.StaffReadDTO;
+import com.teachsync.dtos.test.TestReadDTO;
 import com.teachsync.dtos.user.UserReadDTO;
-import com.teachsync.entities.BaseEntity;
-import com.teachsync.entities.ClazzMember;
-import com.teachsync.entities.CourseSemester;
-import com.teachsync.entities.Staff;
+import com.teachsync.entities.*;
+import com.teachsync.repositories.ClazzMemberRepository;
+import com.teachsync.repositories.ClazzTestRepository;
+import com.teachsync.repositories.MemberTestRecordRepository;
+import com.teachsync.repositories.TestRepository;
 import com.teachsync.services.center.CenterService;
 import com.teachsync.services.clazz.ClazzService;
 import com.teachsync.services.clazzMember.ClazzMemberService;
 import com.teachsync.services.course.CourseService;
 import com.teachsync.services.courseSemester.CourseSemesterService;
+import com.teachsync.services.homework.HomeworkService;
+import com.teachsync.services.news.NewsService;
 import com.teachsync.services.semester.SemesterService;
 import com.teachsync.services.staff.StaffService;
 import com.teachsync.utils.Constants;
 import com.teachsync.utils.MiscUtil;
+import com.teachsync.utils.enums.Status;
 import jakarta.servlet.http.HttpServletRequest;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -34,6 +41,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -57,12 +65,29 @@ public class ClazzController {
     private CenterService centerService;
     @Autowired
     private StaffService staffService;
+    @Autowired
+    private TestRepository testRepository;
+    @Autowired
+    private ClazzTestRepository clazzTestRepository;
+    @Autowired
+    private MemberTestRecordRepository memberTestRecordRepository;
+    @Autowired
+    private ClazzMemberRepository clazzMemberRepository;
 
     @Autowired
     private MiscUtil miscUtil;
 
+    @Autowired
+    NewsService newsService;
+
+    @Autowired
+    HomeworkService homeworkService;
+
     /* =================================================== API ====================================================== */
-    /** Return JSON */
+
+    /**
+     * Return JSON
+     */
     @GetMapping("/api/clazz")
     @ResponseBody
     public Map<String, Object> getClazzList(
@@ -96,7 +121,8 @@ public class ClazzController {
         Map<String, Object> response = new HashMap<>();
         try {
             ClazzReadDTO clazzDTO =
-                    clazzService.getDTOById(clazzId, List.of(MEMBER_LIST, STAFF, USER, CLAZZ_SCHEDULE, SCHEDULE_CAT, ROOM_NAME));
+                    clazzService.getDTOById(clazzId, List.of(MEMBER_LIST, STAFF, USER, CLAZZ_SCHEDULE, SCHEDULE_CAT, ROOM_NAME, TEST_LIST));
+
             response.put("clazz", clazzDTO);
         } catch (Exception e) {
             e.printStackTrace();
@@ -122,7 +148,7 @@ public class ClazzController {
         return response;
     }
 
-    
+
     /* =================================================== READ ===================================================== */
     @GetMapping("/clazz")
     public String clazzListPage(
@@ -197,9 +223,46 @@ public class ClazzController {
             ClazzReadDTO clazzDTO =
                     clazzService.getDTOById(
                             clazzId,
-                            List.of(STAFF, USER, COURSE_SEMESTER, SEMESTER, COURSE_NAME, COURSE_ALIAS, CENTER));
+                            List.of(STAFF, USER, COURSE_SEMESTER, SEMESTER, COURSE_NAME, COURSE_ALIAS, CENTER, TEST_LIST));
+            //get news of class
+            List<NewsReadDTO> newsReadDTOList = newsService.getAllNewsByClazz(clazzDTO.getId());
+            //get homework of class
+            //get score of class
+            List<HomeworkReadDTO> homeworkReadDTOList = homeworkService.getAllByClazzId(clazzDTO.getId());
+            //get course
+            CourseReadDTO courseReadDTO = courseService.getDTOById(clazzDTO.getCourseSemester().getCourseId(), List.of(MATERIAL_LIST));
+            for (ClazzTestReadDTO clT : clazzDTO.getTestList()) {
+                Test test = testRepository.findById(clT.getTestId()).orElse(null);
+                TestReadDTO testReadDTO = new TestReadDTO();
+                testReadDTO.setTestType(test.getTestType());
+                testReadDTO.setQuestionType(test.getQuestionType());
+                testReadDTO.setId(test.getId());
+                clT.setTest(testReadDTO);
+                if (clT.getOpenFrom().compareTo(LocalDateTime.now()) < 0 && clT.getOpenTo() == null) {
+                    clT.setInTime("Đang mở");
+                } else if (clT.getOpenTo() != null && clT.getOpenTo().compareTo(LocalDateTime.now()) < 0) {
+                    clT.setInTime("Đã kết thúc");
+                }
+            }
 
+            List<Test> lstTestTeacher = testRepository.findAllByCourseIdAndStatusNot(clazzDTO.getCourseSemester().getCourseId(), Status.DELETED);
+
+            for (Test t : lstTestTeacher) {
+                ClazzTest clazzTest = clazzTestRepository.findByClazzIdAndTestIdAndStatusNot(clazzId, t.getId(), Status.DELETED).orElse(null);
+                if (clazzTest == null) {
+                    t.setStatusTeacherTest(0);
+                } else if (clazzTest != null && clazzTest.getOpenTo() == null) {
+                    t.setStatusTeacherTest(1);
+                } else {
+                    t.setStatusTeacherTest(2);
+                }
+            }
+
+            model.addAttribute("homeworkList", homeworkReadDTOList);
+            model.addAttribute("newsList", newsReadDTOList);
             model.addAttribute("clazz", clazzDTO);
+            model.addAttribute("lstTestTeacher", lstTestTeacher);
+            model.addAttribute("material", courseReadDTO.getMaterialList());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -397,5 +460,43 @@ public class ClazzController {
             model.addAttribute("mess", "Xóa class room thất bại");
             return "clazz/add-clazz";
         }
+    }
+
+
+    @PostMapping("/finish-class")
+    public String finishClass(Model model,
+                              @RequestParam(value = "id", required = false) Long clazzId,
+                              @RequestParam(value = "courseId", required = false) Long courseId) throws Exception {
+        List<ClazzMember> clazzMemberList = clazzMemberService.getAllByClazzId(clazzId);
+        for (ClazzMember clazzMember : clazzMemberList) {
+            List<Test> listTest = testRepository.findAllByCourseIdAndStatusNot(courseId, Status.DELETED);
+            long totalScore = 0;
+            long totalWeight = 0;
+            for (Test test : listTest) {
+                totalWeight = totalWeight + test.getTestWeight();
+            }
+            for (Test test : listTest) {
+
+                ClazzTest clazzTest = clazzTestRepository.findByClazzIdAndTestIdAndStatusNot(clazzId, test.getId(), Status.DELETED).orElse(null);
+                if (clazzTest == null) {
+                    System.out.println("Bài test chưa bắt đầu. Không cho kết thúc");
+                    return "redirect:/";
+                }
+                MemberTestRecord memberTestRecord = memberTestRecordRepository.findByMemberIdAndClazzTestIdAndStatusNot(clazzMember.getId(), clazzTest.getTestId(), Status.DELETED).orElse(null);
+                if (memberTestRecord.getScore() < test.getMinScore()) {
+                    clazzMember.setIsPassed(false);
+                }
+                totalScore = (long) (totalScore + memberTestRecord.getScore() * (test.getTestWeight() / totalWeight));
+
+            }
+            clazzMember.setScore((double) totalScore);
+            if (totalScore < 5) {
+                clazzMember.setIsPassed(false);
+            } else if (clazzMember.getIsPassed() == null && totalScore >= 5){
+                clazzMember.setIsPassed(true);
+            }
+                clazzMemberRepository.save(clazzMember);
+        }
+        return "redirect:/";
     }
 }
