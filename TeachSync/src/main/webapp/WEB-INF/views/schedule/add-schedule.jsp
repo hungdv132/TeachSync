@@ -43,20 +43,14 @@
       
       <input type="hidden" name="scheduleType" value="${ScheduleType.SCHEDULE}">
       
-      <div class="row mb-3">
-        <div class="col-12">
-          <div class="d-flex align-items-center">
-            <p class="ms-5 mb-0">Loại lịch học</p>
-            <div class="dropdown ms-3">
-              <select class="btn btn-secondary dropdown-toggle"
-                      id="selScheduleCaId" name="schedulecaId">
-                <c:forEach items="${scheduleCateList}" var="scheduleCate">
-                  <option value="${scheduleCate.id}">${scheduleCate.scheduleDesc}</option>
-                </c:forEach>
-              </select>
-            </div>
-          </div>
-        </div>
+      <div class="col mb-3">
+        <label class="ms-5 mb-0">Loại lịch học</label>
+        <select class="btn btn-secondary dropdown-toggle"
+                id="selScheduleCaId" name="schedulecaId">
+          <c:forEach items="${scheduleCateList}" var="scheduleCate">
+            <option value="${scheduleCate.id}">${scheduleCate.scheduleDesc}</option>
+          </c:forEach>
+        </select>
       </div>
       
       <div class="">
