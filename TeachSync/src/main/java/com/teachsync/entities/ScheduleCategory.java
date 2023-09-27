@@ -14,8 +14,6 @@ import lombok.*;
 @Entity
 @Table(name = "schedulecat")
 public class ScheduleCategory extends BaseEntity{
-
-
     @Column(name = "name", nullable = true, length = 45)
     private String scheduleName;
 

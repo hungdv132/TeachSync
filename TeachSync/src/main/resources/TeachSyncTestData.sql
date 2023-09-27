@@ -2437,7 +2437,7 @@ values (1,  1, 'ILT101 - 01', null, 15, 'CREATED'),
 INSERT INTO schedulecat (`name`, `description`, `status`)
 VALUES ('T2,T4,T6', 'T2,T4,T6 hàng tuần', 'CREATED'),
        ('T3,T5,T7', 'T3,T5,T7 hàng tuần', 'CREATED'),
-       ('T7, CN',   'T7,CN hàng tuần',    'CREATED'),
+       ('T7,CN',    'T7,CN hàng tuần',    'CREATED'),
        ('T2',       'T2 hàng tuần',       'CREATED');
 
 insert into clazz_schedule(clazzId, roomId, schedulecaId, scheduleType, startDate, endDate, slot, sessionStart, sessionEnd, status)

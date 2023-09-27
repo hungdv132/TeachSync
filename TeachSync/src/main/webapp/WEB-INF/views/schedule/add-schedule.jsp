@@ -53,6 +53,7 @@
   <div class="col-12 ts-bg-white border-top border-bottom ts-border-teal pt-3 px-5 mb-3">
     <form action="/add-schedule" method="post" class="row">
       <input type="hidden" name="clazzId" value="${clazz.id}">
+      <input type="hidden" id="txtStaffId" name="staffId" value="${clazz.staffId}">
       <input type="hidden" name="scheduleType" value="${ScheduleType.SCHEDULE}">
   
       <h5>Lịch học</h5>
@@ -89,7 +90,7 @@
         <label class="form-label" for="selScheduleCaId">Lịch học</label>
         <select class="form-select" id="selScheduleCaId" name="schedulecaId" onchange="checkSchedule()">
           <c:forEach items="${scheduleCateList}" var="scheduleCate">
-            <option value="${scheduleCate.id}">${scheduleCate.scheduleDesc}</option>
+            <option value="${scheduleCate.id}">${scheduleCate.scheduleName}</option>
           </c:forEach>
         </select>
       </div>
@@ -113,7 +114,7 @@
       </div>
       
       <h5>Tiết học</h5>
-      <p>(Số tiết học của khóa: ${clazz.courseSemester.course.numSession} ; N/A: Thời gian ngoài hạn)</p>
+      <p>(Số tiết học của khóa: <span id="txtNumSession"></span>/${clazz.courseSemester.course.numSession} ; N/A: Thời gian ngoài hạn)</p>
       <div class="col-12 mb-3">
         <table class="table table-striped table-bordered" style="table-layout: fixed;">
           <thead class="table-primary">
@@ -142,9 +143,11 @@
 </div>
 <!-- ================================================== Main Body ================================================== -->
 
+
 <!-- ================================================== Footer ===================================================== -->
 <%@ include file="/WEB-INF/fragments/footer.jspf" %>
 <!-- ================================================== Footer ===================================================== -->
+
 
 <!-- ================================================== Script ===================================================== -->
 <script>
@@ -152,23 +155,95 @@
     if (mess != '') {
         alert(mess);
     }
+    
+    const slotStartTime = {
+        "1": "07:00",
+        "2": "08:45",
+        "3": "10:30",
 
+        "4": "12:30",
+        "5": "14:15",
+        "6": "16:00",
+
+        "7": "18:00",
+        "8": "19:45",
+    }
+    const slotEndTime = {
+        "1": "08:30",
+        "2": "10:15",
+        "3": "12:00",
+
+        "4": "14:00",
+        "5": "15:45",
+        "6": "17:30",
+
+        "7": "19:30",
+        "8": "21:15"
+    }
+    
+    const numSessionTotal = ${clazz.courseSemester.course.numSession};
+    let numSession = 0;
+
+    function checkSessionNum() {
+        numSession = $('#tbodySession input[type="checkbox"]:checked').length;
+
+        if (numSession < numSessionTotal) {
+            $('#tbodySession input[type="checkbox"]:not(:checked)').prop("disabled", false);
+            
+            hideById("btnSubmit");
+        }
+        
+        if (numSession === numSessionTotal) {
+            $('#tbodySession input[type="checkbox"]:not(:checked)').prop("disabled", true);
+            
+            showById("btnSubmit");
+        }
+        
+        if (numSession > numSessionTotal) {
+            $('#tbodySession input[type="checkbox"]:not(:checked)').prop("disabled", true);
+            $('#tbodySession input[type="checkbox"]:checked')[0].prop("checked", false);
+            checkSessionNum();
+        }
+        
+        $("#txtNumSession").text(numSession);
+    }
+    
+    function addSession(id) {
+        let chk = $("#chk" + id).is(':checked');
+        
+        if (chk) {
+          let string = `
+          
+          `;
+        }
+
+        checkSessionNum();
+    }
+    
     function updateSession() {
+        let inNumSession = 0;
+        
+        let scheduleCa = $("#selScheduleCaId option:selected").text();
+        let scheduleCaArray = scheduleCa.split(",");
+        
         let tbodySession = $("#tbodySession");
         tbodySession.empty();
+        let staffId = $("#txtStaffId").val();
+        let roomId = $("#selRoomId").val();
         let startDate = $("#dateStart").val();
         let endDate = $("#dateEnd").val();
+        let slot = $("#selSlot").val();
 
         let dateObj = new Date(startDate);
         let endDateObj = new Date(endDate);
         
-        let weekdayArray = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        let weekdayArray = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
         /* Date.getDay() return 0 -> 6. 0 being sunday */
         let weekday = weekdayArray[dateObj.getDay()];
         
-        if (weekday !== 'Mon') {
+        if (weekday !== 'T2') {
             let tmpDateObj = new Date(dateObj.getTime());
-            if (weekday === 'Sun') {
+            if (weekday === 'CN') {
                 tmpDateObj.setDate(tmpDateObj.getDate() - 6);
             } else {
                 tmpDateObj.setDate(tmpDateObj.getDate() - (tmpDateObj.getDay() - 1));
@@ -181,31 +256,63 @@
                 tmpDateObj.setDate(tmpDateObj.getDate() + 1);
             }
 
-            while (weekday !== 'Mon') {
+            while (weekday !== 'T2') {
                 let isoDateString = dateObj.toISOString().split('T')[0];
                 let splitDate = isoDateString.split('-');
                 let viVNDateString = splitDate[2] + '/' + splitDate[1] + '/' + splitDate[0];
-                
-                tr.append(
-                    "<td id='" + isoDateString + "'>" +
-                    "  <div class='form-check'>" +
-                    "    <input class='form-check-input' type='checkbox' " +
-                    "           id='chk"+ isoDateString +"' value='"+ isoDateString +"'" +
-                    "           onclick=''>" +
-                    "    <label class='form-check-label' for='chk"+ isoDateString +"'>" +
-                    "      2023-02-06" +
-                    "    </label>" +
-                    "  </div>                       " +
-                    "                               " +
-                    "                               " +
-                    "                               " +
-                    "                               " +
-                    "                               " +
-                    "                               " +
-                    "                               " +
-                    "</td>"
-                );
-                
+
+                if (scheduleCaArray.includes(weekday)) {
+                    if (inNumSession < numSessionTotal) {
+                        tr.append(`
+                            <td id="` + isoDateString + `">
+                              <div class="form-check">
+                                <input class="form-check-input" type="checkbox" checked
+                                       id="chk`+ isoDateString +`" value="`+ isoDateString +`"
+                                       onclick="addSession('form`+ isoDateString +`')">
+                                <label class="form-check-label" for="chk`+ isoDateString +`">` + viVNDateString + `</label>
+                              </div>
+                              <div id="form` + isoDateString + `">
+                                <input type="hidden" name="sessionCreateDTOList[`+inNumSession+`].sessionStart"
+                                       value="`+isoDateString+`T`+slotStartTime[slot]+`:00`+`">
+                                <input type="hidden" name="sessionCreateDTOList[`+inNumSession+`].sessionEnd"
+                                       value="`+isoDateString+`T`+slotEndTime[slot]+`:00`+`">
+                                <input type="hidden" name="sessionCreateDTOList[`+inNumSession+`].slot"
+                                       value="`+slot+`">
+                                <input type="hidden" name="sessionCreateDTOList[`+inNumSession+`].staffId"
+                                       value="`+staffId+`">
+                                <input type="hidden" name="sessionCreateDTOList[`+inNumSession+`].roomId"
+                                       value="`+roomId+`">
+                              </div>
+                            </td>
+                        `);
+
+                        inNumSession++;
+                    } else {
+                        tr.append(`
+                            <td id="` + isoDateString + `">
+                              <div class="form-check">
+                                <input class="form-check-input" type="checkbox"
+                                       id="chk`+ isoDateString +`" value="`+ isoDateString +`"
+                                       onclick="addSession('form`+ isoDateString +`')">
+                                <label class="form-check-label" for="chk`+ isoDateString +`">` + viVNDateString + `</label>
+                              </div>
+                              <div id="form` + isoDateString + `"></div>
+                            </td>
+                        `);
+                    }
+                } else {
+                    tr.append(`
+                        <td id="` + isoDateString + `">
+                          <div class="form-check">
+                            <input class="form-check-input" type="checkbox"
+                                   id="chk`+ isoDateString +`" value="`+ isoDateString +`"
+                                   onclick="addSession('form`+ isoDateString +`')">
+                            <label class="form-check-label" for="chk`+ isoDateString +`">` + viVNDateString + `</label>
+                          </div>
+                          <div id="form` + isoDateString + `"></div>
+                        </td>
+                    `);
+                }
                 
                 dateObj.setDate(dateObj.getDate() + 1);
                 weekday = weekdayArray[dateObj.getDay()];
@@ -219,17 +326,75 @@
             
             for (let i = 0; i < 7; i++) {
                 if (dateObj <= endDateObj) {
-                    tr.append("<td id='" + dateObj.toISOString().split('T')[0] + "'>-</td>");
+                    let isoDateString = dateObj.toISOString().split('T')[0];
+                    let splitDate = isoDateString.split('-');
+                    let viVNDateString = splitDate[2] + '/' + splitDate[1] + '/' + splitDate[0];
+
+                    if (scheduleCaArray.includes(weekday)) {
+                        if (inNumSession < numSessionTotal) {
+                            tr.append(`
+                                <td id="` + isoDateString + `">
+                                  <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" checked
+                                           id="chk`+ isoDateString +`" value="`+ isoDateString +`"
+                                           onclick="addSession('form`+ isoDateString +`')">
+                                    <label class="form-check-label" for="chk`+ isoDateString +`">` + viVNDateString + `</label>
+                                  </div>
+                                    <div id="form` + isoDateString + `">
+                                      <input type="hidden" name="sessionCreateDTOList[`+inNumSession+`].sessionStart"
+                                             value="`+isoDateString+`T`+slotStartTime[slot]+`:00`+`">
+                                      <input type="hidden" name="sessionCreateDTOList[`+inNumSession+`].sessionEnd"
+                                             value="`+isoDateString+`T`+slotEndTime[slot]+`:00`+`">
+                                      <input type="hidden" name="sessionCreateDTOList[`+inNumSession+`].slot"
+                                             value="`+slot+`">
+                                      <input type="hidden" name="sessionCreateDTOList[`+inNumSession+`].staffId"
+                                             value="`+staffId+`">
+                                      <input type="hidden" name="sessionCreateDTOList[`+inNumSession+`].roomId"
+                                             value="`+roomId+`">
+                                    </div>
+                                </td>
+                            `);
+                            
+                            inNumSession++;
+                        } else {
+                            tr.append(`
+                                <td id="` + isoDateString + `">
+                                  <div class="form-check">
+                                    <input class="form-check-input" type="checkbox"
+                                           id="chk`+ isoDateString +`" value="`+ isoDateString +`"
+                                           onclick="addSession('form`+ isoDateString +`')">
+                                    <label class="form-check-label" for="chk`+ isoDateString +`">` + viVNDateString + `</label>
+                                  </div>
+                                  <div id="form` + isoDateString + `"></div>
+                                </td>
+                            `);
+                        }
+                    } else {
+                        tr.append(`
+                            <td id="` + isoDateString + `">
+                              <div class="form-check">
+                                <input class="form-check-input" type="checkbox"
+                                       id="chk`+ isoDateString +`" value="`+ isoDateString +`"
+                                       onclick="addSession('form`+ isoDateString +`')">
+                                <label class="form-check-label" for="chk`+ isoDateString +`">` + viVNDateString + `</label>
+                              </div>
+                              <div id="form` + isoDateString + `"></div>
+                            </td>
+                        `);
+                    }
+                    
                 } else {
                     tr.append("<td>N/A</td>");
                 }
+                
                 dateObj.setDate(dateObj.getDate() + 1);
+                weekday = weekdayArray[dateObj.getDay()];
             }
 
             tbodySession.append(tr);
         }
-        
-        
+
+        checkSessionNum();
     }
     
     function checkSchedule() {

@@ -115,7 +115,7 @@ public class ScheduleController {
     @PostMapping("/add-schedule")
     public String addClazzSchedule(
             @ModelAttribute ClazzScheduleCreateDTO createDTO,
-            @ModelAttribute List<SessionCreateDTO> sessionCreateDTOList,
+            @ModelAttribute ArrayList<SessionCreateDTO> sessionCreateDTOList,
             @SessionAttribute(value = "user", required = false) UserReadDTO userDTO,
             RedirectAttributes redirect) throws Exception {
         //check login
@@ -134,7 +134,7 @@ public class ScheduleController {
 
             /* Create Session */
             sessionCreateDTOList =
-                    sessionCreateDTOList.stream()
+                    (ArrayList<SessionCreateDTO>) sessionCreateDTOList.stream()
                             .peek(sessionCreateDTO -> sessionCreateDTO.setScheduleId(clazzScheduleReadDTO.getId()))
                             .toList();
 
