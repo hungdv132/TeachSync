@@ -19,7 +19,6 @@ public interface UserService {
     UserReadDTO signupDTO(UserCreateDTO dto) throws Exception;
 
 
-
     /* =================================================== READ ===================================================== */
     User login(String username) throws Exception;
     UserReadDTO loginDTO(String username,String password) throws Exception;
@@ -42,24 +41,17 @@ public interface UserService {
 
 
     /* =================================================== UPDATE =================================================== */
-
     User updateUser(User user) throws Exception;
     UserReadDTO updateDTOUser(UserUpdateDTO dto) throws Exception;
 
     UserReadDTO activateTeacherAccount(Long unactivatedTeacherAccId) throws Exception;
+
 
     /* =================================================== DELETE =================================================== */
 
 
 
     /* =================================================== WRAPPER ================================================== */
-    @Deprecated
-    UserReadDTO wrapDTO(User user) throws Exception;
-    @Deprecated
-    List<UserReadDTO> wrapListDTO(Collection<User> userCollection) throws Exception;
-    @Deprecated
-    Page<UserReadDTO> wrapPageDTO(Page<User> userPage) throws Exception;
-
     UserReadDTO wrapDTO(User user, Collection<DtoOption> options) throws Exception;
     List<UserReadDTO> wrapListDTO(Collection<User> userCollection, Collection<DtoOption> options) throws Exception;
     Page<UserReadDTO> wrapPageDTO(Page<User> userPage, Collection<DtoOption> options) throws Exception;

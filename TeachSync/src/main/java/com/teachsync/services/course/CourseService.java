@@ -24,9 +24,6 @@ public interface CourseService {
     Page<CourseReadDTO> getPageDTOAllHotCourse(Pageable paging) throws Exception;
 
     List<Course> getAll() throws Exception;
-
-    @Deprecated
-    List<CourseReadDTO> getAllDTO() throws Exception;
     List<CourseReadDTO> getAllDTO(Collection<DtoOption> options) throws Exception;
     Map<Long, CourseReadDTO> mapIdDTO(Collection<DtoOption> options) throws Exception;
 
@@ -60,13 +57,6 @@ public interface CourseService {
     void deleteCourse(Long id, Long userId) throws Exception;
 
     /* =================================================== WRAPPER ================================================== */
-    @Deprecated
-    CourseReadDTO wrapDTO(Course course) throws Exception;
-    @Deprecated
-    List<CourseReadDTO> wrapListDTO(Collection<Course> courseCollection) throws Exception;
-    @Deprecated
-    Page<CourseReadDTO> wrapPageDTO(Page<Course> coursePage) throws Exception;
-
     CourseReadDTO wrapDTO(Course course, Collection<DtoOption> options) throws Exception;
     List<CourseReadDTO> wrapListDTO(Collection<Course> courseCollection, Collection<DtoOption> options) throws Exception;
     Page<CourseReadDTO> wrapPageDTO(Page<Course> coursePage, Collection<DtoOption> options) throws Exception;

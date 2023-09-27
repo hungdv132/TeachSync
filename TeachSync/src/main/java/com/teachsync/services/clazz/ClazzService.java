@@ -21,14 +21,10 @@ public interface ClazzService {
 
     /* =================================================== READ ===================================================== */
     Page<Clazz> getPageAll(Pageable paging) throws Exception;
-    @Deprecated
-    Page<ClazzReadDTO> getPageDTOAll(Pageable paging) throws Exception;
     Page<ClazzReadDTO> getPageDTOAll(Pageable paging, Collection<DtoOption> options) throws Exception;
 
     /* id */
     Clazz getById(Long id) throws Exception;
-    @Deprecated
-    ClazzReadDTO getDTOById(Long id) throws Exception;
     ClazzReadDTO getDTOById(Long id, Collection<DtoOption> options) throws Exception;
 
     Page<Clazz> getPageAllByIdIn(Pageable paging, Collection<Long> idCollection) throws Exception;

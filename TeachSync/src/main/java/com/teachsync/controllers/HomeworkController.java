@@ -92,7 +92,7 @@ public class HomeworkController {
         }
 
         try {
-            Page<ClazzReadDTO> dtoPage = clazzService.getPageDTOAll(null);
+            Page<ClazzReadDTO> dtoPage = clazzService.getPageDTOAll(null, null);
             if (!ObjectUtils.isEmpty(request.getParameter("id"))) {
                 HomeworkReadDTO homeworkReadDTO = homeworkService.findById(Long.parseLong(request.getParameter("id")));
                 model.addAttribute("homework", homeworkReadDTO);
@@ -123,7 +123,7 @@ public class HomeworkController {
         }
         UserReadDTO userDTO = (UserReadDTO) session.getAttribute("user");
         try {
-            Page<ClazzReadDTO> dtoPage = clazzService.getPageDTOAll(null);
+            Page<ClazzReadDTO> dtoPage = clazzService.getPageDTOAll(null, null);
             if (!ObjectUtils.isEmpty(request.getParameter("id"))) {
                 HomeworkReadDTO homeworkReadDTO = new HomeworkReadDTO();
                 if (userDTO.getRoleId().equals(Constants.ROLE_STUDENT)) {

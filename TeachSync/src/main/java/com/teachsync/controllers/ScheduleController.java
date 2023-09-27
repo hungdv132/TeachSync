@@ -6,31 +6,20 @@ import com.teachsync.dtos.clazz.ClazzReadDTO;
 import com.teachsync.dtos.clazzSchedule.ClazzScheduleCreateDTO;
 import com.teachsync.dtos.clazzSchedule.ClazzScheduleReadDTO;
 import com.teachsync.dtos.clazzSchedule.ClazzScheduleUpdateDTO;
-import com.teachsync.dtos.course.CourseReadDTO;
-import com.teachsync.dtos.courseSemester.CourseSemesterReadDTO;
 import com.teachsync.dtos.room.RoomReadDTO;
 import com.teachsync.dtos.scheduleCategory.ScheduleCaReadDTO;
-import com.teachsync.dtos.semester.SemesterReadDTO;
 import com.teachsync.dtos.session.SessionCreateDTO;
-import com.teachsync.dtos.session.SessionReadDTO;
 import com.teachsync.dtos.session.SessionUpdateDTO;
 import com.teachsync.dtos.user.UserReadDTO;
 
 import com.teachsync.entities.ClazzSchedule;
-import com.teachsync.entities.CourseSemester;
-import com.teachsync.entities.Room;
-import com.teachsync.services.center.CenterService;
 import com.teachsync.services.clazz.ClazzService;
 import com.teachsync.services.clazzSchedule.ClazzScheduleService;
-import com.teachsync.services.course.CourseService;
-import com.teachsync.services.courseSemester.CourseSemesterService;
 import com.teachsync.services.room.RoomService;
 import com.teachsync.services.scheduleCategory.ScheduleCateService;
-import com.teachsync.services.semester.SemesterService;
 import com.teachsync.services.session.SessionService;
 import com.teachsync.utils.Constants;
 import com.teachsync.utils.MiscUtil;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -40,11 +29,8 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.time.LocalDate;
+import java.util.*;
 
 import static com.teachsync.utils.Constants.*;
 import static com.teachsync.utils.enums.DtoOption.*;
@@ -82,6 +68,7 @@ public class ScheduleController {
     @Autowired
     private MiscUtil miscUtil;
 
+
     /* =================================================== CREATE =================================================== */
     @GetMapping("/add-schedule")
     public String addSchedulePage(
@@ -89,17 +76,19 @@ public class ScheduleController {
             @RequestParam("id") Long clazzId,
             @ModelAttribute("mess") String mess,
             @SessionAttribute(name = "user", required = false) UserReadDTO userDTO) {
-        if (userDTO == null ) {
-            return "redirect:/index";
-        }
-
-        if (!userDTO.getRoleId().equals(ROLE_ADMIN)) {
-            return "redirect:/index";
-        }
+//        if (userDTO == null ) {
+//            return "redirect:/index";
+//        }
+//
+//        if (!userDTO.getRoleId().equals(ROLE_ADMIN)) {
+//            return "redirect:/index";
+//        }
 
         try {
             /* Clazz */
-            ClazzReadDTO clazzReadDTO = clazzService.getDTOById(clazzId, List.of(CLAZZ_SCHEDULE,COURSE_SEMESTER, SEMESTER, CENTER,SCHEDULE_CAT));
+            ClazzReadDTO clazzReadDTO =
+                    clazzService.getDTOById(clazzId,
+                            List.of(CLAZZ_SCHEDULE, COURSE_SEMESTER, COURSE, SEMESTER, CENTER, SCHEDULE_CAT));
             model.addAttribute("clazz", clazzReadDTO);
 
             /* Semester (max, min for startDtae & endDate) */
@@ -168,13 +157,16 @@ public class ScheduleController {
             @SessionAttribute(name = "user", required = false) UserReadDTO userDTO) {
 
         if (userDTO == null) {
+//            redirect.addAttribute("mess", "Làm ơn đăng nhập");
             return "redirect:/index";
         }
 
         try {
             Page<ClazzReadDTO> dtoPage;
-            if (userDTO.getRoleId() == ROLE_STUDENT) {
-            } else if (userDTO.getRoleId() == ROLE_TEACHER || userDTO.getRoleId() == ROLE_ADMIN) {
+            if (userDTO.getRoleId().equals(ROLE_STUDENT)) {
+//                redirect.addAttribute("mess", "bạn không đủ quyền");
+                return "redirect:/index";
+            } else if (userDTO.getRoleId().equals(ROLE_TEACHER) || userDTO.getRoleId().equals(ROLE_ADMIN)) {
                 if (pageNo == null || pageNo < 0) {
                     pageNo = 0;
                 }
@@ -183,6 +175,7 @@ public class ScheduleController {
                 dtoPage = clazzService.getPageDTOAll(paging, List.of(CLAZZ_SCHEDULE, ROOM_NAME, SCHEDULE_CAT));
 
                 if (dtoPage != null) {
+                    model.addAttribute("localDateNow", LocalDate.now());
                     model.addAttribute("clazzList", dtoPage.getContent());
                     model.addAttribute("pageNo", dtoPage.getPageable().getPageNumber());
                     model.addAttribute("pageTotal", dtoPage.getTotalPages());
@@ -291,5 +284,29 @@ public class ScheduleController {
         return "redirect:/schedule-clazz";
     }
 
+    /* =================================================== DELETE =================================================== */
+
+
+    /* =================================================== API ====================================================== */
+    @GetMapping("/api/check-conflict-schedule")
+    @ResponseBody
+    public Boolean isConflictSchedule(
+            @RequestParam Long roomId,
+            @RequestParam Long scheduleCaId,
+            @RequestParam Integer slot,
+            @RequestParam LocalDate startDate,
+            @RequestParam LocalDate endDate
+    ) {
+        try {
+            List<ClazzSchedule> conflictSchedule =
+                    clazzScheduleService.getAllByRoomIdAndScheduleCaIdAndSlotAndInRange(
+                            roomId, scheduleCaId, slot, startDate, endDate);
+
+            return conflictSchedule != null;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return true;
+        }
+    }
 
 }

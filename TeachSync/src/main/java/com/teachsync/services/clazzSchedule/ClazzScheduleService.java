@@ -8,6 +8,7 @@ import com.teachsync.utils.enums.DtoOption;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -22,8 +23,6 @@ public interface ClazzScheduleService {
 
     /* =================================================== READ ===================================================== */
     Page<ClazzSchedule> getPageAll(Pageable paging) throws Exception;
-    @Deprecated
-    Page<ClazzScheduleReadDTO> getPageDTOAll(Pageable paging) throws Exception;
     Page<ClazzScheduleReadDTO> getPageDTOAll(Pageable paging, Collection<DtoOption> options) throws Exception;
 
     /* id */
@@ -46,6 +45,10 @@ public interface ClazzScheduleService {
             Collection<Long> clazzIdCollection, Collection<DtoOption> options) throws Exception;
     Map<Long, ClazzScheduleReadDTO> mapClazzIdDTOByClazzIdIn(
             Collection<Long> clazzIdCollection, Collection<DtoOption> options) throws Exception;
+
+    /* roomId & scheduleCaId & slot & startDate & endDate */
+    List<ClazzSchedule> getAllByRoomIdAndScheduleCaIdAndSlotAndInRange(
+            Long roomId, Long scheduleCaId, Integer slot, LocalDate from, LocalDate to) throws Exception;
 
 
     /* =================================================== UPDATE =================================================== */
