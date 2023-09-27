@@ -121,7 +121,7 @@ public class CourseServiceImpl implements CourseService {
             return null;
         }
 
-        return wrapPageDTO(coursePage);
+        return wrapPageDTO(coursePage, null);
     }
     @Override
     public Page<CourseReadDTO> getPageDTOAllHotCourse(Pageable paging) throws Exception {
@@ -139,7 +139,7 @@ public class CourseServiceImpl implements CourseService {
         if (coursePage == null) {
             return null; }
 
-        List<CourseReadDTO> courseDTOList = wrapListDTO(coursePage.getContent());
+        List<CourseReadDTO> courseDTOList = wrapListDTO(coursePage.getContent(), null);
 
         courseDTOList =
                 courseDTOList.stream()
@@ -162,17 +162,6 @@ public class CourseServiceImpl implements CourseService {
         }
 
         return coursePage;
-    }
-
-    @Override
-    public List<CourseReadDTO> getAllDTO() throws Exception {
-        List<Course> courseList = getAll();
-
-        if (courseList == null) {
-            return null;
-        }
-
-        return wrapListDTO(courseList);
     }
 
     @Override
@@ -235,7 +224,7 @@ public class CourseServiceImpl implements CourseService {
         if (coursePage == null) {
             return null; }
 
-        return wrapPageDTO(coursePage);
+        return wrapPageDTO(coursePage, null);
     }
 
     @Override
@@ -391,49 +380,6 @@ public class CourseServiceImpl implements CourseService {
 
     /* =================================================== WRAPPER ================================================== */
     @Override
-    public CourseReadDTO wrapDTO(Course course) throws Exception {
-        CourseReadDTO dto = mapper.map(course, CourseReadDTO.class);
-
-        /* Add Dependency */
-        /* TODO: replace with dto and call service */
-        PriceLogReadDTO priceLogDTO =
-                priceLogService.getCurrentDTOByCourseId(course.getId());
-
-        dto.setCurrentPrice(priceLogDTO);
-
-//        dto.setMaterialList();
-//        dto.setClassroomList();
-
-        return dto;
-    }
-    @Override
-    public List<CourseReadDTO> wrapListDTO(Collection<Course> courseCollection) throws Exception {
-        List<CourseReadDTO> dtoList = new ArrayList<>();
-
-        CourseReadDTO dto;
-
-        for (Course course : courseCollection) {
-            dto = mapper.map(course, CourseReadDTO.class);
-
-            /* Add Dependency */
-//            dto.setPriceLogList();
-//            dto.setMaterialList();
-//            dto.setClassroomList();
-
-            dtoList.add(dto);
-        }
-
-        return dtoList;
-    }
-    @Override
-    public Page<CourseReadDTO> wrapPageDTO(Page<Course> coursePage) throws Exception {
-        return new PageImpl<>(
-                wrapListDTO(coursePage.getContent()),
-                coursePage.getPageable(),
-                coursePage.getTotalPages());
-    }
-
-    @Override
     public CourseReadDTO wrapDTO(Course course, Collection<DtoOption> options) throws Exception {
         CourseReadDTO dto = mapper.map(course, CourseReadDTO.class);
 
@@ -516,7 +462,7 @@ public class CourseServiceImpl implements CourseService {
     public Page<CourseReadDTO> wrapPageDTO(
             Page<Course> coursePage, Collection<DtoOption> options) throws Exception {
         return new PageImpl<>(
-                wrapListDTO(coursePage.getContent()),
+                wrapListDTO(coursePage.getContent(), options),
                 coursePage.getPageable(),
                 coursePage.getTotalPages());
     }

@@ -5,10 +5,7 @@ import com.teachsync.dtos.clazzSchedule.ClazzScheduleCreateDTO;
 import com.teachsync.dtos.clazzSchedule.ClazzScheduleReadDTO;
 import com.teachsync.dtos.clazzSchedule.ClazzScheduleUpdateDTO;
 import com.teachsync.dtos.scheduleCategory.ScheduleCaReadDTO;
-import com.teachsync.entities.Clazz;
-import com.teachsync.entities.ClazzSchedule;
-import com.teachsync.entities.Room;
-import com.teachsync.entities.ScheduleCategory;
+import com.teachsync.entities.*;
 import com.teachsync.repositories.ClazzRepository;
 import com.teachsync.repositories.ClazzScheduleRepository;
 import com.teachsync.repositories.RoomRepository;
@@ -30,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
+import java.time.LocalDate;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -144,18 +142,6 @@ public class ClazzScheduleServiceImpl implements ClazzScheduleService {
 
         return clazzSchedulePage;
     }
-
-    @Override
-    public Page<ClazzScheduleReadDTO> getPageDTOAll(Pageable paging) throws Exception {
-        Page<ClazzSchedule> clazzSchedulePage = getPageAll(paging);
-
-        if (clazzSchedulePage == null) {
-            return null;
-        }
-
-        return wrapPageDTO(clazzSchedulePage, null);
-    }
-
     @Override
     public Page<ClazzScheduleReadDTO> getPageDTOAll(Pageable paging, Collection<DtoOption> options) throws Exception {
         Page<ClazzSchedule> clazzSchedulePage = getPageAll(paging);
@@ -280,6 +266,18 @@ public class ClazzScheduleServiceImpl implements ClazzScheduleService {
                 .collect(Collectors.toMap(ClazzScheduleReadDTO::getClazzId, Function.identity()));
     }
 
+    /* roomId & slot & startDate & endDate */
+    @Override
+    public List<ClazzSchedule> getAllByRoomIdAndScheduleCaIdAndSlotAndInRange(
+            Long roomId, Long scheduleCaId, Integer slot, LocalDate from, LocalDate to) throws Exception {
+        List<ClazzSchedule> clazzScheduleList =
+                clazzScheduleRepository.findAllByRoomIdAndScheduleCaIdAndSlotAndInRange(
+                        roomId, scheduleCaId, slot, from, to);
+        if (clazzScheduleList.isEmpty()) {
+            return null;
+        }
+        return clazzScheduleList;
+    }
 
     /* =================================================== UPDATE =================================================== */
     @Override

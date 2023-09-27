@@ -120,16 +120,6 @@ public class ClazzServiceImpl implements ClazzService {
         return clazzPage;
     }
     @Override
-    public Page<ClazzReadDTO> getPageDTOAll(Pageable paging) throws Exception {
-        Page<Clazz> clazzPage = getPageAll(paging);
-
-        if (clazzPage == null) {
-            return null;
-        }
-
-        return wrapPageDTO(clazzPage, null);
-    }
-    @Override
     public Page<ClazzReadDTO> getPageDTOAll(Pageable paging, Collection<DtoOption> options) throws Exception {
         Page<Clazz> clazzPage = getPageAll(paging);
 
@@ -146,16 +136,6 @@ public class ClazzServiceImpl implements ClazzService {
         return clazzRepository
                 .findByIdAndStatusNot(id, Status.DELETED)
                 .orElse(null);
-    }
-    @Override
-    public ClazzReadDTO getDTOById(Long id) throws Exception {
-        Clazz clazz = getById(id);
-
-        if (clazz == null) {
-            return null;
-        }
-
-        return wrapDTO(clazz, null);
     }
     @Override
     public ClazzReadDTO getDTOById(Long id, Collection<DtoOption> options) throws Exception {

@@ -10,7 +10,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>Enroll</title>
+  <title>Đăng ký học</title>
 
   <link rel="stylesheet" href="../../../resources/css/bootstrap-5.3.0/bootstrap.css">
 

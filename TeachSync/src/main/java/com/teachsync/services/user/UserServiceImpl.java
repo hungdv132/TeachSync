@@ -76,7 +76,7 @@ public class UserServiceImpl implements UserService {
         /* create dependencies */
 
 
-        return wrapDTO(user);
+        return wrapDTO(user, null);
     }
 
     @Override
@@ -101,7 +101,7 @@ public class UserServiceImpl implements UserService {
 
         user = createUser(user);
 
-        return wrapDTO(user);
+        return wrapDTO(user, null);
     }
 
 
@@ -129,7 +129,7 @@ public class UserServiceImpl implements UserService {
             throw new BadCredentialsException("Sai username hoặc password");
         }
 
-        return wrapDTO(user);
+        return wrapDTO(user, null);
     }
 
     /* id */
@@ -271,12 +271,13 @@ public class UserServiceImpl implements UserService {
 
         user = updateUser(user);
 
-        return wrapDTO(user);
+        return wrapDTO(user, null);
     }
 
     @Override
     public UserReadDTO activateTeacherAccount(Long unactivatedTeacherAccId) throws Exception {
-        Optional<User> teacherOptional = userRepository.findByIdAndStatus(unactivatedTeacherAccId, Status.DELETED); /* TODO: different status */
+        Optional<User> teacherOptional = userRepository.findByIdAndStatus(unactivatedTeacherAccId, Status.DELETED);
+        /* TODO: different status */
 
         if (teacherOptional.isEmpty()) {
             throw new IllegalArgumentException(
@@ -288,7 +289,7 @@ public class UserServiceImpl implements UserService {
 
         teacher = updateUser(teacher);
 
-        return wrapDTO(teacher);
+        return wrapDTO(teacher, null);
     }
 
 
@@ -296,32 +297,6 @@ public class UserServiceImpl implements UserService {
 
 
     /* =================================================== WRAPPER ================================================== */
-    @Override
-    public UserReadDTO wrapDTO(User user) throws Exception {
-        UserReadDTO dto = mapper.map(user, UserReadDTO.class);
-
-        /* Add Dependency */
-//        dto.setRequestMadeList();
-//        if (user.getRoleId() == parentRoleId) {
-//            dto.setChildList();
-//        }
-
-        return dto;
-    }
-    @Override
-    public List<UserReadDTO> wrapListDTO(Collection<User> userCollection) throws Exception {
-        return userCollection.stream()
-                .map(user -> mapper.map(user, UserReadDTO.class))
-                .collect(Collectors.toList());
-    }
-    @Override
-    public Page<UserReadDTO> wrapPageDTO(Page<User> userPage) throws Exception {
-        return new PageImpl<>(
-                wrapListDTO(userPage.getContent()),
-                userPage.getPageable(),
-                userPage.getTotalPages());
-    }
-
     @Override
     public UserReadDTO wrapDTO(User user, Collection<DtoOption> options) throws Exception {
         UserReadDTO dto = mapper.map(user, UserReadDTO.class);

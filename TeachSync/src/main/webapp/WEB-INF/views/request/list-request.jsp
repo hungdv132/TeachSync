@@ -56,8 +56,8 @@
   
   <!-- Request list -->
   <div class="col-12 overflow-auto mb-3">
-    <table class="table table-striped table-bordered table-hover mb-0">
-      <thead class="table-primary ts-border-blue">
+    <table class="table table-striped table-hover mb-0">
+      <thead class="table-primary">
       <tr>
         <th scope="col" class="text-center">ID</th>
         
@@ -75,29 +75,29 @@
       </tr>
       </thead>
       
-      <tbody class="table-hover ts-border-blue align-middle">
-      <c:forEach var="request" items="${requestList}">
+      <tbody class="table-hover align-middle">
+      <c:forEach var="clazz" items="${requestList}">
         <c:url var="requestDetail" value="/edit-request">
-          <c:param name="id" value="${request.id}"/>
+          <c:param name="id" value="${clazz.id}"/>
         </c:url>
         
         <tr>
-          <th scope="row" class="text-center"><a href="${requestDetail}">${request.id}</a></th>
+          <th scope="row" class="text-center"><a href="${requestDetail}">${clazz.id}</a></th>
           
-          <td><a href="${requestDetail}">${request.requestType.stringValueVie}</a></td>
+          <td><a href="${requestDetail}">${clazz.requestType.stringValueVie}</a></td>
           <c:if test="${isAdmin}">
-            <td>${request.requesterFullName}</td>
+            <td>${clazz.requesterFullName}</td>
           </c:if>
-          <td>${request.clazz.clazzName}</td>
-          <td>${request.clazz.courseSemester.courseAlias}</td>
-          <td>${request.clazz.courseSemester.semesterAlias}</td>
-          <td>${request.clazz.courseSemester.centerName}</td>
-          <td>${request.status.stringValueVie}</td>
+          <td>${clazz.clazz.clazzName}</td>
+          <td>${clazz.clazz.courseSemester.courseAlias}</td>
+          <td>${clazz.clazz.courseSemester.semesterAlias}</td>
+          <td>${clazz.clazz.courseSemester.centerName}</td>
+          <td>${clazz.status.stringValueVie}</td>
           
           <td class=text-center"">
             <a href="${requestDetail}" class="btn btn-warning">Sửa</a>
             <c:if test="${isStudent}">
-              <a href="/delete-request?id=${request.id}" class="btn btn-danger ms-2">Xóa</a>
+              <a href="/delete-request?id=${clazz.id}" class="btn btn-danger ms-2">Xóa</a>
             </c:if>
           </td>
         </tr>
