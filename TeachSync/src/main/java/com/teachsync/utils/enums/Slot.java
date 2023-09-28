@@ -33,4 +33,13 @@ public enum Slot {
     public String getEnd() {
         return end;
     }
+
+    public static Slot fromInt(int slot) {
+        for (Slot s : Slot.values()) {
+            if (s.slot == slot){
+                return s;
+            }
+        }
+        return null;
+    }
 }

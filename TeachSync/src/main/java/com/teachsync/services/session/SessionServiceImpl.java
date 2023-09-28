@@ -96,7 +96,7 @@ public class SessionServiceImpl implements SessionService {
 
         for (Session session : sessionCollection) {
             /* Validate input */
-            if (session.getSlot() < 1 || session.getSlot() > 9) {
+            if (session.getSlot() < 1 || session.getSlot() > 8) {
                 throw new IllegalArgumentException("Update error. Slot must be from 1 to 9.");
             }
             if (session.getSessionStart().isAfter(session.getSessionEnd())) {
@@ -425,7 +425,7 @@ public class SessionServiceImpl implements SessionService {
 
         for (Session session : sessionCollection) {
             /* Validate input */
-            if (session.getSlot() < 1 || session.getSlot() > 9) {
+            if (session.getSlot() < 1 || session.getSlot() > 8) {
                 throw new IllegalArgumentException("Update error. Slot must be from 1 to 9.");
             }
             if (session.getSessionStart().isAfter(session.getSessionEnd())) {

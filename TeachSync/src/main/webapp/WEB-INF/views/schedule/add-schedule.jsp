@@ -2,6 +2,7 @@
 <%@ page import="com.teachsync.utils.enums.Slot" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 
 <!DOCTYPE html>
 <html lang="vi" dir="ltr">
@@ -51,7 +52,7 @@
   
   <!-- Content -->
   <div class="col-12 ts-bg-white border-top border-bottom ts-border-teal pt-3 px-5 mb-3">
-    <form action="/add-schedule" method="post" class="row">
+    <form:form modelAttribute="createDTO" action="/add-schedule" method="post" class="row">
       <input type="hidden" name="clazzId" value="${clazz.id}">
       <input type="hidden" id="txtStaffId" name="staffId" value="${clazz.staffId}">
       <input type="hidden" name="scheduleType" value="${ScheduleType.SCHEDULE}">
@@ -137,7 +138,7 @@
       <div class="col-12 text-center mb-3">
         <button type="submit" id="btnSubmit" class="btn btn-primary w-50 visually-hidden">Xác nhận</button>
       </div>
-    </form>
+    </form:form>
   </div>
   <!-- Content -->
 </div>
@@ -185,39 +186,50 @@
     let numSession = 0;
 
     function checkSessionNum() {
-        numSession = $('#tbodySession input[type="checkbox"]:checked').length;
+        let chkArray = $('#tbodySession input[type="checkbox"]:checked');
+        let unChkArray = $('#tbodySession input[type="checkbox"]:not(:checked)')
+        
+        numSession = chkArray.length;
 
         if (numSession < numSessionTotal) {
-            $('#tbodySession input[type="checkbox"]:not(:checked)').prop("disabled", false);
-            
+            unChkArray.prop("disabled", false);
             hideById("btnSubmit");
         }
         
         if (numSession === numSessionTotal) {
-            $('#tbodySession input[type="checkbox"]:not(:checked)').prop("disabled", true);
-            
+            unChkArray.prop("disabled", true);
             showById("btnSubmit");
         }
         
         if (numSession > numSessionTotal) {
-            $('#tbodySession input[type="checkbox"]:not(:checked)').prop("disabled", true);
-            $('#tbodySession input[type="checkbox"]:checked')[0].prop("checked", false);
+            unChkArray.prop("disabled", true);
+            chkArray[0].prop("checked", false);
             checkSessionNum();
         }
+
+        chkArray.each(function(i, obj) {
+            let date = $(obj).val();
+            enableAllFormElementIn(date);
+            
+            $("#hidSesStart"+date).attr("name", "sessionCreateDTOList["+i+"].sessionStart");
+            $("#hidSesEnd"+date).attr("name", "sessionCreateDTOList["+i+"].sessionEnd");
+            $("#selSesSlot"+date).attr("name", "sessionCreateDTOList["+i+"].slot");
+            $("#selSesStaffId"+date).attr("name", "sessionCreateDTOList["+i+"].staffId");
+            $("#selSesRoomId"+date).attr("name", "sessionCreateDTOList["+i+"].roomId");
+        });
+
+        unChkArray.each(function(i, obj) {
+            let date = $(obj).val();
+            disableAllFormElementIn(date);
+
+            $("#hidSesStart"+date).removeAttr("name");
+            $("#hidSesEnd"+date).removeAttr("name");
+            $("#selSesSlot"+date).removeAttr("name");
+            $("#selSesStaffId"+date).removeAttr("name");
+            $("#selSesRoomId"+date).removeAttr("name");
+        });
         
         $("#txtNumSession").text(numSession);
-    }
-    
-    function addSession(id) {
-        let chk = $("#chk" + id).is(':checked');
-        
-        if (chk) {
-          let string = `
-          
-          `;
-        }
-
-        checkSessionNum();
     }
     
     function updateSession() {
@@ -234,160 +246,93 @@
         let endDate = $("#dateEnd").val();
         let slot = $("#selSlot").val();
 
-        let dateObj = new Date(startDate);
+        let startDateObj = new Date(startDate);
         let endDateObj = new Date(endDate);
+        
+        let dateObj = new Date(startDate);
         
         let weekdayArray = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
         /* Date.getDay() return 0 -> 6. 0 being sunday */
         let weekday = weekdayArray[dateObj.getDay()];
-        
-        if (weekday !== 'T2') {
-            let tmpDateObj = new Date(dateObj.getTime());
-            if (weekday === 'CN') {
-                tmpDateObj.setDate(tmpDateObj.getDate() - 6);
-            } else {
-                tmpDateObj.setDate(tmpDateObj.getDate() - (tmpDateObj.getDay() - 1));
-            }
 
+        if (weekday !== 'T2') {
+            /* Set counter to Monday */
+            if (weekday === 'CN') {
+                dateObj.setDate(startDateObj.getDate() - 6);
+            } else {
+                dateObj.setDate(startDateObj.getDate() - (startDateObj.getDay() - 1));
+            }
+        }
+        
+        while (dateObj <= endDateObj) {
             let tr = $("<tr>");
             
-            while (tmpDateObj < dateObj) {
-                tr.append("<td>N/A</td>");
-                tmpDateObj.setDate(tmpDateObj.getDate() + 1);
-            }
+            for (let i = 0; i < 7; i++) {
+                if (dateObj < startDateObj) {
+                    tr.append("<td>N/A</td>");
+                } else {
+                    if (dateObj <= endDateObj) {
+                        let isoDateString = dateObj.toISOString().split('T')[0];
+                        let splitDate = isoDateString.split('-');
+                        let viVNDateString = splitDate[2]+'/'+splitDate[1]+'/'+splitDate[0];
 
-            while (weekday !== 'T2') {
-                let isoDateString = dateObj.toISOString().split('T')[0];
-                let splitDate = isoDateString.split('-');
-                let viVNDateString = splitDate[2] + '/' + splitDate[1] + '/' + splitDate[0];
-
-                if (scheduleCaArray.includes(weekday)) {
-                    if (inNumSession < numSessionTotal) {
+                        let isChk = false;
+                        if (scheduleCaArray.includes(weekday)) {
+                            if (inNumSession < numSessionTotal) {
+                                isChk = true;
+                                inNumSession++;
+                            } else {
+                                isChk = false;
+                            }
+                        } else {
+                            isChk = false;
+                        }
+                        
                         tr.append(`
-                            <td id="` + isoDateString + `">
+                            <td>
                               <div class="form-check">
-                                <input class="form-check-input" type="checkbox" checked
-                                       id="chk`+ isoDateString +`" value="`+ isoDateString +`"
-                                       onclick="addSession('form`+ isoDateString +`')">
-                                <label class="form-check-label" for="chk`+ isoDateString +`">` + viVNDateString + `</label>
+                                <input class="form-check-input" type="checkbox"
+                                       `+(isChk ? `checked` : ``)+`
+                                       id="chk`+isoDateString+`" value="`+isoDateString+`"
+                                       onclick="checkSessionNum()">
+                                <label class="form-check-label" for="chk`+isoDateString+`">`+viVNDateString+`</label>
                               </div>
-                              <div id="form` + isoDateString + `">
-                                <input type="hidden" name="sessionCreateDTOList[`+inNumSession+`].sessionStart"
-                                       value="`+isoDateString+`T`+slotStartTime[slot]+`:00`+`">
-                                <input type="hidden" name="sessionCreateDTOList[`+inNumSession+`].sessionEnd"
-                                       value="`+isoDateString+`T`+slotEndTime[slot]+`:00`+`">
-                                <input type="hidden" name="sessionCreateDTOList[`+inNumSession+`].slot"
+                              <div id="`+isoDateString+`">
+                                <input type="hidden" id="hidSesStart`+isoDateString+`"
+                                       `+(isChk ? `
+                                       name="sessionCreateDTOList[`+inNumSession+`].sessionStart"` : `
+                                       class="visually-hidden" disabled`)+`
+                                       value="`+isoDateString+`T`+slotStartTime[slot]+`">
+                                <input type="hidden" id="hidSesEnd`+isoDateString+`"
+                                       `+(isChk ? `
+                                       name="sessionCreateDTOList[`+inNumSession+`].sessionEnd"` : `
+                                       class="visually-hidden" disabled`)+`
+                                       value="`+isoDateString+`T`+slotEndTime[slot]+`">
+                                <input type="hidden" id="selSesSlot`+isoDateString+`"
+                                       `+(isChk ? `
+                                       name="sessionCreateDTOList[`+inNumSession+`].slot"` : `
+                                       class="visually-hidden" disabled`)+`
                                        value="`+slot+`">
-                                <input type="hidden" name="sessionCreateDTOList[`+inNumSession+`].staffId"
+                                <input type="hidden" id="selSesStaffId`+isoDateString+`"
+                                       `+(isChk ? `
+                                       name="sessionCreateDTOList[`+inNumSession+`].staffId"` : `
+                                       class="visually-hidden" disabled`)+`
                                        value="`+staffId+`">
-                                <input type="hidden" name="sessionCreateDTOList[`+inNumSession+`].roomId"
+                                <input type="hidden" id="selSesRoomId`+isoDateString+`"
+                                       `+(isChk ? `
+                                       name="sessionCreateDTOList[`+inNumSession+`].roomId"` : `
+                                       class="visually-hidden" disabled`)+`
                                        value="`+roomId+`">
                               </div>
                             </td>
                         `);
 
-                        inNumSession++;
                     } else {
-                        tr.append(`
-                            <td id="` + isoDateString + `">
-                              <div class="form-check">
-                                <input class="form-check-input" type="checkbox"
-                                       id="chk`+ isoDateString +`" value="`+ isoDateString +`"
-                                       onclick="addSession('form`+ isoDateString +`')">
-                                <label class="form-check-label" for="chk`+ isoDateString +`">` + viVNDateString + `</label>
-                              </div>
-                              <div id="form` + isoDateString + `"></div>
-                            </td>
-                        `);
+                        tr.append("<td>N/A</td>");
                     }
-                } else {
-                    tr.append(`
-                        <td id="` + isoDateString + `">
-                          <div class="form-check">
-                            <input class="form-check-input" type="checkbox"
-                                   id="chk`+ isoDateString +`" value="`+ isoDateString +`"
-                                   onclick="addSession('form`+ isoDateString +`')">
-                            <label class="form-check-label" for="chk`+ isoDateString +`">` + viVNDateString + `</label>
-                          </div>
-                          <div id="form` + isoDateString + `"></div>
-                        </td>
-                    `);
                 }
                 
-                dateObj.setDate(dateObj.getDate() + 1);
-                weekday = weekdayArray[dateObj.getDay()];
-            }
-            
-            tbodySession.append(tr);
-        }
-        
-        while (dateObj < endDateObj) {
-            let tr = $("<tr>");
-            
-            for (let i = 0; i < 7; i++) {
-                if (dateObj <= endDateObj) {
-                    let isoDateString = dateObj.toISOString().split('T')[0];
-                    let splitDate = isoDateString.split('-');
-                    let viVNDateString = splitDate[2] + '/' + splitDate[1] + '/' + splitDate[0];
-
-                    if (scheduleCaArray.includes(weekday)) {
-                        if (inNumSession < numSessionTotal) {
-                            tr.append(`
-                                <td id="` + isoDateString + `">
-                                  <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" checked
-                                           id="chk`+ isoDateString +`" value="`+ isoDateString +`"
-                                           onclick="addSession('form`+ isoDateString +`')">
-                                    <label class="form-check-label" for="chk`+ isoDateString +`">` + viVNDateString + `</label>
-                                  </div>
-                                    <div id="form` + isoDateString + `">
-                                      <input type="hidden" name="sessionCreateDTOList[`+inNumSession+`].sessionStart"
-                                             value="`+isoDateString+`T`+slotStartTime[slot]+`:00`+`">
-                                      <input type="hidden" name="sessionCreateDTOList[`+inNumSession+`].sessionEnd"
-                                             value="`+isoDateString+`T`+slotEndTime[slot]+`:00`+`">
-                                      <input type="hidden" name="sessionCreateDTOList[`+inNumSession+`].slot"
-                                             value="`+slot+`">
-                                      <input type="hidden" name="sessionCreateDTOList[`+inNumSession+`].staffId"
-                                             value="`+staffId+`">
-                                      <input type="hidden" name="sessionCreateDTOList[`+inNumSession+`].roomId"
-                                             value="`+roomId+`">
-                                    </div>
-                                </td>
-                            `);
-                            
-                            inNumSession++;
-                        } else {
-                            tr.append(`
-                                <td id="` + isoDateString + `">
-                                  <div class="form-check">
-                                    <input class="form-check-input" type="checkbox"
-                                           id="chk`+ isoDateString +`" value="`+ isoDateString +`"
-                                           onclick="addSession('form`+ isoDateString +`')">
-                                    <label class="form-check-label" for="chk`+ isoDateString +`">` + viVNDateString + `</label>
-                                  </div>
-                                  <div id="form` + isoDateString + `"></div>
-                                </td>
-                            `);
-                        }
-                    } else {
-                        tr.append(`
-                            <td id="` + isoDateString + `">
-                              <div class="form-check">
-                                <input class="form-check-input" type="checkbox"
-                                       id="chk`+ isoDateString +`" value="`+ isoDateString +`"
-                                       onclick="addSession('form`+ isoDateString +`')">
-                                <label class="form-check-label" for="chk`+ isoDateString +`">` + viVNDateString + `</label>
-                              </div>
-                              <div id="form` + isoDateString + `"></div>
-                            </td>
-                        `);
-                    }
-                    
-                } else {
-                    tr.append("<td>N/A</td>");
-                }
-                
-                dateObj.setDate(dateObj.getDate() + 1);
+                dateObj.setDate(dateObj.getDate()+1);
                 weekday = weekdayArray[dateObj.getDay()];
             }
 
@@ -406,8 +351,8 @@
 
         $.ajax({
             type: "GET",
-            url: "/api/check-conflict-schedule?roomId=" + roomId + "&scheduleCaId=" + scheduleCaId +
-                "&slot=" + slot + "&startDate=" + startDate + "&endDate=" + endDate,
+            url: "/api/check-conflict-schedule?roomId="+roomId+"&scheduleCaId="+scheduleCaId+
+                "&slot="+slot+"&startDate="+startDate+"&endDate="+endDate,
             success: function(response) {
                 if (response) {
                     /* if have conflict */

@@ -20,16 +20,20 @@ import com.teachsync.services.scheduleCategory.ScheduleCateService;
 import com.teachsync.services.session.SessionService;
 import com.teachsync.utils.Constants;
 import com.teachsync.utils.MiscUtil;
+import com.teachsync.utils.enums.Slot;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.ObjectUtils;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.*;
 
 import static com.teachsync.utils.Constants.*;
@@ -91,7 +95,7 @@ public class ScheduleController {
                             List.of(CLAZZ_SCHEDULE, COURSE_SEMESTER, COURSE, SEMESTER, CENTER, SCHEDULE_CAT));
             model.addAttribute("clazz", clazzReadDTO);
 
-            /* Semester (max, min for startDtae & endDate) */
+            /* Semester (max, min for startDate & endDate) */
             model.addAttribute("semester", clazzReadDTO.getCourseSemester().getSemester());
 
             CenterReadDTO centerReadDTO = clazzReadDTO.getCourseSemester().getCenter();
@@ -100,7 +104,7 @@ public class ScheduleController {
             List<RoomReadDTO> roomReadDTOList = roomService.getAllDTOByCenterId(centerReadDTO.getId(), null);
             model.addAttribute("roomList", roomReadDTOList);
 
-            /*Schedule Category List*/
+            /* Schedule Category List */
             List<ScheduleCaReadDTO> scheduleCateDTOList = scheduleCateService.getAllDTO();
             model.addAttribute("scheduleCateList", scheduleCateDTOList);
 
@@ -114,8 +118,8 @@ public class ScheduleController {
 
     @PostMapping("/add-schedule")
     public String addClazzSchedule(
-            @ModelAttribute ClazzScheduleCreateDTO createDTO,
-            @ModelAttribute ArrayList<SessionCreateDTO> sessionCreateDTOList,
+            @RequestParam("clazzId") Long clazzId,
+            @ModelAttribute("createDTO") ClazzScheduleCreateDTO createDTO,
             @SessionAttribute(value = "user", required = false) UserReadDTO userDTO,
             RedirectAttributes redirect) throws Exception {
         //check login
@@ -130,18 +134,31 @@ public class ScheduleController {
 
         try {
             /* Create Schedule */
+            Slot slot = Slot.fromInt(createDTO.getSlot());
+
+            assert slot != null;
+            createDTO.setSessionStart(LocalTime.parse(slot.getStart()));
+            createDTO.setSessionEnd(LocalTime.parse(slot.getEnd()));
+            createDTO.setCreatedBy(userDTO.getId());
+
             ClazzScheduleReadDTO clazzScheduleReadDTO = clazzScheduleService.createClazzScheduleByDTO(createDTO);
 
             /* Create Session */
-            sessionCreateDTOList =
-                    (ArrayList<SessionCreateDTO>) sessionCreateDTOList.stream()
-                            .peek(sessionCreateDTO -> sessionCreateDTO.setScheduleId(clazzScheduleReadDTO.getId()))
-                            .toList();
+            List<SessionCreateDTO> sessionCreateDTOList = createDTO.getSessionCreateDTOList();
 
-            sessionService.createBulkSessionByDTO(sessionCreateDTOList);
+            if (!ObjectUtils.isEmpty(sessionCreateDTOList)) {
+                sessionCreateDTOList =
+                        sessionCreateDTOList.stream()
+                                .peek(sessionCreateDTO -> {
+                                    sessionCreateDTO.setScheduleId(clazzScheduleReadDTO.getId());
+                                    sessionCreateDTO.setCreatedBy(userDTO.getId()); })
+                                .toList();
+
+                sessionService.createBulkSessionByDTO(sessionCreateDTOList);
+            }
         } catch (Exception e) {
             e.printStackTrace();
-            return "redirect:/add-schedule";
+            return "redirect:/add-schedule"+"?id="+clazzId;
         }
 
         return "redirect:/schedule-clazz";

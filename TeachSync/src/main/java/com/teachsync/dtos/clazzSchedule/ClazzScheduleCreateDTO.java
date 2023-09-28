@@ -1,6 +1,7 @@
 package com.teachsync.dtos.clazzSchedule;
 
 import com.teachsync.dtos.BaseCreateDTO;
+import com.teachsync.dtos.session.SessionCreateDTO;
 import com.teachsync.utils.enums.ScheduleType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,6 +10,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -32,4 +34,6 @@ public class ClazzScheduleCreateDTO extends BaseCreateDTO {
     private LocalTime sessionStart;
 
     private LocalTime sessionEnd;
+
+    private List<SessionCreateDTO> sessionCreateDTOList;
 }
