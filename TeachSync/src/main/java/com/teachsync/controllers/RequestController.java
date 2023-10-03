@@ -383,7 +383,7 @@ public class RequestController {
             return "redirect:/request";
         }
 
-        return "redirect:/edit-request?id="+requestId;
+        return "redirect:/request";
     }
 
 

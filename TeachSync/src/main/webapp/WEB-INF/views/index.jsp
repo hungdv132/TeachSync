@@ -46,7 +46,7 @@
 
 
   <!-- Content -->
-  <div class="col-12 ts-bg-white border-top border-bottom ts-border-teal mb-3 pt-3">
+  <div class="col-12 ts-bg-white border-top border-bottom ts-border-teal pt-3 px-5 mb-3">
     <c:if test="${isGuest}">
       <%@ include file="/WEB-INF/fragments/guest/guest-home.jspf" %>
     </c:if>
@@ -101,8 +101,8 @@
 
 <!-- ================================================== Script ===================================================== -->
 <script>
-    var mess = <c:out value="${mess}"/>
-    if (mess != '') {
+    var mess = '<c:out value="${mess}"/>';
+    if (mess !== '') {
         alert(mess);
     }
 </script>

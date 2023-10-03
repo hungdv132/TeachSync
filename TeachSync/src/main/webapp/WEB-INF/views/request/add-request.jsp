@@ -475,7 +475,7 @@
         $("#classDetail").removeClass("visually-hidden");
         $("#selClazz").val("${clazzList.get(0).id}").prop('disabled', true);
         
-        $("#txtClazzSchedule").removeClass("visually-hidden").append("${clazzList.get(0).clazzSchedule.scheduleType.stringValueVie}");
+        $("#txtClazzSchedule").removeClass("visually-hidden").append("${clazzList.get(0).clazzSchedule.scheduleCategory.scheduleName}");
         $("#txtClazzSlot").removeClass("visually-hidden").append("Tiết ${clazzList.get(0).clazzSchedule.slot}");
         $("#txtClazzFrom").removeClass("visually-hidden").append("${clazzList.get(0).clazzSchedule.sessionStart}");
         $("#txtClazzTo").removeClass("visually-hidden").append("${clazzList.get(0).clazzSchedule.sessionEnd}");

@@ -181,7 +181,7 @@
                             <div class="card-body">
                               <p class="card-text">
                                 <c:set var="clazzSchedule" value="${clazzDTO.clazzSchedule}"/>
-                                Lịch học: <c:out value="${clazzSchedule.scheduleType.stringValueVie}"/><br/>
+                                Lịch học: <c:out value="${clazzSchedule.scheduleCategory.scheduleName}"/><br/>
                                 Slot: <c:out value="${clazzSchedule.slot}"/><br/>
                                 Từ: <c:out value="${clazzSchedule.sessionStart}"/>&nbsp;
                                 Đến: <c:out value="${clazzSchedule.sessionEnd}"/><br/>

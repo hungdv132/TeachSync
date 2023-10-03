@@ -83,7 +83,7 @@ public class EnrollController {
             Map<Long, List<ClazzReadDTO>> courseSemesterIdClazzDTOListMap =
                     clazzService.mapCourseSemesterIdListDTOByCourseSemesterIdIn(
                             courseSemesterIdSemesterIdCenterIdStringMap.keySet(),
-                            Arrays.asList(CLAZZ_SCHEDULE, MEMBER_LIST, ROOM_NAME));
+                            Arrays.asList(CLAZZ_SCHEDULE, SCHEDULE_CAT, MEMBER_LIST, ROOM_NAME));
 
             Map<String, List<ClazzReadDTO>> semesterIdCenterIdStringClassDTOListMap = new HashMap<>();
 

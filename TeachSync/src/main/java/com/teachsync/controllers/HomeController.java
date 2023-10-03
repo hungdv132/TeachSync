@@ -6,6 +6,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.SessionAttribute;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.Objects;
 
@@ -20,23 +21,32 @@ public class HomeController {
             @ModelAttribute("mess") String mess) {
         model.addAttribute("mess", mess);
 
-        if (Objects.isNull(userDTO)) {
-
-        }
+//        if (Objects.isNull(userDTO)) {
+//
+//        }
 
         return "index";
     }
 
     @GetMapping("/home")
-    public String home1() {
+    public String home1(
+            @ModelAttribute("mess") String mess,
+            RedirectAttributes redirect) {
+        redirect.addAttribute("mess", mess);
         return "redirect:/";
     }
     @GetMapping("/index")
-    public String home2() {
+    public String home2(
+            @ModelAttribute("mess") String mess,
+            RedirectAttributes redirect) {
+        redirect.addAttribute("mess", mess);
         return "redirect:/";
     }
     @GetMapping("/trang-chu")
-    public String home3() {
+    public String home3(
+            @ModelAttribute("mess") String mess,
+            RedirectAttributes redirect) {
+        redirect.addAttribute("mess", mess);
         return "redirect:/";
     }
 }

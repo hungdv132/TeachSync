@@ -59,44 +59,77 @@ public class CourseController {
         return "course/add-course";
     }
 
+//    @PostMapping("/add-course")
+//    @ResponseBody
+//    public Map<String, Object> addCourse(
+//            Model model,
+//            @RequestBody CourseCreateDTO createDTO,
+//            RedirectAttributes redirect,
+//            @SessionAttribute(value = "user", required = false) UserReadDTO userDTO) {
+//        Map<String, Object> response = new HashMap<>();
+//
+//        CourseReadDTO courseDTO = null;
+//
+//        if (Objects.isNull(userDTO)) {
+//            redirect.addAttribute("mess", "Làm ơn đăng nhập");
+//            response.put("view", "/index");
+//            return response;
+//        }
+//
+//        if (!userDTO.getRoleId().equals(ROLE_ADMIN)) {
+//            redirect.addAttribute("mess", "Bạn không đủ quyền");
+//            response.put("view", "/index");
+//            return response;
+//        }
+//
+//        try {
+//            createDTO.setCreatedBy(userDTO.getId());
+//            courseDTO = courseService.createCourseByDTO(createDTO);
+//        } catch (Exception e) {
+//            model.addAttribute("mess", "Lỗi : " + e.getMessage());
+//            response.put("mess", "Lỗi : " + e.getMessage());
+//            response.put("view", "/add-course");
+//            return response;
+//        }
+//
+//        redirect.addAttribute("mess", "Tạo mới khóa học thành công");
+//        response.put("view", "/course-detail?id=" + courseDTO.getId());
+//        return response;
+//    }
+
     @PostMapping("/add-course")
-    @ResponseBody
-    public Map<String, Object> addCourse(
+    public String addCourse(
             Model model,
-            @RequestBody CourseCreateDTO createDTO,
+            @ModelAttribute CourseCreateDTO createDTO,
             RedirectAttributes redirect,
             @SessionAttribute(value = "user", required = false) UserReadDTO userDTO) {
-        Map<String, Object> response = new HashMap<>();
-
-        CourseReadDTO courseDTO = null;
 
         if (Objects.isNull(userDTO)) {
             redirect.addAttribute("mess", "Làm ơn đăng nhập");
-            response.put("view", "/index");
-            return response;
+            return "redirect:/index";
         }
 
         if (!userDTO.getRoleId().equals(ROLE_ADMIN)) {
             redirect.addAttribute("mess", "Bạn không đủ quyền");
-            response.put("view", "/index");
-            return response;
+            return "redirect:/index";
         }
 
+        CourseReadDTO courseDTO = null;
+
         try {
+            /* Validate input */
+
+
             createDTO.setCreatedBy(userDTO.getId());
+
             courseDTO = courseService.createCourseByDTO(createDTO);
         } catch (Exception e) {
             model.addAttribute("mess", "Lỗi : " + e.getMessage());
-            response.put("mess", "Lỗi : " + e.getMessage());
-            response.put("view", "/add-course");
-            return response;
+            return "/course/add-course";
         }
 
-        redirect.addAttribute("mess", "Tạo mới khóa học thành công");
-        response.put("view", "/course-detail?id=" + courseDTO.getId());
-        return response;
+        return "/course/course-detail" + "?id=" + courseDTO.getId();
     }
-
 
     /* =================================================== READ ===================================================== */
     @GetMapping("/course")

@@ -1,3 +1,5 @@
+/* =============================== UTIL ============================================================================= */
+/* Show / hide */
 function showById(id) {
     $("#" + id).removeClass("visually-hidden");
 }
@@ -5,6 +7,7 @@ function hideById(id) {
     $("#" + id).addClass("visually-hidden");
 }
 
+/* Enable / disable */
 function enableById(id) {
     $("#" + id).prop("disabled", false);
 }
@@ -61,6 +64,107 @@ function disableAllFormElementIn(id) {
     $("#" + id).find("input, textarea, select, button").prop("disabled", true);
 }
 
+/* Validate data */
+/** Check if string start with white space */
+function startWithWhiteSpace(string) {
+    return /^\s/.test(string);
+}
+
+/** Check if string end with white space */
+function endWithWhiteSpace(string) {
+    return /\s$/.test(string);
+}
+
+function validateTextInput(textInput, minLength, maxLength, validateOption) {
+    let specialCharacterRegex = /[!@#$%^&*(),.?":{}|<>]/g;
+    let errorMsg = ``;
+
+    let value = textInput.value;
+
+    /* required */
+    if (validateOption.includes("required")) {
+        if (value === ``) {
+            textInput.setCustomValidity(`Xin hãy điền vào trường này.`);
+            textInput.reportValidity();
+            return false;
+        }
+    }
+
+    /* null or minLength (if null ignore, if not check minlength) */
+    if (validateOption.includes("nullOrMinLength")) {
+        if (value !== ``) {
+            if (value.length < minLength) {
+                errorMsg += `Tối thiểu `+minLength+` ký tự, hoặc để trống trường này.\n`;
+            }
+        }
+    }
+
+    /* minLength */
+    if (validateOption.includes("minLength")) {
+        if (value.length < minLength) {
+            errorMsg += `Tối thiểu `+minLength+` ký tự.\n`;
+        }
+    }
+
+    /* maxLength */
+    if (validateOption.includes("maxLength")) {
+        if (value.length > maxLength) {
+            errorMsg += `Tối đa `+maxLength+` ký tự.\n`;
+        }
+    }
+
+    /* only white space */
+    if (validateOption.includes("onlyBlank")) {
+        if (value !== ``) {
+            if (value.trim() === ``) {
+                errorMsg += `Không được phép chỉ chứa khoảng trắng.\n`;
+            }
+        }
+    }
+
+    /* start with white space */
+    if (validateOption.includes("startBlank")) {
+        if (value !== ``) {
+            if (value.trim() === ``) {
+                if (!validateOption.includes("onlyBlank")) {
+                    errorMsg += `Không được phép chỉ chứa khoảng trắng.\n`;
+                }
+            } else if (startWithWhiteSpace(value)) {
+                errorMsg += `Không được phép bắt đầu với khoảng trắng.\n`;
+            }
+        }
+    }
+
+    /* end with white space */
+    if (validateOption.includes("endBlank")) {
+        if (value !== ``) {
+            if (value.trim() === ``) {
+                if (!validateOption.includes("onlyBlank")) {
+                    errorMsg += `Không được phép chỉ chứa khoảng trắng.\n`;
+                }
+            } else if (endWithWhiteSpace(value)) {
+                errorMsg += `Không được phép kết thúc với khoảng trắng.\n`;
+            }
+        }
+    }
+
+    /* special character */
+    if (validateOption.includes("specialChar")) {
+        if (specialCharacterRegex.test(value)) {
+            errorMsg += `Không được phép chứa ký tự đặc biệt ( !@#$%^&*(),.?":{}|<> ).\n`;
+        }
+    }
+
+    textInput.setCustomValidity(errorMsg);
+    if (errorMsg !== ``) {
+        textInput.reportValidity();
+        return false;
+    }
+
+    return true;
+}
+
+/* Copy to clipboard */
 function copyToClipboard(id) {
     const fadeTime = 1500;
 
@@ -77,6 +181,7 @@ function copyToClipboard(id) {
 
     setTimeout(function() { $("#alert").remove(); }, fadeTime);
 }
+/* =============================== UTIL ============================================================================= */
 
 /** For single file input type <b>image/*</b>
  * @param inputId the id of the file input tag

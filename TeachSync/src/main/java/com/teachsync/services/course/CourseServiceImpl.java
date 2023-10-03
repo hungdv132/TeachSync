@@ -59,8 +59,26 @@ public class CourseServiceImpl implements CourseService {
     /* =================================================== CREATE =================================================== */
     @Override
     public Course createCourse(Course course) throws Exception {
+        StringBuilder errorMsg = new StringBuilder();
         /* Validate input */
-        /* TODO: valid ImgLink, ... */
+        /* alias */
+        errorMsg.append(
+                miscUtil.validateString(
+                        course.getCourseAlias(), 1, 10,
+                        List.of("required", "minLength", "maxLength", "onlyBlank", "startBlank", "endBlank", "specialChar")));
+        /* name */
+        errorMsg.append(
+                miscUtil.validateString(
+                        course.getCourseAlias(), 1, 45,
+                        List.of("required", "minLength", "maxLength", "onlyBlank", "startBlank", "endBlank", "specialChar")));
+        /* alias */
+        errorMsg.append(
+                miscUtil.validateString(
+                        course.getCourseAlias(), 1, 9999,
+                        List.of("nullOrMinLength", "maxLength", "onlyBlank", "startBlank", "endBlank", "specialChar")));
+
+        /* TODO: number validate */
+
 
         /* Check FK */
         /* No FK */
@@ -71,9 +89,12 @@ public class CourseServiceImpl implements CourseService {
                         course.getCourseName(),
                         course.getCourseAlias(),
                         Status.DELETED)) {
-            throw new IllegalArgumentException(
-                    "Already exists Course with Name: " + course.getCourseName()
-                            + " or with Alias: " + course.getCourseAlias());
+            errorMsg.append("Already exists Course with Name: ").append(course.getCourseName())
+                    .append(" or with Alias: ").append(course.getCourseAlias());
+        }
+
+        if (!errorMsg.isEmpty()) {
+            throw new IllegalArgumentException(errorMsg.toString());
         }
 
         /* Save to DB */
