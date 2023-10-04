@@ -117,12 +117,50 @@ public class CourseController {
         CourseReadDTO courseDTO = null;
 
         try {
-            /* Validate input */
+            StringBuilder errorMsg = new StringBuilder();
 
+            /* Validate input */
+            errorMsg.append(
+                    miscUtil.validateString(
+                            "Mã khóa học", createDTO.getCourseAlias(), 1, 10,
+                            List.of("required", "minLength", "maxLength", "onlyBlank", "startBlank", "endBlank", "specialChar")));
+            /* courseName */
+            errorMsg.append(
+                    miscUtil.validateString(
+                            "Tên khóa học", createDTO.getCourseName(), 1, 45,
+                            List.of("required", "minLength", "maxLength", "onlyBlank", "startBlank", "endBlank", "specialChar")));
+            /* courseDesc */
+            errorMsg.append(
+                    miscUtil.validateString(
+                            "Miêu tả khóa học", createDTO.getCourseDesc(), 1, 9999,
+                            List.of("nullOrMinLength", "maxLength", "onlyBlank", "startBlank", "endBlank", "specialChar")));
+            /* courseImg */
+            /* TODO: check valid link */
+            /* numSession */
+            errorMsg.append(
+                    miscUtil.validateNumber(
+                            "Số tiết học", Double.valueOf(createDTO.getNumSession()), 1.0, 100.0, 1.0,
+                            List.of("min", "max", "onlyBlank", "step")));
+            /* minScore */
+            errorMsg.append(
+                    miscUtil.validateNumber(
+                            "Điểm tối thiểu", createDTO.getMinScore(), 0.0, 10.0, 0.01,
+                            List.of("min", "max", "onlyBlank", "step")));
+            /* minAttendant */
+            errorMsg.append(
+                    miscUtil.validateNumber(
+                            "Điểm danh tối thiểu", createDTO.getMinAttendant(), 0.0, 100.0, 0.01,
+                            List.of("min", "max", "onlyBlank", "step")));
+
+            if (!errorMsg.isEmpty()) {
+                throw new IllegalArgumentException(errorMsg.toString());
+            }
 
             createDTO.setCreatedBy(userDTO.getId());
 
             courseDTO = courseService.createCourseByDTO(createDTO);
+
+            /* TODO: process price */
         } catch (Exception e) {
             model.addAttribute("mess", "Lỗi : " + e.getMessage());
             return "/course/add-course";

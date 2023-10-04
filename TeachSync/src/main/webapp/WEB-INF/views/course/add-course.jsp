@@ -56,8 +56,8 @@
   <div class="col-12 ts-bg-white border-top border-bottom ts-border-teal pt-3 px-5 mb-3">
     <%--@elvariable id="createDTO" type="com.teachsync.dtos.course.CourseCreateDTO"--%>
     <form:form id="form"
-               modelAttribute="createDTO" action="/add-course" method="post" class="row"
-               onkeydown="return event.key != 'Enter';">
+               modelAttribute="createDTO" action="/add-course" method="post"
+               class="row">
     
         <h4>Thêm khóa học</h4>
         <br>
@@ -79,10 +79,11 @@
         </div>
     
         <!-- Course detail -->
-        <div class="col-sm-12 col-md-9 mb-3">
-          <div class="row mb-3">
+        <div class="col-sm-12 col-md-9">
+          <!-- Course Alias, Name, Desc -->
+          <div class="row">
             <!-- Course Alias -->
-            <div class="col-sm-4 col-md-2 mb-3">
+            <div class="col-4 mb-3">
               <label for="txtAlias" class="form-label">Mã khóa học:</label>
               <input id="txtAlias" name="courseAlias"
                      type="text" minlength="1" maxlength="10"
@@ -91,7 +92,7 @@
             </div>
 
             <!-- Course Name -->
-            <div class="col-sm-8 col-md-10 mb-3">
+            <div class="col-8 mb-3">
               <label for="txtName" class="form-label">Tên khóa học:</label>
               <input id="txtName" name="courseName"
                      type="text" minlength="1" maxlength="45"
@@ -104,8 +105,7 @@
               <label for="txtADesc" class="form-label">Miêu tả về khóa học:</label>
               <textarea id="txtADesc" name="courseDesc"
                         minlength="0" maxlength="9999"
-                        class="form-control ts-border-grey" rows="3" style="resize: none"
-                        required="required"></textarea>
+                        class="form-control ts-border-grey" rows="3" style="resize: none"></textarea>
             </div>
           </div>
   
@@ -115,7 +115,7 @@
             <div class="col-sm-12 col-md-4 mb-3">
               <label for="numNumSession" class="form-label">Số tiết học:</label>
               <input id="numNumSession" name="numSession"
-                     type="number" min="1" max="100" value="10"
+                     type="number" min="1" max="100" step="1" value="10"
                      class="form-control ts-border-grey"
                      required="required">
             </div>
@@ -141,10 +141,10 @@
               </div>
             </div>
           </div>
-  
+
+          <!-- Course price, isPromotion, (promotionAmount, finalPrice, promotionDesc) -->
           <div class="row">
             <div class="col-sm-12 col-md-4 mb-3">
-  
               <!-- Course price -->
               <label for="numPrice" class="form-label">Giá khóa học:</label>
               <div class="input-group">
@@ -200,7 +200,7 @@
             </div>
   
             <!-- Course promotionDesc -->
-            <div class="col-12 visually-hidden" id="divPromotionDesc">
+            <div class="col-12 mb-3 visually-hidden" id="divPromotionDesc">
               <label for="txtAPromotionDesc" class="form-label">Chi tiết Khuyến mãi:</label>
               <textarea id="txtAPromotionDesc" name="price.promotionDesc"
                         minlength="0" maxlength="9999"
@@ -211,12 +211,12 @@
         </div>
         
         <!-- Submit button -->
-        <div class="col-12">
-          <div class="row d-flex justify-content-center">
-            <div class="col-sm-12 col-md-4">
-              <button id="btnSubmit" type="submit" class="btn btn-primary w-100">Submit</button>
-            </div>
-          </div>
+        <div class="col-12 text-center">
+          <button id="btnSubmit"
+                  type="submit"
+                  class="btn btn-primary w-50 mb-3">
+            Gửi
+          </button>
         </div>
         
     </form:form>
@@ -327,6 +327,16 @@
 
 <script>
     /* Validate input */
+    // Select all form elements with the 'required' attribute
+    const requiredElements = $('#form :input[required]');
+    // Iterate through each required element
+    requiredElements.each(function () {
+        const element = $(this);
+
+        // Set an initial custom validity message for required input in VN
+        element[0].setCustomValidity(requiredErrorMsg);
+    });
+    
     /* courseAlias */
     let txtAlias = document.getElementById("txtAlias");
     txtAlias.addEventListener("input", function () {
@@ -342,7 +352,7 @@
         validateTextInput(
             txtName, txtName.minLength, txtName.maxLength,
             ["required", "minLength", "maxLength", "onlyBlank", "startBlank", "endBlank", "specialChar"]);
-        
+
     });
 
     /* courseDesc */
@@ -352,41 +362,53 @@
             txtADesc, 1, txtADesc.maxLength,
             ["nullOrMinLength", "maxLength", "onlyBlank", "startBlank", "endBlank", "specialChar"]);
     });
-    
-    
-    $("#btnSubmit").on("click", async function (event) {
-        let isInvalid = 0;
-        
-        /* Validate input */
-        if(!validateTextInput(
-            txtAlias, txtAlias.minLength, txtAlias.maxLength,
-            ["required", "minLength", "maxLength", "onlyBlank", "startBlank", "endBlank", "specialChar"])) {
-            isInvalid++;
-        }
 
-        if(!validateTextInput(
-            txtName, txtName.minLength, txtName.maxLength,
-            ["required", "minLength", "maxLength", "onlyBlank", "startBlank", "endBlank", "specialChar"])) {
-            isInvalid++;
-        }
+    /* numSession */
+    let numNumSession = document.getElementById("numNumSession");
+    numNumSession.addEventListener("input", function () {
+        validateNumberInput(
+            numNumSession, Number(numNumSession.min), Number(numNumSession.max), Number(numNumSession.step),
+            ["required", "min", "max", "step"]);
+    });
 
-        if(!validateTextInput(
-            txtADesc, 1, txtADesc.maxLength,
-            ["nullOrMinLength", "maxLength", "onlyBlank", "startBlank", "endBlank", "specialChar"])) {
-            isInvalid++;
-        }
+    /* numMinScore */
+    let numMinScore = document.getElementById("numMinScore");
+    numMinScore.addEventListener("input", function () {
+        validateNumberInput(
+            numMinScore, Number(numMinScore.min), Number(numMinScore.max), Number(numMinScore.step),
+            ["required", "min", "max", "step"]);
+    });
 
-        /* TODO: number validate */
+    /* numMinScore */
+    let numMinAttendant = document.getElementById("numMinAttendant");
+    numMinAttendant.addEventListener("input", function () {
+        validateNumberInput(
+            numMinAttendant, Number(numMinAttendant.min), Number(numMinAttendant.max), Number(numMinAttendant.step),
+            ["required", "min", "max", "step"]);
+    });
 
-        if (isInvalid > 0) {
-            event.preventDefault();
-        } else {
-            let file = $('#fileImg').prop("files")[0];
+    /* numPrice */
+    let numPrice = document.getElementById("numPrice");
+    numPrice.addEventListener("input", function () {
+        validateNumberInput(
+            numPrice, Number(numPrice.min), Number(numPrice.max), Number(numPrice.step),
+            ["required", "min", "max", "step"]);
+    });
 
-            let imgURL = await uploadImageFileToFirebaseAndGetURL(file);
+    /* numPromotionAmount */
+    let numPromotionAmount = document.getElementById("numPromotionAmount");
+    numPromotionAmount.addEventListener("input", function () {
+        validateNumberInput(
+            numPromotionAmount, Number(numPromotionAmount.min), Number(numPromotionAmount.max), Number(numPromotionAmount.step),
+            ["required", "min", "max", "step"]);
+    });
 
-            $("#hidCourseImg").val(imgURL);
-        }
+    $("#form").on("submit", async function (event) {
+        let file = $('#fileImg').prop("files")[0];
+
+        let imgURL = await uploadImageFileToFirebaseAndGetURL(file);
+
+        $("#hidCourseImg").val(imgURL);
     });
 </script>
 <!-- ================================================== Script ===================================================== -->

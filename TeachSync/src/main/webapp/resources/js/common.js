@@ -1,18 +1,22 @@
+/* =============================== PARAM ============================================================================ */
+const requiredErrorMsg = `Xin hãy điền vào trường này.`;
+
+
 /* =============================== UTIL ============================================================================= */
 /* Show / hide */
 function showById(id) {
-    $("#" + id).removeClass("visually-hidden");
+    $(`#`+id).removeClass(`visually-hidden`);
 }
 function hideById(id) {
-    $("#" + id).addClass("visually-hidden");
+    $(`#`+id).addClass(`visually-hidden`);
 }
 
 /* Enable / disable */
 function enableById(id) {
-    $("#" + id).prop("disabled", false);
+    $(`#`+id).prop(`disabled`, false);
 }
 function disableById(id) {
-    $("#" + id).prop("disabled", true);
+    $(`#`+id).prop(`disabled`, true);
 }
 
 /**  Remove the disabled property in a container by id
@@ -20,9 +24,9 @@ function disableById(id) {
  * @param type *Optional. The type of input to be enabled */
 function enableAllInputIn(id, type) {
     if (type == null) {
-        $("#"+id+" input").prop("disabled", false);
+        $(`#`+id+` input`).prop(`disabled`, false);
     } else {
-        $("#"+id+" input[type="+type+"]").prop("disabled", false);
+        $(`#`+id+` input[type=`+type+`]`).prop(`disabled`, false);
     }
 }
 /**  Add the disabled property in a container by id
@@ -30,38 +34,38 @@ function enableAllInputIn(id, type) {
  * @param type *Optional. The type of input to be disabled */
 function disableAllInputIn(id, type) {
     if (type == null) {
-        $("#"+id+" input").prop("disabled", true);
+        $(`#`+id+` input`).prop(`disabled`, true);
     } else {
-        $("#"+id+" input[type="+type+"]").prop("disabled", true);
+        $(`#`+id+` input[type=`+type+`]`).prop(`disabled`, true);
     }
 }
 
 function enableAllSelectIn(id) {
-    $("#"+id+" select").prop("disabled", false);
+    $(`#`+id+` select`).prop(`disabled`, false);
 }
 function disableAllSelectIn(id) {
-    $("#"+id+" select").prop("disabled", true);
+    $(`#`+id+` select`).prop(`disabled`, true);
 }
 
 function enableAllTextAreaIn(id) {
-    $("#"+id+" textarea").prop("disabled", false);
+    $(`#`+id+` textarea`).prop(`disabled`, false);
 }
 function disableAllTextAreaIn(id) {
-    $("#"+id+" textarea").prop("disabled", true);
+    $(`#`+id+` textarea`).prop(`disabled`, true);
 }
 
 function enableAllButtonIn(id) {
-    $("#"+id+" button").prop("disabled", false);
+    $(`#`+id+` button`).prop(`disabled`, false);
 }
 function disableAllButtonIn(id) {
-    $("#"+id+" button").prop("disabled", true);
+    $(`#`+id+` button`).prop(`disabled`, true);
 }
 
 function enableAllFormElementIn(id) {
-    $("#" + id).find("input, textarea, select, button").prop("disabled", false);
+    $(`#`+id+` :input`).prop(`disabled`, false);
 }
 function disableAllFormElementIn(id) {
-    $("#" + id).find("input, textarea, select, button").prop("disabled", true);
+    $(`#`+id+` :input`).prop(`disabled`, true);
 }
 
 /* Validate data */
@@ -76,82 +80,78 @@ function endWithWhiteSpace(string) {
 }
 
 function validateTextInput(textInput, minLength, maxLength, validateOption) {
+    textInput.setCustomValidity(``);
+
     let specialCharacterRegex = /[!@#$%^&*(),.?":{}|<>]/g;
     let errorMsg = ``;
 
-    let value = textInput.value;
+    let textValue = textInput.value;
 
-    /* required */
-    if (validateOption.includes("required")) {
-        if (value === ``) {
-            textInput.setCustomValidity(`Xin hãy điền vào trường này.`);
-            textInput.reportValidity();
-            return false;
+    if (textValue === ``) {
+        /* required */
+        if (validateOption.includes(`required`)) {
+            errorMsg = requiredErrorMsg;
         }
-    }
 
-    /* null or minLength (if null ignore, if not check minlength) */
-    if (validateOption.includes("nullOrMinLength")) {
-        if (value !== ``) {
-            if (value.length < minLength) {
-                errorMsg += `Tối thiểu `+minLength+` ký tự, hoặc để trống trường này.\n`;
+        /* if not required, then nothing to validate against */
+    } else {
+        /* null or minLength (if null ignore, if not check minlength) */
+        if (validateOption.includes(`nullOrMinLength`)) {
+            if (textValue.length < minLength) {
+                errorMsg+= `Tối thiểu `+minLength+` ký tự, hoặc để trống trường này.\n`;
             }
         }
-    }
 
-    /* minLength */
-    if (validateOption.includes("minLength")) {
-        if (value.length < minLength) {
-            errorMsg += `Tối thiểu `+minLength+` ký tự.\n`;
-        }
-    }
-
-    /* maxLength */
-    if (validateOption.includes("maxLength")) {
-        if (value.length > maxLength) {
-            errorMsg += `Tối đa `+maxLength+` ký tự.\n`;
-        }
-    }
-
-    /* only white space */
-    if (validateOption.includes("onlyBlank")) {
-        if (value !== ``) {
-            if (value.trim() === ``) {
-                errorMsg += `Không được phép chỉ chứa khoảng trắng.\n`;
+        /* minLength */
+        if (validateOption.includes(`minLength`)) {
+            if (textValue.length < minLength) {
+                errorMsg+= `Tối thiểu `+minLength+` ký tự.\n`;
             }
         }
-    }
 
-    /* start with white space */
-    if (validateOption.includes("startBlank")) {
-        if (value !== ``) {
-            if (value.trim() === ``) {
-                if (!validateOption.includes("onlyBlank")) {
-                    errorMsg += `Không được phép chỉ chứa khoảng trắng.\n`;
+        /* maxLength */
+        if (validateOption.includes(`maxLength`)) {
+            if (textValue.length > maxLength) {
+                errorMsg+= `Tối đa `+maxLength+` ký tự.\n`;
+            }
+        }
+
+        /* only white space */
+        if (validateOption.includes(`onlyBlank`)) {
+            if (textValue.trim() === ``) {
+                errorMsg+= `Không được phép chỉ chứa khoảng trắng.\n`;
+            }
+        }
+
+        /* start with white space */
+        if (validateOption.includes(`startBlank`)) {
+            if (textValue.trim() === ``) {
+                if (!validateOption.includes(`onlyBlank`)) {
+                    /* if not yet validated against only white space */
+                    errorMsg+= `Không được phép chỉ chứa khoảng trắng.\n`;
                 }
-            } else if (startWithWhiteSpace(value)) {
-                errorMsg += `Không được phép bắt đầu với khoảng trắng.\n`;
+            } else if (startWithWhiteSpace(textValue)) {
+                errorMsg+= `Không được phép bắt đầu với khoảng trắng.\n`;
             }
         }
-    }
 
-    /* end with white space */
-    if (validateOption.includes("endBlank")) {
-        if (value !== ``) {
-            if (value.trim() === ``) {
-                if (!validateOption.includes("onlyBlank")) {
-                    errorMsg += `Không được phép chỉ chứa khoảng trắng.\n`;
+        /* end with white space */
+        if (validateOption.includes(`endBlank`)) {
+            if (textValue.trim() === ``) {
+                if (!validateOption.includes(`onlyBlank`)) {
+                    /* if not yet validated against only white space */
+                    errorMsg+= `Không được phép chỉ chứa khoảng trắng.\n`;
                 }
-            } else if (endWithWhiteSpace(value)) {
-                errorMsg += `Không được phép kết thúc với khoảng trắng.\n`;
+            } else if (endWithWhiteSpace(textValue)) {
+                errorMsg+= `Không được phép kết thúc với khoảng trắng.\n`;
             }
         }
-    }
 
-    /* special character */
-    if (validateOption.includes("specialChar")) {
-        if (specialCharacterRegex.test(value)) {
-            errorMsg += `Không được phép chứa ký tự đặc biệt ( !@#$%^&*(),.?":{}|<> ).\n`;
+        /* special character */
+        if (validateOption.includes(`specialChar`)) {
+            if (specialCharacterRegex.test(textValue)) {
+                errorMsg+= `Không được phép chứa ký tự đặc biệt ( !@#$%^&*(),.?":{}|<> ).\n`;
+            }
         }
     }
 
@@ -164,25 +164,80 @@ function validateTextInput(textInput, minLength, maxLength, validateOption) {
     return true;
 }
 
+function validateNumberInput(numberInput, min, max, step, validateOption) {
+    numberInput.setCustomValidity(``);
+
+    let errorMsg = ``;
+
+    let numberValue = numberInput.valueAsNumber;
+
+    if (isNaN(numberValue)) {
+        /* required */
+        if (validateOption.includes(`required`)) {
+            errorMsg = requiredErrorMsg;
+        }
+
+        /* if not required, then nothing to validate against */
+    } else {
+
+        /* null or min (if null ignore, if not check minlength) */
+        if (validateOption.includes(`nullOrMin`)) {
+            if (numberValue < min) {
+                errorMsg+= `Giá trị cần lớn hơn `+min+` , hoặc để trống trường này.\n`;
+            }
+        }
+
+        /* min */
+        if (validateOption.includes(`min`)) {
+            if (numberValue < min) {
+                errorMsg+= `Giá trị cần lớn hơn `+min+` .\n`;
+            }
+        }
+
+        /* max */
+        if (validateOption.includes(`max`)) {
+            if (numberValue > max) {
+                errorMsg+= `Giá trị cần nhỏ hơn `+max+` .\n`;
+            }
+        }
+
+        /* step */
+        if (validateOption.includes(`step`)) {
+            if (numberValue % step !== 0) {
+                errorMsg+= `Đơn vị biến đổi nhỏ nhất: ±`+step+` .\n`;
+            }
+        }
+    }
+
+    numberInput.setCustomValidity(errorMsg);
+    if (errorMsg !== ``) {
+        numberInput.reportValidity();
+        return false;
+    }
+
+    return true;
+}
+
 /* Copy to clipboard */
 function copyToClipboard(id) {
     const fadeTime = 1500;
 
-    navigator.clipboard.writeText($("#" + id).text());
+    navigator.clipboard.writeText($(`#`+id).text());
 
-    $("body").prepend(
-        '<div class="fixed-top d-flex justify-content-center" id="alert">' +
-        '   <p class="ts-bg-grey-subtle rounded-pill py-2 px-5" style="width: fit-content;">' +
-        '       Đã copy vào clipboard' +
-        '   </p>' +
-        '</div>');
+    $(`body`).prepend(`
+        <div class="fixed-top d-flex justify-content-center" id="alert">
+           <p class="ts-bg-grey-subtle rounded-pill py-2 px-5" style="width: fit-content;">
+               Đã copy vào clipboard
+           </p>
+        </div>`);
 
-    $("#alert").fadeOut(fadeTime);
+    $(`#alert`).fadeOut(fadeTime);
 
-    setTimeout(function() { $("#alert").remove(); }, fadeTime);
+    setTimeout(function() { $(`#alert`).remove(); }, fadeTime);
 }
-/* =============================== UTIL ============================================================================= */
 
+
+/* =============================== FIREBASE ========================================================================= */
 /** For single file input type <b>image/*</b>
  * @param inputId the id of the file input tag
  * @param imgId the id of the img tag
@@ -197,7 +252,7 @@ function updateImgFromInput(inputId, imgId, fileSizeLimit) {
         let bytes = 1048576 * fileSizeLimit;
         if (file.size > bytes) {
             /* File quá cỡ */
-            fileInput.setCustomValidity("File too big. Max " + fileSizeLimit + " MB.");
+            fileInput.setCustomValidity(`File too big. Max `+fileSizeLimit+` MB.`);
             fileInput.reportValidity();
             return;
         }
@@ -205,7 +260,7 @@ function updateImgFromInput(inputId, imgId, fileSizeLimit) {
 
     let reader = new FileReader();
     reader.onload = function (e) {
-        $("#"+imgId).prop("src", e.target.result);
+        $(`#`+imgId).prop(`src`, e.target.result);
     }
 
     // you have to declare the file loading
@@ -214,6 +269,6 @@ function updateImgFromInput(inputId, imgId, fileSizeLimit) {
 
 /* TODO: chưa import js cho datatable */
 $(document).ready( function () {
-    $('#myTable').DataTable();
+    $(`#myTable`).DataTable();
 } );
 

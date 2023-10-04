@@ -61,24 +61,38 @@ public class CourseServiceImpl implements CourseService {
     public Course createCourse(Course course) throws Exception {
         StringBuilder errorMsg = new StringBuilder();
         /* Validate input */
-        /* alias */
+        /* courseAlias */
         errorMsg.append(
                 miscUtil.validateString(
-                        course.getCourseAlias(), 1, 10,
+                        "Mã khóa học", course.getCourseAlias(), 1, 10,
                         List.of("required", "minLength", "maxLength", "onlyBlank", "startBlank", "endBlank", "specialChar")));
-        /* name */
+        /* courseName */
         errorMsg.append(
                 miscUtil.validateString(
-                        course.getCourseAlias(), 1, 45,
+                        "Tên khóa học", course.getCourseName(), 1, 45,
                         List.of("required", "minLength", "maxLength", "onlyBlank", "startBlank", "endBlank", "specialChar")));
-        /* alias */
+        /* courseDesc */
         errorMsg.append(
                 miscUtil.validateString(
-                        course.getCourseAlias(), 1, 9999,
+                        "Miêu tả khóa học", course.getCourseDesc(), 1, 9999,
                         List.of("nullOrMinLength", "maxLength", "onlyBlank", "startBlank", "endBlank", "specialChar")));
-
-        /* TODO: number validate */
-
+        /* courseImg */
+        /* TODO: check valid link */
+        /* numSession */
+        errorMsg.append(
+                miscUtil.validateNumber(
+                        "Số tiết học", Double.valueOf(course.getNumSession()), 1.0, 100.0, 1.0,
+                        List.of("min", "max", "onlyBlank", "step")));
+        /* minScore */
+        errorMsg.append(
+                miscUtil.validateNumber(
+                        "Điểm tối thiểu", course.getMinScore(), 0.0, 10.0, 0.01,
+                        List.of("min", "max", "onlyBlank", "step")));
+        /* minAttendant */
+        errorMsg.append(
+                miscUtil.validateNumber(
+                        "Điểm danh tối thiểu", course.getMinAttendant(), 0.0, 100.0, 0.01,
+                        List.of("min", "max", "onlyBlank", "step")));
 
         /* Check FK */
         /* No FK */
