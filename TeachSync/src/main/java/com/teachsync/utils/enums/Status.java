@@ -10,8 +10,11 @@ public enum Status {
     APPROVED("APPROVED", "Approved", "Chấp nhận"),
     DENIED("DENIED", "Denied", "Từ chối"),
 
-    OPENED("OPENED", "Opened", "Mở"),
-    CLOSED("CLOSED", "Closed", "Đóng"),
+
+    DESIGNING("DESIGNING", "Designing", "Đang thiết kế"),
+    AWAIT_REVIEW("AWAIT_REVIEW", "Awaiting review", "Đang chờ xét duyệt"),
+    OPENED("OPENED", "Opened", "Đang mở"),
+    CLOSED("CLOSED", "Closed", "Đã đóng"),
 
     ALLOWED_REDO("ALLOWED_REDO", "Allowing redo", "Cho phép làm lại"),
     SUSPENDED("SUSPENDED", "Suspended", "Tạm ngưng"),

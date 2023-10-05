@@ -28,6 +28,7 @@
 <%@ include file="/WEB-INF/fragments/header.jspf" %>
 <!-- ================================================== Header ===================================================== -->
 
+
 <!-- ================================================== Main Body ================================================== -->
 <div class="row">
   <!-- Breadcrumb -->
@@ -57,167 +58,167 @@
     <%--@elvariable id="createDTO" type="com.teachsync.dtos.course.CourseCreateDTO"--%>
     <form:form id="form"
                modelAttribute="createDTO" action="/add-course" method="post"
-               class="row">
+               cssClass="row">
     
-        <h4>Thêm khóa học</h4>
-        <br>
-    
-        <!-- Course Img -->
-        <div class="col-sm-12 col-md-3 mb-3">
-          <label for="fileImg" class="form-label">Ảnh khóa học:</label>
-          <img id="imgCourseImg"
-               src="../../../resources/img/no-img.jpg" alt="courseImg"
-               class="rounded-2 border ts-border-blue w-100 h-auto mb-3">
-            
-          <input id="fileImg" name="img"
-                 type="file" accept="image/*"
-                 class="form-control ts-border-grey"
-                 onchange="updateImgFromInput('fileImg', 'imgCourseImg', 0.75)">
-          <p class="ts-txt-italic ts-txt-sm mb-0">*Tối đa 0.75 MB</p>
-          <input id="hidCourseImg" name="courseImg"
-                 type="hidden" value="../../../resources/img/no-img.jpg">
+      <h4>Thêm khóa học</h4>
+      <br>
+  
+      <!-- Course Img -->
+      <div class="col-sm-12 col-md-3 mb-3">
+        <label for="fileImg" class="form-label">Ảnh khóa học:</label>
+        <img id="imgCourseImg"
+             src="../../../resources/img/no-img.jpg" alt="courseImg"
+             class="rounded-2 border ts-border-blue w-100 h-auto mb-3">
+          
+        <input id="fileImg" name="img"
+               type="file" accept="image/*"
+               class="form-control ts-border-grey"
+               onchange="updateImgFromInput('fileImg', 'imgCourseImg', 0.75)">
+        <p class="ts-txt-italic ts-txt-sm mb-0">*Tối đa 0.75 MB</p>
+        <input id="hidCourseImg" name="courseImg"
+               type="hidden" value="../../../resources/img/no-img.jpg">
+      </div>
+  
+      <!-- Course detail -->
+      <div class="col-sm-12 col-md-9">
+        <!-- Course Alias, Name, Desc -->
+        <div class="row">
+          <!-- Course Alias -->
+          <div class="col-4 mb-3">
+            <label for="txtAlias" class="form-label">Mã khóa học:</label>
+            <input id="txtAlias" name="courseAlias"
+                   type="text" minlength="1" maxlength="10"
+                   class="form-control ts-border-grey"
+                   required="required">
+          </div>
+
+          <!-- Course Name -->
+          <div class="col-8 mb-3">
+            <label for="txtName" class="form-label">Tên khóa học:</label>
+            <input id="txtName" name="courseName"
+                   type="text" minlength="1" maxlength="45"
+                   class="form-control ts-border-grey"
+                   required="required">
+          </div>
+          
+          <!-- Course Desc -->
+          <div class="col-12 mb-3">
+            <label for="txtADesc" class="form-label">Miêu tả về khóa học:</label>
+            <textarea id="txtADesc" name="courseDesc"
+                      minlength="0" maxlength="9999"
+                      class="form-control ts-border-grey" rows="3" style="resize: none"></textarea>
+          </div>
         </div>
-    
-        <!-- Course detail -->
-        <div class="col-sm-12 col-md-9">
-          <!-- Course Alias, Name, Desc -->
-          <div class="row">
-            <!-- Course Alias -->
-            <div class="col-4 mb-3">
-              <label for="txtAlias" class="form-label">Mã khóa học:</label>
-              <input id="txtAlias" name="courseAlias"
-                     type="text" minlength="1" maxlength="10"
-                     class="form-control ts-border-grey"
-                     required="required">
-            </div>
 
-            <!-- Course Name -->
-            <div class="col-8 mb-3">
-              <label for="txtName" class="form-label">Tên khóa học:</label>
-              <input id="txtName" name="courseName"
-                     type="text" minlength="1" maxlength="45"
+        <!-- Course numSession, minScore, minAttendant -->
+        <div class="row">
+          <!-- Course numSession -->
+          <div class="col-sm-12 col-md-4 mb-3">
+            <label for="numNumSession" class="form-label">Số tiết học:</label>
+            <input id="numNumSession" name="numSession"
+                   type="number" min="1" max="100" step="1" value="10"
+                   class="form-control ts-border-grey"
+                   required="required">
+          </div>
+
+          <!-- Course minScore -->
+          <div class="col-sm-12 col-md-4 mb-3">
+            <label for="numMinScore" class="form-label">Điểm tối thiểu:</label>
+            <input id="numMinScore" name="minScore"
+                   type="number" min="0" max="10" step=".01" value="5"
+                   class="form-control ts-border-grey"
+                   required="required">
+          </div>
+
+          <!-- Course minAttendant -->
+          <div class="col-sm-12 col-md-4 mb-3">
+            <label for="numMinAttendant" class="form-label">Điểm danh tối thiểu:</label>
+            <div class="input-group">
+              <input id="numMinAttendant" name="minAttendant"
+                     type="number" min="0" max="100" step=".01" value="80"
                      class="form-control ts-border-grey"
                      required="required">
-            </div>
-            
-            <!-- Course Desc -->
-            <div class="col-12 mb-3">
-              <label for="txtADesc" class="form-label">Miêu tả về khóa học:</label>
-              <textarea id="txtADesc" name="courseDesc"
-                        minlength="0" maxlength="9999"
-                        class="form-control ts-border-grey" rows="3" style="resize: none"></textarea>
+              <span class="input-group-text ts-border-grey">%</span>
             </div>
           </div>
-  
-          <!-- Course numSession, minScore, minAttendant -->
-          <div class="row">
-            <!-- Course numSession -->
-            <div class="col-sm-12 col-md-4 mb-3">
-              <label for="numNumSession" class="form-label">Số tiết học:</label>
-              <input id="numNumSession" name="numSession"
-                     type="number" min="1" max="100" step="1" value="10"
-                     class="form-control ts-border-grey"
-                     required="required">
-            </div>
+        </div>
 
-            <!-- Course minScore -->
-            <div class="col-sm-12 col-md-4 mb-3">
-              <label for="numMinScore" class="form-label">Điểm tối thiểu:</label>
-              <input id="numMinScore" name="minScore"
-                     type="number" min="0" max="10" step=".01" value="5"
+        <!-- Course price, isPromotion, (promotionAmount, finalPrice, promotionDesc) -->
+        <div class="row">
+          <div class="col-sm-12 col-md-4 mb-3">
+            <!-- Course price -->
+            <label for="numPrice" class="form-label">Giá khóa học:</label>
+            <div class="input-group">
+              <input id="numPrice" name="price.price"
+                     type="number" min="1000" max="99999000" step="100" value="100000"
                      class="form-control ts-border-grey"
-                     required="required">
-            </div>
+                     required="required"
+                     oninput="calculateFinalPrice(); updateInputPromotionAmountMax()">
+              <span class="input-group-text ts-border-grey">₫</span>
 
-            <!-- Course minAttendant -->
-            <div class="col-sm-12 col-md-4 mb-3">
-              <label for="numMinAttendant" class="form-label">Điểm danh tối thiểu:</label>
-              <div class="input-group">
-                <input id="numMinAttendant" name="minAttendant"
-                       type="number" min="0" max="100" step=".01" value="80"
-                       class="form-control ts-border-grey"
-                       required="required">
-                <span class="input-group-text ts-border-grey">%</span>
+              <!-- Course isPromotion -->
+              <div class="input-group-text ts-border-grey">
+                <input id="chkIsPromotion" name="price.isPromotion"
+                       type="checkbox" value="true"
+                       class="form-check-input mt-0"
+                       onchange="togglePromotion()">
+                <label for="chkIsPromotion" class="form-check-label">&nbsp;Giảm giá</label>
               </div>
             </div>
           </div>
 
-          <!-- Course price, isPromotion, (promotionAmount, finalPrice, promotionDesc) -->
-          <div class="row">
-            <div class="col-sm-12 col-md-4 mb-3">
-              <!-- Course price -->
-              <label for="numPrice" class="form-label">Giá khóa học:</label>
-              <div class="input-group">
-                <input id="numPrice" name="price.price"
-                       type="number" min="1000" max="99999000" step="100" value="100000"
-                       class="form-control ts-border-grey"
-                       required="required"
-                       oninput="calculateFinalPrice(); updateInputPromotionAmountMax()">
-                <span class="input-group-text ts-border-grey">₫</span>
-  
-                <!-- Course isPromotion -->
-                <div class="input-group-text ts-border-grey">
-                  <input id="chkIsPromotion" name="price.isPromotion"
-                         type="checkbox" value="true"
-                         class="form-check-input mt-0"
-                         onchange="togglePromotion()">
-                  <label for="chkIsPromotion" class="form-check-label">&nbsp;Giảm giá</label>
-                </div>
-              </div>
-            </div>
-  
+          <div class="col-sm-12 col-md-4 mb-3 visually-hidden" id="divPromotionAmount">
             <!-- Course promotionAmount -->
-            <div class="col-sm-12 col-md-4 mb-3 visually-hidden" id="divPromotionAmount">
-              <label class="form-label" for="numPromotionAmount">Giảm:</label>
-              <div class="input-group">
-                <input id="numPromotionAmount" name="price.promotionAmount"
-                       type="number" min="0.01" max="100" step=".01" value="0.01"
-                       class="form-control ts-border-grey" style="width: 70%;"
-                       disabled="disabled" required="required" 
-                       oninput="calculateFinalPrice()" onchange="calculateFinalPrice()">
-  
-                <!-- Course promotionType -->
-                <select id="selPromotionType" name="price.promotionType"
-                        class="form-select ts-border-grey px-2" style="width: 30%;"
-                        disabled="disabled"
-                        onchange="changeInputPromotionAmountSpec()">
-                  <option value="PERCENT">%</option>
-                  <option value="AMOUNT">₫</option>
-                </select>
-              </div>
-            </div>
+            <label class="form-label" for="numPromotionAmount">Giảm:</label>
+            <div class="input-group">
+              <input id="numPromotionAmount" name="price.promotionAmount"
+                     type="number" min="0.01" max="100" step=".01" value="0.01"
+                     class="form-control ts-border-grey" style="width: 70%;"
+                     disabled="disabled" required="required"
+                     oninput="calculateFinalPrice()" onchange="calculateFinalPrice()">
 
-            <!-- Course finalPrice -->
-            <div class="col-sm-12 col-md-4 mb-3 visually-hidden" id="divPromotionFinal">
-              <label class="form-label" for="txtFinalPrice">Giá sau giảm:</label>
-              <div class="input-group">
-                <input id="txtFinalPrice"
-                       type="text"
-                       class="form-control ts-border-grey"
-                       disabled="disabled" readonly="readonly">
-                <span class="input-group-text ts-border-grey">₫</span>
-              </div>
-            </div>
-  
-            <!-- Course promotionDesc -->
-            <div class="col-12 mb-3 visually-hidden" id="divPromotionDesc">
-              <label for="txtAPromotionDesc" class="form-label">Chi tiết Khuyến mãi:</label>
-              <textarea id="txtAPromotionDesc" name="price.promotionDesc"
-                        minlength="0" maxlength="9999"
-                        class="form-control ts-border-grey" rows="3" style="resize: none;"
-                        disabled="disabled"></textarea>
+              <!-- Course promotionType -->
+              <select id="selPromotionType" name="price.promotionType"
+                      class="form-select ts-border-grey px-2" style="width: 30%;"
+                      disabled="disabled"
+                      onchange="changeInputPromotionAmountSpec()">
+                <option value="PERCENT">%</option>
+                <option value="AMOUNT">₫</option>
+              </select>
             </div>
           </div>
+
+          <!-- Course finalPrice -->
+          <div class="col-sm-12 col-md-4 mb-3 visually-hidden" id="divPromotionFinal">
+            <label class="form-label" for="txtFinalPrice">Giá sau giảm:</label>
+            <div class="input-group">
+              <input id="txtFinalPrice"
+                     type="text"
+                     class="form-control ts-border-grey"
+                     disabled="disabled" readonly="readonly">
+              <span class="input-group-text ts-border-grey">₫</span>
+            </div>
+          </div>
+
+          <!-- Course promotionDesc -->
+          <div class="col-12 mb-3 visually-hidden" id="divPromotionDesc">
+            <label for="txtAPromotionDesc" class="form-label">Chi tiết Khuyến mãi:</label>
+            <textarea id="txtAPromotionDesc" name="price.promotionDesc"
+                      minlength="0" maxlength="9999"
+                      class="form-control ts-border-grey" rows="3" style="resize: none;"
+                      disabled="disabled"></textarea>
+          </div>
         </div>
-        
-        <!-- Submit button -->
-        <div class="col-12 text-center">
-          <button id="btnSubmit"
-                  type="submit"
-                  class="btn btn-primary w-50 mb-3">
-            Gửi
-          </button>
-        </div>
+      </div>
+      
+      <!-- Submit button -->
+      <div class="col-12 text-center">
+        <button id="btnSubmit"
+                type="submit"
+                class="btn btn-primary w-50 mb-3">
+          Gửi
+        </button>
+      </div>
         
     </form:form>
   </div>
@@ -297,8 +298,14 @@
                 finalPrice = Math.ceil(roundedFinalPrice / 100) * 100;
                 break;
         }
-
-        $("#txtFinalPrice").val(finalPrice);
+        
+        let formatted =
+            finalPrice
+                .toLocaleString(
+                    'vi-VN',
+                    {style: 'decimal', minimumFractionDigits: 0});
+        
+        $("#txtFinalPrice").val(formatted);
     }
 
     function togglePromotion() {
@@ -322,7 +329,6 @@
             hideById("divPromotionFinal");
         }
     }
-
 </script>
 
 <script>

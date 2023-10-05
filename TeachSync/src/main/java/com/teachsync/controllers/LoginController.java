@@ -12,6 +12,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,8 +21,6 @@ import java.util.Map;
 public class LoginController {
     @Autowired
     private UserService userService;
-
-
 
     @GetMapping("/sign-in")
     public String login(
@@ -43,6 +42,7 @@ public class LoginController {
     public Map<String, Object> login(
             @RequestBody UserLoginDTO loginDTO,
             HttpSession session,
+            RedirectAttributes redirect,
             @SessionAttribute(required = false) String targetUrl) {
         Map<String, Object> response = new HashMap<>();
 

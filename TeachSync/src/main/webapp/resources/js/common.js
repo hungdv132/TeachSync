@@ -79,6 +79,16 @@ function endWithWhiteSpace(string) {
     return /\s$/.test(string);
 }
 
+function isStep(number, step) {
+    // Calculate the remainder of dividing the number by the step
+    let remainder = number % step;
+
+    // Check if the remainder is close to zero or the step, accounting for floating-point errors
+    let epsilon = 1e-10; // A small tolerance value
+
+    return Math.abs(remainder) < epsilon || Math.abs(remainder - step) < epsilon;
+}
+
 function validateTextInput(textInput, minLength, maxLength, validateOption) {
     textInput.setCustomValidity(``);
 
@@ -164,6 +174,72 @@ function validateTextInput(textInput, minLength, maxLength, validateOption) {
     return true;
 }
 
+/** TODO:  */
+function validateTextInputAsNumber(textInputAsNumberInput, min, max, step, validateOption) {
+    textInputAsNumberInput.setCustomValidity(``);
+
+    let errorMsg = ``;
+
+    let textValue = textInputAsNumberInput.value;
+
+    if (textValue === ``) {
+        /* required */
+        if (validateOption.includes(`required`)) {
+            errorMsg = requiredErrorMsg;
+        }
+
+        /* if not required, then nothing to validate against */
+    } else {
+        let numberValue = Number(textValue.replace(/./g, ``).replace(/,/, `.`));
+
+        if (isNaN(numberValue)) {
+            /* required */
+            errorMsg = "";
+        } else {
+            /* null or min (if null ignore, if not check minlength) */
+            if (validateOption.includes(`nullOrMin`)) {
+                if (numberValue < min) {
+                    errorMsg+= `Giá trị cần lớn hơn `+min+` , hoặc để trống trường này.\n`;
+                }
+            }
+
+            /* min */
+            if (validateOption.includes(`min`)) {
+                if (numberValue < min) {
+                    errorMsg+= `Giá trị cần lớn hơn `+min+` .\n`;
+                }
+            }
+
+            /* max */
+            if (validateOption.includes(`max`)) {
+                if (numberValue > max) {
+                    errorMsg+= `Giá trị cần nhỏ hơn `+max+` .\n`;
+                }
+            }
+
+            /* step */
+            if (validateOption.includes(`step`)) {
+                let numberInput = document.createElement(`input`);
+                numberInput.type = `number`;
+                numberInput.step = step;
+                numberInput.value = numberValue.toString();
+                if (numberInput.validity.stepMismatch) {
+                    errorMsg+= `Đơn vị biến đổi nhỏ nhất: ±`+step+` .\n`;
+                }
+                numberInput = null;
+            }
+        }
+    }
+
+    textInputAsNumberInput.setCustomValidity(errorMsg);
+    if (errorMsg !== ``) {
+        textInputAsNumberInput.reportValidity();
+        return false;
+    }
+
+    return true;
+}
+
 function validateNumberInput(numberInput, min, max, step, validateOption) {
     numberInput.setCustomValidity(``);
 
@@ -179,31 +255,30 @@ function validateNumberInput(numberInput, min, max, step, validateOption) {
 
         /* if not required, then nothing to validate against */
     } else {
-
         /* null or min (if null ignore, if not check minlength) */
         if (validateOption.includes(`nullOrMin`)) {
-            if (numberValue < min) {
+            if (numberInput.validity.rangeUnderflow) {
                 errorMsg+= `Giá trị cần lớn hơn `+min+` , hoặc để trống trường này.\n`;
             }
         }
 
         /* min */
         if (validateOption.includes(`min`)) {
-            if (numberValue < min) {
+            if (numberInput.validity.rangeUnderflow) {
                 errorMsg+= `Giá trị cần lớn hơn `+min+` .\n`;
             }
         }
 
         /* max */
         if (validateOption.includes(`max`)) {
-            if (numberValue > max) {
+            if (numberInput.validity.rangeOverflow) {
                 errorMsg+= `Giá trị cần nhỏ hơn `+max+` .\n`;
             }
         }
 
         /* step */
         if (validateOption.includes(`step`)) {
-            if (numberValue % step !== 0) {
+            if (numberInput.validity.stepMismatch) {
                 errorMsg+= `Đơn vị biến đổi nhỏ nhất: ±`+step+` .\n`;
             }
         }

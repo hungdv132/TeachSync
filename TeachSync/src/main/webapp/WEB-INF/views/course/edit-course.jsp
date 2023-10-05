@@ -1,5 +1,7 @@
+<%@ page import="com.teachsync.utils.enums.Status" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 
 <!DOCTYPE html>
 <html lang="vi" dir="ltr">
@@ -28,9 +30,10 @@
 <!-- ================================================== Header ===================================================== -->
 
 
-<!-- ================================================== Breadcrumb ================================================= -->
-<div class="row ts-bg-white border ts-border-teal rounded-3 mx-2 mb-3">
-  <div class="col">
+<!-- ================================================== Main Body ================================================== -->
+<div class="row">
+  <!-- Breadcrumb -->
+  <div class="col-12 ts-bg-white border-top border-bottom ts-border-teal px-5 mb-3">
     <nav aria-label="breadcrumb">
       <ol class="breadcrumb ts-txt-sm ts-txt-bold my-2">
         <li class="breadcrumb-item">
@@ -57,190 +60,237 @@
       </ol>
     </nav>
   </div>
-</div>
-<!-- ================================================== Breadcrumb ================================================= -->
-
-
-<!-- ================================================== Main Body ================================================== -->
-<div class="row ts-bg-white d-flex justify-content-center border ts-border-teal rounded-3 pt-3 mx-2 mb-3">
-    <form onsubmit="editCourse(event)" class="col-12 d-flex justify-content-center px-5 mb-3">
-      <div class="row">
-        
-        <h4>Sửa khóa học</h4>
-        <br>
-        
-        <!-- Course Img -->
-        <div class="col-sm-12 col-md-3 mb-3">
-          <label class="w-100">
-            Ảnh khóa học: <br/>
-            <img src="${empty course.courseImg ? '../../../resources/img/no-img.jpg' : course.courseImg}" alt="courseImg" id="imgCourseImg"
-                 class="rounded-2 border ts-border-blue w-100 h-auto mb-3">
-            <br/>
-            <input type="file" name="img" id="txtImg" class="w-100"
-                   accept="image/*" onchange="updateImgFromInput('txtImg', 'imgCourseImg', 0.75)">
-          </label>
-          <p class="ts-txt-italic ts-txt-sm mb-0">*Tối đa 0.75 MB</p>
-        </div>
-        
-        <!-- Course detail -->
-        <div class="col-sm-12 col-md-9 mb-3">
-          <!-- Course name, Alias -->
-          <div class="row mb-3">
-            <label class="col-sm-4 col-md-2">
-              Mã khóa học: <br/>
-              <input type="text" name="alias" id="txtAlias" class="w-100"
-                     required="required" value="${course.courseAlias}">
-            </label>
-            <label class="col-sm-8 col-md-10">
-              Tên khóa học: <br/>
-              <input type="text" name="name" id="txtName" class="w-100"
-                     required="required" value="${course.courseName}">
-            </label>
-          </div>
-          
-          <!-- Course desc -->
-          <label class="w-100 mb-3">
-            Miêu tả về khóa học: <br/>
-            <textarea name="desc" id="txtDesc" class="w-100" style="resize: none"
-                      rows="3">${course.courseDesc}</textarea>
-          </label>
-          
-          <!-- Course numSession, minScore, minAttendant -->
-          <div class="row">
-            <label class="col-sm-12 col-md-4 mb-3">
-              Số tiết học: <br/>
-              <input type="number" name="numSession" id="txtNumSession" class="w-100"
-                     required="required" min="1" max="100" value="${course.numSession}">
-            </label>
-            
-            <label class="col-sm-12 col-md-4 mb-3">
-              Điểm tối thiểu: <br/>
-              <input type="number" name="minScore" id="txtMinScore" class="w-100"
-                     required="required" min="0" max="10" step=".01" value="${course.minScore}">
-            </label>
-            
-            <label class="col-sm-12 col-md-4 mb-3">
-              Điểm danh tối thiểu: <br/>
-              <span class="input-percent right">
-              <input type="number" name="minAttendant" id="txtMinAttendant" class="w-100 pe-4"
-                     required="required" min="0" max="100" step=".01" value="${course.minAttendant}">
-            </span>
-            </label>
-          </div>
-          
-          <!-- Course price, isPromotion, promotionAmount, promotionType -->
-          <div class="row">
-            <div class="col-sm-12 col-md-4 mb-3">
-              <div class="row align-items-end">
-                <label class="col-8">
-                  Giá khóa học:
-                  <br/>
-                  <span class="input-vnd right">
-                  <input type="number" name="price" id="txtPrice" class="w-100 pe-4"
-                         required="required" min="1000" max="99999000" value="${course.currentPrice.price}" step="100"
-                         oninput="calculateFinalPrice(); updateInputPromotionAmountMax()">
-                </span>
-                </label>
-                
-                <label class="col-4 px-0">
-                  <input type="checkbox" name="isPromotion" id="chkIsPromotion"
-                         onchange="togglePromotion()">
-                  Giảm giá.
-                </label>
-                <script id="script1">
-                    $("#chkIsPromotion").attr("checked", ${course.currentPrice.isPromotion});
-                    $("#script1").remove();
-                </script>
-              </div>
-            </div>
-            
-            <div class="col-sm-12 col-md-4 mb-3 visually-hidden" id="divPromotionAmount">
-              <div class="row d-flex align-items-end">
-                <label class="col-9 pe-0">
-                  Giảm:
-                  <br/>
-                  <input type="number" name="promotionAmount" id="txtPromotionAmount" class="w-100"
-                         min="0.01" max="100" step=".01"
-                         value="${course.currentPrice.isPromotion ? course.currentPrice.promotionAmount : '0.01'}"
-                         oninput="calculateFinalPrice()" onchange="calculateFinalPrice()">
-                </label>
-                
-                <label class="col-3">
-                  <select name="promotionType" id="selPromotionType" class="w-100"
-                          onchange="changeInputPromotionAmountSpec()">
-                    <option value="PERCENT">%</option>
-                    <option value="AMOUNT">₫</option>
-                  </select>
-                </label>
-                <script id="script2">
-                    let isPromotion = ${course.currentPrice.isPromotion};
-                    if (isPromotion) {
-                        $("#selPromotionType").val("${course.currentPrice.promotionType.stringValue}").change();
-                    }
-                    $("#script2").remove();
-                </script>
-              </div>
-            </div>
-            
-            <label class="col-sm-12 col-md-4 mb-3 visually-hidden" id="lblPromotionFinal">
-              Giá sau giảm:
-              <br/>
-              <span class="input-vnd right">
-                <input type="number" name="price" id="txtFinalPrice" class="w-100 pe-4"
-                       disabled="disabled" value="${course.currentPrice.finalPrice}">
-              </span>
-            </label>
-          </div>
-          
-          <!-- Course promotionDesc -->
-          <label class="w-100 visually-hidden" id="lblPromotionDesc">
-            Chi tiết Khuyến mãi: <br/>
-            <textarea name="promotionDesc" id="txtPromotionDesc" class="w-100"  style="resize: none"
-                      rows="3">${course.currentPrice.isPromotion ? course.currentPrice.promotionDesc : ''}</textarea>
-          </label>
-        
-        </div>
-        
-        <!-- Submit button -->
-        <div class="col-12">
-          <div class="row d-flex justify-content-center">
-            <div class="col-sm-12 col-md-4">
-              <button type="submit" class="btn btn-primary w-100">Submit</button>
-            </div>
-          </div>
-        </div>
+  <!-- Breadcrumb -->
+  
+  <!-- Content -->
+  <div class="col-12 ts-bg-white border-top border-bottom ts-border-teal pt-3 px-5 mb-3">
+    <%--@elvariable id="updateDTO" type="com.teachsync.dtos.course.CourseUpdateDTO"--%>
+    <form:form id="form"
+               modelAttribute="updateDTO" action="/edit-course" method="post"
+               cssClass="row">
+      <input type="hidden" name="id" value="${course.id}">
       
+      <h4>Sửa khóa học</h4>
+      <br>
+      
+      <!-- Course Img -->
+      <div id="divCourseImg"
+          class="col-sm-12 col-md-3 mb-3">
+        <label for="fileImg" class="form-label">Ảnh khóa học:</label>
+        <img id="imgCourseImg"
+             src="${empty course.courseImg ? '../../../resources/img/no-img.jpg' : course.courseImg}" alt="courseImg"
+             class="rounded-2 border ts-border-blue w-100 h-auto mb-3">
+    
+        <input id="fileImg" name="img"
+               type="file" accept="image/*"
+               class="form-control ts-border-grey"
+               onchange="updateImgFromInput('fileImg', 'imgCourseImg', 0.75)">
+        <p class="ts-txt-italic ts-txt-sm mb-0">*Tối đa 0.75 MB</p>
+        <input id="hidCourseImg" name="courseImg"
+               type="hidden" value="../../../resources/img/no-img.jpg">
       </div>
-    </form>
+
+      
+      <!-- Course detail -->
+      <div class="col-sm-12 col-md-9">
+        <!-- Course status -->
+        <div class="row">
+          <div class="col-12">
+            <label for="selStatus" class="form-label">Trạng thái:</label>
+            <select id="selStatus" name="status"
+                    class="form-select"
+                    onchange="restrictByStatus()">
+              <option value="${Status.DESIGNING}">${Status.DESIGNING.stringValueVie}</option>
+              <option value="${Status.AWAIT_REVIEW}">${Status.AWAIT_REVIEW.stringValueVie}</option>
+      
+              <option value="${Status.OPENED}">${Status.OPENED.stringValueVie}</option>
+              <option value="${Status.CLOSED}">${Status.CLOSED.stringValueVie}</option>
+            </select>
+          </div>
+        </div>
+        
+        <!-- Course Alias, Name, Desc -->
+        <div id="divCourseTextDetail"
+             class="row">
+          <!-- Course Alias -->
+          <div class="col-4 mb-3">
+            <label for="txtAlias" class="form-label">Mã khóa học:</label>
+            <input id="txtAlias" name="courseAlias"
+                   type="text" minlength="1" maxlength="10" value="${course.courseAlias}"
+                   class="form-control ts-border-grey"
+                   required="required">
+          </div>
+    
+          <!-- Course Name -->
+          <div class="col-8 mb-3">
+            <label for="txtName" class="form-label">Tên khóa học:</label>
+            <input id="txtName" name="courseName"
+                   type="text" minlength="1" maxlength="45" value="${course.courseName}"
+                   class="form-control ts-border-grey"
+                   required="required">
+          </div>
+    
+          <!-- Course Desc -->
+          <div class="col-12 mb-3">
+            <label for="txtADesc" class="form-label">Miêu tả về khóa học:</label>
+            <textarea id="txtADesc" name="courseDesc"
+                      minlength="0" maxlength="9999"
+                      class="form-control ts-border-grey" rows="3" style="resize: none"><c:out value="${course.courseDesc}"/></textarea>
+          </div>
+        </div>
+        
+        <!-- Course numSession, minScore, minAttendant -->
+        <div id="divCourseNumberDetail"
+             class="row">
+          <!-- Course numSession -->
+          <div class="col-sm-12 col-md-4 mb-3">
+            <label for="numNumSession" class="form-label">Số tiết học:</label>
+            <input id="numNumSession" name="numSession"
+                   type="number" min="1" max="100" step="1" value="${course.numSession}"
+                   class="form-control ts-border-grey"
+                   required="required">
+          </div>
+    
+          <!-- Course minScore -->
+          <div class="col-sm-12 col-md-4 mb-3">
+            <label for="numMinScore" class="form-label">Điểm tối thiểu:</label>
+            <input id="numMinScore" name="minScore"
+                   type="number" min="0" max="10" step=".01" value="${course.minScore}"
+                   class="form-control ts-border-grey"
+                   required="required">
+          </div>
+    
+          <!-- Course minAttendant -->
+          <div class="col-sm-12 col-md-4 mb-3">
+            <label for="numMinAttendant" class="form-label">Điểm danh tối thiểu:</label>
+            <div class="input-group">
+              <input id="numMinAttendant" name="minAttendant"
+                     type="number" min="0" max="100" step=".01" value="${course.minAttendant}"
+                     class="form-control ts-border-grey"
+                     required="required">
+              <span class="input-group-text ts-border-grey">%</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Course price, isPromotion, (promotionAmount, finalPrice, promotionDesc) -->
+        <div id="divCoursePrice"
+             class="row">
+          <div class="col-sm-12 col-md-4 mb-3">
+            <!-- Course price -->
+            <label for="numPrice" class="form-label">Giá khóa học:</label>
+            <div class="input-group">
+              <input id="numPrice" name="price.price"
+                     type="number" min="1000" max="99999000" step="100" value="${course.currentPrice.price}"
+                     class="form-control ts-border-grey"
+                     required="required"
+                     oninput="calculateFinalPrice(); updateInputPromotionAmountMax()">
+              <span class="input-group-text ts-border-grey">₫</span>
+      
+              <!-- Course isPromotion -->
+              <div class="input-group-text ts-border-grey">
+                <input id="chkIsPromotion" name="price.isPromotion"
+                       type="checkbox" value="true"
+                       class="form-check-input mt-0"
+                       onchange="togglePromotion()">
+                <label for="chkIsPromotion" class="form-check-label">&nbsp;Giảm giá</label>
+              </div>
+            </div>
+          </div>
+          
+          <div class="col-sm-12 col-md-4 mb-3 visually-hidden" id="divPromotionAmount">
+            <!-- Course promotionAmount -->
+            <label class="form-label" for="numPromotionAmount">Giảm:</label>
+            <div class="input-group">
+              <input id="numPromotionAmount" name="price.promotionAmount"
+                     type="number" min="0.01" max="100" step=".01"
+                     class="form-control ts-border-grey" style="width: 70%;"
+                     disabled="disabled" required="required"
+                     oninput="calculateFinalPrice()" onchange="calculateFinalPrice()">
+      
+              <!-- Course promotionType -->
+              <select id="selPromotionType" name="price.promotionType"
+                      class="form-select ts-border-grey px-2" style="width: 30%;"
+                      disabled="disabled"
+                      onchange="changeInputPromotionAmountSpec()">
+                <option value="PERCENT">%</option>
+                <option value="AMOUNT">₫</option>
+              </select>
+            </div>
+          </div>
+  
+          <!-- Course finalPrice -->
+          <div class="col-sm-12 col-md-4 mb-3 visually-hidden" id="divPromotionFinal">
+            <label class="form-label" for="txtFinalPrice">Giá sau giảm:</label>
+            <div class="input-group">
+              <input id="txtFinalPrice"
+                     type="text" value="${course.currentPrice.finalPrice}"
+                     class="form-control ts-border-grey"
+                     disabled="disabled" readonly="readonly">
+              <span class="input-group-text ts-border-grey">₫</span>
+            </div>
+          </div>
+
+          <!-- Course promotionDesc -->
+          <div class="col-12 mb-3 visually-hidden" id="divPromotionDesc">
+            <label for="txtAPromotionDesc" class="form-label">Chi tiết Khuyến mãi:</label>
+            <textarea id="txtAPromotionDesc" name="price.promotionDesc"
+                      minlength="0" maxlength="9999"
+                      class="form-control ts-border-grey" rows="3" style="resize: none;"
+                      disabled="disabled"></textarea>
+          </div>
+          
+        </div>
+      </div>
+
+      <!-- Submit button -->
+      <div class="col-12 text-center">
+        <button id="btnSubmit"
+                type="submit"
+                class="btn btn-primary w-50 mb-3">
+          Gửi
+        </button>
+      </div>
+    
+    </form:form>
   </div>
+  <!-- Content -->
+</div>
 <!-- ================================================== Main Body ================================================== -->
 
 
 <!-- ================================================== Footer ===================================================== -->
   <%@ include file="/WEB-INF/fragments/footer.jspf" %>
 <!-- ================================================== Footer ===================================================== -->
-</body>
+
+<!-- ================================================== Script ===================================================== -->
 <script>
     var mess = '${mess}'
     if (mess != '') {
         alert(mess);
     }
-    
-    togglePromotion();
+</script>
 
+<script>
     function updateInputPromotionAmountMax() {
-        $("#txtPromotionAmount").attr({
-            'max': $("#txtPrice").val(),
-            'placeholder' : '0 - ' + $("#txtPrice").val()});
+        let numPromotionAmount = $("#numPromotionAmount");
+
+        if ($("#selPromotionType").val() === 'AMOUNT') {
+            let price = $("#numPrice").val();
+            numPromotionAmount.attr({
+                'max': price,
+                'placeholder': '0 - ' + price
+            });
+        }
     }
 
     function changeInputPromotionAmountSpec() {
-        let txtPromotionAmount = $("#txtPromotionAmount");
+        let numPromotionAmount = $("#numPromotionAmount");
 
         switch ($("#selPromotionType").val()) {
             case 'AMOUNT':
-                let price = $("#txtPrice").val();
-                txtPromotionAmount
+                let price = $("#numPrice").val();
+                numPromotionAmount
                     .attr({
                         'min': "100",
                         'max': price,
@@ -250,7 +300,7 @@
                 break;
 
             case 'PERCENT':
-                txtPromotionAmount
+                numPromotionAmount
                     .attr({
                         'min': '0.01',
                         'max': '100',
@@ -264,8 +314,8 @@
     }
 
     function calculateFinalPrice() {
-        let price = $("#txtPrice").val();
-        let promotionAmount = $("#txtPromotionAmount").val();
+        let price = $("#numPrice").val();
+        let promotionAmount = $("#numPromotionAmount").val();
         let finalPrice = 0;
 
         switch ($("#selPromotionType").val()) {
@@ -274,7 +324,9 @@
                 break;
 
             case 'PERCENT':
-                finalPrice = price - (price * (promotionAmount/100));
+                finalPrice = price - (price * (promotionAmount / 100));
+                let roundedFinalPrice = Math.round(finalPrice);
+                finalPrice = Math.ceil(roundedFinalPrice / 100) * 100;
                 break;
         }
 
@@ -282,74 +334,172 @@
     }
 
     function togglePromotion() {
-        let promotionAmount = $("#txtPromotionAmount");
-
         if ($("#chkIsPromotion").is(":checked")) {
             showById("divPromotionAmount");
-            showById("lblPromotionFinal");
-            showById("lblPromotionDesc");
+            enableAllFormElementIn("divPromotionAmount");
+            
+            showById("divPromotionDesc");
+            enableAllFormElementIn("divPromotionDesc");
 
-            promotionAmount.attr("required", true);
+            showById("divPromotionFinal");
 
             calculateFinalPrice();
         } else {
             hideById("divPromotionAmount");
-            hideById("lblPromotionFinal");
-            hideById("lblPromotionDesc");
+            disableAllFormElementIn("divPromotionAmount");
 
-            promotionAmount.attr("required", false);
+            hideById("divPromotionDesc");
+            disableAllFormElementIn("divPromotionDesc");
+
+            hideById("divPromotionFinal");
         }
     }
+    
+    const initialStatus = "${course.status}";
+    
+    function restrictByStatus() {
+        let selStatus = $("#selStatus");
+        let status = selStatus.val();
 
-    async function editCourse(event) {
-        event.preventDefault();
+        switch (status) {
+            case "${Status.DESIGNING}":
+                enableAllFormElementIn("divCourseTextDetail");
+                enableAllFormElementIn("divCourseNumberDetail");
+                enableAllFormElementIn("divCoursePrice");
+                break;
+            case "${Status.AWAIT_REVIEW}":
+                disableAllFormElementIn("divCoursePrice");
+            case "${Status.OPENED}":
+            case "${Status.CLOSED}":
+                disableAllFormElementIn("divCourseTextDetail");
+                disableAllFormElementIn("divCourseNumberDetail");
+                break;
+        }
+    }
+</script>
 
+<script id="script1">
+    /* promotion */
+    let isPromotion = ${course.currentPrice.isPromotion};
+
+    if (isPromotion) {
+        let promoType = "${course.currentPrice.promotionType.stringValue}";
+        $("#selPromotionType").val(promoType).trigger("change");
+
+        let promoValue = "${course.currentPrice.promotionAmount}";
+        $("#numPromotionAmount").val(promoValue).trigger("change");
+
+        let promoDesc = "${course.currentPrice.promotionDesc}";
+        $("#txtAPromotionDesc").val(promoDesc);
+    }
+
+    $("#chkIsPromotion").attr("checked", isPromotion).trigger("change");
+
+    /* status */
+    $("#selStatus").val(initialStatus).trigger("change");
+
+    switch (initialStatus) {
+        case "${Status.DESIGNING}":
+            break;
+        case "${Status.AWAIT_REVIEW}":
+            disableAllFormElementIn("divCoursePrice");
+        case "${Status.OPENED}":
+        case "${Status.CLOSED}":
+            disableAllFormElementIn("divCourseTextDetail");
+            disableAllFormElementIn("divCourseNumberDetail");
+            break;
+    }
+    
+    $("#script1").remove();
+</script>
+
+<script>
+    /* Validate input */
+    // Select all form elements with the 'required' attribute
+    const requiredElements = $('#form :input[required]');
+    // Iterate through each required element
+    requiredElements.each(function () {
+        const element = $(this);
+
+        // Set an initial custom validity message for required input in VN
+        element[0].setCustomValidity(requiredErrorMsg);
+    });
+
+
+    /* courseAlias */
+    let txtAlias = document.getElementById("txtAlias");
+    txtAlias.addEventListener("input", function () {
+        validateTextInput(
+            txtAlias, txtAlias.minLength, txtAlias.maxLength,
+            ["required", "minLength", "maxLength", "onlyBlank", "startBlank", "endBlank", "specialChar"]);
+
+    });
+
+    /* courseName */
+    let txtName = document.getElementById("txtName");
+    txtName.addEventListener("input", function () {
+        validateTextInput(
+            txtName, txtName.minLength, txtName.maxLength,
+            ["required", "minLength", "maxLength", "onlyBlank", "startBlank", "endBlank", "specialChar"]);
+
+    });
+
+    /* courseDesc */
+    let txtADesc = document.getElementById("txtADesc");
+    txtADesc.addEventListener("input", function () {
+        validateTextInput(
+            txtADesc, 1, txtADesc.maxLength,
+            ["nullOrMinLength", "maxLength", "onlyBlank", "startBlank", "endBlank", "specialChar"]);
+    });
+
+    /* numSession */
+    let numNumSession = document.getElementById("numNumSession");
+    numNumSession.addEventListener("input", function () {
+        validateNumberInput(
+            numNumSession, Number(numNumSession.min), Number(numNumSession.max), Number(numNumSession.step),
+            ["required", "min", "max", "step"]);
+    });
+
+    /* numMinScore */
+    let numMinScore = document.getElementById("numMinScore");
+    numMinScore.addEventListener("input", function () {
+        validateNumberInput(
+            numMinScore, Number(numMinScore.min), Number(numMinScore.max), Number(numMinScore.step),
+            ["required", "min", "max", "step"]);
+    });
+
+    /* numMinScore */
+    let numMinAttendant = document.getElementById("numMinAttendant");
+    numMinAttendant.addEventListener("input", function () {
+        validateNumberInput(
+            numMinAttendant, Number(numMinAttendant.min), Number(numMinAttendant.max), Number(numMinAttendant.step),
+            ["required", "min", "max", "step"]);
+    });
+
+    /* numPrice */
+    let numPrice = document.getElementById("numPrice");
+    numPrice.addEventListener("input", function () {
+        validateNumberInput(
+            numPrice, Number(numPrice.min), Number(numPrice.max), Number(numPrice.step),
+            ["required", "min", "max", "step"]);
+    });
+
+    /* numPromotionAmount */
+    let numPromotionAmount = document.getElementById("numPromotionAmount");
+    numPromotionAmount.addEventListener("input", function () {
+        validateNumberInput(
+            numPromotionAmount, Number(numPromotionAmount.min), Number(numPromotionAmount.max), Number(numPromotionAmount.step),
+            ["required", "min", "max", "step"]);
+    });
+
+    $("#form").on("submit", async function (event) {
         let file = $('#fileImg').prop("files")[0];
 
         let imgURL = await uploadImageFileToFirebaseAndGetURL(file);
-        
-        let priceCreateDTO = {};
 
-        if ($("#chkIsPromotion").is(":checked")) {
-            priceCreateDTO = {
-                "price": $("#txtPrice").val(),
-                "isPromotion": true,
-                "promotionType": $("#selPromotionType").val(),
-                "promotionAmount": $("#txtPromotionAmount").val(),
-                "promotionDesc": $("#txtPromotionDesc").val(),
-            }
-        } else {
-            priceCreateDTO = {
-                "price": $("#txtPrice").val(),
-            }
-        }
-
-        let createDTO = {
-            "id": ${course.id},
-            "courseName": $("#txtName").val(),
-            "courseAlias": $("#txtAlias").val(),
-            "courseImg": imgURL,
-            "courseDesc": $("#txtDesc").val(),
-            "numSession": $("#txtNumSession").val(),
-            "minScore": $("#txtMinScore").val(),
-            "minAttendant": $("#txtMinAttendant").val(),
-
-            "price": priceCreateDTO,
-        }
-
-        $.ajax({
-            type: "PUT",
-            data: JSON.stringify(createDTO),
-            url: "/edit-course",
-            contentType: "application/json",
-            success: function(response) {
-                if (response['view'] != null) {
-                    location.href = response['view'];
-                }
-            }
-        })
-
-        return false;
-    }
+        $("#hidCourseImg").val(imgURL);
+    });
 </script>
+<!-- ================================================== Script ===================================================== -->
+</body>
 </html>

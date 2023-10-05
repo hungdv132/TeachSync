@@ -59,44 +59,6 @@ public class CourseController {
         return "course/add-course";
     }
 
-//    @PostMapping("/add-course")
-//    @ResponseBody
-//    public Map<String, Object> addCourse(
-//            Model model,
-//            @RequestBody CourseCreateDTO createDTO,
-//            RedirectAttributes redirect,
-//            @SessionAttribute(value = "user", required = false) UserReadDTO userDTO) {
-//        Map<String, Object> response = new HashMap<>();
-//
-//        CourseReadDTO courseDTO = null;
-//
-//        if (Objects.isNull(userDTO)) {
-//            redirect.addAttribute("mess", "Làm ơn đăng nhập");
-//            response.put("view", "/index");
-//            return response;
-//        }
-//
-//        if (!userDTO.getRoleId().equals(ROLE_ADMIN)) {
-//            redirect.addAttribute("mess", "Bạn không đủ quyền");
-//            response.put("view", "/index");
-//            return response;
-//        }
-//
-//        try {
-//            createDTO.setCreatedBy(userDTO.getId());
-//            courseDTO = courseService.createCourseByDTO(createDTO);
-//        } catch (Exception e) {
-//            model.addAttribute("mess", "Lỗi : " + e.getMessage());
-//            response.put("mess", "Lỗi : " + e.getMessage());
-//            response.put("view", "/add-course");
-//            return response;
-//        }
-//
-//        redirect.addAttribute("mess", "Tạo mới khóa học thành công");
-//        response.put("view", "/course-detail?id=" + courseDTO.getId());
-//        return response;
-//    }
-
     @PostMapping("/add-course")
     public String addCourse(
             Model model,
@@ -308,10 +270,10 @@ public class CourseController {
     }
 
     @PutMapping("/edit-course")
-    @ResponseBody
-    public Map<String, Object> editCourse(
+    public String editCourse(
             Model model,
-            @RequestBody CourseUpdateDTO updateDTO,
+            @RequestParam(name = "id") Long courseId,
+            @ModelAttribute CourseUpdateDTO updateDTO,
             RedirectAttributes redirect,
             @SessionAttribute(value = "user", required = false) UserReadDTO userDTO) {
         Map<String, Object> response = new HashMap<>();
@@ -320,28 +282,66 @@ public class CourseController {
 
         if (Objects.isNull(userDTO)) {
             redirect.addAttribute("mess", "Làm ơn đăng nhập");
-            response.put("view", "/index");
-            return response;
+            return "redirect:/index";
         }
 
         if (!userDTO.getRoleId().equals(ROLE_ADMIN)) {
             redirect.addAttribute("mess", "Bạn không đủ quyền");
-            response.put("view", "/index");
-            return response;
+            return "redirect:/index";
         }
 
         try {
+            StringBuilder errorMsg = new StringBuilder();
+
+            /* Validate input */
+            errorMsg.append(
+                    miscUtil.validateString(
+                            "Mã khóa học", updateDTO.getCourseAlias(), 1, 10,
+                            List.of("required", "minLength", "maxLength", "onlyBlank", "startBlank", "endBlank", "specialChar")));
+            /* courseName */
+            errorMsg.append(
+                    miscUtil.validateString(
+                            "Tên khóa học", updateDTO.getCourseName(), 1, 45,
+                            List.of("required", "minLength", "maxLength", "onlyBlank", "startBlank", "endBlank", "specialChar")));
+            /* courseDesc */
+            errorMsg.append(
+                    miscUtil.validateString(
+                            "Miêu tả khóa học", updateDTO.getCourseDesc(), 1, 9999,
+                            List.of("nullOrMinLength", "maxLength", "onlyBlank", "startBlank", "endBlank", "specialChar")));
+            /* courseImg */
+            /* TODO: check valid link */
+            /* numSession */
+            errorMsg.append(
+                    miscUtil.validateNumber(
+                            "Số tiết học", Double.valueOf(updateDTO.getNumSession()), 1.0, 100.0, 1.0,
+                            List.of("min", "max", "onlyBlank", "step")));
+            /* minScore */
+            errorMsg.append(
+                    miscUtil.validateNumber(
+                            "Điểm tối thiểu", updateDTO.getMinScore(), 0.0, 10.0, 0.01,
+                            List.of("min", "max", "onlyBlank", "step")));
+            /* minAttendant */
+            errorMsg.append(
+                    miscUtil.validateNumber(
+                            "Điểm danh tối thiểu", updateDTO.getMinAttendant(), 0.0, 100.0, 0.01,
+                            List.of("min", "max", "onlyBlank", "step")));
+
+            if (!errorMsg.isEmpty()) {
+                throw new IllegalArgumentException(errorMsg.toString());
+            }
+
+            /* TODO: check status condition */
+
+
             updateDTO.setUpdatedBy(userDTO.getId());
             courseDTO = courseService.updateCourseByDTO(updateDTO);
         } catch (Exception e) {
             model.addAttribute("mess", "Lỗi : " + e.getMessage());
-            response.put("view", "/edit-course");
-            return response;
+            return "redirect:/edit-course" + "?id=" + courseId;
         }
 
         redirect.addAttribute("mess", "Sửa khóa học thành công");
-        response.put("view", "/course-detail?id=" + courseDTO.getId());
-        return response;
+        return "redirect:/course-detail" + "?id=" + courseId;
     }
 
 
