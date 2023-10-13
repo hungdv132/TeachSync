@@ -1,6 +1,7 @@
 package com.teachsync.services.course;
 
 import com.teachsync.dtos.BaseReadDTO;
+import com.teachsync.dtos.clazz.ClazzReadDTO;
 import com.teachsync.dtos.course.CourseCreateDTO;
 import com.teachsync.dtos.course.CourseReadDTO;
 import com.teachsync.dtos.course.CourseUpdateDTO;
@@ -11,6 +12,7 @@ import com.teachsync.dtos.priceLog.PriceLogUpdateDTO;
 import com.teachsync.dtos.test.TestReadDTO;
 import com.teachsync.entities.*;
 import com.teachsync.repositories.CourseRepository;
+import com.teachsync.services.clazz.ClazzService;
 import com.teachsync.services.material.MaterialService;
 import com.teachsync.services.priceLog.PriceLogService;
 import com.teachsync.services.test.TestService;
@@ -25,7 +27,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -41,6 +42,8 @@ public class CourseServiceImpl implements CourseService {
     private MaterialService materialService;
     @Autowired
     private PriceLogService priceLogService;
+    @Autowired
+    private ClazzService clazzService;
     @Autowired
     private TestService testService;
 
@@ -319,7 +322,7 @@ public class CourseServiceImpl implements CourseService {
         return courseList;
     }
     @Override
-    public Map<Long, String> mapCourseIdCourseAliasByIdIn(
+    public Map<Long, String> mapIdCourseAliasByIdIn(
             Collection<Long> ids, Collection<Status> statuses, boolean isStatusIn) throws Exception {
 
         List<Course> courseList = getAllByIdIn(ids, statuses, isStatusIn);
@@ -330,7 +333,7 @@ public class CourseServiceImpl implements CourseService {
                 .collect(Collectors.toMap(BaseEntity::getId, Course::getCourseAlias));
     }
     @Override
-    public Map<Long, String> mapCourseIdCourseNameByIdIn(
+    public Map<Long, String> mapIdCourseNameByIdIn(
             Collection<Long> ids, Collection<Status> statuses, boolean isStatusIn) throws Exception {
 
         List<Course> courseList = getAllByIdIn(ids, statuses, isStatusIn);
@@ -799,24 +802,37 @@ public class CourseServiceImpl implements CourseService {
         /* Add Dependency */
         if (options != null && !options.isEmpty()) {
             if (options.contains(DtoOption.MATERIAL_LIST)) {
-//                List<CourseMaterial> courseMaterialList =
-//                        courseMaterialRepository.findAllByCourseIdAndStatusNot(dto.getId(),DELETED);
-//
-//                List<Long> materialIdList = new ArrayList<>(courseMaterialList.size());
-//
-//                for(CourseMaterial courseMaterial : courseMaterialList){
-//                    materialIdList.add(courseMaterial.getMaterialId());
-//                }
-
                 List<MaterialReadDTO> materialList =
                         materialService.getAllDTOByCourseId(course.getId(), options);
-//                        materialRepository.findAllByIdInAndStatusNot(materialIdList,DELETED);
-
                 dto.setMaterialList(materialList);
             }
 
             if (options.contains(DtoOption.TEST_LIST)) {
 //                dto.setTestList();
+            }
+
+            if (options.contains(DtoOption.CLAZZ_LIST_OPENED)) {
+                List<ClazzReadDTO> clazzDTOList =
+                        clazzService.getAllDTOByCourseId(
+                                course.getId(), List.of(OPENED), true, options);
+
+                dto.setClazzList(clazzDTOList);
+            }
+
+            if (options.contains(DtoOption.CLAZZ_LIST_CURRENT)) {
+                List<ClazzReadDTO> clazzDTOList =
+                        clazzService.getAllDTOByCourseId(
+                                course.getId(), List.of(ONGOING, OPENED), true, options);
+
+                dto.setClazzList(clazzDTOList);
+            }
+
+            if (options.contains(DtoOption.CLAZZ_LIST_ALL)) {
+                List<ClazzReadDTO> clazzDTOList =
+                        clazzService.getAllDTOByCourseId(
+                                course.getId(), List.of(DELETED), false, options);
+
+                dto.setClazzList(clazzDTOList);
             }
 
             if (options.contains(DtoOption.CURRENT_PRICE)) {

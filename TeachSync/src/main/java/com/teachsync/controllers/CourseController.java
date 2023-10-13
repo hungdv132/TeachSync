@@ -1,20 +1,14 @@
 package com.teachsync.controllers;
 
-import com.teachsync.dtos.clazz.ClazzReadDTO;
 import com.teachsync.dtos.course.CourseCreateDTO;
 import com.teachsync.dtos.course.CourseReadDTO;
 import com.teachsync.dtos.course.CourseUpdateDTO;
-import com.teachsync.dtos.courseSemester.CourseSemesterReadDTO;
 import com.teachsync.dtos.user.UserReadDTO;
-import com.teachsync.entities.Course;
 import com.teachsync.services.course.CourseService;
 import com.teachsync.services.courseSemester.CourseSemesterService;
-import com.teachsync.utils.Constants;
 import com.teachsync.utils.MiscUtil;
 import com.teachsync.utils.enums.DtoOption;
 import com.teachsync.utils.enums.Status;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -259,13 +253,13 @@ public class CourseController {
                     /* Is guest, parent => All OPENED Course */
                     statuses = List.of(OPENED);
                     isStatusIn = true;
-                    options = List.of(CURRENT_PRICE, CERTIFICATE, CLAZZ_LIST);
+                    options = List.of(CURRENT_PRICE, CERTIFICATE, CLAZZ_LIST_OPENED);
                 }
                 case 2 -> {
                     /* Is teacher, student => All OPENED & CLOSED Course */
                     statuses = List.of(OPENED, CLOSED);
                     isStatusIn = true;
-                    options = List.of(CURRENT_PRICE, CERTIFICATE, CLAZZ_LIST_ALL,
+                    options = List.of(CURRENT_PRICE, CERTIFICATE, CLAZZ_LIST_CURRENT,
                             MATERIAL_LIST, TEST_LIST);
                 }
                 case 3 -> {

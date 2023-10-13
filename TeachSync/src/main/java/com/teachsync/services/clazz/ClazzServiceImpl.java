@@ -10,7 +10,9 @@ import com.teachsync.dtos.clazzSchedule.ClazzScheduleReadDTO;
 import com.teachsync.dtos.course.CourseReadDTO;
 import com.teachsync.dtos.staff.StaffReadDTO;
 import com.teachsync.entities.BaseEntity;
+import com.teachsync.entities.Center;
 import com.teachsync.entities.Clazz;
+import com.teachsync.entities.Course;
 import com.teachsync.repositories.ClazzRepository;
 import com.teachsync.services.center.CenterService;
 import com.teachsync.services.clazzMember.ClazzMemberService;
@@ -1299,12 +1301,36 @@ public class ClazzServiceImpl implements ClazzService {
 
             if (options.contains(DtoOption.COURSE)) {
                 dto.setCourse(
-                        courseService.getDTOById(clazz.getCourseId(), List.of(DELETED), false, options));
+                        courseService.getDTOById(
+                                clazz.getCourseId(),
+                                List.of(DELETED),
+                                false,
+                                options));
+            }
+            if (options.contains(DtoOption.COURSE_NAME)) {
+                Course course =
+                        courseService.getById(
+                            clazz.getCourseId(),
+                            List.of(DELETED),
+                            false);
+                dto.setCourseName(course.getCourseName());
+            }
+            if (options.contains(DtoOption.COURSE_ALIAS)) {
+                Course course =
+                        courseService.getById(
+                                clazz.getCourseId(),
+                                List.of(DELETED),
+                                false);
+                dto.setCourseName(course.getCourseAlias());
             }
 
             if (options.contains(DtoOption.CENTER)) {
                 dto.setCenter(
                         centerService.getDTOById(clazz.getCenterId(), options));
+            }
+            if (options.contains(DtoOption.CENTER_NAME)) {
+                Center center = centerService.getById(clazz.getCenterId());
+                dto.setCenterName(center.getCenterName());
             }
 
             if (options.contains(DtoOption.STAFF)) {
@@ -1347,7 +1373,10 @@ public class ClazzServiceImpl implements ClazzService {
 
 //        Map<Long, CourseSemesterReadDTO> coSeIdCourseSemesterMap = new HashMap<>();
         Map<Long, CourseReadDTO> courseIdCourseMap = new HashMap<>();
+        Map<Long, String> courseIdCourseNameMap = new HashMap<>();
+        Map<Long, String> courseIdCourseAliasMap = new HashMap<>();
         Map<Long, CenterReadDTO> centerIdCenterMap = new HashMap<>();
+        Map<Long, String> centerIdCenterNameMap = new HashMap<>();
         Map<Long, StaffReadDTO> staffIdStaffMap = new HashMap<>();
         Map<Long, ClazzScheduleReadDTO> clazzIdClazzScheduleMap = new HashMap<>();
 
@@ -1378,12 +1407,34 @@ public class ClazzServiceImpl implements ClazzService {
 
             if (options.contains(DtoOption.COURSE)) {
                 courseIdCourseMap =
-                        courseService.mapIdDTOByIdIn(courseIdSet, List.of(DELETED), false, options);
+                        courseService.mapIdDTOByIdIn(
+                                courseIdSet,
+                                List.of(DELETED),
+                                false,
+                                options);
+            }
+            if (options.contains(DtoOption.COURSE_NAME)) {
+                courseIdCourseNameMap =
+                        courseService.mapIdCourseNameByIdIn(
+                                courseIdSet,
+                                List.of(DELETED),
+                                false);
+            }
+            if (options.contains(DtoOption.COURSE_ALIAS)) {
+                courseIdCourseAliasMap =
+                        courseService.mapIdCourseAliasByIdIn(
+                                courseIdSet,
+                                List.of(DELETED),
+                                false);
             }
 
             if (options.contains(DtoOption.CENTER)) {
                 centerIdCenterMap =
                         centerService.mapIdDTOByIdIn(centerIdSet, options);
+            }
+            if (options.contains(DtoOption.CENTER)) {
+                centerIdCenterNameMap =
+                        centerService.mapIdCenterNameByIdIn(centerIdSet);
             }
 
             if (options.contains(DtoOption.STAFF)) {
@@ -1423,9 +1474,15 @@ public class ClazzServiceImpl implements ClazzService {
 
             dto.setCourse(
                     courseIdCourseMap.get(clazz.getCourseId()));
+            dto.setCourseName(
+                    courseIdCourseNameMap.get(clazz.getCourseId()));
+            dto.setCourseAlias(
+                    courseIdCourseAliasMap.get(clazz.getCourseId()));
 
             dto.setCenter(
                     centerIdCenterMap.get(clazz.getCenterId()));
+            dto.setCenterName(
+                    centerIdCenterNameMap.get(clazz.getCenterId()));
 
             dto.setStaff(
                     staffIdStaffMap.get(clazz.getStaffId()));

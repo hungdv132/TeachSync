@@ -42,14 +42,13 @@
 
         <p>Giáo viên: ${clazz.staff.user.fullName}</p>
 
-        <p>Khóa học: ${clazz.courseSemester.courseAlias} - ${clazz.courseSemester.courseName}</p>
+        <p>Khóa học: ${clazz.courseAlias} - ${clazz.courseName}</p>
 
-        <p>Học kỳ: ${clazz.courseSemester.semester.semesterAlias} - ${clazz.courseSemester.semester.semesterName}</p>
 
         <p>Miêu tả: ${clazz.clazzDesc}</p>
 
         <c:if test="${isAdmin}">
-            <p>Trạng thái: ${statusLabelMap[clazz.statusClazz]}</p>
+            <p>Trạng thái: ${clazz.status.stringValueVie}</p>
         </c:if>
 
         <p>Dung lượng học sinh: ${clazz.maxCapacity}</p>

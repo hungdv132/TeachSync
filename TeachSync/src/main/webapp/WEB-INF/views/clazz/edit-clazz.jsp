@@ -8,7 +8,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   
-  <title>Thêm lớp học</title>
+  <title>Sửa lớp học</title>
   
   <link rel="stylesheet" href="../../../resources/css/bootstrap-5.3.0/bootstrap.css">
   <link rel="stylesheet" href="../../../resources/css/teachsync_style.css">
@@ -41,7 +41,7 @@
           </a>
         </li>
         <li class="breadcrumb-item active" aria-current="page">
-          Thêm lớp học
+          Sửa lớp học
         </li>
       </ol>
     </nav>
@@ -53,10 +53,11 @@
   <div class="col-12 ts-bg-white border-top border-bottom ts-border-teal pt-3 px-5 mb-3">
     <%--@elvariable id="createDTO" type="com.teachsync.dtos.clazz.ClazzCreateDTO"--%>
     <form:form id="form"
-               modelAttribute="createDTO" action="/add-clazz" method="POST"
+               modelAttribute="createDTO" action="/edit-clazz" method="POST"
                cssClass="row">
+      <input type="hidden" name="id" value="${clazz.id}">
   
-      <h4>Thêm lớp học</h4>
+      <h4>Sửa lớp học</h4>
       <br>
   
       <div class="col-12">
@@ -65,7 +66,7 @@
           <div class="col-4 mb-3">
             <label for="txtAlias" class="form-label">Mã lớp:</label>
             <input id="txtAlias" name="clazzAlias"
-                   type="text" minlength="1" maxlength="10"
+                   type="text" minlength="1" maxlength="10" value="${clazz.clazzAlias}"
                    class="form-control ts-border-grey"
                    required="required">
           </div>
@@ -74,7 +75,7 @@
           <div class="col-8 mb-3">
             <label for="txtName" class="form-label">Tên lớp:</label>
             <input id="txtName" name="clazzName"
-                   type="text" minlength="1" maxlength="45"
+                   type="text" minlength="1" maxlength="45" value="${clazz.clazzName}"
                    class="form-control ts-border-grey"
                    required="required">
           </div>
@@ -84,7 +85,7 @@
             <label for="txtADesc" class="form-label">Miêu tả về lớp học:</label>
             <textarea id="txtADesc" name="clazzDesc"
                       minlength="0" maxlength="9999"
-                      class="form-control ts-border-grey" rows="3" style="resize: none"></textarea>
+                      class="form-control ts-border-grey" rows="3" style="resize: none"><c:out value="${clazz.clazzDesc}"/></textarea>
           </div>
           
         </div>
@@ -135,7 +136,7 @@
           <div class="col-sm-12 col-md-6 mb-3">
             <label for="numMinCapacity" class="form-label">Số học sinh tối thiểu: (Để mở lớp)</label>
             <input id="numMinCapacity" name="minCapacity"
-                   type="number" min="1" max="1" step="1" value="1"
+                   type="number" min="1" max="${clazz.minCapacity}" step="1" value="${clazz.minCapacity}"
                    class="form-control ts-border-grey"
                    required="required">
           </div>
@@ -144,7 +145,7 @@
           <div class="col-sm-12 col-md-6 mb-3">
             <label for="numMaxCapacity" class="form-label">Số học sinh tối đa:</label>
             <input id="numMaxCapacity" name="maxCapacity"
-                   type="number" min="1" step="1" value="1"
+                   type="number" min="1" step="1" value="${clazz.maxCapacity}"
                    class="form-control ts-border-grey"
                    required="required">
           </div>
@@ -193,6 +194,16 @@
             }
         })
     }
+</script>
+
+<script id="script1">
+    $("#selCourseId").val("${clazz.courseId}");
+
+    $("#selCenterId").val("${clazz.centerId}");
+
+    $("#selStaffId").val("${clazz.staffId}");
+
+    $("#script1").remove(); /* Xóa thẻ script này sau khi xong */
 </script>
 <!-- ================================================== Script ===================================================== -->
 </body>

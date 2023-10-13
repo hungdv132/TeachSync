@@ -95,7 +95,7 @@
           <div class="col-12">
             <label for="selStatus" class="form-label">Trạng thái:</label>
             <select id="selStatus" name="status"
-                    class="form-select mb-3"
+                    class="form-select ts-border-grey mb-3"
                     onchange="restrictByStatus()">
               <option value="${Status.DESIGNING}">${Status.DESIGNING.stringValueVie}</option>
               <option value="${Status.AWAIT_REVIEW}">${Status.AWAIT_REVIEW.stringValueVie}</option>

@@ -54,9 +54,9 @@ public interface CourseService {
 
     List<Course> getAllByIdIn(
             Collection<Long> ids, Collection<Status> statuses, boolean isStatusIn) throws Exception;
-    Map<Long, String> mapCourseIdCourseAliasByIdIn(
+    Map<Long, String> mapIdCourseAliasByIdIn(
             Collection<Long> ids, Collection<Status> statuses, boolean isStatusIn) throws Exception;
-    Map<Long, String> mapCourseIdCourseNameByIdIn(
+    Map<Long, String> mapIdCourseNameByIdIn(
             Collection<Long> ids, Collection<Status> statuses, boolean isStatusIn) throws Exception;
     List<CourseReadDTO> getAllDTOByIdIn(
             Collection<Long> ids, Collection<Status> statuses, boolean isStatusIn,

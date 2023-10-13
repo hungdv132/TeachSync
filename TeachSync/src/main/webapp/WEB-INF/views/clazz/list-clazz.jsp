@@ -24,7 +24,7 @@
 <!-- ================================================== Main Body ================================================== -->
 <div class="row ts-bg-white border ts-border-teal rounded-3 pt-3 mx-2 mb-3">
   <c:if test="${isAdmin}">
-    <a href="add-clazz?option=add">
+    <a href="/add-clazz">
       <button type="button" class="btn btn-primary">Thêm mới class</button>
     </a>
   </c:if>
@@ -34,7 +34,6 @@
       <th scope="col">ID</th>
       <th scope="col">Tên lớp</th>
       <th scope="col">Khóa học</th>
-      <th scope="col">Học kỳ</th>
       <c:if test="${isAdmin}">
         <th scope="col">Trạng thái</th>
         <th scope="col">Chức năng</th>
@@ -46,15 +45,14 @@
       <tr>
         <th scope="row">${clazzDTO.id}</th>
         <td><a style="font-weight: bold;" href="/clazz-detail?id=${clazzDTO.id}">${clazzDTO.clazzName}</a></td>
-        <td>${clazzDTO.courseSemester.courseAlias} - ${clazzDTO.courseSemester.courseName}</td>
-        <td>${clazzDTO.courseSemester.semester.semesterAlias}</td>
+        <td>${clazzDTO.courseAlias} - ${clazzDTO.courseName}</td>
         <c:if test="${isAdmin}">
-          <td>${statusLabelMap[clazzDTO.statusClazz]}</td>
+          <td>${clazzDTO.status.stringValueVie}</td>
           <td>
-            <a href="/add-clazz?id=${clazzDTO.id}&option=edit">
+            <a href="/edit-clazz?id=${clazzDTO.id}">
               <button type="button" class="btn btn-success">Sửa</button>
             </a>
-              <button type="button" class="btn btn-danger" onclick="confirmDelete(${clazzDTO.id})">Xóa</button>
+<%--              <button type="button" class="btn btn-danger" onclick="confirmDelete(${clazzDTO.id})">Xóa</button>--%>
           </td>
         </c:if>
       </tr>

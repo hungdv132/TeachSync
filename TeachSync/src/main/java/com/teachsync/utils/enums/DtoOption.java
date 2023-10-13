@@ -59,7 +59,9 @@ public enum DtoOption {
     STAFF_LIST,
 
     /** Course */
-    CLAZZ_LIST,
+    CLAZZ_LIST_CURRENT,
+    /** Course */
+    CLAZZ_LIST_OPENED,
     /** Course */
     CLAZZ_LIST_ALL,
     /** Course */

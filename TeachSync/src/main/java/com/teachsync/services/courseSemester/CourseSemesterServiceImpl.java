@@ -439,12 +439,12 @@ public class CourseSemesterServiceImpl implements CourseSemesterService {
                         false, options);
             }
             if (options.contains(DtoOption.COURSE_NAME)) {
-                courseIdCourseNameMap = courseService.mapCourseIdCourseNameByIdIn(courseIdSet,
+                courseIdCourseNameMap = courseService.mapIdCourseNameByIdIn(courseIdSet,
                         List.of(Status.DELETED),
                         false);
             }
             if (options.contains(DtoOption.COURSE_ALIAS)) {
-                courseIdCourseAliasMap = courseService.mapCourseIdCourseAliasByIdIn(courseIdSet,
+                courseIdCourseAliasMap = courseService.mapIdCourseAliasByIdIn(courseIdSet,
                         List.of(Status.DELETED),
                         false);
             }

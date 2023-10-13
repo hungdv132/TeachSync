@@ -45,6 +45,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.teachsync.utils.Constants.ROLE_ADMIN;
 import static com.teachsync.utils.enums.DtoOption.*;
 import static com.teachsync.utils.enums.Status.*;
 
@@ -160,9 +161,91 @@ public class ClazzController {
     }
 
 
+    /* =================================================== CREATE =================================================== */
+    @GetMapping("/add-clazz")
+    public String addClazzPage(
+            Model model,
+            RedirectAttributes redirect,
+            @SessionAttribute(value = "user", required = false) UserReadDTO userDTO) {
+
+        if (Objects.isNull(userDTO)) {
+            redirect.addAttribute("mess", "Làm ơn đăng nhập");
+            return "redirect:/index";
+        }
+
+        if (!userDTO.getRoleId().equals(ROLE_ADMIN)) {
+            redirect.addAttribute("mess", "Bạn không đủ quyền");
+            return "redirect:/index";
+        }
+
+        try {
+            /* List Course (môn nào) */
+            List<CourseReadDTO> courseDTOList =
+                    courseService.getAllDTO(
+                            List.of(OPENED),
+                            true,
+                            null);
+            model.addAttribute("courseList", courseDTOList);
+
+            /* List Center (Cơ sở nào) */
+            List<CenterReadDTO> centerDTOList =
+                    centerService.getAllDTO(null);
+            model.addAttribute("centerList", centerDTOList);
+
+            /* List Staff (Ai dạy) */
+            List<StaffReadDTO> staffDTOList;
+            /* Suy ra từ Center đầu tiên trong list */
+            staffDTOList =
+                    staffService.getAllDTOByCenterId(centerDTOList.get(0).getId(), List.of(USER));
+
+            model.addAttribute("staffList", staffDTOList);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            /* Log Error or return error msg */
+        }
+
+        return "clazz/add-clazz";
+    }
+
+    @PostMapping(value = "/add-clazz", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public Map<String, Object> addClazz(
+            @RequestBody ClazzCreateDTO createDTO,
+            @SessionAttribute(value = "user", required = false) UserReadDTO userDTO,
+            RedirectAttributes redirect) throws Exception {
+        Map<String, Object> response = new HashMap<>();
+
+        //check login
+        if (ObjectUtils.isEmpty(userDTO)) {
+            redirect.addAttribute("mess", "Làm ơn đăng nhập");
+            response.put("view", "/index");
+            return response;
+        }
+
+        if (!userDTO.getRoleId().equals(Constants.ROLE_ADMIN)) {
+            redirect.addAttribute("mess", "bạn không đủ quyền");
+            response.put("view", "/index");
+            return response;
+        }
+        ClazzReadDTO readDTO;
+        try {
+            readDTO = clazzService.createClazzByDTO(createDTO);
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.put("error", e.getMessage());
+            return response;
+        }
+
+        response.put("view", "/clazz-detail?id=" + readDTO.getId());
+        return response;
+    }
+
+
     /* =================================================== READ ===================================================== */
     @GetMapping("/clazz")
     public String clazzListPage(
+            RedirectAttributes redirect,
             Model model,
             @ModelAttribute("mess") String mess,
             @RequestParam(value = "pageNo", required = false) Integer pageNo,
@@ -170,10 +253,16 @@ public class ClazzController {
         try {
             Page<ClazzReadDTO> dtoPage = null;
 
+
             if (Objects.isNull(userDTO)) {
-                /* Chưa login */
+                redirect.addAttribute("mess", "Làm ơn đăng nhập");
                 return "redirect:/index";
             }
+
+//            if (!userDTO.getRoleId().equals(ROLE_ADMIN)) {
+//                redirect.addAttribute("mess", "Bạn không đủ quyền");
+//                return "redirect:/index";
+//            }
 
             if (pageNo == null || pageNo < 0) {
                 pageNo = 0;
@@ -196,7 +285,7 @@ public class ClazzController {
                         clazzIdSet,
                         List.of(OPENED, ONGOING, SUSPENDED, CLOSED),
                         true,
-                        List.of(COURSE_SEMESTER, SEMESTER, COURSE_NAME, COURSE_ALIAS, CENTER));
+                        List.of(COURSE, COURSE_NAME, COURSE_ALIAS, CENTER));
 
             } else if (roleId.equals(Constants.ROLE_TEACHER)) {
                 List<Staff> staffList = staffService.getAllByUserId(userDTO.getId());
@@ -209,14 +298,14 @@ public class ClazzController {
                         staffIdSet,
                         List.of(OPENED, ONGOING, SUSPENDED, CLOSED),
                         true,
-                        List.of(COURSE_SEMESTER, SEMESTER, COURSE_NAME, COURSE_ALIAS, CENTER));
+                        List.of(COURSE_SEMESTER, COURSE_NAME, COURSE_ALIAS, CENTER));
 
             } else if (roleId.equals(Constants.ROLE_ADMIN)) {
                 dtoPage = clazzService.getPageAllDTO(
                         pageable,
                         List.of(DELETED),
                         false,
-                        List.of(COURSE_SEMESTER, SEMESTER, COURSE_NAME, COURSE_ALIAS, CENTER));
+                        List.of(COURSE_SEMESTER, COURSE_NAME, COURSE_ALIAS, CENTER));
 
             }
 
@@ -251,8 +340,8 @@ public class ClazzController {
                             clazzId,
                             List.of(DELETED),
                             false,
-                            List.of(STAFF, USER, COURSE_SEMESTER, SEMESTER,
-                                    COURSE_NAME, COURSE_ALIAS, CENTER, TEST_LIST));
+                            List.of(STAFF, USER, COURSE_NAME,
+                                    COURSE_ALIAS, CENTER, TEST_LIST));
             //get news of class
             List<NewsReadDTO> newsReadDTOList = newsService.getAllNewsByClazz(clazzDTO.getId());
             //get homework of class
@@ -323,27 +412,34 @@ public class ClazzController {
     }
 
 
-    /* =================================================== CREATE =================================================== */
-    @GetMapping("/add-clazz")
-    public String addClazzPage(
+    /* =================================================== UPDATE =================================================== */
+    @GetMapping("/edit-clazz")
+    public String editClazzPage(
             Model model,
             RedirectAttributes redirect,
-            @RequestParam(value = "id", required = false) Long clazzId,
-            @RequestParam("option") String option) {
+            @RequestParam("id") Long clazzId,
+            @SessionAttribute(value = "user", required = false) UserReadDTO userDTO) {
+
+        if (Objects.isNull(userDTO)) {
+            redirect.addAttribute("mess", "Làm ơn đăng nhập");
+            return "redirect:/index";
+        }
+
+        if (!userDTO.getRoleId().equals(ROLE_ADMIN)) {
+            redirect.addAttribute("mess", "Bạn không đủ quyền");
+            return "redirect:/index";
+        }
 
         try {
-            /* Nếu Id => Edit, Lấy dữ liệu cũ */
-            ClazzReadDTO clazzReadDTO = null;
-            if (Objects.nonNull(clazzId)) {
-                clazzReadDTO =
-                        clazzService.getDTOById(
-                                clazzId,
-                                List.of(DELETED),
-                                false,
-                                List.of(COURSE_SEMESTER, STAFF, USER));
+            /* Clazz by id */
+            ClazzReadDTO clazzReadDTO =
+                    clazzService.getDTOById(
+                            clazzId,
+                            List.of(DELETED),
+                            false,
+                            List.of(COURSE, CENTER, STAFF, USER));
 
-                model.addAttribute("clazz", clazzReadDTO);
-            }
+            model.addAttribute("clazz", clazzReadDTO);
 
             /* List Course (môn nào) */
             List<CourseReadDTO> courseDTOList =
@@ -354,53 +450,32 @@ public class ClazzController {
 
             model.addAttribute("courseList", courseDTOList);
 
-            /* List Semester (kỳ nào) */
-//            List<SemesterReadDTO> semesterDTOList;
-//            if (option.equals("add")) {
-//                /* Các kỳ học nào ngày bắt đàu cách 10 ngày từ hiện tại (Để học sinh còn có thời gian đăng ký) */
-//                semesterDTOList =
-//                        semesterService.getAllDTOByStartDateAfter(LocalDate.now().plusDays(10), null);
-//            } else {
-//                semesterDTOList =
-//                        semesterService.getAllDTO(null);
-//            }
-//            model.addAttribute("semesterList", semesterDTOList);
-
             /* List Center (Cơ sở nào) */
-            List<CenterReadDTO> centerDTOList = centerService.getAllDTO(null);
+            List<CenterReadDTO> centerDTOList =
+                    centerService.getAllDTO(null);
             model.addAttribute("centerList", centerDTOList);
 
             /* List Staff (Ai dạy) */
             List<StaffReadDTO> staffDTOList;
-            if (option.equals("add")) {
-                /* Suy ra từ Center đầu tiên trong list */
-                staffDTOList =
-                        staffService.getAllDTOByCenterId(centerDTOList.get(0).getId(), List.of(USER));
-            } else {
-                staffDTOList =
-                        staffService.getAllDTOByCenterId(clazzReadDTO.getCenterId(), List.of(USER));
-            }
+            /* Suy ra từ Center đầu tiên trong list */
+            staffDTOList =
+                    staffService.getAllDTOByCenterId(
+                            clazzReadDTO.getCenterId(),
+                            List.of(USER));
+
             model.addAttribute("staffList", staffDTOList);
 
-            model.addAttribute("option", option);
-            //map option status
-            Map<String, String> statusLabelMap = new HashMap<>();
-            statusLabelMap.put("CREATED_CLAZZ", "Đang khởi tạo");
-            statusLabelMap.put("DEPLOY_CLAZZ", "Đang triển khai");
-            statusLabelMap.put("NOT_ENOUGH_CLAZZ", "Không đủ xếp lớp");
-            statusLabelMap.put("FINISH_CLAZZ", "Đã hoàn thành");
-            model.addAttribute("statusLabelMap", statusLabelMap);
         } catch (Exception e) {
             e.printStackTrace();
             /* Log Error or return error msg */
         }
 
-        return "clazz/add-clazz";
+        return "clazz/edit-clazz";
     }
 
-    @PostMapping(value = "/add-clazz", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/edit-clazz", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public Map<String, Object> addClazz(
+    public Map<String, Object> editClazz(
             @RequestBody ClazzCreateDTO createDTO,
             @SessionAttribute(value = "user", required = false) UserReadDTO userDTO,
             RedirectAttributes redirect) throws Exception {
@@ -428,44 +503,6 @@ public class ClazzController {
         }
 
         response.put("view", "/clazz-detail?id=" + readDTO.getId());
-        return response;
-    }
-
-
-    /* =================================================== UPDATE =================================================== */
-    @PutMapping(value = "/edit-clazz", consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
-    public Map<String, Object> editClazz(
-            @RequestBody ClazzUpdateDTO updateDTO,
-            @SessionAttribute(value = "user", required = false) UserReadDTO userDTO,
-            RedirectAttributes redirect) throws Exception {
-        Map<String, Object> response = new HashMap<>();
-
-        //check login
-        if (ObjectUtils.isEmpty(userDTO)) {
-            redirect.addAttribute("mess", "Làm ơn đăng nhập");
-            response.put("view", "/index");
-            return response;
-        }
-
-        if (!userDTO.getRoleId().equals(Constants.ROLE_ADMIN)) {
-            redirect.addAttribute("mess", "bạn không đủ quyền");
-            response.put("view", "/index");
-            return response;
-        }
-
-        ClazzReadDTO readDTO;
-        try {
-            readDTO = clazzService.updateClazzByDTO(updateDTO);
-        } catch (Exception e) {
-            e.printStackTrace();
-            response.put("error", e.getMessage());
-            return response;
-        }
-
-        //  response.put("view", "/clazz-detail?id=" + readDTO.getId());
-        response.put("view", "/clazz");
-        //  return "redirect:/clazz";
         return response;
     }
 
