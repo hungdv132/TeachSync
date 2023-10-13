@@ -13,6 +13,7 @@ import com.teachsync.utils.Constants;
 import com.teachsync.utils.MiscUtil;
 import com.teachsync.utils.enums.DtoOption;
 import com.teachsync.utils.enums.MaterialType;
+import com.teachsync.utils.enums.Status;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -100,7 +101,10 @@ public class MaterialController {
         try {
 
             /* List Course (môn nào) */
-            List<CourseReadDTO> courseDTOList = courseService.getAllDTO(null);
+            List<CourseReadDTO> courseDTOList = courseService.getAllDTO(
+                    List.of(Status.DELETED),
+                    false,
+                    null);
             model.addAttribute("courseList", courseDTOList);
 
             MaterialReadDTO material = materialService.getDTOById(materialId, null);
@@ -158,7 +162,10 @@ public class MaterialController {
 
         try {
 
-            List<CourseReadDTO> courseDTOList = courseService.getAllDTO(null);
+            List<CourseReadDTO> courseDTOList = courseService.getAllDTO(
+                    List.of(Status.DELETED),
+                    false,
+                    null);
             model.addAttribute("courseList", courseDTOList);
 
             MaterialReadDTO material = materialService.getDTOById(materialId, null);

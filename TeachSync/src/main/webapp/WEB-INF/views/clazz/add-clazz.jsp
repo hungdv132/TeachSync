@@ -115,7 +115,7 @@
         <div class="form-group">
             <label>Dung lượng học sinh
                 <input type="number" name="size" id="txtSize" class="ms-3 w-50"
-                       value="${clazz.clazzSize}" placeholder="Nhập dung lượng">
+                       value="${clazz.maxCapacity}" placeholder="Nhập dung lượng">
             </label>
         </div>
         <br/>

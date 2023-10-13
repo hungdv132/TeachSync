@@ -385,7 +385,7 @@
             ["required", "min", "max", "step"]);
     });
 
-    /* numMinScore */
+    /* numMinAttendant */
     let numMinAttendant = document.getElementById("numMinAttendant");
     numMinAttendant.addEventListener("input", function () {
         validateNumberInput(
@@ -407,6 +407,14 @@
         validateNumberInput(
             numPromotionAmount, Number(numPromotionAmount.min), Number(numPromotionAmount.max), Number(numPromotionAmount.step),
             ["required", "min", "max", "step"]);
+    });
+
+    /* course promotionDesc */
+    let txtAPromotionDesc = document.getElementById("txtAPromotionDesc");
+    txtADesc.addEventListener("input", function () {
+        validateTextInput(
+            txtAPromotionDesc, 1, txtAPromotionDesc.maxLength,
+            ["nullOrMinLength", "maxLength", "onlyBlank", "startBlank", "endBlank", "specialChar"]);
     });
 
     $("#form").on("submit", async function (event) {

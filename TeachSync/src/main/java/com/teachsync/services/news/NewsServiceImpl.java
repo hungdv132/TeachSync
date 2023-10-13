@@ -43,7 +43,7 @@ public class NewsServiceImpl implements NewsService{
     }
 
     @Override
-    public Page<NewsReadDTO> getPageDTOAll(Pageable paging) throws Exception {
+    public Page<NewsReadDTO> getPageAllDTO(Pageable paging) throws Exception {
         Page<News> newsPage = getPageAll(paging);
 
         if (newsPage == null) {

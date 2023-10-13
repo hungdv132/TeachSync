@@ -18,18 +18,24 @@ public class ClazzUpdateDTO extends BaseUpdateDTO {
     private Long staffId;
 
     private Long courseId;
-    private Long semesterId;
+
+//    private Long semesterId;
+
     private Long centerId;
+
+    private String clazzAlias;
 
     private String clazzName;
 
     private String clazzDesc;
 
-    private String statusClazz;
+//    private String statusClazz;
 
-    private Integer clazzSize;
+    private Integer minCapacity;
 
-    private ScheduleType scheduleType;
+    private Integer maxCapacity;
 
-    private Integer slot;
+//    private ScheduleType scheduleType;
+
+//    private Integer slot;
 }

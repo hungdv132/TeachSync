@@ -2354,25 +2354,36 @@ values (1, 3, 'TEACHER', 'CREATED'),
 insert into course(courseName, courseAlias, courseImg, courseDesc, numSession, minScore, minAttendant, status)
 values ('ielts 101', 'ILT101',
         'https://th.bing.com/th/id/OIP.R7Wj-CVruj2Gcx-MmaxmZAHaKe?pid=ImgDet&rs=1',
-        null, 14, 5.0, 80, 'CREATED'),
+        null, 14, 5.0, 80, 'OPENED'),
        ('English Grade 1', 'ENG001',
         'https://th.bing.com/th/id/OIP.isjamm3juJANzM_sHKCx0wHaKe?pid=ImgDet&rs=1',
-        null, 12, 4.5, 75, 'CREATED'),
+        null, 12, 4.5, 75, 'OPENED'),
        ('English Grade 2', 'ENG002',
         'https://www.geo.tv/assets/uploads/updates/2021-05-03/348462_790220_updates.jpg',
-        null, 12, 5.0, 75, 'CREATED'),
+        null, 12, 5.0, 75, 'OPENED'),
        ('English Grade 3', 'ENG003',
         'https://th.bing.com/th/id/OIP.H1Q3_d4okF70VIVYp-YA5AAAAA?pid=ImgDet&w=360&h=470&rs=1',
-        null, 12, 5.0, 75, 'CREATED');
+        null, 12, 5.0, 75, 'OPENED'),
 
-insert into price_log(courseId, price, isPromotion, promotionAmount, promotionType, promotionDesc, validFrom, validTo,
-                      status)
-values (1, 200000, true, 15, 'PERCENT', 'Grand opening super deal, now cheaper ', '2023-06-10 00:00:01', null,
-        'CREATED'),
-       (2, 100000, true, 20000, 'AMOUNT', 'To help with the first step, now reduce', '2023-06-10 00:00:01', null,
-        'CREATED'),
+       ('ielts 102', 'ILT102',
+        'https://th.bing.com/th/id/OIP.R7Wj-CVruj2Gcx-MmaxmZAHaKe?pid=ImgDet&rs=1',
+        null, 14, 5.0, 80, 'DESIGNING'),
+       ('ielts 103', 'ILT103',
+        'https://th.bing.com/th/id/OIP.R7Wj-CVruj2Gcx-MmaxmZAHaKe?pid=ImgDet&rs=1',
+        null, 14, 5.0, 80, 'AWAIT_REVIEW'),
+       ('ielts 104', 'ILT104',
+        'https://th.bing.com/th/id/OIP.R7Wj-CVruj2Gcx-MmaxmZAHaKe?pid=ImgDet&rs=1',
+        null, 14, 5.0, 80, 'CLOSED');
+
+insert into price_log(courseId, price, isPromotion, promotionAmount, promotionType, promotionDesc, validFrom, validTo, status)
+values (1, 200000, true, 15, 'PERCENT', 'Grand opening super deal, now cheaper', '2023-06-10 00:00:01', null, 'CREATED'),
+       (2, 100000, true, 20000, 'AMOUNT', 'To help with the first step, now reduce', '2023-06-10 00:00:01', null, 'CREATED'),
        (3, 125000, false, null, null, null, '2023-06-10 00:00:01', null, 'CREATED'),
-       (4, 150000, false, null, null, null, '2023-06-10 00:00:01', null, 'CREATED');
+       (4, 150000, false, null, null, null, '2023-06-10 00:00:01', null, 'CREATED'),
+
+       (5, 200000, false, null, null, null, '2023-06-10 00:00:01', null, 'CREATED'),
+       (6, 200000, false, null, null, null, '2023-06-10 00:00:01', null, 'CREATED'),
+       (7, 200000, false, null, null, null, '2023-06-10 00:00:01', null, 'CREATED');
 
 insert into certificate(courseId, certificateName, certificateDesc, status)
 values (1, 'Ielts 101', 'You have complete the Ielts 101 course', 'CREATED'),
@@ -2380,59 +2391,60 @@ values (1, 'Ielts 101', 'You have complete the Ielts 101 course', 'CREATED'),
        (3, 'Eng 2', 'You have complete the Eng 2 course', 'CREATED'),
        (4, 'Eng 3', 'You have complete the Eng 3 course', 'CREATED');
 
-insert into semester(semesterName, semesterAlias, semesterDesc, semesterType, startDate, endDate, status)
-values ('Spring 23', 'SP23', 'Spring 23', 'SEASON', '2023-02-05', '2023-04-05', 'CREATED'),
-       ('Summer 23', 'SU23', 'Summer 23', 'SEASON', '2023-04-10', '2023-07-10', 'CREATED'),
-       ('Fall 23', 'FA23', 'Fall 23', 'SEASON', '2023-07-15', '2023-10-15', 'CREATED'),
-       ('Winter 23', 'WI23', 'Winter 23', 'SEASON', '2023-10-20', '2024-01-20', 'CREATED');
+# insert into semester(semesterName, semesterAlias, semesterDesc, semesterType, startDate, endDate, status)
+# values ('Spring 23', 'SP23', 'Spring 23', 'SEASON', '2023-02-05', '2023-04-05', 'CREATED'),
+#        ('Summer 23', 'SU23', 'Summer 23', 'SEASON', '2023-04-10', '2023-07-10', 'CREATED'),
+#        ('Fall 23', 'FA23', 'Fall 23', 'SEASON', '2023-07-15', '2023-10-15', 'CREATED'),
+#        ('Winter 23', 'WI23', 'Winter 23', 'SEASON', '2023-10-20', '2024-01-20', 'CREATED');
 
-insert into course_semester(courseId, semesterId, centerId, status)
-values (1, 1, 1, 'CREATED'),
-       (1, 2, 1, 'CREATED'),
-       (1, 3, 1, 'CREATED'),
-       (1, 4, 1, 'CREATED'),
-       (2, 1, 1, 'CREATED'),
-       (2, 2, 1, 'CREATED'),
-       (2, 3, 1, 'CREATED'),
-       (2, 4, 1, 'CREATED'),
-       (3, 1, 1, 'CREATED'),
-       (3, 2, 1, 'CREATED'),
-       (3, 3, 1, 'CREATED'),
-       (3, 4, 1, 'CREATED'),
-       (4, 1, 1, 'CREATED'),
-       (4, 2, 1, 'CREATED'),
-       (4, 3, 1, 'CREATED'),
+# insert into course_semester(courseId, semesterId, centerId, status)
+# values (1, 1, 1, 'CREATED'),
+#        (1, 2, 1, 'CREATED'),
+#        (1, 3, 1, 'CREATED'),
+#        (1, 4, 1, 'CREATED'),
+#        (2, 1, 1, 'CREATED'),
+#        (2, 2, 1, 'CREATED'),
+#        (2, 3, 1, 'CREATED'),
+#        (2, 4, 1, 'CREATED'),
+#        (3, 1, 1, 'CREATED'),
+#        (3, 2, 1, 'CREATED'),
+#        (3, 3, 1, 'CREATED'),
+#        (3, 4, 1, 'CREATED'),
+#        (4, 1, 1, 'CREATED'),
+#        (4, 2, 1, 'CREATED'),
+#        (4, 3, 1, 'CREATED'),
+#
+#        (1, 1, 2, 'CREATED'),
+#        (1, 2, 2, 'CREATED'),
+#        (1, 3, 2, 'CREATED'),
+#        (1, 4, 2, 'CREATED'),
+#        (2, 1, 2, 'CREATED'),
+#        (2, 2, 2, 'CREATED'),
+#        (2, 3, 2, 'CREATED'),
+#        (2, 4, 2, 'CREATED'),
+#        (3, 1, 2, 'CREATED'),
+#        (3, 2, 2, 'CREATED'),
+#        (3, 3, 2, 'CREATED'),
+#        (3, 4, 2, 'CREATED'),
+#        (4, 1, 2, 'CREATED'),
+#        (4, 2, 2, 'CREATED'),
+#        (4, 3, 2, 'CREATED');
 
-       (1, 1, 2, 'CREATED'),
-       (1, 2, 2, 'CREATED'),
-       (1, 3, 2, 'CREATED'),
-       (1, 4, 2, 'CREATED'),
-       (2, 1, 2, 'CREATED'),
-       (2, 2, 2, 'CREATED'),
-       (2, 3, 2, 'CREATED'),
-       (2, 4, 2, 'CREATED'),
-       (3, 1, 2, 'CREATED'),
-       (3, 2, 2, 'CREATED'),
-       (3, 3, 2, 'CREATED'),
-       (3, 4, 2, 'CREATED'),
-       (4, 1, 2, 'CREATED'),
-       (4, 2, 2, 'CREATED'),
-       (4, 3, 2, 'CREATED');
+insert into clazz(courseId, centerId, staffId, clazzAlias, clazzName, clazzDesc, minCapacity, maxCapacity, status)
 
-insert into clazz(courseSemesterId, staffId, clazzName, clazzDesc, clazzSize, status)
-values (1,  1, 'ILT101 - 01', null, 15, 'CREATED'),
-       (2,  1, 'ILT101 - 02', null, 15, 'CREATED'),
+values (1, 1, 1, 'ILT10101', 'ILT101 - 01', null, 5, 15, 'CREATED'),
+       (1, 2, 1, 'ILT10102', 'ILT101 - 02', null, 5, 15, 'CREATED'),
 
-       (5,  1, 'ENG001 - 01', null, 30, 'CREATED'),
-       (6,  1, 'ENG001 - 01', null, 30, 'CREATED'),
+       (2, 1, 1, 'ENG00101', 'ENG001 - 01', null, 5, 30, 'CREATED'),
+       (2, 2, 1, 'ENG00102', 'ENG001 - 02', null, 5, 30, 'CREATED'),
 
-       (9,  2, 'ENG002 - 01', null, 30, 'CREATED'),
-       (10, 2, 'ENG002 - 02', null, 30, 'CREATED'),
+       (3, 1, 2, 'ENG00201', 'ENG002 - 01', null, 5, 30, 'CREATED'),
+       (3, 2, 2, 'ENG00202', 'ENG002 - 02', null, 5, 30, 'CREATED'),
 
-       (13, 2, 'ENG003 - 01', null, 25, 'CREATED'),
-       (14, 2, 'ENG003 - 02', null, 25, 'CREATED'),
+       (4, 1, 2, 'ENG00301', 'ENG003 - 01', null, 5, 25, 'CREATED'),
+       (4, 2, 2, 'ENG00302', 'ENG003 - 02', null, 5, 25, 'CREATED'),
 
-       (12, 2, 'ENG002 - 01', null, 25, 'CREATED');
+       (3, 1, 2, 'ENG00203', 'ENG002 - 01', null, 5, 25, 'CREATED');
 
 INSERT INTO schedulecat (`name`, `description`, `status`)
 VALUES ('T2,T4,T6', 'T2,T4,T6 hàng tuần', 'CREATED'),

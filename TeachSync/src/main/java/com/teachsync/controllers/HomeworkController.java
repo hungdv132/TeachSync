@@ -12,6 +12,7 @@ import com.teachsync.services.homework.HomeworkService;
 import com.teachsync.services.memberHomeworkRecord.MemberHomeworkRecordService;
 import com.teachsync.utils.Constants;
 import com.teachsync.utils.MiscUtil;
+import com.teachsync.utils.enums.Status;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.slf4j.Logger;
@@ -92,7 +93,11 @@ public class HomeworkController {
         }
 
         try {
-            Page<ClazzReadDTO> dtoPage = clazzService.getPageDTOAll(null, null);
+            Page<ClazzReadDTO> dtoPage = clazzService.getPageAllDTO(
+                    null,
+                    List.of(Status.DELETED),
+                    false,
+                    null);
             if (!ObjectUtils.isEmpty(request.getParameter("id"))) {
                 HomeworkReadDTO homeworkReadDTO = homeworkService.findById(Long.parseLong(request.getParameter("id")));
                 model.addAttribute("homework", homeworkReadDTO);
@@ -123,7 +128,11 @@ public class HomeworkController {
         }
         UserReadDTO userDTO = (UserReadDTO) session.getAttribute("user");
         try {
-            Page<ClazzReadDTO> dtoPage = clazzService.getPageDTOAll(null, null);
+            Page<ClazzReadDTO> dtoPage = clazzService.getPageAllDTO(
+                    null,
+                    List.of(Status.DELETED),
+                    false,
+                    null);
             if (!ObjectUtils.isEmpty(request.getParameter("id"))) {
                 HomeworkReadDTO homeworkReadDTO = new HomeworkReadDTO();
                 if (userDTO.getRoleId().equals(Constants.ROLE_STUDENT)) {

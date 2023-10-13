@@ -23,7 +23,7 @@ public interface ClazzScheduleService {
 
     /* =================================================== READ ===================================================== */
     Page<ClazzSchedule> getPageAll(Pageable paging) throws Exception;
-    Page<ClazzScheduleReadDTO> getPageDTOAll(Pageable paging, Collection<DtoOption> options) throws Exception;
+    Page<ClazzScheduleReadDTO> getPageAllDTO(Pageable paging, Collection<DtoOption> options) throws Exception;
 
     /* id */
     Boolean existsById(Long id) throws Exception;
@@ -56,6 +56,12 @@ public interface ClazzScheduleService {
 
     ClazzSchedule updateClazzSchedule(ClazzSchedule clazzSchedule) throws Exception;
     ClazzScheduleReadDTO updateClazzScheduleByDTO(ClazzScheduleUpdateDTO updateDTO) throws Exception;
+
+
+    /* =================================================== WRAPPER ================================================== */
+    Boolean deleteClazzSchedule(Long id) throws Exception;
+
+    Boolean deleteByClazzId(Long clazzId) throws Exception;
 
 
     /* =================================================== WRAPPER ================================================== */

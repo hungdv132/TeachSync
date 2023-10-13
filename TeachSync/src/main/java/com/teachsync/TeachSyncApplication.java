@@ -49,7 +49,7 @@ public class TeachSyncApplication extends SpringBootServletInitializer {
 
         modelMapper.typeMap(Clazz.class, ClazzReadDTO.class)
                 .addMappings(mapper -> {
-                    mapper.skip(ClazzReadDTO::setCourseSemester);
+//                    mapper.skip(ClazzReadDTO::setCourseSemester);
                     mapper.skip(ClazzReadDTO::setSessionList);
                     mapper.skip(ClazzReadDTO::setHomeworkList);
                     mapper.skip(ClazzReadDTO::setTestList); });

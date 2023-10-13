@@ -199,21 +199,21 @@ function validateTextInputAsNumber(textInputAsNumberInput, min, max, step, valid
             /* null or min (if null ignore, if not check minlength) */
             if (validateOption.includes(`nullOrMin`)) {
                 if (numberValue < min) {
-                    errorMsg+= `Giá trị cần lớn hơn `+min+` , hoặc để trống trường này.\n`;
+                    errorMsg+= `Giá trị cần lớn hơn hoặc bằng `+min+` , hoặc để trống trường này.\n`;
                 }
             }
 
             /* min */
             if (validateOption.includes(`min`)) {
                 if (numberValue < min) {
-                    errorMsg+= `Giá trị cần lớn hơn `+min+` .\n`;
+                    errorMsg+= `Giá trị cần lớn hơn hoặc bằng `+min+` .\n`;
                 }
             }
 
             /* max */
             if (validateOption.includes(`max`)) {
                 if (numberValue > max) {
-                    errorMsg+= `Giá trị cần nhỏ hơn `+max+` .\n`;
+                    errorMsg+= `Giá trị cần nhỏ hơn hoặc bằng `+max+` .\n`;
                 }
             }
 

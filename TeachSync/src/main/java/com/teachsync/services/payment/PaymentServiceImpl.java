@@ -77,7 +77,7 @@ public class PaymentServiceImpl implements PaymentService {
         }
         PriceLogReadDTO priceDTO =
                 priceLogService.getDTOByCourseIdAt(
-                        requestDTO.getClazz().getCourseSemester().getCourseId(),
+                        requestDTO.getClazz().getCourseId(),
                         requestDTO.getCreatedAt());
         if (!payment.getPaymentAmount().equals(priceDTO.getFinalPrice())){
             /* Giá tiền nộp != giá tiền yêu cầu lúc gửi đơn */

@@ -89,7 +89,10 @@ public class RequestController {
 
         try {
             /* List Course (môn nào) */
-            List<CourseReadDTO> courseDTOList = courseService.getAllDTO(null);
+            List<CourseReadDTO> courseDTOList = courseService.getAllDTO(
+                    List.of(Status.DELETED),
+                    false,
+                    null);
             model.addAttribute("courseList", courseDTOList);
 
             /* List Semester (kỳ nào) */
@@ -133,20 +136,22 @@ public class RequestController {
             ClazzReadDTO clazzDTO =
                     clazzService.getDTOById(
                             createDTO.getClazzId(),
+                            List.of(Status.DELETED),
+                            false,
                             List.of(COURSE_SEMESTER, COURSE_NAME, CENTER_NAME, SEMESTER_NAME));
 
-            CourseSemesterReadDTO courseSemesterDTO = clazzDTO.getCourseSemester();
+//            CourseSemesterReadDTO courseSemesterDTO = clazzDTO.getCourseSemester();
 
             String requestName = "hoc sinh '" + userDTO.getId() +
                     "' xin hoc lop '" + clazzDTO.getId() +
-                    "' mon '" + clazzDTO.getCourseSemester().getCourseId() + "'";
+                    "' mon '" + clazzDTO.getCourseId() + "'";
             createDTO.setRequestName(requestName);
 
             String requestDesc = "Học sinh '" + userDTO.getFullName() +
                     "' xin nhập học Lớp '" + clazzDTO.getClazzName() +
-                    "' cho Khóa học '" + courseSemesterDTO.getCourseName() +
-                    "' vào Kỳ '" + courseSemesterDTO.getSemesterName() +
-                    "' tại Cơ Sở '" + courseSemesterDTO.getCenterName() + "'.";
+                    "' cho Khóa học '" + clazzDTO.getCourseName() +
+//                    "' vào Kỳ '" + courseSemesterDTO.getSemesterName() +
+                    "' tại Cơ Sở '" + clazzDTO.getCenterName() + "'.";
             createDTO.setRequestDesc(requestDesc);
             createDTO.setCreatedBy(userDTO.getId());
             createDTO.setStatus(Status.PENDING_PAYMENT);
@@ -254,14 +259,14 @@ public class RequestController {
                     List.of(REQUESTER, PAYMENT, CLAZZ, CLAZZ_SCHEDULE, SCHEDULE_CAT,
                             ROOM_NAME, COURSE_SEMESTER, SEMESTER, COURSE, CENTER, ADDRESS));
 
-            CourseReadDTO courseDTO = requestDTO.getClazz().getCourseSemester().getCourse();
+            CourseReadDTO courseDTO = requestDTO.getClazz().getCourse();
 
             LocalDateTime requestAt = requestDTO.getCreatedAt();
             PriceLogReadDTO priceDTO = priceLogService.getDTOByCourseIdAt(courseDTO.getId(), requestAt);
 
             courseDTO.setCurrentPrice(priceDTO);
 
-            requestDTO.getClazz().getCourseSemester().setCourse(courseDTO);
+            requestDTO.getClazz().setCourse(courseDTO);
 
             model.addAttribute("request", requestDTO);
         } catch (Exception e) {

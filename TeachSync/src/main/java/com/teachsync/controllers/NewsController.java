@@ -122,7 +122,7 @@ public class NewsController {
     public String news(Model model, @ModelAttribute("mess") String mess) {
 
         try {
-            Page<NewsReadDTO> dtoPage = newsService.getPageDTOAll(null);
+            Page<NewsReadDTO> dtoPage = newsService.getPageAllDTO(null);
 
             if (dtoPage != null) {
                 model.addAttribute("newsList", dtoPage.getContent());

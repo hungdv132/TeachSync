@@ -10,7 +10,7 @@ public enum Status {
     APPROVED("APPROVED", "Approved", "Chấp nhận"),
     DENIED("DENIED", "Denied", "Từ chối"),
 
-
+    //status of Course & Clazz
     DESIGNING("DESIGNING", "Designing", "Đang thiết kế"),
     AWAIT_REVIEW("AWAIT_REVIEW", "Awaiting review", "Đang chờ xét duyệt"),
     OPENED("OPENED", "Opened", "Đang mở"),

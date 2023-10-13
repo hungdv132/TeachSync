@@ -15,6 +15,8 @@ public interface CenterRepository extends JpaRepository<Center, Long> {
     List<Center> findAllByStatusNot(Status status);
 
     /* id */
+    Boolean existsByIdAndStatusNot(Long id, Status status);
     Optional<Center> findByIdAndStatusNot(Long id, Status status);
+    Boolean existsAllByIdInAndStatusNot(Collection<Long> idCollection, Status status);
     List<Center> findAllByIdInAndStatusNot(Collection<Long> idCollection, Status status);
 }

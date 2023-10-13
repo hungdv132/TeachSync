@@ -4,15 +4,14 @@ import com.teachsync.dtos.BaseReadDTO;
 import com.teachsync.dtos.course.CourseCreateDTO;
 import com.teachsync.dtos.course.CourseReadDTO;
 import com.teachsync.dtos.course.CourseUpdateDTO;
+import com.teachsync.dtos.material.MaterialReadDTO;
 import com.teachsync.dtos.priceLog.PriceLogCreateDTO;
 import com.teachsync.dtos.priceLog.PriceLogReadDTO;
 import com.teachsync.dtos.priceLog.PriceLogUpdateDTO;
 import com.teachsync.dtos.test.TestReadDTO;
 import com.teachsync.entities.*;
-import com.teachsync.repositories.CourseMaterialRepository;
 import com.teachsync.repositories.CourseRepository;
-import com.teachsync.repositories.MaterialRepository;
-import com.teachsync.repositories.PriceLogRepository;
+import com.teachsync.services.material.MaterialService;
 import com.teachsync.services.priceLog.PriceLogService;
 import com.teachsync.services.test.TestService;
 import com.teachsync.utils.MiscUtil;
@@ -24,12 +23,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static com.teachsync.utils.enums.Status.*;
 
 @Service
 public class CourseServiceImpl implements CourseService {
@@ -37,18 +38,11 @@ public class CourseServiceImpl implements CourseService {
     private CourseRepository courseRepository;
 
     @Autowired
-    private CourseMaterialRepository courseMaterialRepository;
-
-    @Autowired
-    private MaterialRepository materialRepository;
-
+    private MaterialService materialService;
     @Autowired
     private PriceLogService priceLogService;
     @Autowired
     private TestService testService;
-
-    @Autowired
-    private PriceLogRepository priceLogRepository;
 
     @Autowired
     private MiscUtil miscUtil;
@@ -58,74 +52,100 @@ public class CourseServiceImpl implements CourseService {
 
     /* =================================================== CREATE =================================================== */
     @Override
-    public Course createCourse(Course course) throws Exception {
+    public Course createCourse(
+            Course course) throws Exception {
         StringBuilder errorMsg = new StringBuilder();
         /* Validate input */
         /* courseAlias */
         errorMsg.append(
                 miscUtil.validateString(
                         "Mã khóa học", course.getCourseAlias(), 1, 10,
-                        List.of("required", "minLength", "maxLength", "onlyBlank", "startBlank", "endBlank", "specialChar")));
+                        List.of("required", "minLength", "maxLength", "onlyBlank",
+                                "startBlank", "endBlank", "specialChar")));
         /* courseName */
         errorMsg.append(
                 miscUtil.validateString(
                         "Tên khóa học", course.getCourseName(), 1, 45,
-                        List.of("required", "minLength", "maxLength", "onlyBlank", "startBlank", "endBlank", "specialChar")));
+                        List.of("required", "minLength", "maxLength", "onlyBlank",
+                                "startBlank", "endBlank", "specialChar")));
         /* courseDesc */
         errorMsg.append(
                 miscUtil.validateString(
                         "Miêu tả khóa học", course.getCourseDesc(), 1, 9999,
-                        List.of("nullOrMinLength", "maxLength", "onlyBlank", "startBlank", "endBlank", "specialChar")));
+                        List.of("nullOrMinLength", "maxLength", "onlyBlank", "startBlank",
+                                "endBlank", "specialChar")));
         /* courseImg */
         /* TODO: check valid link */
         /* numSession */
         errorMsg.append(
                 miscUtil.validateNumber(
-                        "Số tiết học", Double.valueOf(course.getNumSession()), 1.0, 100.0, 1.0,
-                        List.of("min", "max", "onlyBlank", "step")));
+                        "Số tiết học", course.getNumSession().doubleValue(), 1.0, 100.0, 1.0,
+                        List.of("min", "max", "step")));
         /* minScore */
         errorMsg.append(
                 miscUtil.validateNumber(
                         "Điểm tối thiểu", course.getMinScore(), 0.0, 10.0, 0.01,
-                        List.of("min", "max", "onlyBlank", "step")));
+                        List.of("min", "max", "step")));
         /* minAttendant */
         errorMsg.append(
                 miscUtil.validateNumber(
                         "Điểm danh tối thiểu", course.getMinAttendant(), 0.0, 100.0, 0.01,
-                        List.of("min", "max", "onlyBlank", "step")));
+                        List.of("min", "max", "step")));
 
         /* Check FK */
         /* No FK */
 
         /* Check duplicate */
         if (courseRepository
-                .existsByCourseNameOrCourseAliasAndStatusNot(
-                        course.getCourseName(),
+                .existsByCourseAliasAndStatusNotIn(
                         course.getCourseAlias(),
-                        Status.DELETED)) {
-            errorMsg.append("Already exists Course with Name: ").append(course.getCourseName())
-                    .append(" or with Alias: ").append(course.getCourseAlias());
+                        List.of(Status.DELETED))) {
+            errorMsg.append("Đã tồn tại Khóa Học khác với Mã: ").append(course.getCourseAlias());
         }
 
+        /* Is error */
         if (!errorMsg.isEmpty()) {
-            throw new IllegalArgumentException(errorMsg.toString());
+            throw new IllegalArgumentException(
+                    "Lỗi tạo Khóa Học. " + errorMsg.toString());
         }
 
         /* Save to DB */
-        course = courseRepository.save(course);
-
-        return course;
+        return courseRepository.save(course);
     }
     @Override
-    public CourseReadDTO createCourseByDTO(CourseCreateDTO createDTO) throws Exception {
+    public CourseReadDTO createCourseByDTO(
+            CourseCreateDTO createDTO) throws Exception {
         Course course = mapper.map(createDTO, Course.class);
 
         course = createCourse(course);
 
         /* Create dependency */
-        PriceLogCreateDTO priceLogCreateDTO = createDTO.getPrice();
-        priceLogCreateDTO.setCourseId(course.getId());
-        priceLogService.createPriceLogByDTO(priceLogCreateDTO);
+        try {
+            PriceLogCreateDTO priceCreateDTO = createDTO.getPrice();
+
+            priceCreateDTO.setCourseId(course.getId());
+
+            if (priceCreateDTO.getIsPromotion() && priceCreateDTO.getValidTo() != null) {
+                /* Regular price after promotion end */
+                    PriceLogCreateDTO priceCreateDTOAfterPromotion =
+                            new PriceLogCreateDTO(
+                                    course.getId(), priceCreateDTO.getPrice(), false,
+                                    null, null, null,
+                                    priceCreateDTO.getValidTo(), null);
+
+                priceLogService.createPriceLogByDTO(priceCreateDTO);
+
+                priceLogService.createPriceLogByDTO(priceCreateDTOAfterPromotion);
+            } else {
+                priceLogService.createPriceLogByDTO(priceCreateDTO);
+            }
+        } catch (IllegalArgumentException iAE) {
+            /* Revert create */
+            deleteCourse(course.getId());
+
+            throw new IllegalArgumentException(
+                    "Lỗi tạo Khóa Học. Bắt nguồn từ: \n"+iAE.getMessage());
+        }
 
         return wrapDTO(course, null);
     }
@@ -133,263 +153,594 @@ public class CourseServiceImpl implements CourseService {
 
     /* =================================================== READ ===================================================== */
     @Override
-    public Page<Course> getPageAll(Pageable paging) throws Exception {
-        if (paging == null) {
-            paging = miscUtil.defaultPaging();
+    public List<Course> getAll(
+            Collection<Status> statuses, boolean isStatusIn) throws Exception {
+
+        List<Course> courseList;
+        
+        if (isStatusIn) {
+            if (ObjectUtils.isEmpty(statuses)) { return null; }
+
+            courseList =
+                    courseRepository.findAllByStatusIn(
+                            statuses);
+        } else {
+            if (ObjectUtils.isEmpty(statuses)) { statuses = List.of(DELETED); }
+            
+            courseList = 
+                    courseRepository.findAllByStatusNotIn(
+                            statuses);
         }
 
-        Page<Course> coursePage =
-                courseRepository.findAllByStatusNot(Status.DELETED, paging);
+        if (ObjectUtils.isEmpty(courseList)) { return null; }
 
-        if (coursePage.isEmpty()) {
-            return null;
-        }
-
-        return coursePage;
-    }
-
-    @Override
-    public Page<CourseReadDTO> getPageDTOAll(Pageable paging) throws Exception {
-        Page<Course> coursePage = getPageAll(paging);
-
-        if (coursePage == null) {
-            return null;
-        }
-
-        return wrapPageDTO(coursePage, null);
+        return courseList;
     }
     @Override
-    public Page<CourseReadDTO> getPageDTOAllHotCourse(Pageable paging) throws Exception {
-        Page<PriceLogReadDTO> priceLogDTOPage = priceLogService.getPageAllLatestPromotionDTO(paging);
+    public List<CourseReadDTO> getAllDTO(
+            Collection<Status> statuses, boolean isStatusIn, 
+            Collection<DtoOption> options) throws Exception {
 
-        if (priceLogDTOPage == null) {
-            return null; }
-
-        Map<Long, PriceLogReadDTO> courseIdPriceLogDTOMap =
-                priceLogDTOPage.stream()
-                        .collect(Collectors.toMap(PriceLogReadDTO::getCourseId, Function.identity()));
-
-        Page<Course> coursePage = getPageAllByIdIn(priceLogDTOPage.getPageable(), courseIdPriceLogDTOMap.keySet());
-
-        if (coursePage == null) {
-            return null; }
-
-        List<CourseReadDTO> courseDTOList = wrapListDTO(coursePage.getContent(), null);
-
-        courseDTOList =
-                courseDTOList.stream()
-                        .peek(dto -> dto.setCurrentPrice(courseIdPriceLogDTOMap.get(dto.getId())))
-                        .collect(Collectors.toList());
-
-        return new PageImpl<>(
-                courseDTOList,
-                coursePage.getPageable(),
-                coursePage.getTotalPages());
-    }
-
-    @Override
-    public List<Course> getAll() throws Exception {
-        List<Course> coursePage =
-                courseRepository.findAllByStatusNot(Status.DELETED);
-
-        if (coursePage.isEmpty()) {
-            return null;
-        }
-
-        return coursePage;
-    }
-
-    @Override
-    public List<CourseReadDTO> getAllDTO(Collection<DtoOption> options) throws Exception {
-        List<Course> courseList = getAll();
-
-        if (courseList == null) {
-            return null;
-        }
+        List<Course> courseList = getAll(statuses, isStatusIn);
 
         return wrapListDTO(courseList, options);
     }
     @Override
-    public Map<Long, CourseReadDTO> mapIdDTO(Collection<DtoOption> options) throws Exception {
-        List<CourseReadDTO> courseDTOList = getAllDTO(options);
+    public Map<Long, CourseReadDTO> mapIdDTO(
+            Collection<Status> statuses, boolean isStatusIn, 
+            Collection<DtoOption> options) throws Exception {
 
-        if (courseDTOList == null) {
-            return new HashMap<>();
-        }
+        List<CourseReadDTO> courseDTOList = getAllDTO(statuses, isStatusIn, options);
+
+        if (ObjectUtils.isEmpty(courseDTOList)) { return new HashMap<>(); }
 
         return courseDTOList.stream()
                 .collect(Collectors.toMap(BaseReadDTO::getId, Function.identity()));
     }
 
-    /* id */
     @Override
-    public Course getById(Long id) throws Exception {
-        return courseRepository
-                .findByIdAndStatusNot(id, Status.DELETED)
-                .orElse(null);
-    }
-    @Override
-    public CourseReadDTO getDTOById(Long id, Collection<DtoOption> options) throws Exception {
-        Course course = getById(id);
+    public Page<Course> getPageAll(
+            Pageable paging, Collection<Status> statuses, boolean isStatusIn) throws Exception {
+        
+        if (paging == null) { paging = miscUtil.defaultPaging(); }
 
-        if (course == null) {
-            return null;
+        Page<Course> coursePage;
+
+        if (isStatusIn) {
+            if (ObjectUtils.isEmpty(statuses)) { return null; }
+
+            coursePage =
+                    courseRepository.findAllByStatusIn(
+                            statuses,
+                            paging);
+        } else {
+            if (ObjectUtils.isEmpty(statuses)) { statuses = List.of(DELETED); }
+
+            coursePage =
+                    courseRepository.findAllByStatusNotIn(
+                            statuses,
+                            paging);
         }
 
-        return wrapDTO(course, options);
-    }
-
-    @Override
-    public Page<Course> getPageAllByIdIn(Pageable paging, Collection<Long> courseIdCollection) throws Exception {
-        if (paging == null) {
-            paging = miscUtil.defaultPaging(); }
-
-        Page<Course> coursePage =
-                courseRepository.findAllByIdInAndStatusNot(courseIdCollection, Status.DELETED, paging);
-
-        if (coursePage.isEmpty()) {
-            return null; }
+        if (ObjectUtils.isEmpty(coursePage)) { return null; }
 
         return coursePage;
     }
     @Override
-    public Page<CourseReadDTO> getPageDTOAllByIdIn(Pageable paging, Collection<Long> courseIdCollection) throws Exception {
-        Page<Course> coursePage = getPageAllByIdIn(paging, courseIdCollection);
+    public Page<CourseReadDTO> getPageAllDTO(
+            Pageable paging, Collection<Status> statuses, boolean isStatusIn, 
+            Collection<DtoOption> options) throws Exception {
 
-        if (coursePage == null) {
-            return null; }
+        Page<Course> coursePage = getPageAll(paging, statuses, isStatusIn);
 
-        return wrapPageDTO(coursePage, null);
+        return wrapPageDTO(coursePage, options);
     }
 
     @Override
-    public List<Course> getAllByIdIn(Collection<Long> courseIdCollection) throws Exception {
-        List<Course> courseList =
-                courseRepository.findAllByIdInAndStatusNot(courseIdCollection, Status.DELETED);
+    public Page<CourseReadDTO> getPageAllDTOOnSale(
+            Pageable paging, Collection<Status> statuses, boolean isStatusIn,
+            Collection<DtoOption> options) throws Exception {
 
-        if (courseList.isEmpty()) {
-            return null; }
+        /* TODO: filter price */
+
+        Page<Course> coursePage = getPageAll(paging, statuses, isStatusIn);
+
+        return wrapPageDTO(coursePage, options);
+    }
+
+    /* id */
+    @Override
+    public Boolean existsById(
+            Long id) throws Exception {
+
+        return courseRepository
+                .existsByIdAndStatusNotIn(id, List.of(DELETED));
+    }
+    @Override
+    public Boolean existsAllByIdIn(
+            Collection<Long> ids) throws Exception {
+
+        return courseRepository
+                .existsAllByIdInAndStatusNotIn(ids, List.of(DELETED));
+    }
+
+    @Override
+    public Course getById(
+            Long id, Collection<Status> statuses, boolean isStatusIn) throws Exception {
+
+        if (isStatusIn) {
+            if (ObjectUtils.isEmpty(statuses)) { return null; }
+
+            return courseRepository
+                    .findByIdAndStatusIn(id, statuses)
+                    .orElse(null);
+        } else {
+            if (ObjectUtils.isEmpty(statuses)) { statuses = List.of(DELETED); }
+
+            return courseRepository
+                    .findByIdAndStatusNotIn(id, statuses)
+                    .orElse(null);
+        }
+    }
+    @Override
+    public CourseReadDTO getDTOById(
+            Long id, Collection<Status> statuses, boolean isStatusIn, 
+            Collection<DtoOption> options) throws Exception {
+
+        Course course = getById(id, statuses, isStatusIn);
+
+        return wrapDTO(course, options);
+    }
+    
+    @Override
+    public List<Course> getAllByIdIn(
+            Collection<Long> ids, Collection<Status> statuses, boolean isStatusIn) throws Exception {
+
+        List<Course> courseList;
+
+        if (isStatusIn) {
+            if (ObjectUtils.isEmpty(statuses)) { return null; }
+
+            courseList =
+                    courseRepository.findAllByIdInAndStatusIn(
+                            ids,
+                            statuses);
+        } else {
+            if (ObjectUtils.isEmpty(statuses)) { statuses = List.of(DELETED); }
+
+            courseList =
+                    courseRepository.findAllByIdInAndStatusNotIn(
+                            ids,
+                            statuses);
+        }
+
+        if (ObjectUtils.isEmpty(courseList)) { return null; }
 
         return courseList;
     }
     @Override
-    public Map<Long, String> mapCourseIdCourseNameByIdIn(Collection<Long> courseIdCollection) throws Exception {
-        List<Course> courseList = getAllByIdIn(courseIdCollection);
+    public Map<Long, String> mapCourseIdCourseAliasByIdIn(
+            Collection<Long> ids, Collection<Status> statuses, boolean isStatusIn) throws Exception {
 
-        if (courseList == null) {
-            return new HashMap<>(); }
+        List<Course> courseList = getAllByIdIn(ids, statuses, isStatusIn);
 
-        return courseList.stream()
-                .collect(Collectors.toMap(BaseEntity::getId, Course::getCourseName));
-    }
-    @Override
-    public Map<Long, String> mapCourseIdCourseAliasByIdIn(Collection<Long> courseIdCollection) throws Exception {
-        List<Course> courseList = getAllByIdIn(courseIdCollection);
-
-        if (courseList == null) {
-            return new HashMap<>();
-        }
+        if (ObjectUtils.isEmpty(courseList)) { return new HashMap<>(); }
 
         return courseList.stream()
                 .collect(Collectors.toMap(BaseEntity::getId, Course::getCourseAlias));
     }
     @Override
-    public List<CourseReadDTO> getAllDTOByIdIn(
-            Collection<Long> courseIdCollection, Collection<DtoOption> options) throws Exception {
-        List<Course> courseList = getAllByIdIn(courseIdCollection);
+    public Map<Long, String> mapCourseIdCourseNameByIdIn(
+            Collection<Long> ids, Collection<Status> statuses, boolean isStatusIn) throws Exception {
 
-        if (courseList == null) {
-            return null; }
+        List<Course> courseList = getAllByIdIn(ids, statuses, isStatusIn);
+
+        if (ObjectUtils.isEmpty(courseList)) { return new HashMap<>(); }
+
+        return courseList.stream()
+                .collect(Collectors.toMap(BaseEntity::getId, Course::getCourseName));
+    }
+    @Override
+    public List<CourseReadDTO> getAllDTOByIdIn(
+            Collection<Long> ids, Collection<Status> statuses, boolean isStatusIn, 
+            Collection<DtoOption> options) throws Exception {
+
+        List<Course> courseList = getAllByIdIn(ids, statuses, isStatusIn);
 
         return wrapListDTO(courseList, options);
     }
     @Override
     public Map<Long, CourseReadDTO> mapIdDTOByIdIn(
-            Collection<Long> courseIdCollection, Collection<DtoOption> options) throws Exception {
-        List<CourseReadDTO> courseDTOList = getAllDTOByIdIn(courseIdCollection, options);
+            Collection<Long> ids, Collection<Status> statuses, boolean isStatusIn, 
+            Collection<DtoOption> options) throws Exception {
 
-        if (courseDTOList == null) {
-            return new HashMap<>();
-        }
+        List<CourseReadDTO> courseDTOList = getAllDTOByIdIn(ids, statuses, isStatusIn, options);
+
+        if (ObjectUtils.isEmpty(courseDTOList)) { return new HashMap<>(); }
 
         return courseDTOList.stream()
                 .collect(Collectors.toMap(BaseReadDTO::getId, Function.identity()));
     }
 
-    /* courseName */
     @Override
-    public List<Course> getAllByNameContains(String courseName) throws Exception {
-        List<Course> courseList =
-                courseRepository.findAllByCourseNameContainsAndStatusNot(courseName, Status.DELETED);
+    public Page<Course> getPageAllByIdIn(
+            Pageable paging, Collection<Long> ids, Collection<Status> statuses, boolean isStatusIn) throws Exception {
 
-        if (courseList.isEmpty()) {
-            return null;
+        if (paging == null) { paging = miscUtil.defaultPaging(); }
+
+        Page<Course> coursePage;
+
+        if (isStatusIn) {
+            if (ObjectUtils.isEmpty(statuses)) { return null; }
+
+            coursePage =
+                    courseRepository.findAllByIdInAndStatusIn(
+                            ids,
+                            statuses,
+                            paging);
+        } else {
+            if (ObjectUtils.isEmpty(statuses)) { statuses = List.of(DELETED); }
+
+            coursePage =
+                    courseRepository.findAllByIdInAndStatusNotIn(
+                            ids,
+                            statuses,
+                            paging);
         }
+
+        if (ObjectUtils.isEmpty(coursePage)) { return null; }
+
+        return coursePage;
+    }
+    @Override
+    public Page<CourseReadDTO> getPageAllDTOByIdIn(
+            Pageable paging, Collection<Long> ids, Collection<Status> statuses, boolean isStatusIn, 
+            Collection<DtoOption> options) throws Exception {
+
+        Page<Course> coursePage = getPageAllByIdIn(paging, ids, statuses, isStatusIn);
+
+        return wrapPageDTO(coursePage, options);
+    }
+    
+    /* courseAlias */
+    @Override
+    public List<Course> getAllByAliasContains(
+            String courseAlias, Collection<Status> statuses, boolean isStatusIn) throws Exception {
+
+        List<Course> courseList;
+
+        if (isStatusIn) {
+            if (ObjectUtils.isEmpty(statuses)) { return null; }
+
+            courseList =
+                    courseRepository.findAllByCourseAliasContainsAndStatusIn(
+                            courseAlias,
+                            statuses);
+        } else {
+            if (ObjectUtils.isEmpty(statuses)) { statuses = List.of(DELETED); }
+
+            courseList =
+                    courseRepository.findAllByCourseAliasContainsAndStatusNotIn(
+                            courseAlias,
+                            statuses);
+        }
+
+        if (ObjectUtils.isEmpty(courseList)) { return null; }
 
         return courseList;
     }
     @Override
-    public List<CourseReadDTO> getAllDTOByNameContains(String courseName, Collection<DtoOption> options) throws Exception {
-        List<Course> courseList = getAllByNameContains(courseName);
+    public List<CourseReadDTO> getAllDTOByAliasContains(
+            String courseAlias, Collection<Status> statuses, boolean isStatusIn, 
+            Collection<DtoOption> options) throws Exception {
 
-        if (courseList == null) {
-            return null; }
+        List<Course> courseList = getAllByAliasContains(courseAlias, statuses, isStatusIn);
 
         return wrapListDTO(courseList, options);
     }
 
+    @Override
+    public Page<Course> getPageAllByAliasContains(
+            Pageable paging, String courseAlias, Collection<Status> statuses, boolean isStatusIn) throws Exception {
+
+        if (paging == null) { paging = miscUtil.defaultPaging(); }
+
+        Page<Course> coursePage;
+
+        if (isStatusIn) {
+            if (ObjectUtils.isEmpty(statuses)) { return null; }
+
+            coursePage =
+                    courseRepository.findAllByCourseAliasContainsAndStatusNotIn(
+                            courseAlias,
+                            statuses,
+                            paging);
+        } else {
+            if (ObjectUtils.isEmpty(statuses)) { statuses = List.of(DELETED); }
+
+            coursePage =
+                    courseRepository.findAllByCourseAliasContainsAndStatusNotIn(
+                            courseAlias,
+                            statuses,
+                            paging);
+        }
+        if (ObjectUtils.isEmpty(coursePage)) { return null; }
+
+        return coursePage;
+    }
+    @Override
+    public Page<CourseReadDTO> getPageAllDTOByAliasContains(
+            Pageable paging, String courseAlias, Collection<Status> statuses, boolean isStatusIn, 
+            Collection<DtoOption> options) throws Exception {
+
+        Page<Course> coursePage = getPageAllByAliasContains(paging, courseAlias, statuses, isStatusIn);
+
+        return wrapPageDTO(coursePage, options);
+    }
+
+    /* courseName */
+    @Override
+    public List<Course> getAllByNameContains(
+            String courseName, Collection<Status> statuses, boolean isStatusIn) throws Exception {
+
+        List<Course> courseList;
+
+        if (isStatusIn) {
+            if (ObjectUtils.isEmpty(statuses)) { return null; }
+
+            courseList =
+                    courseRepository.findAllByCourseNameContainsAndStatusIn(
+                            courseName,
+                            statuses);
+        } else {
+            if (ObjectUtils.isEmpty(statuses)) { statuses = List.of(DELETED); }
+
+            courseList =
+                    courseRepository.findAllByCourseNameContainsAndStatusNotIn(
+                            courseName,
+                            statuses);
+        }
+
+        if (ObjectUtils.isEmpty(courseList)) { return null; }
+
+        return courseList;
+    }
+    @Override
+    public List<CourseReadDTO> getAllDTOByNameContains(
+            String courseName, Collection<Status> statuses, boolean isStatusIn,
+            Collection<DtoOption> options) throws Exception {
+
+        List<Course> courseList = getAllByNameContains(courseName, statuses, isStatusIn);
+
+        return wrapListDTO(courseList, options);
+    }
+
+    @Override
+    public Page<Course> getPageAllByNameContains(
+            Pageable paging, String courseName, Collection<Status> statuses, boolean isStatusIn) throws Exception {
+
+        if (paging == null) { paging = miscUtil.defaultPaging(); }
+
+        Page<Course> coursePage;
+
+        if (isStatusIn) {
+            if (ObjectUtils.isEmpty(statuses)) { return null; }
+
+            coursePage =
+                    courseRepository.findAllByCourseNameContainsAndStatusNotIn(
+                            courseName,
+                            statuses,
+                            paging);
+        } else {
+            if (ObjectUtils.isEmpty(statuses)) { statuses = List.of(DELETED); }
+
+            coursePage =
+                    courseRepository.findAllByCourseNameContainsAndStatusNotIn(
+                            courseName,
+                            statuses,
+                            paging);
+        }
+        if (ObjectUtils.isEmpty(coursePage)) { return null; }
+
+        return coursePage;
+    }
+    @Override
+    public Page<CourseReadDTO> getPageAllDTOByNameContains(
+            Pageable paging, String courseName, Collection<Status> statuses, boolean isStatusIn,
+            Collection<DtoOption> options) throws Exception {
+
+        Page<Course> coursePage = getPageAllByNameContains(paging, courseName, statuses, isStatusIn);
+
+        return wrapPageDTO(coursePage, options);
+    }
 
     /* =================================================== UPDATE =================================================== */
     @Override
-    public Course updateCourse(Course course) throws Exception {
+    public Course updateCourse(
+            Course course) throws Exception {
         /* Check exists */
-        Course oldCourse = getById(course.getId());
+        Course oldCourse = getById(course.getId(), List.of(DELETED), false);
         if (Objects.isNull(oldCourse)) {
             throw new IllegalArgumentException(
-                    "No Course found with id: " + course.getId());
+                    "Lỗi sửa Khóa Học. Không tìm thấy Khóa Học nào với id: " + course.getId());
         }
         course.setCreatedAt(oldCourse.getCreatedAt());
         course.setCreatedBy(oldCourse.getCreatedBy());
 
+        StringBuilder errorMsg = new StringBuilder();
+
         /* Validate input */
-        /* TODO: valid ImgLink, ... */
+        /* status */
+        Status oldStatus = oldCourse.getStatus();
+        Status newStatus = course.getStatus();
+        if (!oldStatus.equals(newStatus)) {
+            /* Change status => no change other attribute */
+            switch (oldStatus) {
+                case DESIGNING -> {
+                    if (!AWAIT_REVIEW.equals(newStatus)) {
+                        errorMsg.append("Khóa Học với trạng thái 'Đang thiết kế' chỉ được phép chuyển trạng thái thành 'Đang chờ xét duyệt'.");
+                    }
+                }
+                case AWAIT_REVIEW -> {
+                    if (!List.of(DESIGNING, OPENED).contains(newStatus)) {
+                        errorMsg.append("Khóa Học với trạng thái 'Đang thiết kế' chỉ được phép chuyển trạng thái thành 'Đang thiết kế' hoặc 'Đang mở'.");
+                    }
+                }
+                case OPENED -> {
+                    if (!CLOSED.equals(newStatus)) {
+                        errorMsg.append("Khóa Học với trạng thái 'Đang mở' chỉ được phép chuyển trạng thái thành 'Đã đóng'.");
+                    }
+                }
+                case CLOSED -> {
+                    if (!OPENED.equals(newStatus)) {
+                        errorMsg.append("Khóa Học với trạng thái 'Đã đóng' chỉ được phép chuyển trạng thái thành 'Đang mở'.");
+                    }
+                }
+            }
+            /* Override old data */
+            oldCourse.setStatus(newStatus);
+            oldCourse.setUpdatedBy(course.getUpdatedBy());
+            oldCourse.setUpdatedAt(course.getUpdatedAt());
 
-        /* Check FK */
-        /* No FK */
+            /* Copy from old data */
+            course = oldCourse;
 
-        /* Check duplicate */
-        if (courseRepository
-                .existsByIdNotAndCourseNameOrCourseAliasAndStatusNot(
-                        course.getId(),
-                        course.getCourseName(),
-                        course.getCourseAlias(),
-                        Status.DELETED)) {
+            /* No change of attribute => no need validate input, no need check FK */
+        } else {
+            /* No change status => change other attribute */
+            switch (oldStatus) {
+                case DESIGNING -> {
+                    /* Validate input */
+                    /* courseAlias */
+                    errorMsg.append(
+                            miscUtil.validateString(
+                                    "Mã khóa học", course.getCourseAlias(), 1, 10,
+                                    List.of("required", "minLength", "maxLength", "onlyBlank", "startBlank", "endBlank", "specialChar")));
+                    /* courseName */
+                    errorMsg.append(
+                            miscUtil.validateString(
+                                    "Tên khóa học", course.getCourseName(), 1, 45,
+                                    List.of("required", "minLength", "maxLength", "onlyBlank", "startBlank", "endBlank", "specialChar")));
+                    /* courseDesc */
+                    errorMsg.append(
+                            miscUtil.validateString(
+                                    "Miêu tả khóa học", course.getCourseDesc(), 1, 9999,
+                                    List.of("nullOrMinLength", "maxLength", "onlyBlank", "startBlank", "endBlank", "specialChar")));
+                    /* courseImg */
+                    /* TODO: check valid link */
+                    /* numSession */
+                    errorMsg.append(
+                            miscUtil.validateNumber(
+                                    "Số tiết học", course.getNumSession().doubleValue(), 1.0, 100.0, 1.0,
+                                    List.of("min", "max", "step")));
+                    /* minScore */
+                    errorMsg.append(
+                            miscUtil.validateNumber(
+                                    "Điểm tối thiểu", course.getMinScore(), 0.0, 10.0, 0.01,
+                                    List.of("min", "max", "step")));
+                    /* minAttendant */
+                    errorMsg.append(
+                            miscUtil.validateNumber(
+                                    "Điểm danh tối thiểu", course.getMinAttendant(), 0.0, 100.0, 0.01,
+                                    List.of("min", "max", "step")));
+
+                    /* Check FK */
+                    /* No FK */
+
+                    /* Check duplicate */
+                    if (courseRepository
+                            .existsByIdNotAndCourseAliasAndStatusNotIn(
+                                    course.getId(),
+                                    course.getCourseAlias(),
+                                    List.of(Status.DELETED))) {
+                        errorMsg.append("Đã tồn tại Khóa Học khác với Mã: ").append(course.getCourseAlias());
+                    }
+                }
+                case AWAIT_REVIEW -> {
+                    /* Await review don't allow change of attribute => Cancel update. */
+                    return oldCourse;
+                }
+                case OPENED, CLOSED -> {
+                    /* Override old data */
+                    oldCourse.setCourseImg(course.getCourseImg());
+
+                    oldCourse.setUpdatedBy(course.getUpdatedBy());
+                    oldCourse.setUpdatedAt(course.getUpdatedAt());
+
+                    /* Copy from old data */
+                    course = oldCourse;
+
+                    /* Validate input */
+                    /* courseImg */
+                    /* TODO: check valid link */
+
+                    /* Check FK */
+                    /* No FK */
+                }
+            }
+        }
+
+        /* Is error */
+        if (!errorMsg.isEmpty()) {
             throw new IllegalArgumentException(
-                    "Already exists Course with Name: " + course.getCourseName()
-                            + " or with Alias: " + course.getCourseAlias());
+                    "Lỗi sửa Khóa Học. " + errorMsg.toString());
         }
 
         /* Save to DB */
-        course = courseRepository.save(course);
-
-        return course;
+        return courseRepository.save(course);
     }
     @Override
-    public CourseReadDTO updateCourseByDTO(CourseUpdateDTO updateDTO) throws Exception {
+    public CourseReadDTO updateCourseByDTO(
+            CourseUpdateDTO updateDTO) throws Exception {
+        /* Check exists */
+        Course oldCourse = getById(updateDTO.getId(), List.of(DELETED), false);
+        if (Objects.isNull(oldCourse)) {
+            throw new IllegalArgumentException(
+                    "Lỗi sửa Khóa Học. Không tìm thấy Khóa Học nào với id: " + updateDTO.getId());
+        }
+
         Course course = mapper.map(updateDTO, Course.class);
+
+        Status oldStatus = oldCourse.getStatus();
+        Status newStatus = course.getStatus();
 
         course = updateCourse(course);
 
-        /* Update dependency */
-        /* Close old price */
-        PriceLogReadDTO oldPrice = priceLogService.getCurrentDTOByCourseId(course.getId());
-        oldPrice.setValidTo(LocalDateTime.now());
-        priceLogService.updatePriceLogByDTO(mapper.map(oldPrice, PriceLogUpdateDTO.class));
+        if (oldStatus.equals(newStatus)) {
+            /* If status not change => change price */
+            try {
+                PriceLogCreateDTO newPriceLog = updateDTO.getPrice();
 
-        /* Create dependency */
-        PriceLogCreateDTO priceLogCreateDTO = updateDTO.getPrice();
-        priceLogCreateDTO.setCourseId(course.getId());
-        priceLogService.createPriceLogByDTO(priceLogCreateDTO);
+                /* Update dependency */
+                /* Close old price */
+                PriceLogReadDTO oldPriceLog = priceLogService.getCurrentDTOByCourseId(course.getId());
+                oldPriceLog.setValidTo(newPriceLog.getValidFrom());
+                priceLogService.updatePriceLogByDTO(
+                        mapper.map(oldPriceLog, PriceLogUpdateDTO.class));
+
+                /* Create dependency */
+                newPriceLog.setCourseId(course.getId());
+
+                if (newPriceLog.getIsPromotion() && newPriceLog.getValidTo() != null) {
+                    /* Regular price after promotion end */
+                    PriceLogCreateDTO priceCreateDTOAfterPromotion =
+                            new PriceLogCreateDTO(
+                                    course.getId(), newPriceLog.getPrice(), false,
+                                    null, null, null,
+                                    newPriceLog.getValidTo(), null);
+
+                    priceLogService.createPriceLogByDTO(newPriceLog);
+
+                    priceLogService.createPriceLogByDTO(priceCreateDTOAfterPromotion);
+                } else {
+                    priceLogService.createPriceLogByDTO(newPriceLog);
+                }
+
+            } catch (IllegalArgumentException iAE) {
+                /* Revert update */
+                course = updateCourse(oldCourse);
+            }
+        }
 
         return wrapDTO(course, null);
     }
@@ -397,36 +748,70 @@ public class CourseServiceImpl implements CourseService {
 
     /* =================================================== DELETE =================================================== */
     @Override
-    @Transactional
-    public void deleteCourse(Long id, Long userId) throws Exception {
-        Course course = courseRepository.findById(id).orElseThrow(() -> new Exception("không tìm thấy khóa học"));
-        PriceLog priceLog = priceLogRepository.findByCourseIdAndValidBetweenAndStatusNot(
-                        id, LocalDateTime.now(), Status.DELETED)
-                .orElseThrow(() -> new Exception("không tìm thấy giá khóa học"));
-        priceLog.setStatus(Status.DELETED);
-        priceLog.setUpdatedBy(userId);
-        course.setStatus(Status.DELETED);
-        course.setUpdatedBy(userId);
-        priceLogRepository.save(priceLog);
-        courseRepository.save(course);
+    public Boolean deleteCourse(Long id) throws Exception {
+        Course course = getById(id, List.of(DELETED), false);
 
+        if (course == null) {
+            throw new IllegalArgumentException(
+                    "Lỗi xóa Khóa Học. Không tìm thấy Khóa Học nào với id: " + id);
+        }
+
+        if (!course.getStatus().equals(Status.DESIGNING)) {
+            throw new IllegalArgumentException(
+                    "Lỗi xóa Khóa Học. Chỉ có những Khóa Học với trạng thái 'Đang thiết kế' mới được phép xóa.");
+        }
+
+        Status oldStatus = course.getStatus();
+
+        /* Delete */
+        course.setStatus(DELETED);
+
+        /* Save to DB */
+        courseRepository.saveAndFlush(course);
+
+        try {
+            priceLogService.deleteAllByCourseId(id);
+        } catch (IllegalArgumentException iAE) {
+            /* Revert delete */
+            course.setStatus(oldStatus);
+
+            courseRepository.saveAndFlush(course);
+
+            throw new IllegalArgumentException(
+                    "Lỗi xóa Khóa Học. Bắt nguồn từ: \n" + iAE.getMessage());
+        }
+
+        return true;
     }
 
 
     /* =================================================== WRAPPER ================================================== */
     @Override
-    public CourseReadDTO wrapDTO(Course course, Collection<DtoOption> options) throws Exception {
+    public CourseReadDTO wrapDTO(
+            Course course, 
+            Collection<DtoOption> options) throws Exception {
+        if (course == null) {
+            return null;
+        }
+
         CourseReadDTO dto = mapper.map(course, CourseReadDTO.class);
 
         /* Add Dependency */
         if (options != null && !options.isEmpty()) {
             if (options.contains(DtoOption.MATERIAL_LIST)) {
-                List<CourseMaterial> courseMaterialList = courseMaterialRepository.findAllByCourseIdAndStatusNot(dto.getId(),Status.DELETED);
-                Collection<Long> idCollection = new ArrayList<>(courseMaterialList.size());
-                for(CourseMaterial item : courseMaterialList){
-                    idCollection.add(item.getMaterialId());
-                }
-                List<Material> materialList = materialRepository.findAllByIdInAndStatusNot(idCollection,Status.DELETED);
+//                List<CourseMaterial> courseMaterialList =
+//                        courseMaterialRepository.findAllByCourseIdAndStatusNot(dto.getId(),DELETED);
+//
+//                List<Long> materialIdList = new ArrayList<>(courseMaterialList.size());
+//
+//                for(CourseMaterial courseMaterial : courseMaterialList){
+//                    materialIdList.add(courseMaterial.getMaterialId());
+//                }
+
+                List<MaterialReadDTO> materialList =
+                        materialService.getAllDTOByCourseId(course.getId(), options);
+//                        materialRepository.findAllByIdInAndStatusNot(materialIdList,DELETED);
+
                 dto.setMaterialList(materialList);
             }
 
@@ -445,13 +830,18 @@ public class CourseServiceImpl implements CourseService {
     }
     @Override
     public List<CourseReadDTO> wrapListDTO(
-            Collection<Course> courseCollection, Collection<DtoOption> options) throws Exception {
+            Collection<Course> courseCollection, 
+            Collection<DtoOption> options) throws Exception {
+        if (ObjectUtils.isEmpty(courseCollection)) {
+            return null;
+        }
+
         List<CourseReadDTO> dtoList = new ArrayList<>();
 
         CourseReadDTO dto;
 
 //        Map<Long, List<ClazzReadDTO>> courseIdClazzDTOListMap = new HashMap<>();
-//        Map<Long, List<MaterialReadDTO>> courseIdMaterialDTOListMap = new HashMap<>();
+        Map<Long, List<MaterialReadDTO>> courseIdMaterialDTOListMap = new HashMap<>();
         Map<Long, List<TestReadDTO>> courseIdTestDTOListMap = new HashMap<>();
         Map<Long, PriceLogReadDTO> courseIdLatestPriceLogMap = new HashMap<>();
 
@@ -463,7 +853,8 @@ public class CourseServiceImpl implements CourseService {
             }
 
             if (options.contains(DtoOption.MATERIAL_LIST)) {
-//                dto.setMaterialList();
+                courseIdMaterialDTOListMap =
+                        materialService.mapCourseIdListDTOByCourseIdIn(courseIdSet, options);
             }
 
             if (options.contains(DtoOption.TEST_LIST)) {
@@ -477,13 +868,13 @@ public class CourseServiceImpl implements CourseService {
             }
         }
 
-
         for (Course course : courseCollection) {
             dto = mapper.map(course, CourseReadDTO.class);
 
             /* Add Dependency */
 //            dto.setClazzList();
-//            dto.setMaterialList();
+            dto.setMaterialList(courseIdMaterialDTOListMap.get(course.getId()));
+
             dto.setTestList(courseIdTestDTOListMap.get(course.getId()));
 
             dto.setCurrentPrice(courseIdLatestPriceLogMap.get(course.getId()));
@@ -495,7 +886,8 @@ public class CourseServiceImpl implements CourseService {
     }
     @Override
     public Page<CourseReadDTO> wrapPageDTO(
-            Page<Course> coursePage, Collection<DtoOption> options) throws Exception {
+            Page<Course> coursePage, 
+            Collection<DtoOption> options) throws Exception {
         return new PageImpl<>(
                 wrapListDTO(coursePage.getContent(), options),
                 coursePage.getPageable(),

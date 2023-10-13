@@ -1,6 +1,8 @@
 package com.teachsync.dtos.course;
 
 import com.teachsync.dtos.BaseReadDTO;
+import com.teachsync.dtos.clazz.ClazzReadDTO;
+import com.teachsync.dtos.material.MaterialReadDTO;
 import com.teachsync.dtos.priceLog.PriceLogReadDTO;
 import com.teachsync.dtos.test.TestReadDTO;
 import com.teachsync.entities.Clazz;
@@ -31,9 +33,9 @@ public class CourseReadDTO extends BaseReadDTO {
 
     private Double minAttendant;
 
-    private List<Clazz> clazzList;
+    private List<ClazzReadDTO> clazzList;
 
-    private List<Material> materialList;
+    private List<MaterialReadDTO> materialList;
     private List<TestReadDTO> testList;
 
     private List<PriceLogReadDTO> priceLog;

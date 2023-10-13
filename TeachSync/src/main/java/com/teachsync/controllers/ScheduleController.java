@@ -21,6 +21,7 @@ import com.teachsync.services.session.SessionService;
 import com.teachsync.utils.Constants;
 import com.teachsync.utils.MiscUtil;
 import com.teachsync.utils.enums.Slot;
+import com.teachsync.utils.enums.Status;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -91,14 +92,17 @@ public class ScheduleController {
         try {
             /* Clazz */
             ClazzReadDTO clazzReadDTO =
-                    clazzService.getDTOById(clazzId,
+                    clazzService.getDTOById(
+                            clazzId,
+                            List.of(Status.DELETED),
+                            false,
                             List.of(CLAZZ_SCHEDULE, COURSE_SEMESTER, COURSE, SEMESTER, CENTER, SCHEDULE_CAT));
             model.addAttribute("clazz", clazzReadDTO);
 
             /* Semester (max, min for startDate & endDate) */
-            model.addAttribute("semester", clazzReadDTO.getCourseSemester().getSemester());
+//            model.addAttribute("semester", clazzReadDTO.getCourseSemester().getSemester());
 
-            CenterReadDTO centerReadDTO = clazzReadDTO.getCourseSemester().getCenter();
+            CenterReadDTO centerReadDTO = clazzReadDTO.getCenter();
 
             /* Room List */
             List<RoomReadDTO> roomReadDTOList = roomService.getAllDTOByCenterId(centerReadDTO.getId(), null);
@@ -189,7 +193,10 @@ public class ScheduleController {
                 }
 
                 Pageable paging = miscUtil.makePaging(pageNo, 10, "id", true);
-                dtoPage = clazzService.getPageDTOAll(paging, List.of(CLAZZ_SCHEDULE, ROOM_NAME, SCHEDULE_CAT));
+                dtoPage = clazzService.getPageAllDTO(paging,
+                        List.of(Status.DELETED),
+                        false,
+                        List.of(CLAZZ_SCHEDULE, ROOM_NAME, SCHEDULE_CAT));
 
                 if (dtoPage != null) {
                     model.addAttribute("localDateNow", LocalDate.now());
@@ -226,17 +233,21 @@ public class ScheduleController {
         try {
             /* Clazz */
             ClazzReadDTO clazzReadDTO =
-                    clazzService.getDTOById(clazzId, List.of(CLAZZ_SCHEDULE, COURSE_SEMESTER, SEMESTER, CENTER, SCHEDULE_CAT));
+                    clazzService.getDTOById(
+                            clazzId,
+                            List.of(Status.DELETED),
+                            false,
+                            List.of(CLAZZ_SCHEDULE, COURSE_SEMESTER, SEMESTER, CENTER, SCHEDULE_CAT));
             model.addAttribute("clazz", clazzReadDTO);
 
             /* Semester (max, min for startDtae & endDate) */
-            model.addAttribute("semester", clazzReadDTO.getCourseSemester().getSemester());
+//            model.addAttribute("semester", clazzReadDTO.getCourseSemester().getSemester());
 
             /* ClazzSchedule */
             model.addAttribute("schedule", clazzReadDTO.getClazzSchedule());
 
 
-            CenterReadDTO centerReadDTO = clazzReadDTO.getCourseSemester().getCenter();
+            CenterReadDTO centerReadDTO = clazzReadDTO.getCenter();
 
             /* Room List */
             List<RoomReadDTO> roomReadDTOList = roomService.getAllDTOByCenterId(centerReadDTO.getId(), null);

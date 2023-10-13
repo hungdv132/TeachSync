@@ -1,9 +1,11 @@
 package com.teachsync.dtos.clazz;
 
 import com.teachsync.dtos.BaseReadDTO;
+import com.teachsync.dtos.center.CenterReadDTO;
 import com.teachsync.dtos.clazzMember.ClazzMemberReadDTO;
 import com.teachsync.dtos.clazzSchedule.ClazzScheduleReadDTO;
 import com.teachsync.dtos.clazzTest.ClazzTestReadDTO;
+import com.teachsync.dtos.course.CourseReadDTO;
 import com.teachsync.dtos.courseSemester.CourseSemesterReadDTO;
 import com.teachsync.dtos.homework.HomeworkReadDTO;
 import com.teachsync.dtos.session.SessionReadDTO;
@@ -24,19 +26,32 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ClazzReadDTO extends BaseReadDTO {
-    private Long courseSemesterId;
-    private CourseSemesterReadDTO courseSemester;
+//    private Long courseSemesterId;
+//    private CourseSemesterReadDTO courseSemester;
+
+    private Long courseId;
+    private String courseAlias;
+    private String courseName;
+    private CourseReadDTO course;
+
+    private Long centerId;
+    private String centerName;
+    private CenterReadDTO center;
 
     private Long staffId;
     private StaffReadDTO staff;
+
+    private String clazzAlias;
 
     private String clazzName;
 
     private String clazzDesc;
 
-    private String statusClazz;
+//    private String statusClazz;
 
-    private Integer clazzSize;
+    private Integer minCapacity;
+
+    private Integer maxCapacity;
 
     private ClazzScheduleReadDTO clazzSchedule;
 

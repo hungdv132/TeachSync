@@ -46,7 +46,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.teachsync.utils.enums.DtoOption.*;
-import static com.teachsync.utils.enums.Status.DEPLOY_CLAZZ;
+import static com.teachsync.utils.enums.Status.*;
 
 @Controller
 public class ClazzController {
@@ -92,20 +92,26 @@ public class ClazzController {
     @ResponseBody
     public Map<String, Object> getClazzList(
             @RequestParam Long courseId,
-            @RequestParam Long semesterId,
+//            @RequestParam Long semesterId,
             @RequestParam Long centerId) {
         Map<String, Object> response = new HashMap<>();
         try {
-            CourseSemester courseSemester =
-                    courseSemesterService.getByCourseIdAndSemesterIdAndCenterId(courseId, semesterId, centerId);
+//            CourseSemester courseSemester =
+//                    courseSemesterService.getByCourseIdAndSemesterIdAndCenterId(courseId, semesterId, centerId);
 
-            if (courseSemester == null) {
-                response.put("clazzList", null);
-                return response;
-            }
+//            if (courseSemester == null) {
+//                response.put("clazzList", null);
+//                return response;
+//            }
 
             List<ClazzReadDTO> clazzDTOList =
-                    clazzService.getAllDTOByCourseSemesterId(courseSemester.getId(), null);
+                    clazzService.getAllDTOByCourseIdAndCenterId(
+                            courseId, 
+                            centerId, 
+                            List.of(OPENED),
+                            true,
+                            null);
+
             response.put("clazzList", clazzDTOList);
         } catch (Exception e) {
             e.printStackTrace();
@@ -121,7 +127,12 @@ public class ClazzController {
         Map<String, Object> response = new HashMap<>();
         try {
             ClazzReadDTO clazzDTO =
-                    clazzService.getDTOById(clazzId, List.of(MEMBER_LIST, STAFF, USER, CLAZZ_SCHEDULE, SCHEDULE_CAT, ROOM_NAME, TEST_LIST));
+                    clazzService.getDTOById(
+                            clazzId,
+                            List.of(DELETED),
+                            false,
+                            List.of(MEMBER_LIST, STAFF, USER,
+                                    CLAZZ_SCHEDULE, SCHEDULE_CAT, ROOM_NAME));
 
             response.put("clazz", clazzDTO);
         } catch (Exception e) {
@@ -168,31 +179,45 @@ public class ClazzController {
                 pageNo = 0;
             }
 
-            Pageable pageable = miscUtil.makePaging(pageNo, 10, "id", true);
+            Pageable pageable = miscUtil.makePaging(pageNo, 10, "status", true);
 
             Long roleId = userDTO.getRoleId();
             if (roleId.equals(Constants.ROLE_STUDENT)) {
                 List<ClazzMember> clazzMemberList = clazzMemberService.getAllByUserId(userDTO.getId());
-                Set<Long> clazzIdSet = clazzMemberList.stream().map(ClazzMember::getClazzId).collect(Collectors.toSet());
+                Set<Long> clazzIdSet =
+                        clazzMemberList.stream()
+                                .map(ClazzMember::getClazzId)
+                                .collect(Collectors.toSet());
 
                 /* TODO: lọc clazz nào học xong rồi ẩn hay hiện hay sort */
 
-                dtoPage = clazzService.getPageDTOAllByIdIn(
-                        pageable, clazzIdSet,
+                dtoPage = clazzService.getPageAllDTOByIdIn(
+                        pageable,
+                        clazzIdSet,
+                        List.of(OPENED, ONGOING, SUSPENDED, CLOSED),
+                        true,
                         List.of(COURSE_SEMESTER, SEMESTER, COURSE_NAME, COURSE_ALIAS, CENTER));
+
             } else if (roleId.equals(Constants.ROLE_TEACHER)) {
                 List<Staff> staffList = staffService.getAllByUserId(userDTO.getId());
                 Set<Long> staffIdSet = staffList.stream().map(BaseEntity::getId).collect(Collectors.toSet());
 
                 /* TODO: lọc clazz nào dạy xong rồi ẩn hay hiện hay sort */
 
-                dtoPage = clazzService.getPageDTOAllByStaffIdIn(
-                        pageable, staffIdSet,
-                        List.of(COURSE_SEMESTER, SEMESTER, COURSE_NAME, COURSE_ALIAS, CENTER));
-            } else if (roleId.equals(Constants.ROLE_ADMIN)) {
-                dtoPage = clazzService.getPageDTOAll(
+                dtoPage = clazzService.getPageAllDTOByStaffIdIn(
                         pageable,
+                        staffIdSet,
+                        List.of(OPENED, ONGOING, SUSPENDED, CLOSED),
+                        true,
                         List.of(COURSE_SEMESTER, SEMESTER, COURSE_NAME, COURSE_ALIAS, CENTER));
+
+            } else if (roleId.equals(Constants.ROLE_ADMIN)) {
+                dtoPage = clazzService.getPageAllDTO(
+                        pageable,
+                        List.of(DELETED),
+                        false,
+                        List.of(COURSE_SEMESTER, SEMESTER, COURSE_NAME, COURSE_ALIAS, CENTER));
+
             }
 
             if (dtoPage != null) {
@@ -205,12 +230,13 @@ public class ClazzController {
         }
 
         //map option status
-        Map<String, String> statusLabelMap = new HashMap<>();
-        statusLabelMap.put("CREATED_CLAZZ", "Đang khởi tạo");
-        statusLabelMap.put("DEPLOY_CLAZZ", "Đang triển khai");
-        statusLabelMap.put("NOT_ENOUGH_CLAZZ", "Không đủ xếp lớp");
-        statusLabelMap.put("FINISH_CLAZZ", "Đã hoàn thành");
-        model.addAttribute("statusLabelMap", statusLabelMap);
+//        Map<String, String> statusLabelMap = new HashMap<>();
+//        statusLabelMap.put("CREATED_CLAZZ", "Đang khởi tạo");
+//        statusLabelMap.put("DEPLOY_CLAZZ", "Đang triển khai");
+//        statusLabelMap.put("NOT_ENOUGH_CLAZZ", "Không đủ xếp lớp");
+//        statusLabelMap.put("FINISH_CLAZZ", "Đã hoàn thành");
+//        model.addAttribute("statusLabelMap", statusLabelMap);
+
         model.addAttribute("mess", mess);
         return "clazz/list-clazz";
     }
@@ -223,14 +249,23 @@ public class ClazzController {
             ClazzReadDTO clazzDTO =
                     clazzService.getDTOById(
                             clazzId,
-                            List.of(STAFF, USER, COURSE_SEMESTER, SEMESTER, COURSE_NAME, COURSE_ALIAS, CENTER, TEST_LIST));
+                            List.of(DELETED),
+                            false,
+                            List.of(STAFF, USER, COURSE_SEMESTER, SEMESTER,
+                                    COURSE_NAME, COURSE_ALIAS, CENTER, TEST_LIST));
             //get news of class
             List<NewsReadDTO> newsReadDTOList = newsService.getAllNewsByClazz(clazzDTO.getId());
             //get homework of class
             //get score of class
             List<HomeworkReadDTO> homeworkReadDTOList = homeworkService.getAllByClazzId(clazzDTO.getId());
+
             //get course
-            CourseReadDTO courseReadDTO = courseService.getDTOById(clazzDTO.getCourseSemester().getCourseId(), List.of(MATERIAL_LIST));
+            CourseReadDTO courseReadDTO = courseService.getDTOById(
+                    clazzDTO.getCourseId(),
+                    List.of(DELETED),
+                    false,
+                    List.of(MATERIAL_LIST));
+
             for (ClazzTestReadDTO clT : clazzDTO.getTestList()) {
                 Test test = testRepository.findById(clT.getTestId()).orElse(null);
                 TestReadDTO testReadDTO = new TestReadDTO();
@@ -245,10 +280,18 @@ public class ClazzController {
                 }
             }
 
-            List<Test> lstTestTeacher = testRepository.findAllByCourseIdAndStatusNot(clazzDTO.getCourseSemester().getCourseId(), Status.DELETED);
+            List<Test> lstTestTeacher =
+                    testRepository.findAllByCourseIdAndStatusNot(clazzDTO.getCourseId(), Status.DELETED);
 
             for (Test t : lstTestTeacher) {
-                ClazzTest clazzTest = clazzTestRepository.findByClazzIdAndTestIdAndStatusNot(clazzId, t.getId(), Status.DELETED).orElse(null);
+                ClazzTest clazzTest =
+                        clazzTestRepository
+                                .findByClazzIdAndTestIdAndStatusNot(
+                                        clazzId,
+                                        t.getId(),
+                                        Status.DELETED)
+                                .orElse(null);
+
                 if (clazzTest == null) {
                     t.setStatusTeacherTest(0);
                 } else if (clazzTest != null && clazzTest.getOpenTo() == null) {
@@ -268,12 +311,12 @@ public class ClazzController {
         }
 
         //map option status
-        Map<String, String> statusLabelMap = new HashMap<>();
-        statusLabelMap.put("CREATED_CLAZZ", "Đang khởi tạo");
-        statusLabelMap.put("DEPLOY_CLAZZ", "Đang triển khai");
-        statusLabelMap.put("NOT_ENOUGH_CLAZZ", "Không đủ xếp lớp");
-        statusLabelMap.put("FINISH_CLAZZ", "Đã hoàn thành");
-        model.addAttribute("statusLabelMap", statusLabelMap);
+//        Map<String, String> statusLabelMap = new HashMap<>();
+//        statusLabelMap.put("CREATED_CLAZZ", "Đang khởi tạo");
+//        statusLabelMap.put("DEPLOY_CLAZZ", "Đang triển khai");
+//        statusLabelMap.put("NOT_ENOUGH_CLAZZ", "Không đủ xếp lớp");
+//        statusLabelMap.put("FINISH_CLAZZ", "Đã hoàn thành");
+//        model.addAttribute("statusLabelMap", statusLabelMap);
 
 
         return "clazz/clazz-detail";
@@ -293,27 +336,35 @@ public class ClazzController {
             ClazzReadDTO clazzReadDTO = null;
             if (Objects.nonNull(clazzId)) {
                 clazzReadDTO =
-                        clazzService.getDTOById(clazzId,
+                        clazzService.getDTOById(
+                                clazzId,
+                                List.of(DELETED),
+                                false,
                                 List.of(COURSE_SEMESTER, STAFF, USER));
 
                 model.addAttribute("clazz", clazzReadDTO);
             }
 
             /* List Course (môn nào) */
-            List<CourseReadDTO> courseDTOList = courseService.getAllDTO(null);
+            List<CourseReadDTO> courseDTOList =
+                    courseService.getAllDTO(
+                            List.of(OPENED),
+                            true,
+                            null);
+
             model.addAttribute("courseList", courseDTOList);
 
             /* List Semester (kỳ nào) */
-            List<SemesterReadDTO> semesterDTOList;
-            if (option.equals("add")) {
-                /* Các kỳ học nào ngày bắt đàu cách 10 ngày từ hiện tại (Để học sinh còn có thời gian đăng ký) */
-                semesterDTOList =
-                        semesterService.getAllDTOByStartDateAfter(LocalDate.now().plusDays(10), null);
-            } else {
-                semesterDTOList =
-                        semesterService.getAllDTO(null);
-            }
-            model.addAttribute("semesterList", semesterDTOList);
+//            List<SemesterReadDTO> semesterDTOList;
+//            if (option.equals("add")) {
+//                /* Các kỳ học nào ngày bắt đàu cách 10 ngày từ hiện tại (Để học sinh còn có thời gian đăng ký) */
+//                semesterDTOList =
+//                        semesterService.getAllDTOByStartDateAfter(LocalDate.now().plusDays(10), null);
+//            } else {
+//                semesterDTOList =
+//                        semesterService.getAllDTO(null);
+//            }
+//            model.addAttribute("semesterList", semesterDTOList);
 
             /* List Center (Cơ sở nào) */
             List<CenterReadDTO> centerDTOList = centerService.getAllDTO(null);
@@ -327,7 +378,7 @@ public class ClazzController {
                         staffService.getAllDTOByCenterId(centerDTOList.get(0).getId(), List.of(USER));
             } else {
                 staffDTOList =
-                        staffService.getAllDTOByCenterId(clazzReadDTO.getCourseSemester().getCenterId(), List.of(USER));
+                        staffService.getAllDTOByCenterId(clazzReadDTO.getCenterId(), List.of(USER));
             }
             model.addAttribute("staffList", staffDTOList);
 
@@ -440,11 +491,14 @@ public class ClazzController {
 
         if (Objects.nonNull(Id)) {
             ClazzReadDTO clazzReadDTO =
-                    clazzService.getDTOById(Id,
+                    clazzService.getDTOById(
+                            Id,
+                            List.of(DELETED),
+                            false,
                             List.of(COURSE_SEMESTER, STAFF, USER));
 
             model.addAttribute("clazz", clazzReadDTO);
-            if (!ObjectUtils.isEmpty(clazzReadDTO.getStatusClazz()) && clazzReadDTO.getStatusClazz().equals(DEPLOY_CLAZZ.getStringValue())) {
+            if (clazzReadDTO.getStatus().equals(OPENED)) {
                 redirect.addAttribute("mess", "Lớp học đang triển khai không thể thao tác");
                 return "redirect:/clazz";
             }
@@ -452,8 +506,7 @@ public class ClazzController {
         }
 
 
-        String result = clazzService.deleteClazz(Id);
-        if (result.equals("success")) {
+        if (clazzService.deleteClazz(Id)) {
             redirect.addAttribute("mess", "Xóa class room thành công");
             return "redirect:/clazz";
         } else {

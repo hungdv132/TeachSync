@@ -52,7 +52,7 @@
             <p>Trạng thái: ${statusLabelMap[clazz.statusClazz]}</p>
         </c:if>
 
-        <p>Dung lượng học sinh: ${clazz.clazzSize}</p>
+        <p>Dung lượng học sinh: ${clazz.maxCapacity}</p>
     </div>
 
     <!-- Dependency -->

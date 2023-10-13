@@ -20,7 +20,7 @@ public interface PriceLogService {
 
     /* =================================================== READ ===================================================== */
     Page<PriceLog> getPageAll(Pageable paging) throws Exception;
-    Page<PriceLogReadDTO> getPageDTOAll(Pageable paging) throws Exception;
+    Page<PriceLogReadDTO> getPageAllDTO(Pageable paging) throws Exception;
 
     Page<PriceLog> getPageAllLatestPromotion(Pageable paging) throws Exception;
     Page<PriceLogReadDTO> getPageAllLatestPromotionDTO(Pageable paging) throws Exception;
@@ -44,14 +44,15 @@ public interface PriceLogService {
     List<PriceLogReadDTO> getAllDTOByCourseId(Long courseId) throws Exception;
 
 
-
     /* =================================================== UPDATE =================================================== */
     PriceLog updatePriceLog(PriceLog price) throws Exception;
     PriceLogReadDTO updatePriceLogByDTO(PriceLogUpdateDTO updateDTO) throws Exception;
 
 
     /* =================================================== DELETE =================================================== */
+    Boolean deletePriceLog(Long id) throws Exception;
 
+    Boolean deleteAllByCourseId(Long courseId) throws Exception;
 
 
     /* =================================================== WRAPPER ================================================== */

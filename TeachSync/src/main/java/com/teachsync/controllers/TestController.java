@@ -14,7 +14,6 @@ import com.teachsync.dtos.user.UserReadDTO;
 import com.teachsync.entities.*;
 import com.teachsync.repositories.*;
 import com.teachsync.services.answer.AnswerService;
-import com.teachsync.services.clazz.ClazzService;
 import com.teachsync.services.clazzMember.ClazzMemberService;
 import com.teachsync.services.clazzTest.ClazzTestService;
 import com.teachsync.services.course.CourseService;
@@ -35,8 +34,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import javax.security.auth.Subject;
-import java.nio.file.AccessDeniedException;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Function;
@@ -95,7 +92,7 @@ public class TestController {
         if (user == null || !user.getRoleId().equals(Constants.ROLE_ADMIN)) {
             return "redirect:/";
         }
-        List<Course> lst = courseRepository.findAllByStatusNot(Status.DELETED);
+        List<Course> lst = courseRepository.findAllByStatusNotIn(List.of(Status.DELETED));
         model.addAttribute("lstCourse", lst);
         return "test/create-test";
     }
@@ -116,7 +113,11 @@ public class TestController {
         }
 
         try {
-            CourseReadDTO courseDTO = courseService.getDTOById(courseId, List.of(TEST_LIST));
+            CourseReadDTO courseDTO = courseService.getDTOById(
+                    courseId,
+                    List.of(Status.DELETED),
+                    false,
+                    List.of(TEST_LIST));
 
             TestCreateDTO createDTO = new TestCreateDTO();
 
@@ -225,7 +226,8 @@ public class TestController {
                 hm.put(qs, answerRepository.findAllByQuestionId(qs.getId()));
                 System.out.println(qs.getQuestionDesc());
             }
-            List<Course> lst = courseRepository.findAllByStatusNot(Status.DELETED);
+            List<Course> lst = courseRepository.findAllByStatusNotIn(
+                    List.of(Status.DELETED));
             model.addAttribute("lstCourse", lst);
             model.addAttribute("testType", test.getTestType().getStringValue());
             model.addAttribute("questionType", test.getTestDesc());
@@ -297,7 +299,8 @@ public class TestController {
                 hm.put(qs, answerRepository.findAllByQuestionId(qs.getId()));
                 System.out.println(qs.getQuestionDesc());
             }
-            List<Course> lst = courseRepository.findAllByStatusNot(Status.DELETED);
+            List<Course> lst = courseRepository.findAllByStatusNotIn(
+                    List.of(Status.DELETED));
             model.addAttribute("lstCourse", lst);
             model.addAttribute("testType", test.getTestType().getStringValue());
             model.addAttribute("questionType", test.getTestDesc());
@@ -549,13 +552,14 @@ public class TestController {
         Page<MemberTestRecord> tests;
         List<Long> lstId = new ArrayList<>();
         if (searchType.equals("class")) {
-            List<Clazz> clazz = clazzRepository.findAllByClazzNameContaining(name);
+            List<Clazz> clazz = clazzRepository.findAllByClazzNameContainsAndStatusNotIn(name, List.of(Status.DELETED));
             List<Long> lstIdClazz = clazz.stream().map(Clazz::getId).collect(Collectors.toList());
             List<ClazzTest> clazzTests = clazzTestRepository.findAllByClazzIdIn(lstIdClazz);
             List<Long> lstIdClazzTest = clazzTests.stream().map(ClazzTest::getId).collect(Collectors.toList());
             mTRDTO = memberTestRecordService.getPageByClassDTO(pageable, List.of(MEMBER, USER, CLAZZ, COURSE_SEMESTER, COURSE_NAME), lstIdClazzTest);
         } else if (searchType.equals("subject")) {
-            List<Course> courses = courseRepository.findAllByCourseNameContainsAndStatusNot(name, Status.DELETED);
+            List<Course> courses = courseRepository.findAllByCourseNameContainsAndStatusNotIn(name,
+                    List.of(Status.DELETED));
             List<Long> lstIdCourse = courses.stream().map(Course::getId).collect(Collectors.toList());
             List<Test> lstTests = testRepository.findAllByCourseIdInAndStatusNot(lstIdCourse, Status.DELETED);
             List<Long> lstTestId = lstTests.stream().map(Test::getId).collect(Collectors.toList());

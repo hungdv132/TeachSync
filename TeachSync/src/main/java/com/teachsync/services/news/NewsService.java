@@ -11,7 +11,7 @@ import java.util.List;
 public interface NewsService {
     /* =================================================== READ ===================================================== */
     Page<News> getPageAll(Pageable paging) throws Exception;
-    Page<NewsReadDTO> getPageDTOAll(Pageable paging) throws Exception;
+    Page<NewsReadDTO> getPageAllDTO(Pageable paging) throws Exception;
 
     News getById(Long id) throws Exception;
     NewsReadDTO getDTOById(Long id) throws Exception;

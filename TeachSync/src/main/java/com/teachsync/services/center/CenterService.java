@@ -23,9 +23,11 @@ public interface CenterService {
     Map<Long, CenterReadDTO> mapIdDTO(Collection<DtoOption> options) throws Exception;
 
     /* id */
+    Boolean existsById(Long id) throws Exception;
     Center getById(Long id) throws Exception;
     CenterReadDTO getDTOById(Long id, Collection<DtoOption> options) throws Exception;
 
+    Boolean existsAllByIdIn(Collection<Long> idCollection) throws Exception;
     List<Center> getAllByIdIn(Collection<Long> idCollection) throws Exception;
     Map<Long, String> mapIdCenterNameByIdIn(
             Collection<Long> idCollection) throws Exception;

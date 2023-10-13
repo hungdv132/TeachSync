@@ -267,7 +267,7 @@ public class StaffServiceImpl implements StaffService {
             }
 
             if (options.contains(DtoOption.CENTER)) {
-                /* TODO: */
+                centerIdCenterDTOMap = centerService.mapIdDTOByIdIn(centerIdSet, options);
             }
 
             if (options.contains(DtoOption.USER)) {

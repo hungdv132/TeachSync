@@ -482,7 +482,7 @@
         $("#txtClazzRoom").removeClass("visually-hidden").append("${clazzList.get(0).clazzSchedule.roomName}");
         $("#txtClazzTeacher").removeClass("visually-hidden").append("${clazzList.get(0).staff.user.fullName}");
         let memberCount = ${empty clazzList.get(0).memberList ? 0 : clazzList.get(0).memberList.size()};
-        $("#txtClazzMember").removeClass("visually-hidden").append(memberCount + " / ${clazzList.get(0).clazzSize}");
+        $("#txtClazzMember").removeClass("visually-hidden").append(memberCount + " / ${clazzList.get(0).maxCapacity}");
     
         $("#submitSection").empty()
             .append('<button type="submit" class="btn btn-primary w-50">Gửi đơn</button>');

@@ -17,6 +17,7 @@ import com.teachsync.utils.enums.DtoOption;
 import com.teachsync.utils.enums.Status;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Service;
@@ -31,6 +32,7 @@ public class SessionServiceImpl implements SessionService {
     @Autowired
     private SessionRepository sessionRepository;
 
+    @Lazy
     @Autowired
     private ClazzScheduleService clazzScheduleService;
     @Autowired

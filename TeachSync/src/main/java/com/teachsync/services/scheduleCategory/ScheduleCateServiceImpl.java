@@ -48,7 +48,7 @@ public class ScheduleCateServiceImpl implements ScheduleCateService{
     }
 
     @Override
-    public Page<ScheduleCaReadDTO> getPageDTOAll(Pageable paging) throws Exception {
+    public Page<ScheduleCaReadDTO> getPageAllDTO(Pageable paging) throws Exception {
         Page<ScheduleCategory> scheduleCategoryPage = getPageAll(paging);
 
         if (scheduleCategoryPage == null) {
@@ -59,7 +59,7 @@ public class ScheduleCateServiceImpl implements ScheduleCateService{
     }
 
     @Override
-    public Page<ScheduleCaReadDTO> getPageDTOAll(Pageable paging, Collection<DtoOption> options) throws Exception {
+    public Page<ScheduleCaReadDTO> getPageAllDTO(Pageable paging, Collection<DtoOption> options) throws Exception {
         Page<ScheduleCategory> scheduleCategoryPage = getPageAll(paging);
 
         if (scheduleCategoryPage == null) {

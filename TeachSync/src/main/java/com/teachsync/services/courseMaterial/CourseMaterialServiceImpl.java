@@ -61,7 +61,9 @@ public class CourseMaterialServiceImpl implements CourseMaterialService {
                 .map(CourseMaterial::getCourseId)
                 .collect(Collectors.toSet());
 
-        return courseService.getAllDTOByIdIn(courseIdSet, null);
+        return courseService.getAllDTOByIdIn(courseIdSet,
+                List.of(Status.DELETED),
+                false, null);
     }
 
     @Override
@@ -88,7 +90,9 @@ public class CourseMaterialServiceImpl implements CourseMaterialService {
                 .map(CourseMaterial::getCourseId)
                 .collect(Collectors.toSet());
 
-        Map<Long, CourseReadDTO> courseIdCourseDTOMap = courseService.mapIdDTOByIdIn(courseIdSet, null);
+        Map<Long, CourseReadDTO> courseIdCourseDTOMap = courseService.mapIdDTOByIdIn(courseIdSet,
+                List.of(Status.DELETED),
+                false, null);
 
         Map<Long, List<CourseReadDTO>> materialIdCourseDTOListMap = new HashMap<>();
         Long materialId;

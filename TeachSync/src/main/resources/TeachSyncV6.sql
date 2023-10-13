@@ -719,26 +719,38 @@ DROP TABLE IF EXISTS `teachsync`.`clazz`;
 
 CREATE TABLE IF NOT EXISTS `teachsync`.`clazz`
 (
-    `id`               BIGINT      NOT NULL AUTO_INCREMENT,
-    `courseSemesterId` BIGINT      NOT NULL COMMENT 'Tức Môn gì, khi nào, ở đâu gói gọn làm 1',
-    `staffId`          BIGINT      NOT NULL COMMENT 'Ai dạy (Giáo viên chính thức) (staffRole cần = TEACHER)',
-    `clazzName`        VARCHAR(45) NOT NULL,
-    `clazzDesc`        LONGTEXT    NULL DEFAULT NULL,
-    `clazzSize`        INT         NOT NULL COMMENT 'Số học sinh tối đa',
-    `statusClazz`      varchar(45) DEFAULT NULL,
-    `status`           VARCHAR(45) NOT NULL,
-    `createdAt`        DATETIME    NULL DEFAULT NULL,
-    `createdBy`        BIGINT      NULL DEFAULT NULL,
-    `updatedAt`        DATETIME    NULL DEFAULT NULL,
-    `updatedBy`        BIGINT      NULL DEFAULT NULL,
+    `id`          BIGINT      NOT NULL AUTO_INCREMENT,
+#     `courseSemesterId` BIGINT     NOT NULL COMMENT 'Tức Môn gì, khi nào, ở đâu gói gọn làm 1',
+    `courseId`    BIGINT      NOT NULL COMMENT 'Tức Môn gì',
+    `centerId`    BIGINT      NOT NULL COMMENT 'Tức ở đâu',
+    `staffId`     BIGINT      NOT NULL COMMENT 'Ai dạy (Giáo viên chính thức) (staffRole cần = TEACHER)',
+    `clazzAlias`  VARCHAR(10) NOT NULL,
+    `clazzName`   VARCHAR(45) NOT NULL,
+    `clazzDesc`   LONGTEXT    NULL DEFAULT NULL,
+    `minCapacity` INT         NOT NULL COMMENT 'Số học sinh tối thiểu',
+    `maxCapacity` INT         NOT NULL COMMENT 'Số học sinh tối đa',
+#     `statusClazz` VARCHAR(45) NULL DEFAULT NULL,
+    `status`      VARCHAR(45) NOT NULL,
+    `createdAt`   DATETIME    NULL DEFAULT NULL,
+    `createdBy`   BIGINT      NULL DEFAULT NULL,
+    `updatedAt`   DATETIME    NULL DEFAULT NULL,
+    `updatedBy`   BIGINT      NULL DEFAULT NULL,
     PRIMARY KEY (`id`),
-    INDEX `fk_clazz_course_semester_idx` (`courseSemesterId` ASC) VISIBLE,
+#     INDEX `fk_clazz_course_semester_idx` (`courseSemesterId` ASC) VISIBLE,
+    INDEX `fk_clazz_course_idx` (`courseId` ASC) VISIBLE,
+    INDEX `fk_clazz_center_idx` (`centerId` ASC) VISIBLE,
     INDEX `fk_clazz_staff_idx` (`staffId` ASC) VISIBLE,
     INDEX `fk_clazz_user_createdBy_idx` (`createdBy` ASC) VISIBLE,
     INDEX `fk_clazz_user_updatedBy_idx` (`updatedBy` ASC) VISIBLE,
-    CONSTRAINT `fk_clazz_course_semester`
-        FOREIGN KEY (`courseSemesterId`)
-            REFERENCES `teachsync`.`course_semester` (`id`),
+#     CONSTRAINT `fk_clazz_course_semester`
+#         FOREIGN KEY (`courseSemesterId`)
+#             REFERENCES `teachsync`.`course_semester` (`id`),
+    CONSTRAINT `fk_clazz_course`
+        FOREIGN KEY (`courseId`)
+            REFERENCES `teachsync`.`course` (`id`),
+    CONSTRAINT `fk_clazz_center`
+        FOREIGN KEY (`centerId`)
+            REFERENCES `teachsync`.`center` (`id`),
     CONSTRAINT `fk_clazz_staff`
         FOREIGN KEY (`staffId`)
             REFERENCES `teachsync`.`staff` (`id`),

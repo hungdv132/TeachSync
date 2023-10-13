@@ -18,8 +18,8 @@ public interface ScheduleCateService {
     /* =================================================== READ ===================================================== */
     Page<ScheduleCategory> getPageAll(Pageable paging) throws Exception;
     @Deprecated
-    Page<ScheduleCaReadDTO> getPageDTOAll(Pageable paging) throws Exception;
-    Page<ScheduleCaReadDTO> getPageDTOAll(Pageable paging, Collection<DtoOption> options) throws Exception;
+    Page<ScheduleCaReadDTO> getPageAllDTO(Pageable paging) throws Exception;
+    Page<ScheduleCaReadDTO> getPageAllDTO(Pageable paging, Collection<DtoOption> options) throws Exception;
 
     List<ScheduleCategory> getAll() throws Exception;
 

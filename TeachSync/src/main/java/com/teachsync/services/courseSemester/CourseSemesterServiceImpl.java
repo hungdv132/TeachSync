@@ -350,15 +350,23 @@ public class CourseSemesterServiceImpl implements CourseSemesterService {
             Long semesterId = courseSemester.getSemesterId();
 
             if (options.contains(DtoOption.COURSE)) {
-                CourseReadDTO courseDTO = courseService.getDTOById(courseId, options);
+                CourseReadDTO courseDTO = courseService.getDTOById(
+                        courseId,
+                        List.of(Status.DELETED),
+                        false,
+                        options);
                 dto.setCourse(courseDTO);
             }
             if (options.contains(DtoOption.COURSE_NAME)) {
-                Course course = courseService.getById(courseId);
+                Course course = courseService.getById(courseId,
+                        List.of(Status.DELETED),
+                        false);
                 dto.setCourseName(course.getCourseName());
             }
             if (options.contains(DtoOption.COURSE_ALIAS)) {
-                Course course = courseService.getById(courseId);
+                Course course = courseService.getById(courseId,
+                        List.of(Status.DELETED),
+                        false);
                 dto.setCourseAlias(course.getCourseAlias());
             }
 
@@ -384,10 +392,10 @@ public class CourseSemesterServiceImpl implements CourseSemesterService {
                 dto.setSemesterAlias(semester.getSemesterAlias());
             }
 
-            if (options.contains(DtoOption.CLAZZ_LIST)) {
-                List<ClazzReadDTO> clazzList = clazzService.getAllDTOByCourseSemesterId(courseSemester.getId(), options);
-                dto.setClazzList(clazzList);
-            }
+//            if (options.contains(DtoOption.CLAZZ_LIST)) {
+//                List<ClazzReadDTO> clazzList = clazzService.getAllDTOByCourseSemesterId(courseSemester.getId(), options);
+//                dto.setClazzList(clazzList);
+//            }
         }
 
         return dto;
@@ -426,13 +434,19 @@ public class CourseSemesterServiceImpl implements CourseSemesterService {
             }
 
             if (options.contains(DtoOption.COURSE)) {
-                courseIdCourseDTOMap = courseService.mapIdDTOByIdIn(courseIdSet, options);
+                courseIdCourseDTOMap = courseService.mapIdDTOByIdIn(courseIdSet,
+                        List.of(Status.DELETED),
+                        false, options);
             }
             if (options.contains(DtoOption.COURSE_NAME)) {
-                courseIdCourseNameMap = courseService.mapCourseIdCourseNameByIdIn(courseIdSet);
+                courseIdCourseNameMap = courseService.mapCourseIdCourseNameByIdIn(courseIdSet,
+                        List.of(Status.DELETED),
+                        false);
             }
             if (options.contains(DtoOption.COURSE_ALIAS)) {
-                courseIdCourseAliasMap = courseService.mapCourseIdCourseAliasByIdIn(courseIdSet);
+                courseIdCourseAliasMap = courseService.mapCourseIdCourseAliasByIdIn(courseIdSet,
+                        List.of(Status.DELETED),
+                        false);
             }
 
             if (options.contains(DtoOption.CENTER)) {
@@ -452,10 +466,10 @@ public class CourseSemesterServiceImpl implements CourseSemesterService {
                 semesterIdSemesterAliasMap = semesterService.mapIdSemesterAliasByIdIn(SemesterIdSet);
             }
 
-            if (options.contains(DtoOption.CLAZZ_LIST)) {
-                courseSemesterIdClazzDTOListMap =
-                        clazzService.mapCourseSemesterIdListDTOByCourseSemesterIdIn(courseSemesterIdSet, options);
-            }
+//            if (options.contains(DtoOption.CLAZZ_LIST)) {
+//                courseSemesterIdClazzDTOListMap =
+//                        clazzService.mapCourseSemesterIdListDTOByCourseSemesterIdIn(courseSemesterIdSet, options);
+//            }
         }
 
         for (CourseSemester courseSemester : courseSemesterCollection) {

@@ -14,6 +14,7 @@ import com.teachsync.services.semester.SemesterService;
 import com.teachsync.utils.Constants;
 import com.teachsync.utils.MiscUtil;
 import com.teachsync.utils.enums.RequestType;
+import com.teachsync.utils.enums.Status;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -66,7 +67,11 @@ public class EnrollController {
         }
 
         try {
-            CourseReadDTO courseDTO =  courseService.getDTOById(courseId, null);
+            CourseReadDTO courseDTO =  courseService.getDTOById(
+                    courseId,
+                    List.of(Status.DELETED),
+                    false,
+                    null);
 
             Map<Long, CenterReadDTO> centerIdCenterDTOMap =
                     centerService.mapIdDTO(List.of(ADDRESS));
@@ -76,26 +81,24 @@ public class EnrollController {
                     semesterService.mapIdDTOByStartDateAfter(LocalDate.now(), null);
             model.addAttribute("semesterIdSemesterDTOMap", semesterDTOPage);
 
-            Map<Long, String> courseSemesterIdSemesterIdCenterIdStringMap =
-                    courseSemesterService.mapIdSemesterIdCenterIdStringByCourseIdAndSemesterIdIn(
-                            courseId, semesterDTOPage.keySet());
-
-            Map<Long, List<ClazzReadDTO>> courseSemesterIdClazzDTOListMap =
-                    clazzService.mapCourseSemesterIdListDTOByCourseSemesterIdIn(
-                            courseSemesterIdSemesterIdCenterIdStringMap.keySet(),
-                            Arrays.asList(CLAZZ_SCHEDULE, SCHEDULE_CAT, MEMBER_LIST, ROOM_NAME));
-
-            Map<String, List<ClazzReadDTO>> semesterIdCenterIdStringClassDTOListMap = new HashMap<>();
-
-            for (Long courseSemesterId : courseSemesterIdSemesterIdCenterIdStringMap.keySet()) {
-                semesterIdCenterIdStringClassDTOListMap.put(
-                        courseSemesterIdSemesterIdCenterIdStringMap.get(courseSemesterId),
-                        courseSemesterIdClazzDTOListMap.get(courseSemesterId));
-            }
-
             model.addAttribute("course", courseDTO);
 
-            model.addAttribute("semesterIdCenterIdStringClazzListMap", semesterIdCenterIdStringClassDTOListMap);
+//            TODO: Map<Long, String> courseSemesterIdSemesterIdCenterIdStringMap =
+//                    courseSemesterService.mapIdSemesterIdCenterIdStringByCourseIdAndSemesterIdIn(
+//                            courseId, semesterDTOPage.keySet());
+//            Map<Long, List<ClazzReadDTO>> courseSemesterIdClazzDTOListMap =
+//                    clazzService.mapCourseSemesterIdListDTOByCourseSemesterIdIn(
+//                            courseSemesterIdSemesterIdCenterIdStringMap.keySet(),
+//                            Arrays.asList(CLAZZ_SCHEDULE, SCHEDULE_CAT, MEMBER_LIST, ROOM_NAME));
+//            Map<String, List<ClazzReadDTO>> semesterIdCenterIdStringClassDTOListMap = new HashMap<>();
+//            for (Long courseSemesterId : courseSemesterIdSemesterIdCenterIdStringMap.keySet()) {
+//                semesterIdCenterIdStringClassDTOListMap.put(
+//                        courseSemesterIdSemesterIdCenterIdStringMap.get(courseSemesterId),
+//                        courseSemesterIdClazzDTOListMap.get(courseSemesterId));
+//            }
+
+
+//            model.addAttribute("semesterIdCenterIdStringClazzListMap", semesterIdCenterIdStringClassDTOListMap);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -129,18 +132,20 @@ public class EnrollController {
             /* Clazz (Lớp được chọn) */
             ClazzReadDTO clazzDTO = clazzService.getDTOById(
                     clazzId,
+                    List.of(Status.DELETED),
+                    false,
                     List.of(MEMBER_LIST, STAFF, USER, CLAZZ_SCHEDULE, SCHEDULE_CAT, ROOM_NAME,
                             COURSE_SEMESTER, CENTER, ADDRESS, SEMESTER, COURSE, CURRENT_PRICE));
             model.addAttribute("clazzList", List.of(clazzDTO));
 
             /* Course (môn nào) */
-            model.addAttribute("courseList", List.of(clazzDTO.getCourseSemester().getCourse()));
+            model.addAttribute("courseList", List.of(clazzDTO.getCourse()));
 
             /* Semester (kỳ nào) */
-            model.addAttribute("semesterList", List.of(clazzDTO.getCourseSemester().getSemester()));
+//            model.addAttribute("semesterList", List.of(clazzDTO.getSemester()));
 
             /* Center (Cơ sở nào) */
-            model.addAttribute("centerList", List.of(clazzDTO.getCourseSemester().getCenter()));
+            model.addAttribute("centerList", List.of(clazzDTO.getCenter()));
 
             model.addAttribute("fromEnroll", true);
         } catch (Exception e) {

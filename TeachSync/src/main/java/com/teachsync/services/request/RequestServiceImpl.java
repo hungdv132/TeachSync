@@ -13,6 +13,7 @@ import com.teachsync.services.clazz.ClazzService;
 import com.teachsync.services.user.UserService;
 import com.teachsync.utils.MiscUtil;
 import com.teachsync.utils.enums.DtoOption;
+import com.teachsync.utils.enums.Status;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -369,7 +370,9 @@ public class RequestServiceImpl implements RequestService {
         /* Add dependency */
         if (options != null && !options.isEmpty()) {
             if (options.contains(CLAZZ)) {
-                ClazzReadDTO clazzDTO = clazzService.getDTOById(request.getClazzId(), options);
+                ClazzReadDTO clazzDTO = clazzService.getDTOById(request.getClazzId(),
+                        List.of(Status.DELETED),
+                        false,options);
                 dto.setClazz(clazzDTO);
             }
 
@@ -447,7 +450,9 @@ public class RequestServiceImpl implements RequestService {
                 }
             }
             if (options.contains(CLAZZ)) {
-                clazzIdClazzDTOMap = clazzService.mapIdDTOByIdIn(clazzIdSet, options);
+                clazzIdClazzDTOMap = clazzService.mapIdDTOByIdIn(clazzIdSet,
+                        List.of(Status.DELETED),
+                        false, options);
             }
 
             if (options.contains(REQUESTER)) {

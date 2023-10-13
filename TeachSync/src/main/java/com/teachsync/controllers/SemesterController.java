@@ -11,6 +11,7 @@ import com.teachsync.services.courseSemester.CourseSemesterService;
 import com.teachsync.services.semester.SemesterService;
 import com.teachsync.utils.Constants;
 import com.teachsync.utils.MiscUtil;
+import com.teachsync.utils.enums.Status;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -20,6 +21,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
@@ -57,7 +59,10 @@ public class SemesterController {
         }
         
         try {
-            Map<Long, CourseReadDTO> courseIdCourseDTOMap = courseService.mapIdDTO(null);
+            Map<Long, CourseReadDTO> courseIdCourseDTOMap = courseService.mapIdDTO(
+                    List.of(Status.DELETED),
+                    false,
+                    null);
             model.addAttribute("courseIdCourseDTOMap", courseIdCourseDTOMap);
 
             Map<Long, CenterReadDTO> centerIdCenterDTOMap = centerService.mapIdDTO(null);

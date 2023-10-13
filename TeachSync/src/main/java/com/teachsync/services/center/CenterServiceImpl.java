@@ -101,6 +101,11 @@ public class CenterServiceImpl implements CenterService {
 
     /* id */
     @Override
+    public Boolean existsById(Long id) throws Exception {
+        return centerRepository
+                .existsByIdAndStatusNot(id, Status.DELETED);
+    }
+    @Override
     public Center getById(Long id) throws Exception {
         return centerRepository
                 .findByIdAndStatusNot(id, Status.DELETED)
@@ -116,6 +121,11 @@ public class CenterServiceImpl implements CenterService {
         return wrapDTO(center, options);
     }
 
+    @Override
+    public Boolean existsAllByIdIn(Collection<Long> idCollection) throws Exception {
+        return centerRepository
+                .existsAllByIdInAndStatusNot(idCollection, Status.DELETED);
+    }
     @Override
     public List<Center> getAllByIdIn(Collection<Long> idCollection) throws Exception {
         List<Center> centerList =

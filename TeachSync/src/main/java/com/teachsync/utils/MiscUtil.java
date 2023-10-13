@@ -67,7 +67,7 @@ public class MiscUtil {
     public String validateString(
             String fieldName, String string, Integer minLength, Integer maxLength, Collection<String> validateOption) {
         String specialCharacterRegex = "[!@#$%^&*(),.?\":{}|<>]";
-        String errorMsg = "";
+        StringBuilder errorMsg = new StringBuilder(fieldName+": \n");
 
         if (string == null || string.isEmpty()) {
             /* required */
@@ -80,28 +80,28 @@ public class MiscUtil {
             /* null or minLength (if null ignore, if not check minlength) */
             if (validateOption.contains("nullOrMinLength")) {
                 if (string.length() < minLength) {
-                    errorMsg += fieldName + " tối thiểu "+minLength+" ký tự, hoặc để trống trường này.\n";
+                    errorMsg.append("\tTối thiểu ").append(minLength).append(" ký tự, hoặc để trống trường này.\n");
                 }
             }
 
             /* minLength */
             if (validateOption.contains("minLength")) {
                 if (string.length() < minLength) {
-                    errorMsg += fieldName + " tối thiểu "+minLength+" ký tự.\n";
+                    errorMsg.append("\tTối thiểu ").append(minLength).append(" ký tự.\n");
                 }
             }
 
             /* maxLength */
             if (validateOption.contains("maxLength")) {
                 if (string.length() > maxLength) {
-                    errorMsg += fieldName + " tối đa "+maxLength+" ký tự.\n";
+                    errorMsg.append("\tTối đa ").append(maxLength).append(" ký tự.\n");
                 }
             }
 
             /* only white space */
             if (validateOption.contains("onlyBlank")) {
                 if (string.isBlank()) {
-                    errorMsg += fieldName + " không được phép chỉ chứa khoảng trắng.\n";
+                    errorMsg.append("\tKhông được phép chỉ chứa khoảng trắng.\n");
                 }
             }
 
@@ -109,10 +109,10 @@ public class MiscUtil {
             if (validateOption.contains("startBlank")) {
                 if (string.isBlank()) {
                     if (!validateOption.contains("onlyBlank")) {
-                        errorMsg += fieldName + " không được phép chỉ chứa khoảng trắng.\n";
+                        errorMsg.append("\tKhông được phép chỉ chứa khoảng trắng.\n");
                     }
                 } else if (startWithWhiteSpace(string)) {
-                    errorMsg += fieldName + " không được phép bắt đầu với khoảng trắng.\n";
+                    errorMsg.append("\tKhông được phép bắt đầu với khoảng trắng.\n");
                 }
             }
 
@@ -120,10 +120,10 @@ public class MiscUtil {
             if (validateOption.contains("endBlank")) {
                 if (string.isBlank()) {
                     if (!validateOption.contains("onlyBlank")) {
-                        errorMsg += fieldName + " không được phép chỉ chứa khoảng trắng.\n";
+                        errorMsg.append("\tKhông được phép chỉ chứa khoảng trắng.\n");
                     }
                 } else if (endWithWhiteSpace(string)) {
-                    errorMsg += fieldName + " không được phép kết thúc với khoảng trắng.\n";
+                    errorMsg.append("\tKhông được phép kết thúc với khoảng trắng.\n");
                 }
 
             }
@@ -131,17 +131,21 @@ public class MiscUtil {
             /* special character */
             if (validateOption.contains("specialChar")) {
                 if (string.matches(specialCharacterRegex)) {
-                    errorMsg += fieldName + " không được phép chứa ký tự đặc biệt ( !@#$%^&*(),.?\":{}|<> ).\n";
+                    errorMsg.append("\tKhông được phép chứa ký tự đặc biệt ( !@#$%^&*(),.?\":{}|<> ).\n");
                 }
             }
         }
 
-        return errorMsg;
+        if (!errorMsg.toString().equals(fieldName+": \n")) {
+            return errorMsg.toString();
+        }
+
+        return "";
     }
 
-    public String  validateNumber(
+    public String validateNumber(
             String fieldName, Double number, Double min, Double max, Double step, Collection<String> validateOption) {
-        String errorMsg = "";
+        StringBuilder errorMsg = new StringBuilder(fieldName+": \n");
 
         if (number == null) {
             /* required */
@@ -155,32 +159,36 @@ public class MiscUtil {
             /* null or min (if null ignore, if not check minlength) */
             if (validateOption.contains("nullOrMin")) {
                 if (number < min) {
-                    errorMsg += fieldName + " cần lớn hơn "+min+" , hoặc để trống trường này.\n";
+                    errorMsg.append("\tCần lớn hơn ").append(min).append(" , hoặc để trống trường này.\n");
                 }
             }
 
             /* min */
             if (validateOption.contains("min")) {
                 if (number < min) {
-                    errorMsg += fieldName + " cần lớn hơn "+min+" .\n";
+                    errorMsg.append("\tCần lớn hơn ").append(min).append(" .\n");
                 }
             }
 
             /* max */
             if (validateOption.contains("max")) {
                 if (number > max) {
-                    errorMsg += fieldName + " cần nhỏ hơn "+max+" .\n";
+                    errorMsg.append("\tCần nhỏ hơn ").append(max).append(" .\n");
                 }
             }
 
             /* step */
             if (validateOption.contains("step")) {
                 if (number % step != 0) {
-                    errorMsg += fieldName + " có đơn vị biến đổi nhỏ nhất: ±"+step+" .\n";
+                    errorMsg.append("\tCó đơn vị biến đổi nhỏ nhất: ±").append(step).append(" .\n");
                 }
             }
         }
 
-        return errorMsg;
+        if (!errorMsg.toString().equals(fieldName+": \n")) {
+            return errorMsg.toString();
+        }
+
+        return "";
     }
 }

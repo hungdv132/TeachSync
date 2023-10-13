@@ -2,6 +2,7 @@ package com.teachsync.dtos.course;
 
 import com.teachsync.dtos.BaseCreateDTO;
 import com.teachsync.dtos.priceLog.PriceLogCreateDTO;
+import com.teachsync.utils.enums.Status;
 import jakarta.persistence.Lob;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -48,4 +49,6 @@ public class CourseCreateDTO extends BaseCreateDTO {
     private Double minAttendant;
 
     private PriceLogCreateDTO price;
+
+    private Status status = Status.DESIGNING;
 }

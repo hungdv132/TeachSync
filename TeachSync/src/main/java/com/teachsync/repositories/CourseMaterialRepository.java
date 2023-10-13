@@ -23,6 +23,7 @@ public interface CourseMaterialRepository extends JpaRepository<CourseMaterial, 
 
     /* courseId */
     List<CourseMaterial> findAllByCourseIdAndStatusNot(Long courseId, Status status);
+    List<CourseMaterial> findAllByCourseIdInAndStatusNot(Collection<Long> courseIdCollection, Status status);
 
     List<CourseMaterial> findAllByCourseIdAndMaterialIdInAndStatusNot(
             Long courseId, Collection<Long> semesterIdCollection, Status status);

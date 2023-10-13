@@ -1,10 +1,13 @@
 package com.teachsync.services.material;
 
+import com.teachsync.dtos.BaseReadDTO;
 import com.teachsync.dtos.course.CourseReadDTO;
 import com.teachsync.dtos.material.MaterialCreateDTO;
 import com.teachsync.dtos.material.MaterialReadDTO;
 import com.teachsync.dtos.material.MaterialUpdateDTO;
+import com.teachsync.entities.CourseMaterial;
 import com.teachsync.entities.Material;
+import com.teachsync.repositories.CourseMaterialRepository;
 import com.teachsync.repositories.MaterialRepository;
 import com.teachsync.services.courseMaterial.CourseMaterialService;
 import com.teachsync.utils.MiscUtil;
@@ -16,13 +19,19 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 public class MaterialServiceImpl implements MaterialService {
     @Autowired
     private MaterialRepository materialRepository;
+
+    @Autowired
+    private CourseMaterialRepository courseMaterialRepository;
 
     @Autowired
     private CourseMaterialService courseMaterialService;
@@ -134,6 +143,117 @@ public class MaterialServiceImpl implements MaterialService {
         }
 
         return wrapListDTO(materialList, options);
+    }
+    @Override
+    public Map<Long, MaterialReadDTO> mapIdDTOByIdIn(
+            Collection<Long> idCollection, Collection<DtoOption> options) throws Exception {
+        List<MaterialReadDTO> materialDTOList = getAllDTOByIdIn(idCollection, options);
+
+        if (materialDTOList == null) { return new HashMap<>(); }
+
+        return materialDTOList.stream()
+                .collect(Collectors.toMap(BaseReadDTO::getId, Function.identity()));
+    }
+
+    /* courseId => CourseMaterial => materialId */
+    @Override
+    public List<Material> getAllByCourseId(
+            Long courseId) throws Exception {
+
+        List<CourseMaterial> courseMaterialList =
+                courseMaterialRepository.findAllByCourseIdAndStatusNot(courseId, Status.DELETED);
+
+        if (courseMaterialList.isEmpty()) { return null; }
+
+        Set<Long> materialIdSet =
+                courseMaterialList.stream()
+                        .map(CourseMaterial::getMaterialId)
+                        .collect(Collectors.toSet());
+
+        return getAllByIdIn(materialIdSet);
+    }
+    @Override
+    public List<MaterialReadDTO> getAllDTOByCourseId(
+            Long courseId, Collection<DtoOption> options) throws Exception {
+        List<Material> materialList = getAllByCourseId(courseId);
+
+        if (materialList == null) {
+            return null;
+        }
+
+        return wrapListDTO(materialList, options);
+    }
+
+    @Override
+    public List<Material> getAllByCourseIdIn(
+            Collection<Long> courseIdCollection) throws Exception {
+
+        List<CourseMaterial> courseMaterialList =
+                courseMaterialRepository.findAllByCourseIdInAndStatusNot(courseIdCollection, Status.DELETED);
+
+        if (courseMaterialList.isEmpty()) { return null; }
+
+        Set<Long> materialIdSet =
+                courseMaterialList.stream()
+                        .map(CourseMaterial::getMaterialId)
+                        .collect(Collectors.toSet());
+
+        return getAllByIdIn(materialIdSet);
+    }
+    @Override
+    public List<MaterialReadDTO> getAllDTOByCourseIdIn(
+            Collection<Long> courseIdCollection, Collection<DtoOption> options) throws Exception {
+        List<Material> materialList = getAllByCourseIdIn(courseIdCollection);
+
+        if (materialList == null) {
+            return null;
+        }
+
+        return wrapListDTO(materialList, options);
+    }
+    @Override
+    public Map<Long, List<MaterialReadDTO>> mapCourseIdListDTOByCourseIdIn(
+            Collection<Long> courseIdCollection, Collection<DtoOption> options) throws Exception {
+        List<CourseMaterial> courseMaterialList =
+                courseMaterialRepository.findAllByCourseIdInAndStatusNot(courseIdCollection, Status.DELETED);
+
+        if (courseMaterialList.isEmpty()) { return new HashMap<>(); }
+
+        Set<Long> materialIdSet =
+                courseMaterialList.stream()
+                        .map(CourseMaterial::getMaterialId)
+                        .collect(Collectors.toSet());
+
+        Map<Long, MaterialReadDTO> idDTOMap = mapIdDTOByIdIn(materialIdSet, null);
+
+        if (idDTOMap.isEmpty()) { return new HashMap<>(); }
+
+        Long tmpCourseId;
+        Long tmpMaterialId;
+        MaterialReadDTO tmpMaterialDTO;
+        List<MaterialReadDTO> tmpMaterialDTOList;
+        Map<Long, List<MaterialReadDTO>> courseIdDTOListMap = new HashMap<>();
+
+        for (CourseMaterial courseMaterial : courseMaterialList) {
+            tmpCourseId = courseMaterial.getCourseId();
+            tmpMaterialId = courseMaterial.getMaterialId();
+
+            tmpMaterialDTO = idDTOMap.get(tmpMaterialId);
+
+            if (!ObjectUtils.isEmpty(tmpMaterialDTO)) {
+                tmpMaterialDTOList = courseIdDTOListMap.get(tmpCourseId);
+
+                if (ObjectUtils.isEmpty(tmpMaterialDTOList)) {
+                    tmpMaterialDTOList = new ArrayList<>(List.of(tmpMaterialDTO));
+                } else {
+                    tmpMaterialDTOList.add(tmpMaterialDTO);
+                }
+
+                courseIdDTOListMap.put(tmpCourseId, tmpMaterialDTOList);
+            }
+        }
+
+        return courseIdDTOListMap;
     }
 
     /* isFree */

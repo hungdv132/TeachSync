@@ -15,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 
 import java.text.DecimalFormat;
 import java.time.LocalDateTime;
@@ -81,7 +82,7 @@ public class PriceLogServiceImpl implements PriceLogService {
         return priceLogPage;
     }
     @Override
-    public Page<PriceLogReadDTO> getPageDTOAll(Pageable paging) throws Exception {
+    public Page<PriceLogReadDTO> getPageAllDTO(Pageable paging) throws Exception {
         Page<PriceLog> priceLogPage = getPageAll(paging);
 
         if (priceLogPage == null) {
@@ -260,6 +261,40 @@ public class PriceLogServiceImpl implements PriceLogService {
 
 
     /* =================================================== DELETE =================================================== */
+    @Override
+    public Boolean deletePriceLog(Long id) throws Exception {
+        PriceLog priceLog = getById(id);
+
+        if (priceLog == null) {
+            throw new IllegalArgumentException(
+                    "Lỗi xóa Giá của Khóa Học. Không tìm thấy Khóa Học nào với Giá có id: " + id);
+        }
+
+        priceLog.setStatus(Status.DELETED);
+
+        priceLogRepository.saveAndFlush(priceLog);
+
+        return true;
+    }
+
+    @Override
+    public Boolean deleteAllByCourseId(Long courseId) throws Exception {
+        List<PriceLog> priceLogList = getAllByCourseId(courseId);
+
+        if (ObjectUtils.isEmpty(priceLogList)) {
+            throw new IllegalArgumentException(
+                    "Lỗi xóa Giá của Khóa Học. Không tìm thấy Khóa Học nào với id: " + courseId);
+        }
+
+        priceLogList =
+                priceLogList.stream()
+                        .peek(priceLog -> priceLog.setStatus(Status.DELETED))
+                        .collect(Collectors.toList());
+
+        priceLogRepository.saveAllAndFlush(priceLogList);
+
+        return true;
+    }
 
 
     /* =================================================== WRAPPER ================================================== */

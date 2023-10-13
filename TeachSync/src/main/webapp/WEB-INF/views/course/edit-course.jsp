@@ -47,10 +47,7 @@
           </a>
         </li>
         <li class="breadcrumb-item" aria-current="page">
-          <c:url var="/courseDetail" value="course-detail">
-            <c:param name="id" value="${course.id}"/>
-          </c:url>
-          <a href="${courseDetail}">
+          <a href="/course-detail?id=${course.id}">
             <c:out value="${course.courseName}"/>
           </a>
         </li>
@@ -66,7 +63,7 @@
   <div class="col-12 ts-bg-white border-top border-bottom ts-border-teal pt-3 px-5 mb-3">
     <%--@elvariable id="updateDTO" type="com.teachsync.dtos.course.CourseUpdateDTO"--%>
     <form:form id="form"
-               modelAttribute="updateDTO" action="/edit-course" method="post"
+               modelAttribute="updateDTO" action="/edit-course" method="POST"
                cssClass="row">
       <input type="hidden" name="id" value="${course.id}">
       
@@ -87,7 +84,7 @@
                onchange="updateImgFromInput('fileImg', 'imgCourseImg', 0.75)">
         <p class="ts-txt-italic ts-txt-sm mb-0">*Tối đa 0.75 MB</p>
         <input id="hidCourseImg" name="courseImg"
-               type="hidden" value="../../../resources/img/no-img.jpg">
+               type="hidden" value="${empty course.courseImg ? '../../../resources/img/no-img.jpg' : course.courseImg}">
       </div>
 
       
@@ -98,7 +95,7 @@
           <div class="col-12">
             <label for="selStatus" class="form-label">Trạng thái:</label>
             <select id="selStatus" name="status"
-                    class="form-select"
+                    class="form-select mb-3"
                     onchange="restrictByStatus()">
               <option value="${Status.DESIGNING}">${Status.DESIGNING.stringValueVie}</option>
               <option value="${Status.AWAIT_REVIEW}">${Status.AWAIT_REVIEW.stringValueVie}</option>
@@ -106,6 +103,8 @@
               <option value="${Status.OPENED}">${Status.OPENED.stringValueVie}</option>
               <option value="${Status.CLOSED}">${Status.CLOSED.stringValueVie}</option>
             </select>
+            
+            <p id="pStatusDesc" class="text-danger ts-txt-bold visually-hidden"></p>
           </div>
         </div>
         
@@ -358,59 +357,91 @@
     const initialStatus = "${course.status}";
     
     function restrictByStatus() {
-        let selStatus = $("#selStatus");
-        let status = selStatus.val();
+        let pStatusDesc = $("#pStatusDesc");
+        let status = $("#selStatus").val();
+        
+        /* Clear content */
+        pStatusDesc.text("").addClass("visually-hidden");;
 
-        switch (status) {
-            case "${Status.DESIGNING}":
-                enableAllFormElementIn("divCourseTextDetail");
-                enableAllFormElementIn("divCourseNumberDetail");
-                enableAllFormElementIn("divCoursePrice");
-                break;
-            case "${Status.AWAIT_REVIEW}":
-                disableAllFormElementIn("divCoursePrice");
-            case "${Status.OPENED}":
-            case "${Status.CLOSED}":
-                disableAllFormElementIn("divCourseTextDetail");
-                disableAllFormElementIn("divCourseNumberDetail");
-                break;
-        }
-    }
-</script>
-
-<script id="script1">
-    /* promotion */
-    let isPromotion = ${course.currentPrice.isPromotion};
-
-    if (isPromotion) {
-        let promoType = "${course.currentPrice.promotionType.stringValue}";
-        $("#selPromotionType").val(promoType).trigger("change");
-
-        let promoValue = "${course.currentPrice.promotionAmount}";
-        $("#numPromotionAmount").val(promoValue).trigger("change");
-
-        let promoDesc = "${course.currentPrice.promotionDesc}";
-        $("#txtAPromotionDesc").val(promoDesc);
-    }
-
-    $("#chkIsPromotion").attr("checked", isPromotion).trigger("change");
-
-    /* status */
-    $("#selStatus").val(initialStatus).trigger("change");
-
-    switch (initialStatus) {
-        case "${Status.DESIGNING}":
-            break;
-        case "${Status.AWAIT_REVIEW}":
-            disableAllFormElementIn("divCoursePrice");
-        case "${Status.OPENED}":
-        case "${Status.CLOSED}":
+        console.log("init: " +initialStatus);
+        console.log("new: " +status);
+        
+        if (status !== initialStatus) {
+            /* No edit when changing status */
+            disableAllFormElementIn("divCourseImg");
             disableAllFormElementIn("divCourseTextDetail");
             disableAllFormElementIn("divCourseNumberDetail");
-            break;
+            disableAllFormElementIn("divCoursePrice");
+
+            pStatusDesc.text("Khi chuyển đổi trạng thái không được phép sửa đổi các thông tin khác.")
+                .removeClass("visually-hidden");
+            
+            if (initialStatus === '${Status.AWAIT_REVIEW}') {
+                if (status === '${Status.DESIGNING}') {
+                    /* Denied */
+                    pStatusDesc.append("<br>")
+                        .append("Xác nhận CHƯA hoàn thành thiết kế?")
+                        .removeClass("visually-hidden");
+                }
+                
+                if (status === '${Status.OPENED}') {
+                    /* Accept */
+                    pStatusDesc.append("<br>")
+                        .append("Xác nhận ĐÃ hoàn thành thiết kế? " +
+                            "Một khi đã hoàn thành, hệ thống sẽ khóa khả năng sửa đổi các thông tin của khóa học.")
+                        .removeClass("visually-hidden");
+                }
+            }
+        } else {
+            switch (status) {
+                case "${Status.DESIGNING}":
+                    /* All editable */
+                    enableAllFormElementIn("divCourseImg");
+                    enableAllFormElementIn("divCourseTextDetail");
+                    enableAllFormElementIn("divCourseNumberDetail");
+                    enableAllFormElementIn("divCoursePrice");
+                    break;
+                case "${Status.AWAIT_REVIEW}":
+                    /* No edit, period */
+                    pStatusDesc.text("Khi đang chờ xét duyệt không được phép sửa đổi các thông tin khác.")
+                        .removeClass("visually-hidden");
+
+                    disableAllFormElementIn("divCourseImg");
+                    disableAllFormElementIn("divCourseTextDetail");
+                    disableAllFormElementIn("divCourseNumberDetail");
+                    disableAllFormElementIn("divCoursePrice");
+                    break;
+                case "${Status.OPENED}":
+                    /* Edit price and img */
+                    pStatusDesc.text("Chỉ được phép sửa đổi ảnh và giá của khóa học.")
+                        .removeClass("visually-hidden");
+                    
+                    enableAllFormElementIn("divCourseImg");
+                    disableAllFormElementIn("divCourseTextDetail");
+                    disableAllFormElementIn("divCourseNumberDetail");
+                    enableAllFormElementIn("divCoursePrice");
+                    break;
+                case "${Status.CLOSED}":
+                    /* Edit price and img */
+                    pStatusDesc.text("Chỉ được phép sửa đổi ảnh và giá của khóa học.")
+                        .removeClass("visually-hidden");
+                    
+                    enableAllFormElementIn("divCourseImg");
+                    disableAllFormElementIn("divCourseTextDetail");
+                    disableAllFormElementIn("divCourseNumberDetail");
+                    enableAllFormElementIn("divCoursePrice");
+                    break;
+                    
+                default:
+                    /* Where did you get this status from? */
+                    disableAllFormElementIn("divCourseImg");
+                    disableAllFormElementIn("divCourseTextDetail");
+                    disableAllFormElementIn("divCourseNumberDetail");
+                    disableAllFormElementIn("divCoursePrice");
+                    break;
+            }
+        }
     }
-    
-    $("#script1").remove();
 </script>
 
 <script>
@@ -420,11 +451,11 @@
     // Iterate through each required element
     requiredElements.each(function () {
         const element = $(this);
-
-        // Set an initial custom validity message for required input in VN
-        element[0].setCustomValidity(requiredErrorMsg);
+        if (element.value === '') {
+            // Set an initial custom validity message for required input in VN
+            element[0].setCustomValidity(requiredErrorMsg);
+        }
     });
-
 
     /* courseAlias */
     let txtAlias = document.getElementById("txtAlias");
@@ -492,6 +523,14 @@
             ["required", "min", "max", "step"]);
     });
 
+    /* course promotionDesc */
+    let txtAPromotionDesc = document.getElementById("txtAPromotionDesc");
+    txtADesc.addEventListener("input", function () {
+        validateTextInput(
+            txtAPromotionDesc, 1, txtAPromotionDesc.maxLength,
+            ["nullOrMinLength", "maxLength", "onlyBlank", "startBlank", "endBlank", "specialChar"]);
+    });
+
     $("#form").on("submit", async function (event) {
         let file = $('#fileImg').prop("files")[0];
 
@@ -499,6 +538,46 @@
 
         $("#hidCourseImg").val(imgURL);
     });
+</script>
+
+<script id="script1">
+    /* promotion */
+    const isPromotion = ${course.currentPrice.isPromotion};
+
+    if (isPromotion) {
+        let promoType = "${course.currentPrice.promotionType.stringValue}";
+        $("#selPromotionType").val(promoType).trigger("change");
+
+        let promoValue = "${course.currentPrice.promotionAmount}";
+        $("#numPromotionAmount").val(promoValue).trigger("change");
+
+        let promoDesc = "${course.currentPrice.promotionDesc}";
+        $("#txtAPromotionDesc").val(promoDesc);
+    }
+
+    $("#chkIsPromotion").attr("checked", isPromotion).trigger("change");
+
+    /* status */
+    $("#selStatus").val(initialStatus).trigger("change");
+
+    switch (initialStatus) {
+        case "${Status.DESIGNING}":
+            $(`#selStatus option[value="${Status.OPENED}"]`).remove();
+            $(`#selStatus option[value="${Status.CLOSED}"]`).remove();
+            break;
+
+        case "${Status.AWAIT_REVIEW}":
+            $(`#selStatus option[value="${Status.CLOSED}"]`).remove();
+            break;
+
+        case "${Status.OPENED}":
+        case "${Status.CLOSED}":
+            $(`#selStatus option[value="${Status.DESIGNING}"]`).remove();
+            $(`#selStatus option[value="${Status.AWAIT_REVIEW}"]`).remove();
+            break;
+    }
+
+    $("#script1").remove();
 </script>
 <!-- ================================================== Script ===================================================== -->
 </body>

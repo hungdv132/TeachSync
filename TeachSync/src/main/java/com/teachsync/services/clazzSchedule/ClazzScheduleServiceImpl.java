@@ -12,6 +12,7 @@ import com.teachsync.repositories.RoomRepository;
 import com.teachsync.services.clazz.ClazzService;
 import com.teachsync.services.room.RoomService;
 import com.teachsync.services.scheduleCategory.ScheduleCateService;
+import com.teachsync.services.session.SessionService;
 import com.teachsync.utils.MiscUtil;
 import com.teachsync.utils.enums.DtoOption;
 import com.teachsync.utils.enums.Status;
@@ -32,6 +33,8 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static com.teachsync.utils.enums.Status.*;
+
 @Service
 public class ClazzScheduleServiceImpl implements ClazzScheduleService {
     @Autowired
@@ -40,6 +43,8 @@ public class ClazzScheduleServiceImpl implements ClazzScheduleService {
     @Lazy
     @Autowired
     private ClazzService clazzService;
+    @Autowired
+    private SessionService sessionService;
     @Lazy
     @Autowired
     private RoomService roomService;
@@ -70,7 +75,8 @@ public class ClazzScheduleServiceImpl implements ClazzScheduleService {
             ClazzSchedule clazzSchedule = mapper.map(createDTO, ClazzSchedule.class);
 
             Optional<Clazz> clazz =
-                    clazzRepository.findByIdAndStatusNot(createDTO.getClazzId(), Status.DELETED);
+                    clazzRepository.findByIdAndStatusNotIn(createDTO.getClazzId(),
+                            List.of(Status.DELETED));
             Clazz clazz1 = clazz.orElse(null);
             clazzSchedule.setClazzId(clazz1.getId());
 
@@ -143,7 +149,7 @@ public class ClazzScheduleServiceImpl implements ClazzScheduleService {
         return clazzSchedulePage;
     }
     @Override
-    public Page<ClazzScheduleReadDTO> getPageDTOAll(Pageable paging, Collection<DtoOption> options) throws Exception {
+    public Page<ClazzScheduleReadDTO> getPageAllDTO(Pageable paging, Collection<DtoOption> options) throws Exception {
         Page<ClazzSchedule> clazzSchedulePage = getPageAll(paging);
 
         if (clazzSchedulePage == null) {
@@ -291,7 +297,8 @@ public class ClazzScheduleServiceImpl implements ClazzScheduleService {
             clazzSchedule = mapper.map(updateDTO, ClazzSchedule.class);
 
             Optional<Clazz> clazz =
-                    clazzRepository.findByIdAndStatusNot(updateDTO.getClazzId(), Status.DELETED);
+                    clazzRepository.findByIdAndStatusNotIn(updateDTO.getClazzId(),
+                            List.of(Status.DELETED));
             Clazz clazz1 = clazz.orElse(null);
             clazzSchedule.setClazzId(clazz1.getId());
 
@@ -359,6 +366,67 @@ public class ClazzScheduleServiceImpl implements ClazzScheduleService {
 
 
     /* =================================================== DELETE =================================================== */
+    @Override
+    public Boolean deleteClazzSchedule(Long id) throws Exception {
+        ClazzSchedule schedule = getById(id);
+
+        if (schedule == null) {
+            throw new IllegalArgumentException(
+                    "Lỗi xóa Lịch Học. Không tìm thấy Lịch Học nào với id: " + id);
+        }
+        Status oldStatus = schedule.getStatus();
+
+        /* Delete */
+        schedule.setStatus(DELETED);
+
+        /* Save to DB */
+        clazzScheduleRepository.saveAndFlush(schedule);
+
+        try {
+            sessionService.deleteAllByScheduleId(id);
+        } catch (IllegalArgumentException iAE) {
+            /* Revert delete */
+            schedule.setStatus(oldStatus);
+
+            clazzScheduleRepository.saveAndFlush(schedule);
+
+            throw new IllegalArgumentException(
+                    "Lỗi xóa Lịch Học. Bắt nguồn từ: \n" + iAE.getMessage());
+        }
+
+        return true;
+    }
+
+    @Override
+    public Boolean deleteByClazzId(Long clazzId) throws Exception {
+        ClazzSchedule schedule = getByClazzId(clazzId);
+
+        if (schedule == null) {
+            throw new IllegalArgumentException(
+                    "Lỗi xóa Lịch Học. Không tìm thấy Lớp Học nào với id: " + clazzId);
+        }
+        Status oldStatus = schedule.getStatus();
+
+        /* Delete */
+        schedule.setStatus(DELETED);
+
+        /* Save to DB */
+        clazzScheduleRepository.saveAndFlush(schedule);
+
+        try {
+            sessionService.deleteAllByScheduleId(schedule.getId());
+        } catch (IllegalArgumentException iAE) {
+            /* Revert delete */
+            schedule.setStatus(oldStatus);
+
+            clazzScheduleRepository.saveAndFlush(schedule);
+
+            throw new IllegalArgumentException(
+                    "Lỗi xóa Lịch Học. Bắt nguồn từ: \n" + iAE.getMessage());
+        }
+
+        return true;
+    }
 
 
     /* =================================================== WRAPPER ================================================== */
@@ -369,7 +437,10 @@ public class ClazzScheduleServiceImpl implements ClazzScheduleService {
         /* Add Dependency */
         if (!ObjectUtils.isEmpty(options)) {
             if (options.contains(DtoOption.CLAZZ_NAME)) {
-                Clazz clazz = clazzService.getById(dto.getClazzId());
+                Clazz clazz = clazzService.getById(
+                        dto.getClazzId(),
+                        List.of(Status.DELETED),
+                        false);
                 dto.setClazzName(clazz.getClazzName());
             }
 
@@ -411,7 +482,10 @@ public class ClazzScheduleServiceImpl implements ClazzScheduleService {
             }
 
             if (options.contains(DtoOption.CLAZZ_NAME)) {
-                clazzIdClazzNameMap = clazzService.mapClazzIdClazzNameByIdIn(clazzIdSet);
+                clazzIdClazzNameMap = clazzService.mapIdClazzNameByIdIn(
+                        clazzIdSet,
+                        List.of(Status.DELETED),
+                        false);
             }
 
             if (options.contains(DtoOption.ROOM_NAME)) {

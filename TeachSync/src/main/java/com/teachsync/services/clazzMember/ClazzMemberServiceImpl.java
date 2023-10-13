@@ -278,16 +278,22 @@ public class ClazzMemberServiceImpl implements ClazzMemberService {
         /* Add dependency */
         if (options != null && !options.isEmpty()) {
             if (options.contains(DtoOption.CLAZZ)) {
-                ClazzReadDTO clazzDTO = clazzService.getDTOById(clazzMember.getClazzId(), options);
+                ClazzReadDTO clazzDTO = clazzService.getDTOById(clazzMember.getClazzId(),
+                        List.of(Status.DELETED),
+                        false,options);
                 dto.setClazz(clazzDTO);
             }
             if (options.contains(DtoOption.CLAZZ_NAME)) {
-                Clazz clazz = clazzService.getById(clazzMember.getClazzId());
+                Clazz clazz = clazzService.getById(
+                        clazzMember.getClazzId(),
+                        List.of(Status.DELETED),
+                        false);
                 dto.setClazzName(clazz.getClazzName());
             }
 
             if (options.contains(DtoOption.USER)) {
-                UserReadDTO userDTO = userService.getDTOById(clazzMember.getUserId(), options);
+                UserReadDTO userDTO = userService.getDTOById(
+                        clazzMember.getUserId(), options);
                 dto.setUser(userDTO);
             }
             if (options.contains(DtoOption.USER_FULL_NAME)) {
@@ -320,10 +326,17 @@ public class ClazzMemberServiceImpl implements ClazzMemberService {
             }
 
             if (options.contains(DtoOption.CLAZZ)) {
-                clazzIdClazzDTOMap = clazzService.mapIdDTOByIdIn(clazzIdSet, options);
+                clazzIdClazzDTOMap = clazzService.mapIdDTOByIdIn(
+                        clazzIdSet,
+                        List.of(Status.DELETED),
+                        false,
+                        options);
             }
             if (options.contains(DtoOption.CLAZZ_NAME)) {
-                clazzIdClazzNameMap = clazzService.mapClazzIdClazzNameByIdIn(clazzIdSet);
+                clazzIdClazzNameMap = clazzService.mapIdClazzNameByIdIn(
+                        clazzIdSet,
+                        List.of(Status.DELETED),
+                        false);
             }
 
             if (options.contains(DtoOption.USER)) {

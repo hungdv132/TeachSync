@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 public interface MaterialService {
     /* =================================================== CREATE =================================================== */
@@ -27,6 +28,20 @@ public interface MaterialService {
 
     List<Material> getAllByIdIn(Collection<Long> idCollection) throws Exception;
     List<MaterialReadDTO> getAllDTOByIdIn(Collection<Long> idCollection, Collection<DtoOption> options) throws Exception;
+    Map<Long, MaterialReadDTO> mapIdDTOByIdIn(Collection<Long> idCollection, Collection<DtoOption> options) throws Exception;
+
+    /* courseId => CourseMaterial => materialId */
+    List<Material> getAllByCourseId(
+            Long courseId) throws Exception;
+    List<MaterialReadDTO> getAllDTOByCourseId(
+            Long courseId, Collection<DtoOption> options) throws Exception;
+
+    List<Material> getAllByCourseIdIn(
+            Collection<Long> courseIdCollection) throws Exception;
+    List<MaterialReadDTO> getAllDTOByCourseIdIn(
+            Collection<Long> courseIdCollection, Collection<DtoOption> options) throws Exception;
+    Map<Long, List<MaterialReadDTO>> mapCourseIdListDTOByCourseIdIn(
+            Collection<Long> courseIdCollection, Collection<DtoOption> options) throws Exception;
 
     /* isFree */
     Page<Material> getPageAllByIsFree(Boolean isFree, Pageable pageable) throws Exception;
