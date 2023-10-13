@@ -61,6 +61,8 @@ public enum DtoOption {
     /** Course */
     CLAZZ_LIST,
     /** Course */
+    CLAZZ_LIST_ALL,
+    /** Course */
     MATERIAL_LIST,
     /** Course */
     CURRENT_PRICE,

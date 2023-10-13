@@ -135,20 +135,22 @@ public class CourseController {
             Page<CourseReadDTO> dtoPage;
 
             int pageType = 0;
+
             if (Objects.isNull(userDTO)) {
                 pageType = 1;
-            }
+            } else {
 
-            Long roleId = userDTO.getRoleId();
+                Long roleId = userDTO.getRoleId();
 
-            if (ROLE_STUDENT.equals(roleId)) {
-                pageType = 1;
-            } else if (ROLE_PARENTS.equals(roleId)) {
-                pageType = 1;
-            } else if (ROLE_TEACHER.equals(roleId)) {
-                pageType = 2;
-            } else if (ROLE_ADMIN.equals(roleId)) {
-                pageType = 3;
+                if (ROLE_STUDENT.equals(roleId)) {
+                    pageType = 1;
+                } else if (ROLE_PARENTS.equals(roleId)) {
+                    pageType = 1;
+                } else if (ROLE_TEACHER.equals(roleId)) {
+                    pageType = 2;
+                } else if (ROLE_ADMIN.equals(roleId)) {
+                    pageType = 3;
+                }
             }
 
             List<Status> statuses;
@@ -257,19 +259,21 @@ public class CourseController {
                     /* Is guest, parent => All OPENED Course */
                     statuses = List.of(OPENED);
                     isStatusIn = true;
-                    options = List.of(CURRENT_PRICE, CERTIFICATE);
+                    options = List.of(CURRENT_PRICE, CERTIFICATE, CLAZZ_LIST);
                 }
                 case 2 -> {
                     /* Is teacher, student => All OPENED & CLOSED Course */
                     statuses = List.of(OPENED, CLOSED);
                     isStatusIn = true;
-                    options = List.of(CURRENT_PRICE, CERTIFICATE, MATERIAL_LIST, TEST_LIST);
+                    options = List.of(CURRENT_PRICE, CERTIFICATE, CLAZZ_LIST_ALL,
+                            MATERIAL_LIST, TEST_LIST);
                 }
                 case 3 -> {
                     /* Is Admin => All Course NOT DELETED */
                     statuses = List.of(DELETED);
                     isStatusIn = false;
-                    options = List.of(CURRENT_PRICE, PRICE_LOG, CERTIFICATE, MATERIAL_LIST, TEST_LIST);
+                    options = List.of(CURRENT_PRICE, CERTIFICATE, CLAZZ_LIST_ALL,
+                            MATERIAL_LIST, TEST_LIST, PRICE_LOG);
                 }
                 default -> {
                     throw new IllegalArgumentException(
@@ -286,33 +290,15 @@ public class CourseController {
 
             if (courseDTO == null) {
                 /* Not found by id */
-                redirect.addAttribute("Không tìm thấy khóa học nào với id: " + courseId);
+                redirect.addAttribute("mess","Không tìm thấy khóa học nào với id: " + courseId);
 
                 return "redirect:/course";
             }
 
-            List<CourseSemesterReadDTO> courseSemesterList =
-                    courseSemesterService.getAllLatestDTOByCourseId(courseId, List.of(CLAZZ_LIST));
-
             model.addAttribute("course", courseDTO);
 
-            boolean hasLatestSchedule = !ObjectUtils.isEmpty(courseSemesterList);
-            model.addAttribute("hasLatestSchedule", hasLatestSchedule);
+            model.addAttribute("hasClazz", ObjectUtils.isEmpty(courseDTO.getClazzList()));
 
-            boolean hasClazz = false;
-            if (hasLatestSchedule) {
-                List<ClazzReadDTO> clazzDTOList = new ArrayList<>();
-                List<ClazzReadDTO> tmpClazzDTOlist = new ArrayList<>();
-                for (CourseSemesterReadDTO courseSemester : courseSemesterList) {
-                    tmpClazzDTOlist = courseSemester.getClazzList();
-                    if (!ObjectUtils.isEmpty(tmpClazzDTOlist)) {
-                        clazzDTOList.addAll(tmpClazzDTOlist);
-                    }
-                }
-                hasClazz = !ObjectUtils.isEmpty(clazzDTOList);
-            }
-
-            model.addAttribute("hasClazz", hasClazz);
         } catch (Exception e) {
             e.printStackTrace();
             model.addAttribute("errorMsg", "Server error, please try again later");
@@ -322,12 +308,11 @@ public class CourseController {
     }
 
 
-
     /* =================================================== UPDATE =================================================== */
     @GetMapping("/edit-course")
     public String editCoursePageById(
-            Model model,
             RedirectAttributes redirect,
+            Model model,
             @RequestParam(name = "id") Long courseId,
             @SessionAttribute(name = "user", required = false) UserReadDTO userDTO) throws Exception {
         if (Objects.isNull(userDTO)) {
@@ -359,19 +344,18 @@ public class CourseController {
             @ModelAttribute CourseUpdateDTO updateDTO,
             RedirectAttributes redirect,
             @SessionAttribute(value = "user", required = false) UserReadDTO userDTO) {
-        Map<String, Object> response = new HashMap<>();
+
+        if (Objects.isNull(userDTO)) {
+            redirect.addAttribute("mess", "Làm ơn đăng nhập");
+            return "redirect:/index";
+        }
+
+        if (!userDTO.getRoleId().equals(ROLE_ADMIN)) {
+            redirect.addAttribute("mess", "Bạn không đủ quyền");
+            return "redirect:/index";
+        }
 
         CourseReadDTO courseDTO = null;
-
-//        if (Objects.isNull(userDTO)) {
-//            redirect.addAttribute("mess", "Làm ơn đăng nhập");
-//            return "redirect:/index";
-//        }
-//
-//        if (!userDTO.getRoleId().equals(ROLE_ADMIN)) {
-//            redirect.addAttribute("mess", "Bạn không đủ quyền");
-//            return "redirect:/index";
-//        }
 
         try {
             updateDTO.setUpdatedBy(userDTO.getId());
@@ -379,7 +363,7 @@ public class CourseController {
             courseDTO = courseService.updateCourseByDTO(updateDTO);
 
         } catch (Exception e) {
-            model.addAttribute("mess", "Lỗi : " + e.getMessage());
+            redirect.addAttribute("mess", "Lỗi : " + e.getMessage());
 
             return "redirect:/edit-course" + "?id=" + courseId;
         }
@@ -393,33 +377,31 @@ public class CourseController {
     /* =================================================== DELETE =================================================== */
     @GetMapping("/delete-course")
     public String deleteCourse(
-            Model model,
-            HttpServletRequest request,
-            RedirectAttributes redirect) {
-        HttpSession session = request.getSession();
+            RedirectAttributes redirect,
+            @RequestParam(name = "id") Long courseId,
+            @SessionAttribute(value = "user", required = false) UserReadDTO userDTO) {
 
-        if (ObjectUtils.isEmpty(session.getAttribute("user"))) {
+        if (Objects.isNull(userDTO)) {
             redirect.addAttribute("mess", "Làm ơn đăng nhập");
-            return "redirect:/";
+            return "redirect:/index";
         }
-
-        UserReadDTO userDTO = (UserReadDTO) session.getAttribute("user");
 
         if (!userDTO.getRoleId().equals(ROLE_ADMIN)) {
             redirect.addAttribute("mess", "Bạn không đủ quyền");
-            return "redirect:/";
+            return "redirect:/index";
         }
 
-        Long id = Long.parseLong(request.getParameter("id"));
-
         try {
-            courseService.deleteCourse(id);
+            courseService.deleteCourse(courseId);
+
         } catch (Exception e) {
             redirect.addAttribute("mess", "Lỗi : " + e.getMessage());
+
             return "redirect:/course";
         }
 
         redirect.addAttribute("mess", "Xóa khóa học thành công");
+
         return "redirect:/course";
     }
 }
