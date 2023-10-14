@@ -16,6 +16,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 @Controller
 public class LoginController {
@@ -24,14 +25,14 @@ public class LoginController {
 
     @GetMapping("/sign-in")
     public String login(
-            HttpSession session,
-            @ModelAttribute("msg") String msg) {
-        Object objUser = session.getAttribute("user");
-
-        if (objUser instanceof UserReadDTO) {
+            RedirectAttributes redirect,
+            @SessionAttribute(value = "user", required = false) UserReadDTO userDTO) {
+        if (Objects.nonNull(userDTO)) {
             /* Already login */
+            redirect.addAttribute("mess", "Bạn đã đăng nhập");
             return "redirect:/index";
         }
+        redirect.addAttribute("mess", "");
 
         return "login/login";
     }
@@ -42,7 +43,6 @@ public class LoginController {
     public Map<String, Object> login(
             @RequestBody UserLoginDTO loginDTO,
             HttpSession session,
-            RedirectAttributes redirect,
             @SessionAttribute(required = false) String targetUrl) {
         Map<String, Object> response = new HashMap<>();
 
@@ -71,7 +71,7 @@ public class LoginController {
             return response;
         }
 
-        response.put("view", "index");
+        response.put("view", "redirect:/index");
         return response;
     }
 

@@ -2,7 +2,7 @@ package com.teachsync.utils.enums;
 
 public enum Status {
     PENDING("PENDING", "Pending", "Đang chờ"),
-    ONGOING("ONGOING", "Ongoing", "Đang làm"),
+    ONGOING("ONGOING", "Ongoing", "Đang tiến hành"),
     DONE("DONE", "Done", "Xong"),
 
     PENDING_PAYMENT("PENDING_PAYMENT", "Pending payment", "Đang chờ thanh toán"),

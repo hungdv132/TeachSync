@@ -40,5 +40,5 @@ public class ClazzCreateDTO extends BaseCreateDTO {
 
 //    private Integer slot;
 
-    private Status status = Status.DESIGNING;
+    private final Status status = Status.DESIGNING;
 }

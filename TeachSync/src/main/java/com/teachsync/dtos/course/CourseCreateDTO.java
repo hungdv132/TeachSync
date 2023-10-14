@@ -50,5 +50,5 @@ public class CourseCreateDTO extends BaseCreateDTO {
 
     private PriceLogCreateDTO price;
 
-    private Status status = Status.DESIGNING;
+    private final Status status = Status.DESIGNING;
 }

@@ -133,30 +133,16 @@ public class ClazzServiceImpl implements ClazzService {
         /* Is error */
         if (!errorMsg.isEmpty()) {
             throw new IllegalArgumentException(
-                    "Lỗi tạo Lớp Học. " + errorMsg.toString());
+                    "Lỗi tạo Lớp Học\n" + errorMsg.toString());
         }
 
         /* Create */
-        clazz = clazzRepository.saveAndFlush(clazz);
-
-        return clazz;
+        return clazzRepository.saveAndFlush(clazz);
     }
     @Override
     public ClazzReadDTO createClazzByDTO(
             ClazzCreateDTO createDTO) throws Exception {
         Clazz clazz = mapper.map(createDTO, Clazz.class);
-
-//        CourseSemester courseSemester =
-//                courseSemesterService.getByCourseIdAndSemesterIdAndCenterId(
-//                        createDTO.getCourseId(), createDTO.getSemesterId(), createDTO.getCenterId());
-//        if (courseSemester == null) {
-//            courseSemester = new CourseSemester(
-//                    createDTO.getCourseId(), createDTO.getSemesterId(), createDTO.getCenterId());
-//            courseSemester.setStatus(Status.CREATED);
-//
-//            courseSemester = courseSemesterService.createCourseSemester(courseSemester);
-//        }
-//        clazz.setCourseSemesterId(courseSemester.getId());
 
         clazz = createClazz(clazz);
 
@@ -1160,64 +1146,130 @@ public class ClazzServiceImpl implements ClazzService {
         StringBuilder errorMsg = new StringBuilder();
 
         /* Validate input */
-        /* alias */
-        errorMsg.append(
-                miscUtil.validateString(
-                        "Mã lóp học", clazz.getClazzAlias(), 1, 10,
-                        List.of("required", "minLength", "maxLength",
-                                "onlyBlank", "startBlank", "endBlank", "specialChar")));
-        /* name */
-        errorMsg.append(
-                miscUtil.validateString(
-                        "Tên lóp học", clazz.getClazzName(), 1, 45,
-                        List.of("required", "minLength", "maxLength",
-                                "onlyBlank", "startBlank", "endBlank", "specialChar")));
-        /* clazzDesc */
-        errorMsg.append(
-                miscUtil.validateString(
-                        "Miêu tả lóp học", clazz.getClazzDesc(), 1, 9999,
-                        List.of("nullOrMinLength", "maxLength", "onlyBlank",
-                                "startBlank", "endBlank", "specialChar")));
-        /* minCapacity */
-        errorMsg.append(
-                miscUtil.validateNumber(
-                        "Số học sinh tối thiểu", clazz.getMinCapacity().doubleValue(),
-                        0.0, clazz.getMaxCapacity().doubleValue(), 1.0,
-                        List.of("min", "max", "step")));
-        /* maxCapacity */
-        errorMsg.append(
-                miscUtil.validateNumber(
-                        "Số học sinh tối đa", clazz.getMaxCapacity().doubleValue(),
-                        0.0, null, 1.0,
-                        List.of("min", "step")));
+        /* status */
+        Status oldStatus = oldClazz.getStatus();
+        Status newStatus = clazz.getStatus();
+        if (!oldStatus.equals(newStatus)) {
+            /* Change status => no change other attribute */
+            switch (oldStatus) {
+                case DESIGNING -> {
+                    if (!AWAIT_REVIEW.equals(newStatus)) {
+                        errorMsg.append("Lớp Học với trạng thái 'Đang thiết kế' chỉ được phép chuyển trạng thái thành 'Đang chờ xét duyệt'.");
+                    }
+                }
+                case AWAIT_REVIEW -> {
+                    if (!List.of(DESIGNING, OPENED).contains(newStatus)) {
+                        errorMsg.append("Lớp Học với trạng thái 'Đang thiết kế' chỉ được phép chuyển trạng thái thành 'Đang thiết kế' hoặc 'Đang mở'.");
+                    }
+                }
+                case OPENED -> {
+                    if (!CLOSED.equals(newStatus)) {
+                        errorMsg.append("Lớp Học với trạng thái 'Đang mở' chỉ được phép chuyển trạng thái thành 'Đã đóng'.");
+                    }
+                }
+                case ONGOING -> {
+                    if (!CLOSED.equals(newStatus)) {
+                        errorMsg.append("Lớp Học với trạng thái 'Đang tiến hành' chỉ được phép chuyển trạng thái thành 'Đã đóng'.");
+                    }
+                }
+                case CLOSED -> {
+                    if (!OPENED.equals(newStatus)) {
+                        errorMsg.append("Lớp Học với trạng thái 'Đã đóng' chỉ được phép chuyển trạng thái thành 'Đang mở' hoặc 'Đang tiến hành'.");
+                    }
+                }
+            }
+            /* Override old data */
+            oldClazz.setStatus(newStatus);
+            oldClazz.setUpdatedBy(clazz.getUpdatedBy());
+            oldClazz.setUpdatedAt(clazz.getUpdatedAt());
 
-        /* Check FK */
-        /* courseId */
-        if (!courseService.existsById(clazz.getCourseId())) {
-            errorMsg.append("Không tìm thấy Khóa Học nào với id: ").append(clazz.getCourseId());
-        }
-        /* centerId */
-        if (!centerService.existsById(clazz.getCenterId())) {
-            errorMsg.append("Không tìm thấy Cơ Sở nào với id: ").append(clazz.getCenterId());
-        }
-        /* staffId */
-        if (!staffService.existsById(clazz.getStaffId())) {
-            errorMsg.append("Không tìm thấy Nhân Viên nào với id: ").append(clazz.getStaffId());
-        }
+            /* Copy from old data */
+            clazz = oldClazz;
 
-        /* Check duplicate */
-        if (clazzRepository
-                .existsByIdNotAndClazzAliasAndStatusNotIn(
-                        clazz.getId(),
-                        clazz.getClazzAlias(),
-                        List.of(DELETED))) {
-            errorMsg.append("Đã tồn tại Lớp Học khác với Mã: ").append(clazz.getClazzAlias());
+            /* No change of attribute => no need validate input, no need check FK */
+        } else {
+            /* No change status => change other attribute */
+            switch (oldStatus) {
+                case DESIGNING -> {
+                    /* Validate input */
+
+                    /* alias */
+                    errorMsg.append(
+                            miscUtil.validateString(
+                                    "Mã lóp học", clazz.getClazzAlias(), 1, 10,
+                                    List.of("required", "minLength", "maxLength",
+                                            "onlyBlank", "startBlank", "endBlank", "specialChar")));
+                    /* name */
+                    errorMsg.append(
+                            miscUtil.validateString(
+                                    "Tên lóp học", clazz.getClazzName(), 1, 45,
+                                    List.of("required", "minLength", "maxLength",
+                                            "onlyBlank", "startBlank", "endBlank", "specialChar")));
+                    /* clazzDesc */
+                    errorMsg.append(
+                            miscUtil.validateString(
+                                    "Miêu tả lóp học", clazz.getClazzDesc(), 1, 9999,
+                                    List.of("nullOrMinLength", "maxLength", "onlyBlank",
+                                            "startBlank", "endBlank", "specialChar")));
+                    /* minCapacity */
+                    errorMsg.append(
+                            miscUtil.validateNumber(
+                                    "Số học sinh tối thiểu", clazz.getMinCapacity().doubleValue(),
+                                    0.0, clazz.getMaxCapacity().doubleValue(), 1.0,
+                                    List.of("min", "max", "step")));
+                    /* maxCapacity */
+                    errorMsg.append(
+                            miscUtil.validateNumber(
+                                    "Số học sinh tối đa", clazz.getMaxCapacity().doubleValue(),
+                                    0.0, null, 1.0,
+                                    List.of("min", "step")));
+                    
+                    /* Check FK */
+                    /* courseId */
+                    if (!courseService.existsById(clazz.getCourseId())) {
+                        errorMsg.append("Không tìm thấy Khóa Học nào với id: ").append(clazz.getCourseId());
+                    }
+                    /* centerId */
+                    if (!centerService.existsById(clazz.getCenterId())) {
+                        errorMsg.append("Không tìm thấy Cơ Sở nào với id: ").append(clazz.getCenterId());
+                    }
+                    /* staffId */
+                    if (!staffService.existsById(clazz.getStaffId())) {
+                        errorMsg.append("Không tìm thấy Nhân Viên nào với id: ").append(clazz.getStaffId());
+                    }
+
+                    /* Check duplicate */
+                    if (clazzRepository
+                            .existsByIdNotAndClazzAliasAndStatusNotIn(
+                                    clazz.getId(),
+                                    clazz.getClazzAlias(),
+                                    List.of(DELETED))) {
+                        errorMsg.append("Đã tồn tại Lớp Học khác với Mã: ").append(clazz.getClazzAlias());
+                    }
+                }
+
+                case AWAIT_REVIEW -> {
+                    /* Await review don't allow change of attribute => Cancel update. */
+                    return oldClazz;
+                }
+                case OPENED, ONGOING, CLOSED -> {
+                    /* Override old data */
+                    oldClazz.setUpdatedBy(clazz.getUpdatedBy());
+                    oldClazz.setUpdatedAt(clazz.getUpdatedAt());
+
+                    /* Copy from old data */
+                    clazz = oldClazz;
+
+                    /* Validate input */
+                    /* No change attribute => no validate */
+                }
+            }
         }
 
         /* Is error */
         if (!errorMsg.isEmpty()) {
             throw new IllegalArgumentException(
-                    "Lỗi sửa Lớp Học. " + errorMsg.toString());
+                    "Lỗi sửa Lớp Học: \n" + errorMsg.toString());
         }
 
         /* Update */
@@ -1228,18 +1280,6 @@ public class ClazzServiceImpl implements ClazzService {
     @Override
     public ClazzReadDTO updateClazzByDTO(ClazzUpdateDTO updateDTO) throws Exception {
         Clazz clazz = mapper.map(updateDTO, Clazz.class);
-
-//        CourseSemester courseSemester =
-//                courseSemesterService.getByCourseIdAndSemesterIdAndCenterId(
-//                        updateDTO.getCourseId(), updateDTO.getSemesterId(), updateDTO.getCenterId());
-//        if (courseSemester == null) {
-//            courseSemester = new CourseSemester(
-//                    updateDTO.getCourseId(), updateDTO.getSemesterId(), updateDTO.getCenterId());
-//            courseSemester.setStatus(Status.CREATED);
-//
-//            courseSemester = courseSemesterService.createCourseSemester(courseSemester);
-//        }
-//        clazz.setCourseSemesterId(courseSemester.getId());
 
         clazz = updateClazz(clazz);
 

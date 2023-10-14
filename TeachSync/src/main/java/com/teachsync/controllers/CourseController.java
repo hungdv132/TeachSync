@@ -112,7 +112,9 @@ public class CourseController {
             return "/course/add-course";
         }
 
-        return "/course/course-detail" + "?id=" + courseDTO.getId();
+        redirect.addAttribute("mess", "Thêm khóa học thành công");
+
+        return "redirect:/course-detail" + "?id=" + courseDTO.getId();
     }
 
 
@@ -228,20 +230,22 @@ public class CourseController {
 
         try {
             int pageType = 0;
+
             if (Objects.isNull(userDTO)) {
                 pageType = 1;
-            }
+            } else {
 
-            Long roleId = userDTO.getRoleId();
+                Long roleId = userDTO.getRoleId();
 
-            if (ROLE_STUDENT.equals(roleId)) {
-                pageType = 2;
-            } else if (ROLE_PARENTS.equals(roleId)) {
-                pageType = 1;
-            } else if (ROLE_TEACHER.equals(roleId)) {
-                pageType = 2;
-            } else if (ROLE_ADMIN.equals(roleId)) {
-                pageType = 3;
+                if (ROLE_STUDENT.equals(roleId)) {
+                    pageType = 2;
+                } else if (ROLE_PARENTS.equals(roleId)) {
+                    pageType = 1;
+                } else if (ROLE_TEACHER.equals(roleId)) {
+                    pageType = 2;
+                } else if (ROLE_ADMIN.equals(roleId)) {
+                    pageType = 3;
+                }
             }
 
             List<Status> statuses;
@@ -295,7 +299,8 @@ public class CourseController {
 
         } catch (Exception e) {
             e.printStackTrace();
-            model.addAttribute("errorMsg", "Server error, please try again later");
+
+            model.addAttribute("mess", "Server error, please try again later");
         }
 
         return "course/course-detail";

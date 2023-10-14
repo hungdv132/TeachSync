@@ -128,14 +128,16 @@
           
         </div>
       </div>
-      
+  
+  
+      <!-- Clazz minCapacity, maxCapacity -->
       <div class="col-12">
         <div class="row">
-          <!-- Clazz maxCapacity -->
+          <!-- Clazz minCapacity -->
           <div class="col-sm-12 col-md-6 mb-3">
             <label for="numMinCapacity" class="form-label">Số học sinh tối thiểu: (Để mở lớp)</label>
             <input id="numMinCapacity" name="minCapacity"
-                   type="number" min="1" max="1" step="1" value="1"
+                   type="number" min="1" max="10" step="1" value="5"
                    class="form-control ts-border-grey"
                    required="required">
           </div>
@@ -144,15 +146,23 @@
           <div class="col-sm-12 col-md-6 mb-3">
             <label for="numMaxCapacity" class="form-label">Số học sinh tối đa:</label>
             <input id="numMaxCapacity" name="maxCapacity"
-                   type="number" min="1" step="1" value="1"
+                   type="number" min="1" step="1" value="10"
                    class="form-control ts-border-grey"
+                   onchange="updateInputMinCapacityMax()"
                    required="required">
           </div>
 
         </div>
       </div>
       
-      <button type="submit" class="btn btn-primary">Gửi</button>
+      <!-- Submit button -->
+      <div class="col-12 text-center">
+        <button id="btnSubmit"
+                type="submit"
+                class="btn btn-primary w-50 mb-3">
+          Gửi
+        </button>
+      </div>
       
     </form:form>
   </div>
@@ -193,6 +203,69 @@
             }
         })
     }
+    
+    function updateInputMinCapacityMax() {
+        let maxCapacity = $("#numMaxCapacity").val();
+
+        $("#numMinCapacity").attr("max", maxCapacity);
+    }
+
+</script>
+
+<script>
+    /* Validate input */
+    // Select all form elements with the 'required' attribute
+    const requiredElements = $('#form :input[required]');
+    // Iterate through each required element
+    requiredElements.each(function () {
+        const element = $(this);
+        if (element.val() === '') {
+            // Set an initial custom validity message for required input in VN
+            element[0].setCustomValidity(requiredErrorMsg);
+        }
+    });
+
+    /* clazzAlias */
+    let txtAlias = document.getElementById("txtAlias");
+    txtAlias.addEventListener("input", function () {
+        validateTextInput(
+            txtAlias, txtAlias.minLength, txtAlias.maxLength,
+            ["required", "minLength", "maxLength", "onlyBlank", "startBlank", "endBlank", "specialChar"]);
+
+    });
+
+    /* clazzName */
+    let txtName = document.getElementById("txtName");
+    txtName.addEventListener("input", function () {
+        validateTextInput(
+            txtName, txtName.minLength, txtName.maxLength,
+            ["required", "minLength", "maxLength", "onlyBlank", "startBlank", "endBlank", "specialChar"]);
+
+    });
+
+    /* clazzDesc */
+    let txtADesc = document.getElementById("txtADesc");
+    txtADesc.addEventListener("input", function () {
+        validateTextInput(
+            txtADesc, 1, txtADesc.maxLength,
+            ["nullOrMinLength", "maxLength", "onlyBlank", "startBlank", "endBlank", "specialChar"]);
+    });
+
+    /* numMinCapacity */
+    let numMinCapacity = document.getElementById("numMinCapacity");
+    numMinCapacity.addEventListener("input", function () {
+        validateNumberInput(
+            numMinCapacity, Number(numMinCapacity.min), Number(numMinCapacity.max), Number(numMinCapacity.step),
+            ["required", "min", "max", "step"]);
+    });
+
+    /* numMaxCapacity */
+    let numMaxCapacity = document.getElementById("numMaxCapacity");
+    numMaxCapacity.addEventListener("input", function () {
+        validateNumberInput(
+            numMaxCapacity, Number(numMaxCapacity.min), null, Number(numMaxCapacity.step),
+            ["required", "min", "step"]);
+    });
 </script>
 <!-- ================================================== Script ===================================================== -->
 </body>

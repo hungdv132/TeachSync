@@ -262,9 +262,10 @@
   <%@ include file="/WEB-INF/fragments/footer.jspf" %>
 <!-- ================================================== Footer ===================================================== -->
 
+
 <!-- ================================================== Script ===================================================== -->
 <script>
-    var mess = '${mess}'
+    var mess = `<c:out value="${mess}"/>`;
     if (mess != '') {
         alert(mess);
     }
@@ -361,13 +362,10 @@
         let status = $("#selStatus").val();
         
         /* Clear content */
-        pStatusDesc.text("").addClass("visually-hidden");;
+        pStatusDesc.text("").addClass("visually-hidden");
 
-        console.log("init: " +initialStatus);
-        console.log("new: " +status);
-        
         if (status !== initialStatus) {
-            /* No edit when changing status */
+            /* No edit when changing Status */
             disableAllFormElementIn("divCourseImg");
             disableAllFormElementIn("divCourseTextDetail");
             disableAllFormElementIn("divCourseNumberDetail");
@@ -376,23 +374,52 @@
             pStatusDesc.text("Khi chuyển đổi trạng thái không được phép sửa đổi các thông tin khác.")
                 .removeClass("visually-hidden");
             
-            if (initialStatus === '${Status.AWAIT_REVIEW}') {
-                if (status === '${Status.DESIGNING}') {
-                    /* Denied */
-                    pStatusDesc.append("<br>")
-                        .append("Xác nhận CHƯA hoàn thành thiết kế?")
-                        .removeClass("visually-hidden");
-                }
-                
-                if (status === '${Status.OPENED}') {
-                    /* Accept */
-                    pStatusDesc.append("<br>")
-                        .append("Xác nhận ĐÃ hoàn thành thiết kế? " +
-                            "Một khi đã hoàn thành, hệ thống sẽ khóa khả năng sửa đổi các thông tin của khóa học.")
-                        .removeClass("visually-hidden");
-                }
+            switch (initialStatus) {
+                case '${Status.DESIGNING}':
+                    switch (status) {
+                        case '${Status.AWAIT_REVIEW}':
+                        pStatusDesc.append("<br>")
+                            .append("Xác nhận hoàn thành thiết kế và xin chờ xét duyệt?")
+                            .removeClass("visually-hidden");
+                        break;
+                        default:
+                            /* Where did you get this status from? */
+                            disableAllFormElementIn("divCourseImg");
+                            disableAllFormElementIn("divCourseTextDetail");
+                            disableAllFormElementIn("divCourseNumberDetail");
+                            disableAllFormElementIn("divCoursePrice");
+                            break;
+                    }
+                    break;
+                    
+                case '${Status.AWAIT_REVIEW}':
+                    switch (status) {
+                        case '${Status.DESIGNING}':
+                            /* Denied */
+                            pStatusDesc.append("<br>")
+                                .append("Xác nhận CHƯA hoàn thành thiết kế?")
+                                .removeClass("visually-hidden");
+                            break;
+                            
+                        case '${Status.OPENED}':
+                            /* Accept */
+                            pStatusDesc.append("<br>")
+                                .append("Xác nhận ĐÃ hoàn thành thiết kế? " +
+                                    "Một khi đã hoàn thành, hệ thống sẽ khóa khả năng sửa đổi các thông tin của khóa học.")
+                                .removeClass("visually-hidden");
+                            break;
+                        default:
+                            /* Where did you get this status from? */
+                            disableAllFormElementIn("divCourseImg");
+                            disableAllFormElementIn("divCourseTextDetail");
+                            disableAllFormElementIn("divCourseNumberDetail");
+                            disableAllFormElementIn("divCoursePrice");
+                            break;
+                    }
+                    break;
             }
         } else {
+            /* No change Status */
             switch (status) {
                 case "${Status.DESIGNING}":
                     /* All editable */
@@ -451,7 +478,7 @@
     // Iterate through each required element
     requiredElements.each(function () {
         const element = $(this);
-        if (element.value === '') {
+        if (element.val() === '') {
             // Set an initial custom validity message for required input in VN
             element[0].setCustomValidity(requiredErrorMsg);
         }
@@ -499,7 +526,7 @@
             ["required", "min", "max", "step"]);
     });
 
-    /* numMinScore */
+    /* numMinAttendant */
     let numMinAttendant = document.getElementById("numMinAttendant");
     numMinAttendant.addEventListener("input", function () {
         validateNumberInput(

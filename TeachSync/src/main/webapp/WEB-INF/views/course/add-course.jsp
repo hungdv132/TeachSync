@@ -234,7 +234,7 @@
 
 <!-- ================================================== Script ===================================================== -->
 <script>
-    var mess = '${mess}'
+    var mess = `<c:out value="${mess}"/>`;
     if (mess != '') {
         alert(mess);
     }
@@ -338,9 +338,10 @@
     // Iterate through each required element
     requiredElements.each(function () {
         const element = $(this);
-
-        // Set an initial custom validity message for required input in VN
-        element[0].setCustomValidity(requiredErrorMsg);
+        if (element.val() === '') {
+            // Set an initial custom validity message for required input in VN
+            element[0].setCustomValidity(requiredErrorMsg);
+        }
     });
     
     /* courseAlias */

@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
 import java.lang.reflect.Field;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -159,27 +160,32 @@ public class MiscUtil {
             /* null or min (if null ignore, if not check minlength) */
             if (validateOption.contains("nullOrMin")) {
                 if (number < min) {
-                    errorMsg.append("\tCần lớn hơn ").append(min).append(" , hoặc để trống trường này.\n");
+                    errorMsg.append("\tCần lớn hơn hoặc bằng ").append(min).append(" , hoặc để trống trường này.\n");
                 }
             }
 
             /* min */
             if (validateOption.contains("min")) {
                 if (number < min) {
-                    errorMsg.append("\tCần lớn hơn ").append(min).append(" .\n");
+                    errorMsg.append("\tCần lớn hơn hoặc bằng ").append(min).append(" .\n");
                 }
             }
 
             /* max */
             if (validateOption.contains("max")) {
                 if (number > max) {
-                    errorMsg.append("\tCần nhỏ hơn ").append(max).append(" .\n");
+                    errorMsg.append("\tCần nhỏ hơn hoặc bằng ").append(max).append(" .\n");
                 }
             }
 
             /* step */
             if (validateOption.contains("step")) {
-                if (number % step != 0) {
+                /* Using BigDecimal to avoid Double float overflow*/
+                BigDecimal numberBD = new BigDecimal(Double.toString(number));
+                BigDecimal stepBD = new BigDecimal(Double.toString(step));
+                BigDecimal remainderBD = numberBD.remainder(stepBD);
+
+                if (remainderBD.compareTo(BigDecimal.ZERO) != 0) {
                     errorMsg.append("\tCó đơn vị biến đổi nhỏ nhất: ±").append(step).append(" .\n");
                 }
             }

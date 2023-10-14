@@ -194,7 +194,6 @@
               </a>
               <ul class="dropdown-menu">
                 <li><a class="dropdown-item ts-txt-hover-blue" href="/course">Khoá học</a></li>
-                <li><a class="dropdown-item ts-txt-hover-blue" href="/semester">Học kỳ</a></li>
                 <li><a class="dropdown-item ts-txt-hover-blue" href="/certificate">Bằng cấp</a></li>
                 <li><a class="dropdown-item ts-txt-hover-blue" href="/tests">Bài thi</a></li>
                 <li><a class="dropdown-item ts-txt-hover-blue" href="/material">Tài liệu</a></li>

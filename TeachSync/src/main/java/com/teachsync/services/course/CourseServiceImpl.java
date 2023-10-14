@@ -109,7 +109,7 @@ public class CourseServiceImpl implements CourseService {
         /* Is error */
         if (!errorMsg.isEmpty()) {
             throw new IllegalArgumentException(
-                    "Lỗi tạo Khóa Học. " + errorMsg.toString());
+                    "Lỗi tạo Khóa Học: \n" + errorMsg.toString());
         }
 
         /* Save to DB */
@@ -676,9 +676,6 @@ public class CourseServiceImpl implements CourseService {
                     /* Validate input */
                     /* courseImg */
                     /* TODO: check valid link */
-
-                    /* Check FK */
-                    /* No FK */
                 }
             }
         }
@@ -686,7 +683,7 @@ public class CourseServiceImpl implements CourseService {
         /* Is error */
         if (!errorMsg.isEmpty()) {
             throw new IllegalArgumentException(
-                    "Lỗi sửa Khóa Học. " + errorMsg.toString());
+                    "Lỗi sửa Khóa Học: \n" + errorMsg.toString());
         }
 
         /* Save to DB */

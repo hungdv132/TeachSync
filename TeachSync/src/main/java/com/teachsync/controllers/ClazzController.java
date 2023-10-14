@@ -208,37 +208,39 @@ public class ClazzController {
         return "clazz/add-clazz";
     }
 
-    @PostMapping(value = "/add-clazz", consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
-    public Map<String, Object> addClazz(
-            @RequestBody ClazzCreateDTO createDTO,
+    @PostMapping("/add-clazz")
+    public String addClazz(
+            @ModelAttribute ClazzCreateDTO createDTO,
             @SessionAttribute(value = "user", required = false) UserReadDTO userDTO,
             RedirectAttributes redirect) throws Exception {
-        Map<String, Object> response = new HashMap<>();
 
         //check login
         if (ObjectUtils.isEmpty(userDTO)) {
             redirect.addAttribute("mess", "Làm ơn đăng nhập");
-            response.put("view", "/index");
-            return response;
+            return "redirect:/index";
         }
 
         if (!userDTO.getRoleId().equals(Constants.ROLE_ADMIN)) {
             redirect.addAttribute("mess", "bạn không đủ quyền");
-            response.put("view", "/index");
-            return response;
-        }
-        ClazzReadDTO readDTO;
-        try {
-            readDTO = clazzService.createClazzByDTO(createDTO);
-        } catch (Exception e) {
-            e.printStackTrace();
-            response.put("error", e.getMessage());
-            return response;
+            return "redirect:/index";
         }
 
-        response.put("view", "/clazz-detail?id=" + readDTO.getId());
-        return response;
+        ClazzReadDTO clazzDTO;
+
+        try {
+            createDTO.setCreatedBy(userDTO.getId());
+
+            clazzDTO = clazzService.createClazzByDTO(createDTO);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            redirect.addAttribute("mess", e.getMessage());
+            return "redirect:/clazz";
+        }
+
+        redirect.addAttribute("mess", "Tạo lớp học thành công");
+
+        return "redirect:/clazz-detail" + "?id=" + clazzDTO.getId();
     }
 
 
@@ -473,37 +475,39 @@ public class ClazzController {
         return "clazz/edit-clazz";
     }
 
-    @PostMapping(value = "/edit-clazz", consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
-    public Map<String, Object> editClazz(
-            @RequestBody ClazzCreateDTO createDTO,
+    @PostMapping("/edit-clazz")
+    public String editClazz(
+            @ModelAttribute ClazzUpdateDTO updateDTO,
             @SessionAttribute(value = "user", required = false) UserReadDTO userDTO,
             RedirectAttributes redirect) throws Exception {
-        Map<String, Object> response = new HashMap<>();
 
         //check login
         if (ObjectUtils.isEmpty(userDTO)) {
             redirect.addAttribute("mess", "Làm ơn đăng nhập");
-            response.put("view", "/index");
-            return response;
+            return "redirect:/index";
         }
 
         if (!userDTO.getRoleId().equals(Constants.ROLE_ADMIN)) {
             redirect.addAttribute("mess", "bạn không đủ quyền");
-            response.put("view", "/index");
-            return response;
-        }
-        ClazzReadDTO readDTO;
-        try {
-            readDTO = clazzService.createClazzByDTO(createDTO);
-        } catch (Exception e) {
-            e.printStackTrace();
-            response.put("error", e.getMessage());
-            return response;
+            return "redirect:/index";
         }
 
-        response.put("view", "/clazz-detail?id=" + readDTO.getId());
-        return response;
+        ClazzReadDTO readDTO;
+
+        try {
+            updateDTO.setUpdatedBy(userDTO.getId());
+
+            readDTO = clazzService.updateClazzByDTO(updateDTO);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            redirect.addAttribute("mess", e.getMessage());
+            return "redirect:/clazz";
+        }
+
+        redirect.addAttribute("mess", "Sửa lớp học thành công");
+
+        return "redirect:/clazz-detail" + "?id=" + readDTO.getId();
     }
 
 

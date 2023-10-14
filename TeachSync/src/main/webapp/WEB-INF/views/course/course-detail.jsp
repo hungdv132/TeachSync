@@ -121,10 +121,7 @@
               
               <c:if test="${isStudent}">
                 <div class="card-footer text-center">
-                  <c:url var="enrollLink" value="enroll">
-                    <c:param name="id" value="${course.id}"/>
-                  </c:url>
-                  <a href="${enrollLink}" class="btn btn-primary w-25">Đăng ký học</a>
+                  <a href="/enroll?id=${course.id}" class="btn btn-primary w-25">Đăng ký học</a>
                 </div>
               </c:if>
               
@@ -254,5 +251,15 @@
 <!-- ================================================== Footer ===================================================== -->
 <%@ include file="/WEB-INF/fragments/footer.jspf" %>
 <!-- ================================================== Footer ===================================================== -->
+
+
+<!-- ================================================== Script ===================================================== -->
+<script>
+    var mess = `<c:out value="${mess}"/>`;
+    if (mess != '') {
+        alert(mess);
+    }
+</script>
+<!-- ================================================== Script ===================================================== -->
 </body>
 </html>
