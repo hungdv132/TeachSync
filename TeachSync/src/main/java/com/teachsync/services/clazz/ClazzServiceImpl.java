@@ -1252,7 +1252,7 @@ public class ClazzServiceImpl implements ClazzService {
                     /* Await review don't allow change of attribute => Cancel update. */
                     return oldClazz;
                 }
-                case OPENED, ONGOING, CLOSED -> {
+                case OPENED, ONGOING, SUSPENDED, CLOSED -> {
                     /* Override old data */
                     oldClazz.setUpdatedBy(clazz.getUpdatedBy());
                     oldClazz.setUpdatedAt(clazz.getUpdatedAt());
@@ -1361,7 +1361,7 @@ public class ClazzServiceImpl implements ClazzService {
                                 clazz.getCourseId(),
                                 List.of(DELETED),
                                 false);
-                dto.setCourseName(course.getCourseAlias());
+                dto.setCourseAlias(course.getCourseAlias());
             }
 
             if (options.contains(DtoOption.CENTER)) {

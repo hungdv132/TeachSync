@@ -79,9 +79,7 @@
               </a>
               <ul class="dropdown-menu">
                 <li><a class="dropdown-item ts-txt-hover-blue" href="/course">Khoá học</a></li>
-                <li><a class="dropdown-item ts-txt-hover-blue" href="/promotion">Khuyến mãi</a></li>
-                <c:url var="myCourse" value="/course"><c:param name="userId" value="${user.id}"/></c:url>
-                <li><a class="dropdown-item ts-txt-hover-blue" href="${myCourse}">Khoá của tôi</a></li>
+                <li><a class="dropdown-item ts-txt-hover-blue" href="/my-course">Khoá của tôi</a></li>
               </ul>
             </li>
 

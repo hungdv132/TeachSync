@@ -345,58 +345,61 @@ public class ClazzController {
                             List.of(STAFF, USER, COURSE_NAME,
                                     COURSE_ALIAS, CENTER, TEST_LIST));
             //get news of class
-            List<NewsReadDTO> newsReadDTOList = newsService.getAllNewsByClazz(clazzDTO.getId());
+//            List<NewsReadDTO> newsReadDTOList = newsService.getAllNewsByClazz(clazzDTO.getId());
+
             //get homework of class
+
             //get score of class
             List<HomeworkReadDTO> homeworkReadDTOList = homeworkService.getAllByClazzId(clazzDTO.getId());
 
-            //get course
-            CourseReadDTO courseReadDTO = courseService.getDTOById(
-                    clazzDTO.getCourseId(),
-                    List.of(DELETED),
-                    false,
-                    List.of(MATERIAL_LIST));
+            /* get course */
+//            CourseReadDTO courseReadDTO = courseService.getDTOById(
+//                    clazzDTO.getCourseId(),
+//                    List.of(DELETED),
+//                    false,
+//                    List.of(MATERIAL_LIST));
 
-            for (ClazzTestReadDTO clT : clazzDTO.getTestList()) {
-                Test test = testRepository.findById(clT.getTestId()).orElse(null);
-                TestReadDTO testReadDTO = new TestReadDTO();
-                testReadDTO.setTestType(test.getTestType());
-                testReadDTO.setQuestionType(test.getQuestionType());
-                testReadDTO.setId(test.getId());
-                clT.setTest(testReadDTO);
-                if (clT.getOpenFrom().compareTo(LocalDateTime.now()) < 0 && clT.getOpenTo() == null) {
-                    clT.setInTime("Đang mở");
-                } else if (clT.getOpenTo() != null && clT.getOpenTo().compareTo(LocalDateTime.now()) < 0) {
-                    clT.setInTime("Đã kết thúc");
-                }
-            }
+//            for (ClazzTestReadDTO clT : clazzDTO.getTestList()) {
+//                Test test = testRepository.findById(clT.getTestId()).orElse(null);
+//                TestReadDTO testReadDTO = new TestReadDTO();
+//                testReadDTO.setTestType(test.getTestType());
+//                testReadDTO.setQuestionType(test.getQuestionType());
+//                testReadDTO.setId(test.getId());
+//                clT.setTest(testReadDTO);
+//                if (clT.getOpenFrom().compareTo(LocalDateTime.now()) < 0 && clT.getOpenTo() == null) {
+//                    clT.setInTime("Đang mở");
+//                } else if (clT.getOpenTo() != null && clT.getOpenTo().compareTo(LocalDateTime.now()) < 0) {
+//                    clT.setInTime("Đã kết thúc");
+//                }
+//            }
+//
+//            List<Test> lstTestTeacher =
+//                    testRepository.findAllByCourseIdAndStatusNot(clazzDTO.getCourseId(), Status.DELETED);
+//
+//            for (Test t : lstTestTeacher) {
+//                ClazzTest clazzTest =
+//                        clazzTestRepository
+//                                .findByClazzIdAndTestIdAndStatusNot(
+//                                        clazzId,
+//                                        t.getId(),
+//                                        Status.DELETED)
+//                                .orElse(null);
+//
+//                if (clazzTest == null) {
+//                    t.setStatusTeacherTest(0);
+//                } else if (clazzTest != null && clazzTest.getOpenTo() == null) {
+//                    t.setStatusTeacherTest(1);
+//                } else {
+//                    t.setStatusTeacherTest(2);
+//                }
+//            }
 
-            List<Test> lstTestTeacher =
-                    testRepository.findAllByCourseIdAndStatusNot(clazzDTO.getCourseId(), Status.DELETED);
-
-            for (Test t : lstTestTeacher) {
-                ClazzTest clazzTest =
-                        clazzTestRepository
-                                .findByClazzIdAndTestIdAndStatusNot(
-                                        clazzId,
-                                        t.getId(),
-                                        Status.DELETED)
-                                .orElse(null);
-
-                if (clazzTest == null) {
-                    t.setStatusTeacherTest(0);
-                } else if (clazzTest != null && clazzTest.getOpenTo() == null) {
-                    t.setStatusTeacherTest(1);
-                } else {
-                    t.setStatusTeacherTest(2);
-                }
-            }
-
-            model.addAttribute("homeworkList", homeworkReadDTOList);
-            model.addAttribute("newsList", newsReadDTOList);
+            /* FIl model */
+//            model.addAttribute("homeworkList", homeworkReadDTOList);
+//            model.addAttribute("newsList", newsReadDTOList);
             model.addAttribute("clazz", clazzDTO);
-            model.addAttribute("lstTestTeacher", lstTestTeacher);
-            model.addAttribute("material", courseReadDTO.getMaterialList());
+//            model.addAttribute("lstTestTeacher", lstTestTeacher);
+//            model.addAttribute("material", courseReadDTO.getMaterialList());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -492,12 +495,12 @@ public class ClazzController {
             return "redirect:/index";
         }
 
-        ClazzReadDTO readDTO;
+        ClazzReadDTO clazzDTO;
 
         try {
             updateDTO.setUpdatedBy(userDTO.getId());
 
-            readDTO = clazzService.updateClazzByDTO(updateDTO);
+            clazzDTO = clazzService.updateClazzByDTO(updateDTO);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -507,7 +510,7 @@ public class ClazzController {
 
         redirect.addFlashAttribute("mess", "Sửa lớp học thành công");
 
-        return "redirect:/clazz-detail" + "?id=" + readDTO.getId();
+        return "redirect:/clazz-detail" + "?id=" + clazzDTO.getId();
     }
 
 

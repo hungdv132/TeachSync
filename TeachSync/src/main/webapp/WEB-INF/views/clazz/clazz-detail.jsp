@@ -21,6 +21,7 @@
 <%@ include file="/WEB-INF/fragments/header.jspf" %>
 <!-- ================================================== Header ===================================================== -->
 
+
 <!-- ================================================== Main Body ================================================== -->
 <div class="row ts-bg-white border ts-border-teal rounded-3 pt-3 mx-2 mb-3">
     <!-- Detail -->
@@ -33,9 +34,6 @@
             </c:if>
         </div>
 
-        <p>abc</p>
-
-
         <p>Giáo viên: ${clazz.staff.user.fullName}</p>
 
         <p>Khóa học: ${clazz.courseAlias} - ${clazz.courseName}</p>
@@ -47,7 +45,7 @@
             <p>Trạng thái: ${clazz.status.stringValueVie}</p>
         </c:if>
 
-        <p>Dung lượng học sinh: ${clazz.maxCapacity}</p>
+        <p>Số học sinh tối đa: ${clazz.maxCapacity}</p>
     </div>
 
     <!-- Dependency -->

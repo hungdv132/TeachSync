@@ -433,8 +433,12 @@
             $(`#selStatus option[value="${Status.OPENED}"]`).remove();
             break;
         case "${Status.CLOSED}":
+            /* No change status */
             $(`#selStatus option[value="${Status.DESIGNING}"]`).remove();
             $(`#selStatus option[value="${Status.AWAIT_REVIEW}"]`).remove();
+            $(`#selStatus option[value="${Status.OPENED}"]`).remove();
+            $(`#selStatus option[value="${Status.ONGOING}"]`).remove();
+            $(`#selStatus option[value="${Status.SUSPENDED}"]`).remove();
             break;
     }
 

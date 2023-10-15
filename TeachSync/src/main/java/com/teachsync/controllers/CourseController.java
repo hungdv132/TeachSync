@@ -4,8 +4,14 @@ import com.teachsync.dtos.course.CourseCreateDTO;
 import com.teachsync.dtos.course.CourseReadDTO;
 import com.teachsync.dtos.course.CourseUpdateDTO;
 import com.teachsync.dtos.user.UserReadDTO;
+import com.teachsync.entities.Clazz;
+import com.teachsync.entities.ClazzMember;
+import com.teachsync.entities.Staff;
+import com.teachsync.services.clazz.ClazzService;
+import com.teachsync.services.clazzMember.ClazzMemberService;
 import com.teachsync.services.course.CourseService;
 import com.teachsync.services.courseSemester.CourseSemesterService;
+import com.teachsync.services.staff.StaffService;
 import com.teachsync.utils.MiscUtil;
 import com.teachsync.utils.enums.DtoOption;
 import com.teachsync.utils.enums.Status;
@@ -19,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.teachsync.utils.Constants.*;
 import static com.teachsync.utils.enums.DtoOption.*;
@@ -31,7 +38,12 @@ public class CourseController {
     private CourseService courseService;
 
     @Autowired
-    private CourseSemesterService courseSemesterService;
+    private ClazzMemberService clazzMemberService;
+    @Autowired
+    private StaffService staffService;
+    @Autowired
+    private ClazzService clazzService;
+
     @Autowired
     private MiscUtil miscUtil;
 
@@ -221,6 +233,135 @@ public class CourseController {
         return "course/list-course";
     }
 
+    @GetMapping("/my-course")
+    public String myCourseListPage(
+            RedirectAttributes redirect,
+            Model model,
+            @ModelAttribute("mess") String mess,
+            @RequestParam(value = "pageNo", required = false) Integer pageNo,
+            @SessionAttribute(name = "user", required = false) UserReadDTO userDTO) {
+
+        try {
+            Page<CourseReadDTO> dtoPage;
+
+            if (Objects.isNull(userDTO)) {
+                redirect.addFlashAttribute("mess", "Làm ơn đăng nhập");
+                return "redirect:/index";
+            }
+
+            Long roleId = userDTO.getRoleId();
+            if (!List.of(ROLE_STUDENT, ROLE_TEACHER).contains(roleId)) {
+                redirect.addFlashAttribute("mess", "Bạn không đủ quyền");
+                return "redirect:/index";
+            }
+
+            int pageType = 0;
+            if (ROLE_STUDENT.equals(roleId)) {
+                pageType = 1;
+            } else if (ROLE_PARENTS.equals(roleId)) {
+                pageType = 1;
+            } else if (ROLE_TEACHER.equals(roleId)) {
+                pageType = 2;
+            } else if (ROLE_ADMIN.equals(roleId)) {
+                return "redirect:/course";
+            }
+
+            List<Status> statuses = List.of(OPENED, CLOSED);
+            boolean isStatusIn = true;
+
+            if (Objects.isNull(pageNo)) {
+                pageNo = 0;
+            }
+
+            Pageable pageable = miscUtil.makePaging(pageNo, 10, "status", true);
+
+            Set<Long> courseIdSet = new HashSet<>();
+
+            switch (pageType) {
+                case 1 -> {
+                    List<ClazzMember> clazzMemberList =
+                            clazzMemberService.getAllByUserId(userDTO.getId());
+
+                    if (ObjectUtils.isEmpty(clazzMemberList)) {
+                        break;
+                    }
+
+                    Set<Long> clazzIdSet =
+                            clazzMemberList.stream()
+                                    .map(ClazzMember::getClazzId)
+                                    .collect(Collectors.toSet());
+
+                    List<Clazz> clazzList =
+                            clazzService.getAllByIdIn(clazzIdSet, statuses, isStatusIn);
+
+                    if (ObjectUtils.isEmpty(clazzList)) {
+                        break;
+                    }
+
+                    courseIdSet =
+                            clazzList.stream()
+                                    .map(Clazz::getCourseId)
+                                    .collect(Collectors.toSet());
+                }
+                case 2 -> {
+                    List<Staff> staffList =
+                            staffService.getAllByUserId(userDTO.getId());
+
+                    if (ObjectUtils.isEmpty(staffList)) {
+                        break;
+                    }
+
+                    Set<Long> staffIdSet =
+                            staffList.stream()
+                                    .map(Staff::getId)
+                                    .collect(Collectors.toSet());
+
+                    List<Clazz> clazzList =
+                            clazzService.getAllByStaffIdIn(staffIdSet, statuses, isStatusIn);
+
+                    if (ObjectUtils.isEmpty(clazzList)) {
+                        break;
+                    }
+
+                    courseIdSet =
+                            clazzList.stream()
+                                    .map(Clazz::getCourseId)
+                                    .collect(Collectors.toSet());
+                }
+                default -> {
+                    throw new IllegalArgumentException(
+                            "Invalid role");
+                }
+            }
+
+            /* All course */
+            dtoPage =
+                    courseService.getPageAllDTOByIdIn(
+                            pageable,
+                            courseIdSet,
+                            statuses,
+                            isStatusIn,
+                            null);
+
+            if (dtoPage != null) {
+                model.addAttribute("courseList", dtoPage.getContent());
+                model.addAttribute("pageNo", dtoPage.getPageable().getPageNumber());
+                model.addAttribute("pageTotal", dtoPage.getTotalPages());
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            redirect.addFlashAttribute("mess", e.getMessage());
+
+            return "redirect:/index";
+        }
+
+        model.addAttribute("mess", mess);
+
+        return "course/list-course";
+    }
+
     @GetMapping("/course-detail")
     public String courseDetailPage(
             RedirectAttributes redirect,
@@ -314,6 +455,7 @@ public class CourseController {
             Model model,
             @RequestParam(name = "id") Long courseId,
             @SessionAttribute(name = "user", required = false) UserReadDTO userDTO) throws Exception {
+
         if (Objects.isNull(userDTO)) {
             redirect.addFlashAttribute("mess", "Làm ơn đăng nhập");
             return "redirect:/index";
