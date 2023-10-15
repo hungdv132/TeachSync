@@ -169,12 +169,12 @@ public class ClazzController {
             @SessionAttribute(value = "user", required = false) UserReadDTO userDTO) {
 
         if (Objects.isNull(userDTO)) {
-            redirect.addAttribute("mess", "Làm ơn đăng nhập");
+            redirect.addFlashAttribute("mess", "Làm ơn đăng nhập");
             return "redirect:/index";
         }
 
         if (!userDTO.getRoleId().equals(ROLE_ADMIN)) {
-            redirect.addAttribute("mess", "Bạn không đủ quyền");
+            redirect.addFlashAttribute("mess", "Bạn không đủ quyền");
             return "redirect:/index";
         }
 
@@ -216,12 +216,12 @@ public class ClazzController {
 
         //check login
         if (ObjectUtils.isEmpty(userDTO)) {
-            redirect.addAttribute("mess", "Làm ơn đăng nhập");
+            redirect.addFlashAttribute("mess", "Làm ơn đăng nhập");
             return "redirect:/index";
         }
 
         if (!userDTO.getRoleId().equals(Constants.ROLE_ADMIN)) {
-            redirect.addAttribute("mess", "bạn không đủ quyền");
+            redirect.addFlashAttribute("mess", "bạn không đủ quyền");
             return "redirect:/index";
         }
 
@@ -234,11 +234,11 @@ public class ClazzController {
 
         } catch (Exception e) {
             e.printStackTrace();
-            redirect.addAttribute("mess", e.getMessage());
+            redirect.addFlashAttribute("mess", e.getMessage());
             return "redirect:/clazz";
         }
 
-        redirect.addAttribute("mess", "Tạo lớp học thành công");
+        redirect.addFlashAttribute("mess", "Tạo lớp học thành công");
 
         return "redirect:/clazz-detail" + "?id=" + clazzDTO.getId();
     }
@@ -257,12 +257,12 @@ public class ClazzController {
 
 
             if (Objects.isNull(userDTO)) {
-                redirect.addAttribute("mess", "Làm ơn đăng nhập");
+                redirect.addFlashAttribute("mess", "Làm ơn đăng nhập");
                 return "redirect:/index";
             }
 
 //            if (!userDTO.getRoleId().equals(ROLE_ADMIN)) {
-//                redirect.addAttribute("mess", "Bạn không đủ quyền");
+//                redirect.addFlashAttribute("mess", "Bạn không đủ quyền");
 //                return "redirect:/index";
 //            }
 
@@ -423,12 +423,12 @@ public class ClazzController {
             @SessionAttribute(value = "user", required = false) UserReadDTO userDTO) {
 
         if (Objects.isNull(userDTO)) {
-            redirect.addAttribute("mess", "Làm ơn đăng nhập");
+            redirect.addFlashAttribute("mess", "Làm ơn đăng nhập");
             return "redirect:/index";
         }
 
         if (!userDTO.getRoleId().equals(ROLE_ADMIN)) {
-            redirect.addAttribute("mess", "Bạn không đủ quyền");
+            redirect.addFlashAttribute("mess", "Bạn không đủ quyền");
             return "redirect:/index";
         }
 
@@ -483,12 +483,12 @@ public class ClazzController {
 
         //check login
         if (ObjectUtils.isEmpty(userDTO)) {
-            redirect.addAttribute("mess", "Làm ơn đăng nhập");
+            redirect.addFlashAttribute("mess", "Làm ơn đăng nhập");
             return "redirect:/index";
         }
 
         if (!userDTO.getRoleId().equals(Constants.ROLE_ADMIN)) {
-            redirect.addAttribute("mess", "bạn không đủ quyền");
+            redirect.addFlashAttribute("mess", "bạn không đủ quyền");
             return "redirect:/index";
         }
 
@@ -501,11 +501,11 @@ public class ClazzController {
 
         } catch (Exception e) {
             e.printStackTrace();
-            redirect.addAttribute("mess", e.getMessage());
+            redirect.addFlashAttribute("mess", e.getMessage());
             return "redirect:/clazz";
         }
 
-        redirect.addAttribute("mess", "Sửa lớp học thành công");
+        redirect.addFlashAttribute("mess", "Sửa lớp học thành công");
 
         return "redirect:/clazz-detail" + "?id=" + readDTO.getId();
     }
@@ -520,12 +520,12 @@ public class ClazzController {
             RedirectAttributes redirect) throws Exception {
         //check login
         if (ObjectUtils.isEmpty(userDTO)) {
-            redirect.addAttribute("mess", "Làm ơn đăng nhập");
+            redirect.addFlashAttribute("mess", "Làm ơn đăng nhập");
             return "redirect:/";
         }
 
         if (!userDTO.getRoleId().equals(Constants.ROLE_ADMIN)) {
-            redirect.addAttribute("mess", "bạn không đủ quyền");
+            redirect.addFlashAttribute("mess", "bạn không đủ quyền");
             return "redirect:/";
         }
         Long Id = Long.parseLong(request.getParameter("id"));
@@ -540,7 +540,7 @@ public class ClazzController {
 
             model.addAttribute("clazz", clazzReadDTO);
             if (clazzReadDTO.getStatus().equals(OPENED)) {
-                redirect.addAttribute("mess", "Lớp học đang triển khai không thể thao tác");
+                redirect.addFlashAttribute("mess", "Lớp học đang triển khai không thể thao tác");
                 return "redirect:/clazz";
             }
 
@@ -548,7 +548,7 @@ public class ClazzController {
 
 
         if (clazzService.deleteClazz(Id)) {
-            redirect.addAttribute("mess", "Xóa class room thành công");
+            redirect.addFlashAttribute("mess", "Xóa class room thành công");
             return "redirect:/clazz";
         } else {
             model.addAttribute("mess", "Xóa class room thất bại");

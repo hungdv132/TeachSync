@@ -128,11 +128,11 @@ public class ScheduleController {
             RedirectAttributes redirect) throws Exception {
         //check login
         if (ObjectUtils.isEmpty(userDTO)) {
-            redirect.addAttribute("mess", "Làm ơn đăng nhập");
+            redirect.addFlashAttribute("mess", "Làm ơn đăng nhập");
             return "redirect:/index";
         }
         if (!userDTO.getRoleId().equals(Constants.ROLE_ADMIN)) {
-            redirect.addAttribute("mess", "bạn không đủ quyền");
+            redirect.addFlashAttribute("mess", "bạn không đủ quyền");
             return "redirect:/index";
         }
 
@@ -178,14 +178,14 @@ public class ScheduleController {
             @SessionAttribute(name = "user", required = false) UserReadDTO userDTO) {
 
         if (userDTO == null) {
-//            redirect.addAttribute("mess", "Làm ơn đăng nhập");
+//            redirect.addFlashAttribute("mess", "Làm ơn đăng nhập");
             return "redirect:/index";
         }
 
         try {
             Page<ClazzReadDTO> dtoPage;
             if (userDTO.getRoleId().equals(ROLE_STUDENT)) {
-//                redirect.addAttribute("mess", "bạn không đủ quyền");
+//                redirect.addFlashAttribute("mess", "bạn không đủ quyền");
                 return "redirect:/index";
             } else if (userDTO.getRoleId().equals(ROLE_TEACHER) || userDTO.getRoleId().equals(ROLE_ADMIN)) {
                 if (pageNo == null || pageNo < 0) {
@@ -274,12 +274,12 @@ public class ScheduleController {
 
         //check login
         if (ObjectUtils.isEmpty(userDTO)) {
-            redirect.addAttribute("mess", "Làm ơn đăng nhập");
+            redirect.addFlashAttribute("mess", "Làm ơn đăng nhập");
             return "redirect:/index";
         }
 
         if (!userDTO.getRoleId().equals(Constants.ROLE_ADMIN)) {
-            redirect.addAttribute("mess", "bạn không đủ quyền");
+            redirect.addFlashAttribute("mess", "bạn không đủ quyền");
             return "redirect:/index";
         }
 

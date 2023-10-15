@@ -46,7 +46,7 @@ public class ApplicationController {
     public String listTeacherRequest(Model model, @ModelAttribute("mess") String mess, HttpServletRequest request, RedirectAttributes redirect) throws Exception {
         HttpSession session = request.getSession();
         if (ObjectUtils.isEmpty(session.getAttribute("user"))) {
-            redirect.addAttribute("mess", "Làm ơn đăng nhập");
+            redirect.addFlashAttribute("mess", "Làm ơn đăng nhập");
             return "redirect:/";
         }
         UserReadDTO userDto = (UserReadDTO) session.getAttribute("user");
@@ -92,7 +92,7 @@ public class ApplicationController {
         //check login
         HttpSession session = request.getSession();
         if (ObjectUtils.isEmpty(session.getAttribute("user"))) {
-            redirect.addAttribute("mess", "Làm ơn đăng nhập");
+            redirect.addFlashAttribute("mess", "Làm ơn đăng nhập");
             return "redirect:/";
         }
 
@@ -105,7 +105,7 @@ public class ApplicationController {
             model.addAttribute("mess", mess);
         } catch (Exception e) {
             logger.error(e.getMessage());
-            redirect.addAttribute("mess", "hiển thị chi tiết chiến dịch thất bại ,lỗi : " + e.getMessage());
+            redirect.addFlashAttribute("mess", "hiển thị chi tiết chiến dịch thất bại ,lỗi : " + e.getMessage());
             return "redirect:/application/view-job";
 
         }
@@ -120,13 +120,13 @@ public class ApplicationController {
         //check login
         HttpSession session = request.getSession();
         if (ObjectUtils.isEmpty(session.getAttribute("user"))) {
-            redirect.addAttribute("mess", "Làm ơn đăng nhập");
+            redirect.addFlashAttribute("mess", "Làm ơn đăng nhập");
             return "redirect:/";
         }
 
         if (List.of(Constants.ROLE_ADMIN, Constants.ROLE_TEACHER).contains(userDTO.getRoleId())) {
             /* Nếu roleId ko có trong list role được cấp phép */
-            redirect.addAttribute("mess", "Chương trình không hợp lệ");
+            redirect.addFlashAttribute("mess", "Chương trình không hợp lệ");
             return "redirect:/";
         }
         //DB edit :table application_detail , col applicationId ,detailLink,detailNote thanh chấp nhận null , col Id tự tăng
@@ -154,12 +154,12 @@ public class ApplicationController {
             applicationDetailService.add(applicationDetailReadDTO, userDTO, campaignId);
         } catch (Exception e) {
             e.printStackTrace();
-            redirect.addAttribute("mess", e.getMessage());
+            redirect.addFlashAttribute("mess", e.getMessage());
             return "redirect:/application/application-request?id=" + campaignId;
 
         }
 
-        redirect.addAttribute("mess", "Tạo đơn ứng tuyển thành công");
+        redirect.addFlashAttribute("mess", "Tạo đơn ứng tuyển thành công");
         return "redirect:/application/application-request?id=" + campaignId;
     }
 
@@ -167,13 +167,13 @@ public class ApplicationController {
     public String changeStatusRequest(Model model, HttpServletRequest request, RedirectAttributes redirect) {
         HttpSession session = request.getSession();
         if (ObjectUtils.isEmpty(session.getAttribute("user"))) {
-            redirect.addAttribute("mess", "Làm ơn đăng nhập");
+            redirect.addFlashAttribute("mess", "Làm ơn đăng nhập");
             return "redirect:/";
         }
         UserReadDTO userDto = (UserReadDTO) session.getAttribute("user");
         //TODO :Check role admin
         if (!userDto.getRoleId().equals(Constants.ROLE_ADMIN)) {
-            redirect.addAttribute("mess", "bạn không đủ quyền");
+            redirect.addFlashAttribute("mess", "bạn không đủ quyền");
             return "redirect:/";
         }
 
@@ -190,11 +190,11 @@ public class ApplicationController {
         } catch (Exception e) {
             logger.error(e.getMessage());
             e.printStackTrace();
-            redirect.addAttribute("mess", e.getMessage());
+            redirect.addFlashAttribute("mess", e.getMessage());
             return "redirect:/application/list";
 
         }
-        redirect.addAttribute("mess", mess + " yêu cầu tuyển dụng giáo viên thành công");
+        redirect.addFlashAttribute("mess", mess + " yêu cầu tuyển dụng giáo viên thành công");
         return "redirect:/application/list";
     }
 
@@ -202,7 +202,7 @@ public class ApplicationController {
     public String detailApplication(Model model, HttpServletRequest request, RedirectAttributes redirect) {
         HttpSession session = request.getSession();
         if (ObjectUtils.isEmpty(session.getAttribute("user"))) {
-            redirect.addAttribute("mess", "Làm ơn đăng nhập");
+            redirect.addFlashAttribute("mess", "Làm ơn đăng nhập");
             return "redirect:/";
         }
         UserReadDTO userDto = (UserReadDTO) session.getAttribute("user");
@@ -215,7 +215,7 @@ public class ApplicationController {
         } catch (Exception e) {
             logger.error(e.getMessage());
             e.printStackTrace();
-            redirect.addAttribute("mess", e.getMessage());
+            redirect.addFlashAttribute("mess", e.getMessage());
             return "redirect:/application/list";
 
         }

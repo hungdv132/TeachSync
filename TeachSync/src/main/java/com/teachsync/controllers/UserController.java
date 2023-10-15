@@ -58,12 +58,12 @@ public class UserController {
     ){
         //check login
         if (ObjectUtils.isEmpty(userDTO)) {
-            redirect.addAttribute("mess", "Làm ơn đăng nhập");
+            redirect.addFlashAttribute("mess", "Làm ơn đăng nhập");
             return "redirect:/index";
         }
 
         if (!userDTO.getRoleId().equals(Constants.ROLE_ADMIN)) {
-            redirect.addAttribute("mess", "bạn không đủ quyền");
+            redirect.addFlashAttribute("mess", "bạn không đủ quyền");
             return "redirect:/index";
         }
 
@@ -100,12 +100,12 @@ public class UserController {
         UserReadDTO userReadDTO = null;
 
         if (ObjectUtils.isEmpty(userDTO)) {
-            redirect.addAttribute("mess", "Làm ơn đăng nhập");
+            redirect.addFlashAttribute("mess", "Làm ơn đăng nhập");
             return "redirect:/index";
         }
 
         if (!userDTO.getRoleId().equals(Constants.ROLE_ADMIN)) {
-            redirect.addAttribute("mess", "bạn không đủ quyền");
+            redirect.addFlashAttribute("mess", "bạn không đủ quyền");
             return "redirect:/index";
         }
 
@@ -199,7 +199,7 @@ public class UserController {
 
         /* Check login */
         if (ObjectUtils.isEmpty(userDTO)) {
-            redirect.addAttribute("mess", "Làm ơn đăng nhập");
+            redirect.addFlashAttribute("mess", "Làm ơn đăng nhập");
             return "redirect:/index";
         }
 
@@ -267,7 +267,7 @@ public class UserController {
 
         /* Check login */
         if (ObjectUtils.isEmpty(userDTO)) {
-            redirect.addAttribute("mess", "Làm ơn đăng nhập");
+            redirect.addFlashAttribute("mess", "Làm ơn đăng nhập");
             return "redirect:/index";
         }
 

@@ -1,13 +1,17 @@
+<%@ page import="com.teachsync.utils.enums.PromotionType" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
 <!DOCTYPE html>
 <html lang="vi" dir="ltr">
 <head>
+  <fmt:setLocale value="vi_VN" scope="session"/>
+  
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   
-  <title>Course Detail</title>
+  <title>Chi tiết khóa học</title>
   
   <link rel="stylesheet" href="../../../resources/css/bootstrap-5.3.0/bootstrap.css">
   
@@ -24,9 +28,10 @@
 <!-- ================================================== Header ===================================================== -->
 
 
-<!-- ================================================== Breadcrumb ================================================= -->
-<div class="row ts-bg-white border ts-border-teal rounded-3 mx-2 mb-3">
-  <div class="col">
+<!-- ================================================== Main Body ================================================== -->
+<div class="row">
+  <!-- Breadcrumb -->
+  <div class="col-12 ts-bg-white border-top border-bottom ts-border-teal px-5 mb-3">
     <nav aria-label="breadcrumb">
       <ol class="breadcrumb ts-txt-sm ts-txt-bold my-2">
         <li class="breadcrumb-item">
@@ -45,134 +50,127 @@
       </ol>
     </nav>
   </div>
-</div>
 
-<c:set var="currentUri" value="${requestScope['jakarta.servlet.forward.request_uri']}"/>
-<c:set var="queryString" value="${requestScope['jakarta.servlet.forward.query_string']}"/>
-<c:set var="targetUrl" scope="session" value="${currentUri}${not empty queryString ? '?'.concat(queryString) : ''}"/>
-<!-- ================================================== Breadcrumb ================================================= -->
+  <c:set var="currentUri" value="${requestScope['jakarta.servlet.forward.request_uri']}"/>
+  <c:set var="queryString" value="${requestScope['jakarta.servlet.forward.query_string']}"/>
+  <c:set var="targetUrl" scope="session" value="${currentUri}${not empty queryString ? '?'.concat(queryString) : ''}"/>
+  <!-- Breadcrumb -->
 
-<!-- ================================================== Main Body ================================================== -->
-<div class="row ts-bg-white border ts-border-teal rounded-3 pt-3 mx-2 mb-3">
-  <!--Detail -->
-  <div class="col-12 mb-3">
+  
+  <!-- Content -->
+  <div class="col-12 ts-bg-white border-top border-bottom ts-border-teal pt-3 px-5 mb-3">
     <div class="row gy-3">
-      <div class="col-sm-12 col-md-3 px-sm-3 pe-md-0">
-        <img src="${course.courseImg}" class="rounded-2 border ts-border-blue w-100 h-auto">
+      <!-- Course Img -->
+      <div class="col-sm-12 col-md-3 px-sm-3 pe-md-0 mb-3">
+        <img src="${course.courseImg}" alt="courseImg"
+             class="rounded-2 border ts-border-blue w-100 h-auto">
       </div>
-      
-      <div class="col-sm-12 col-md-9 px-3">
+
+      <!-- Course Detail -->
+      <div class="col-sm-12 col-md-9 px-3 mb-3">
         <div class="card ts-border-yellow h-100">
           
+          <!-- Course name -->
           <div class="card-header">
-            <h4 class="card-title d-flex justify-content-between align-items-center mb-0">
-              <span><c:out value="${course.courseName}"/></span>
+            <h3 class="card-title d-flex justify-content-between align-items-center">
+              <span class="ts-txt-bold"><c:out value="${course.courseName}"/></span>
+  
               <c:if test="${isAdmin}">
+                <!-- Edit button -->
                 <span>
                   <a href="/edit-course?id=${course.id}" class="btn btn-warning">
                     Chỉnh sửa
                   </a>
-                  <a href="/delete-course?id=${course.id}" class="btn btn-danger">
-                    Xóa
-                  </a>
                 </span>
               </c:if>
-            </h4>
+            </h3>
+            <!-- Course Status -->
+            <h6 class="card-subtitle">
+              Trạng thái: <c:out value="${course.status.stringValueVie}"/>
+            </h6>
           </div>
-          
-          <div class="card-body d-flex">
-            <c:set var="currentPriceDTO" value="${course.currentPrice}"/>
-            <c:set var="isPromotion" value="${currentPriceDTO.isPromotion}"/>
-            <h5 class="card-subtitle">
+
+          <!-- Course detail -->
+          <div class="card-body">
+  
+            <!-- Course price -->
+            <h5 class="card-text">
+              <c:set var="currentPrice" value="${course.currentPrice}"/>
+              <c:set var="isPromotion" value="${currentPrice.isPromotion}"/>
+              
               <c:if test="${!isPromotion}">
-                <c:out value="${currentPriceDTO.price}"/> ₫
+                <fmt:formatNumber value="${currentPrice.finalPrice}" type="currency"/>
               </c:if>
+  
               
               <c:if test="${isPromotion}">
-                <span class="ts-txt-orange ts-txt-bold"><c:out value="${currentPriceDTO.finalPrice}"/>&nbsp;₫</span>
-                <br/>
-                <span class="ts-txt-grey ts-txt-light ts-txt-sm ts-txt-italic ts-txt-line-through">
-                  &nbsp;<c:out value="${currentPriceDTO.price}"/>&nbsp;₫
+                <span class="ts-txt-orange ts-txt-bold">
+                  <fmt:formatNumber value="${currentPrice.finalPrice}" type="currency"/>
                 </span>
+                <br/>
+                
+                <span class="ts-txt-grey ts-txt-light ts-txt-sm ts-txt-italic ts-txt-line-through">
+                  <fmt:formatNumber value="${currentPrice.price}" type="currency"/>
+                </span>
+                
                 <span class="ts-txt-orange ts-txt-sm">
-                  &nbsp;-<c:out value="${currentPriceDTO.promotionAmount}"/>
+                  &nbsp;Giảm&nbsp;
                   <c:choose>
-                    <c:when test="${currentPriceDTO.promotionType eq 'PERCENT'}">%</c:when>
-                    <c:when test="${currentPriceDTO.promotionType eq 'AMOUNT'}">₫</c:when>
+                    <c:when test="${currentPrice.promotionType eq PromotionType.AMOUNT}">
+                      <fmt:formatNumber value="${currentPrice.promotionAmount}" type="currency"/>
+                    </c:when>
+                    <c:when test="${currentPrice.promotionType eq PromotionType.PERCENT}">
+                      <fmt:formatNumber value="${currentPrice.promotionAmount}" type="number"/>%
+                    </c:when>
                   </c:choose>
                 </span>
               </c:if>
             </h5>
-            
+
+            <!-- Course desc -->
             <p class="card-text">
               <c:out value="${course.courseDesc}"/>
             </p>
           </div>
-          
-          <%-- Có lịch --%>
-          <c:if test="${hasLatestSchedule}">
+
+          <!-- Course Message / Enroll button / Add clazz button -->
+          <div class="card-footer text-center">
+            
+            
             <%-- Có lớp --%>
             <c:if test="${hasClazz}">
               <c:if test="${isGuest}">
-                <div class="card-footer text-center">
-                  <a href="/sign-in" class="btn btn-primary w-25">Đăng ký học</a>
-                </div>
+                <a href="/sign-in" class="btn btn-primary w-25">Đăng ký học</a>
               </c:if>
-              
               <c:if test="${isStudent}">
-                <div class="card-footer text-center">
-                  <a href="/enroll?id=${course.id}" class="btn btn-primary w-25">Đăng ký học</a>
-                </div>
-              </c:if>
+                <!-- TODO: Ai học qua rồi hoặc đang học thì xóa nút -->
+                <a href="/enroll?id=${course.id}" class="btn btn-primary w-25">Đăng ký học</a>
               
+              
+              </c:if>
               <c:if test="${isAdmin}">
-                <div class="card-footer text-center">
-                  <a href="/add-clazz" class="btn btn-primary w-25">Thêm lớp</a>
-                </div>
+                <a href="/add-clazz" class="btn btn-primary w-25">Thêm lớp</a>
               </c:if>
             </c:if>
-            
+          
             <%-- Ko lớp --%>
             <c:if test="${!hasClazz}">
               <c:if test="${!isAdmin}">
-                <div class="card-footer text-center">
-                  <p class="card-text text-danger">
-                    Khóa học này kỳ tới có lịch dạy nhưng chưa xếp lớp, xin vui lòng quay lại sau
-                  </p>
-                </div>
-              </c:if>
-              
-              <c:if test="${isAdmin}">
-                <div class="card-footer text-center">
-                  <p class="card-text text-danger">
-                    Khóa học này kỳ tới có lịch dạy nhưng chưa xếp lớp
-                  </p>
-                  <a href="/add-clazz" class="btn btn-primary w-25">Thêm lớp</a>
-                </div>
-              </c:if>
-            </c:if>
-          </c:if>
-          
-          <%-- Ko lịch --%>
-          <c:if test="${!hasLatestSchedule}">
-            <c:if test="${!isAdmin}">
-              <div class="card-footer text-center">
                 <p class="card-text text-danger">
-                  Khóa học này kỳ tới hiện chưa có lịch dạy để đăng ký, xin vui lòng quay lại sau
+                  Khóa học này hiện chưa có lớp nào đang mở để đăng ký, xin vui lòng quay lại sau
                 </p>
-              </div>
-            </c:if>
+              </c:if>
             
-            <c:if test="${isAdmin}">
-              <div class="card-footer text-center">
+              <c:if test="${isAdmin}">
                 <p class="card-text text-danger">
-                  Khóa học này kỳ tới hiện chưa có lịch dạy để đăng ký
+                  Khóa học này hiện chưa có lớp nào đang mở để đăng ký
                 </p>
                 <a href="/add-clazz" class="btn btn-primary w-25">Thêm lớp</a>
-              </div>
+              </c:if>
             </c:if>
-          </c:if>
-        
+            
+          </div>
+      
         </div>
       </div>
     </div>

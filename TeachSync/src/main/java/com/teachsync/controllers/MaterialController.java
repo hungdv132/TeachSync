@@ -126,12 +126,12 @@ public class MaterialController {
 
         //check login
         if (ObjectUtils.isEmpty(userDTO)) {
-            redirect.addAttribute("mess", "Làm ơn đăng nhập");
+            redirect.addFlashAttribute("mess", "Làm ơn đăng nhập");
             return "redirect:/index";
         }
 
         if (!userDTO.getRoleId().equals(Constants.ROLE_ADMIN)) {
-            redirect.addAttribute("mess", "bạn không đủ quyền");
+            redirect.addFlashAttribute("mess", "bạn không đủ quyền");
             return "redirect:/index";
         }
 
@@ -188,12 +188,12 @@ public class MaterialController {
 
         //check login
         if (ObjectUtils.isEmpty(userDTO)) {
-            redirect.addAttribute("mess", "Làm ơn đăng nhập");
+            redirect.addFlashAttribute("mess", "Làm ơn đăng nhập");
             return "redirect:/index";
         }
 
         if (!userDTO.getRoleId().equals(Constants.ROLE_ADMIN)) {
-            redirect.addAttribute("mess", "bạn không đủ quyền");
+            redirect.addFlashAttribute("mess", "bạn không đủ quyền");
             return "redirect:/index";
         }
 
@@ -211,12 +211,12 @@ public class MaterialController {
     public String deleteMaterial(Model model, HttpServletRequest request, RedirectAttributes redirect) {
         HttpSession session = request.getSession();
         if (ObjectUtils.isEmpty(session.getAttribute("user"))) {
-            redirect.addAttribute("mess", "Làm ơn đăng nhập");
+            redirect.addFlashAttribute("mess", "Làm ơn đăng nhập");
             return "redirect:/";
         }
         UserReadDTO userDTO = (UserReadDTO) session.getAttribute("user");
         if (!userDTO.getRoleId().equals(ROLE_ADMIN)) {
-            redirect.addAttribute("mess", "Bạn không đủ quyền");
+            redirect.addFlashAttribute("mess", "Bạn không đủ quyền");
             return "redirect:/";
         }
         Long Id = Long.parseLong(request.getParameter("id"));

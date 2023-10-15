@@ -53,7 +53,7 @@ public class HomeworkController {
         //check login
         HttpSession session = request.getSession();
         if (ObjectUtils.isEmpty(session.getAttribute("user"))) {
-            redirect.addAttribute("mess", "Làm ơn đăng nhập");
+            redirect.addFlashAttribute("mess", "Làm ơn đăng nhập");
             return "redirect:/";
         }
         UserReadDTO userDTO = (UserReadDTO) session.getAttribute("user");
@@ -65,7 +65,7 @@ public class HomeworkController {
             model.addAttribute("mess", mess);
         } catch (Exception e) {
             logger.error(e.getMessage());
-            redirect.addAttribute("mess", "hiển thị danh sách bài tập về nhà thất bại ,lỗi : " + e.getMessage());
+            redirect.addFlashAttribute("mess", "hiển thị danh sách bài tập về nhà thất bại ,lỗi : " + e.getMessage());
             return "redirect:/";
 
         }
@@ -82,13 +82,13 @@ public class HomeworkController {
             @ModelAttribute("mess") String mess) {
         //check login
         if (ObjectUtils.isEmpty(userDTO)) {
-            redirect.addAttribute("mess", "Làm ơn đăng nhập");
+            redirect.addFlashAttribute("mess", "Làm ơn đăng nhập");
             return "redirect:/";
         }
 
         if (!List.of(Constants.ROLE_ADMIN, Constants.ROLE_TEACHER).contains(userDTO.getRoleId())) {
             /* Nếu roleId ko có trong list role được cấp phép */
-            redirect.addAttribute("mess", "bạn không đủ quyền");
+            redirect.addFlashAttribute("mess", "bạn không đủ quyền");
             return "redirect:/";
         }
 
@@ -110,7 +110,7 @@ public class HomeworkController {
 
         } catch (Exception e) {
             logger.error(e.getMessage());
-            redirect.addAttribute("mess", "hiển thị danh sách lớp thất bại ,lỗi : " + e.getMessage());
+            redirect.addFlashAttribute("mess", "hiển thị danh sách lớp thất bại ,lỗi : " + e.getMessage());
             return "redirect:/";
 
         }
@@ -123,7 +123,7 @@ public class HomeworkController {
             , @ModelAttribute("mess") String mess) {
         //check login
         if (ObjectUtils.isEmpty(session.getAttribute("user"))) {
-            redirect.addAttribute("mess", "Làm ơn đăng nhập");
+            redirect.addFlashAttribute("mess", "Làm ơn đăng nhập");
             return "redirect:/";
         }
         UserReadDTO userDTO = (UserReadDTO) session.getAttribute("user");
@@ -149,7 +149,7 @@ public class HomeworkController {
         } catch (Exception e) {
             logger.error(e.getMessage());
             e.printStackTrace();
-            redirect.addAttribute("mess", "xem chi tiêt bài tập thất bại ,lỗi : " + e.getMessage());
+            redirect.addFlashAttribute("mess", "xem chi tiêt bài tập thất bại ,lỗi : " + e.getMessage());
             return "redirect:/";
 
         }
@@ -164,13 +164,13 @@ public class HomeworkController {
             RedirectAttributes redirect) {
         //check login
         if (ObjectUtils.isEmpty(userDTO)) {
-            redirect.addAttribute("mess", "Làm ơn đăng nhập");
+            redirect.addFlashAttribute("mess", "Làm ơn đăng nhập");
             return "redirect:/";
         }
 
         if (!List.of(Constants.ROLE_ADMIN, Constants.ROLE_TEACHER).contains(userDTO.getRoleId())) {
             /* Nếu roleId ko có trong list role được cấp phép */
-            redirect.addAttribute("mess", "bạn không đủ quyền");
+            redirect.addFlashAttribute("mess", "bạn không đủ quyền");
             return "redirect:/";
         }
 
@@ -207,12 +207,12 @@ public class HomeworkController {
 
         } catch (Exception e) {
             logger.error(e.getMessage());
-            redirect.addAttribute("mess", options + " bài tập về nhà thất bại ,lỗi : " + e.getMessage());
+            redirect.addFlashAttribute("mess", options + " bài tập về nhà thất bại ,lỗi : " + e.getMessage());
             return "redirect:/homework/add-homework";
 
         }
 
-        redirect.addAttribute("mess", options + " bài tập về nhà thành công");
+        redirect.addFlashAttribute("mess", options + " bài tập về nhà thành công");
         return "redirect:/homework/list";
     }
 
@@ -221,13 +221,13 @@ public class HomeworkController {
             , @ModelAttribute("mess") String mess) {
         //check login
         if (ObjectUtils.isEmpty(session.getAttribute("user"))) {
-            redirect.addAttribute("mess", "Làm ơn đăng nhập");
+            redirect.addFlashAttribute("mess", "Làm ơn đăng nhập");
             return "redirect:/";
         }
         UserReadDTO userDTO = (UserReadDTO) session.getAttribute("user");
 
         if (!userDTO.getRoleId().equals(Constants.ROLE_ADMIN) && !userDTO.getRoleId().equals(Constants.ROLE_TEACHER)) {
-            redirect.addAttribute("mess", "bạn không đủ quyền");
+            redirect.addFlashAttribute("mess", "bạn không đủ quyền");
             return "redirect:/";
         }
 
@@ -235,12 +235,12 @@ public class HomeworkController {
             homeworkService.deleteHomework(Long.parseLong(request.getParameter("id")), userDTO);
         } catch (Exception e) {
             logger.error(e.getMessage());
-            redirect.addAttribute("mess", e.getMessage());
+            redirect.addFlashAttribute("mess", e.getMessage());
             return "redirect:/homework/add-homework";
 
         }
 
-        redirect.addAttribute("mess", "Xóa bài tập về nhà thành công");
+        redirect.addFlashAttribute("mess", "Xóa bài tập về nhà thành công");
         return "redirect:/homework/list";
     }
 
@@ -250,13 +250,13 @@ public class HomeworkController {
             , @ModelAttribute("mess") String mess) {
         //check login
         if (ObjectUtils.isEmpty(session.getAttribute("user"))) {
-            redirect.addAttribute("mess", "Làm ơn đăng nhập");
+            redirect.addFlashAttribute("mess", "Làm ơn đăng nhập");
             return "redirect:/";
         }
         UserReadDTO userDTO = (UserReadDTO) session.getAttribute("user");
 
         if (!userDTO.getRoleId().equals(Constants.ROLE_STUDENT)) {
-            redirect.addAttribute("mess", "bạn không đủ quyền");
+            redirect.addFlashAttribute("mess", "bạn không đủ quyền");
             return "redirect:/";
         }
 
@@ -273,7 +273,7 @@ public class HomeworkController {
             model.addAttribute("option", "add");
         } catch (Exception e) {
             logger.error(e.getMessage());
-            redirect.addAttribute("mess", "lỗi : " + e.getMessage());
+            redirect.addFlashAttribute("mess", "lỗi : " + e.getMessage());
             return "redirect:/";
 
         }
@@ -288,14 +288,14 @@ public class HomeworkController {
             HttpServletRequest request) {
         //check login
         if (ObjectUtils.isEmpty(session.getAttribute("user"))) {
-            redirect.addAttribute("mess", "Làm ơn đăng nhập");
+            redirect.addFlashAttribute("mess", "Làm ơn đăng nhập");
             return "redirect:/";
         }
 
         UserReadDTO userDTO = (UserReadDTO) session.getAttribute("user");
 
         if (!userDTO.getRoleId().equals(Constants.ROLE_STUDENT)) {
-            redirect.addAttribute("mess", "bạn không đủ quyền");
+            redirect.addFlashAttribute("mess", "bạn không đủ quyền");
             return "redirect:/";
         }
         Long homeworkId = Long.parseLong(request.getParameter("homeworkId"));
@@ -323,11 +323,11 @@ public class HomeworkController {
         } catch (Exception e) {
             logger.error(e.getMessage());
             e.printStackTrace();
-            redirect.addAttribute("mess", "lỗi : " + e.getMessage());
+            redirect.addFlashAttribute("mess", "lỗi : " + e.getMessage());
             return "redirect:/";
 
         }
-        redirect.addAttribute("mess", "Nộp bài tập thành công");
+        redirect.addFlashAttribute("mess", "Nộp bài tập thành công");
         return "redirect:/homework/detail-homework?id=" + homeworkId;
     }
 
@@ -336,7 +336,7 @@ public class HomeworkController {
             , @ModelAttribute("mess") String mess) {
         //check login
         if (ObjectUtils.isEmpty(session.getAttribute("user"))) {
-            redirect.addAttribute("mess", "Làm ơn đăng nhập");
+            redirect.addFlashAttribute("mess", "Làm ơn đăng nhập");
             return "redirect:/";
         }
         UserReadDTO userDTO = (UserReadDTO) session.getAttribute("user");
@@ -352,7 +352,7 @@ public class HomeworkController {
             model.addAttribute("mess", mess);
         } catch (Exception e) {
             logger.error(e.getMessage());
-            redirect.addAttribute("mess", "lỗi : " + e.getMessage());
+            redirect.addFlashAttribute("mess", "lỗi : " + e.getMessage());
             return "redirect:/";
 
         }
@@ -364,7 +364,7 @@ public class HomeworkController {
             , @ModelAttribute("mess") String mess) {
         //check login
         if (ObjectUtils.isEmpty(session.getAttribute("user"))) {
-            redirect.addAttribute("mess", "Làm ơn đăng nhập");
+            redirect.addFlashAttribute("mess", "Làm ơn đăng nhập");
             return "redirect:/";
         }
         Long homeworkId = Long.parseLong(request.getParameter("homeworkId"));
@@ -374,11 +374,11 @@ public class HomeworkController {
         } catch (Exception e) {
             logger.error(e.getMessage());
             e.printStackTrace();
-            redirect.addAttribute("mess", "lỗi : " + e.getMessage());
+            redirect.addFlashAttribute("mess", "lỗi : " + e.getMessage());
             return "redirect:/homework/detail-homework?id=" + homeworkId;
 
         }
-        redirect.addAttribute("mess", "Xóa thành công ");
+        redirect.addFlashAttribute("mess", "Xóa thành công ");
         return "redirect:/homework/detail-homework?id=" + homeworkId;
     }
 
@@ -387,12 +387,12 @@ public class HomeworkController {
             , @ModelAttribute("mess") String mess) {
         //check login
         if (ObjectUtils.isEmpty(session.getAttribute("user"))) {
-            redirect.addAttribute("mess", "Làm ơn đăng nhập");
+            redirect.addFlashAttribute("mess", "Làm ơn đăng nhập");
             return "redirect:/";
         }
         UserReadDTO userDTO = (UserReadDTO) session.getAttribute("user");
         if (!userDTO.getRoleId().equals(Constants.ROLE_TEACHER)) {
-            redirect.addAttribute("mess", "bạn không đủ quyền");
+            redirect.addFlashAttribute("mess", "bạn không đủ quyền");
             return "redirect:/";
         }
         Long homeworkId = Long.parseLong(request.getParameter("homeworkId"));
@@ -403,11 +403,11 @@ public class HomeworkController {
         } catch (Exception e) {
             logger.error(e.getMessage());
             e.printStackTrace();
-            redirect.addAttribute("mess", "lỗi : " + e.getMessage());
+            redirect.addFlashAttribute("mess", "lỗi : " + e.getMessage());
             return "redirect:/homework/detail-homework?id=" + homeworkId;
 
         }
-        redirect.addAttribute("mess", "Chấm điểm thành công ");
+        redirect.addFlashAttribute("mess", "Chấm điểm thành công ");
         return "redirect:/homework/detail-homework?id=" + homeworkId;
     }
 }

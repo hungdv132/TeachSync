@@ -258,21 +258,21 @@ function validateNumberInput(numberInput, min, max, step, validateOption) {
         /* null or min (if null ignore, if not check minlength) */
         if (validateOption.includes(`nullOrMin`)) {
             if (numberInput.validity.rangeUnderflow) {
-                errorMsg+= `Giá trị cần lớn hơn `+min+` , hoặc để trống trường này.\n`;
+                errorMsg+= `Giá trị cần lớn hơn hoặc bằng `+min+` , hoặc để trống trường này.\n`;
             }
         }
 
         /* min */
         if (validateOption.includes(`min`)) {
             if (numberInput.validity.rangeUnderflow) {
-                errorMsg+= `Giá trị cần lớn hơn `+min+` .\n`;
+                errorMsg+= `Giá trị cần lớn hơn hoặc bằng `+min+` .\n`;
             }
         }
 
         /* max */
         if (validateOption.includes(`max`)) {
             if (numberInput.validity.rangeOverflow) {
-                errorMsg+= `Giá trị cần nhỏ hơn `+max+` .\n`;
+                errorMsg+= `Giá trị cần nhỏ hơn hoặc bằng `+max+` .\n`;
             }
         }
 
@@ -331,6 +331,7 @@ function updateImgFromInput(inputId, imgId, fileSizeLimit) {
             fileInput.reportValidity();
             return;
         }
+        fileInput.setCustomValidity("");
     }
 
     let reader = new FileReader();

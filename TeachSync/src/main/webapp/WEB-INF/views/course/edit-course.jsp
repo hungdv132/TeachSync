@@ -59,6 +59,7 @@
   </div>
   <!-- Breadcrumb -->
   
+  
   <!-- Content -->
   <div class="col-12 ts-bg-white border-top border-bottom ts-border-teal pt-3 px-5 mb-3">
     <%--@elvariable id="updateDTO" type="com.teachsync.dtos.course.CourseUpdateDTO"--%>
@@ -73,20 +74,19 @@
       <!-- Course Img -->
       <div id="divCourseImg"
           class="col-sm-12 col-md-3 mb-3">
+        <c:set var="courseImg" value="${empty course.courseImg ? '../../../resources/img/no-img.jpg' : course.courseImg}"/>
         <label for="fileImg" class="form-label">Ảnh khóa học:</label>
         <img id="imgCourseImg"
-             src="${empty course.courseImg ? '../../../resources/img/no-img.jpg' : course.courseImg}" alt="courseImg"
+             src="${courseImg}" alt="courseImg"
              class="rounded-2 border ts-border-blue w-100 h-auto mb-3">
     
         <input id="fileImg" name="img"
                type="file" accept="image/*"
-               class="form-control ts-border-grey"
-               onchange="updateImgFromInput('fileImg', 'imgCourseImg', 0.75)">
+               class="form-control ts-border-grey">
         <p class="ts-txt-italic ts-txt-sm mb-0">*Tối đa 0.75 MB</p>
         <input id="hidCourseImg" name="courseImg"
-               type="hidden" value="${empty course.courseImg ? '../../../resources/img/no-img.jpg' : course.courseImg}">
+               type="hidden" value="${courseImg}">
       </div>
-
       
       <!-- Course detail -->
       <div class="col-sm-12 col-md-9">
@@ -558,19 +558,37 @@
             ["nullOrMinLength", "maxLength", "onlyBlank", "startBlank", "endBlank", "specialChar"]);
     });
 
-    $("#form").on("submit", async function (event) {
+    $("#fileImg").on("change", function (e) {
+        updateImgFromInput('fileImg', 'imgCourseImg', 0.75);
+    })
+    
+    $("#form").on("submit", async function (e) {
+        e.preventDefault();
+        
         let file = $('#fileImg').prop("files")[0];
-
-        let imgURL = await uploadImageFileToFirebaseAndGetURL(file);
-
-        $("#hidCourseImg").val(imgURL);
+        
+        if (file !== undefined) {
+            uploadImageFileToFirebaseAndGetURL(file).then(function (imgURL) {
+                $("#hidCourseImg").val(imgURL);
+                
+                console.log(imgURL);
+                
+                $("#form")[0].submit();
+            });
+        }
+        
+        
     });
 </script>
 
 <script id="script1">
+    
     /* promotion */
     const isPromotion = ${course.currentPrice.isPromotion};
+    console.log(isPromotion);
 
+    $("#chkIsPromotion").attr("checked", isPromotion).trigger("change");
+    
     if (isPromotion) {
         let promoType = "${course.currentPrice.promotionType.stringValue}";
         $("#selPromotionType").val(promoType).trigger("change");
@@ -580,9 +598,8 @@
 
         let promoDesc = "${course.currentPrice.promotionDesc}";
         $("#txtAPromotionDesc").val(promoDesc);
-    }
 
-    $("#chkIsPromotion").attr("checked", isPromotion).trigger("change");
+    }
 
     /* status */
     $("#selStatus").val(initialStatus).trigger("change");

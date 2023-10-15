@@ -32,21 +32,21 @@ public class HomeController {
     public String home1(
             @ModelAttribute("mess") String mess,
             RedirectAttributes redirect) {
-        redirect.addAttribute("mess", mess);
+        redirect.addFlashAttribute("mess", mess);
         return "redirect:/";
     }
     @GetMapping("/index")
     public String home2(
             @ModelAttribute("mess") String mess,
             RedirectAttributes redirect) {
-        redirect.addAttribute("mess", mess);
+        redirect.addFlashAttribute("mess", mess);
         return "redirect:/";
     }
     @GetMapping("/trang-chu")
     public String home3(
             @ModelAttribute("mess") String mess,
             RedirectAttributes redirect) {
-        redirect.addAttribute("mess", mess);
+        redirect.addFlashAttribute("mess", mess);
         return "redirect:/";
     }
 }

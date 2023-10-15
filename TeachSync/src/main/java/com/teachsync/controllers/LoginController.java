@@ -29,10 +29,9 @@ public class LoginController {
             @SessionAttribute(value = "user", required = false) UserReadDTO userDTO) {
         if (Objects.nonNull(userDTO)) {
             /* Already login */
-            redirect.addAttribute("mess", "Bạn đã đăng nhập");
+            redirect.addFlashAttribute("mess", "Bạn đã đăng nhập");
             return "redirect:/index";
         }
-        redirect.addAttribute("mess", "");
 
         return "login/login";
     }

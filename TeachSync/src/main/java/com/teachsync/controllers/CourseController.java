@@ -68,13 +68,13 @@ public class CourseController {
             @SessionAttribute(value = "user", required = false) UserReadDTO userDTO) {
 
         if (Objects.isNull(userDTO)) {
-            redirect.addAttribute("mess", "Làm ơn đăng nhập");
+            redirect.addFlashAttribute("mess", "Làm ơn đăng nhập");
 
             return "redirect:/index";
         }
 
         if (!userDTO.getRoleId().equals(ROLE_ADMIN)) {
-            redirect.addAttribute("mess", "Bạn không đủ quyền");
+            redirect.addFlashAttribute("mess", "Bạn không đủ quyền");
 
             return "redirect:/index";
         }
@@ -90,12 +90,12 @@ public class CourseController {
             @SessionAttribute(value = "user", required = false) UserReadDTO userDTO) {
 
         if (Objects.isNull(userDTO)) {
-            redirect.addAttribute("mess", "Làm ơn đăng nhập");
+            redirect.addFlashAttribute("mess", "Làm ơn đăng nhập");
             return "redirect:/index";
         }
 
         if (!userDTO.getRoleId().equals(ROLE_ADMIN)) {
-            redirect.addAttribute("mess", "Bạn không đủ quyền");
+            redirect.addFlashAttribute("mess", "Bạn không đủ quyền");
             return "redirect:/index";
         }
 
@@ -112,7 +112,7 @@ public class CourseController {
             return "/course/add-course";
         }
 
-        redirect.addAttribute("mess", "Thêm khóa học thành công");
+        redirect.addFlashAttribute("mess", "Thêm khóa học thành công");
 
         return "redirect:/course-detail" + "?id=" + courseDTO.getId();
     }
@@ -211,7 +211,7 @@ public class CourseController {
         } catch (Exception e) {
             e.printStackTrace();
 
-            redirect.addAttribute("mess", e.getMessage());
+            redirect.addFlashAttribute("mess", e.getMessage());
 
             return "redirect:/index";
         }
@@ -288,14 +288,14 @@ public class CourseController {
 
             if (courseDTO == null) {
                 /* Not found by id */
-                redirect.addAttribute("mess","Không tìm thấy khóa học nào với id: " + courseId);
+                redirect.addFlashAttribute("mess","Không tìm thấy khóa học nào với id: " + courseId);
 
                 return "redirect:/course";
             }
 
             model.addAttribute("course", courseDTO);
 
-            model.addAttribute("hasClazz", ObjectUtils.isEmpty(courseDTO.getClazzList()));
+            model.addAttribute("hasClazz", !ObjectUtils.isEmpty(courseDTO.getClazzList()));
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -314,15 +314,15 @@ public class CourseController {
             Model model,
             @RequestParam(name = "id") Long courseId,
             @SessionAttribute(name = "user", required = false) UserReadDTO userDTO) throws Exception {
-        if (Objects.isNull(userDTO)) {
-            redirect.addAttribute("mess", "Làm ơn đăng nhập");
-            return "redirect:/index";
-        }
-
-        if (!userDTO.getRoleId().equals(ROLE_ADMIN)) {
-            redirect.addAttribute("mess", "Bạn không đủ quyền");
-            return "redirect:/index";
-        }
+//        if (Objects.isNull(userDTO)) {
+//            redirect.addFlashAttribute("mess", "Làm ơn đăng nhập");
+//            return "redirect:/index";
+//        }
+//
+//        if (!userDTO.getRoleId().equals(ROLE_ADMIN)) {
+//            redirect.addFlashAttribute("mess", "Bạn không đủ quyền");
+//            return "redirect:/index";
+//        }
 
         CourseReadDTO courseDTO =
                 courseService.getDTOById(
@@ -345,12 +345,12 @@ public class CourseController {
             @SessionAttribute(value = "user", required = false) UserReadDTO userDTO) {
 
         if (Objects.isNull(userDTO)) {
-            redirect.addAttribute("mess", "Làm ơn đăng nhập");
+            redirect.addFlashAttribute("mess", "Làm ơn đăng nhập");
             return "redirect:/index";
         }
 
         if (!userDTO.getRoleId().equals(ROLE_ADMIN)) {
-            redirect.addAttribute("mess", "Bạn không đủ quyền");
+            redirect.addFlashAttribute("mess", "Bạn không đủ quyền");
             return "redirect:/index";
         }
 
@@ -362,12 +362,12 @@ public class CourseController {
             courseDTO = courseService.updateCourseByDTO(updateDTO);
 
         } catch (Exception e) {
-            redirect.addAttribute("mess", "Lỗi : " + e.getMessage());
+            redirect.addFlashAttribute("mess", "Lỗi : " + e.getMessage());
 
             return "redirect:/edit-course" + "?id=" + courseId;
         }
 
-        redirect.addAttribute("mess", "Sửa khóa học thành công");
+        redirect.addFlashAttribute("mess", "Sửa khóa học thành công");
 
         return "redirect:/course-detail" + "?id=" + courseId;
     }
@@ -381,12 +381,12 @@ public class CourseController {
             @SessionAttribute(value = "user", required = false) UserReadDTO userDTO) {
 
         if (Objects.isNull(userDTO)) {
-            redirect.addAttribute("mess", "Làm ơn đăng nhập");
+            redirect.addFlashAttribute("mess", "Làm ơn đăng nhập");
             return "redirect:/index";
         }
 
         if (!userDTO.getRoleId().equals(ROLE_ADMIN)) {
-            redirect.addAttribute("mess", "Bạn không đủ quyền");
+            redirect.addFlashAttribute("mess", "Bạn không đủ quyền");
             return "redirect:/index";
         }
 
@@ -394,12 +394,12 @@ public class CourseController {
             courseService.deleteCourse(courseId);
 
         } catch (Exception e) {
-            redirect.addAttribute("mess", "Lỗi : " + e.getMessage());
+            redirect.addFlashAttribute("mess", "Lỗi : " + e.getMessage());
 
             return "redirect:/course";
         }
 
-        redirect.addAttribute("mess", "Xóa khóa học thành công");
+        redirect.addFlashAttribute("mess", "Xóa khóa học thành công");
 
         return "redirect:/course";
     }

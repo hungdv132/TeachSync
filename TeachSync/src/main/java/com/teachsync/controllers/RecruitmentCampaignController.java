@@ -59,7 +59,7 @@ public class RecruitmentCampaignController {
             , @ModelAttribute("mess") String mess) {
         //check login
         if (ObjectUtils.isEmpty(session.getAttribute("user"))) {
-            redirect.addAttribute("mess", "Làm ơn đăng nhập");
+            redirect.addFlashAttribute("mess", "Làm ơn đăng nhập");
             return "redirect:/";
         }
 
@@ -72,7 +72,7 @@ public class RecruitmentCampaignController {
             model.addAttribute("mess", mess);
         } catch (Exception e) {
             logger.error(e.getMessage());
-            redirect.addAttribute("mess", "hiển thị chi tiết chiến dịch thất bại ,lỗi : " + e.getMessage());
+            redirect.addFlashAttribute("mess", "hiển thị chi tiết chiến dịch thất bại ,lỗi : " + e.getMessage());
             return "redirect:/recruitment-campaign/list";
 
         }
@@ -89,13 +89,13 @@ public class RecruitmentCampaignController {
             @ModelAttribute("mess") String mess) {
         //check login
         if (ObjectUtils.isEmpty(userDTO)) {
-            redirect.addAttribute("mess", "Làm ơn đăng nhập");
+            redirect.addFlashAttribute("mess", "Làm ơn đăng nhập");
             return "redirect:/";
         }
 
         if (!List.of(Constants.ROLE_ADMIN).contains(userDTO.getRoleId())) {
             /* Nếu roleId ko có trong list role được cấp phép */
-            redirect.addAttribute("mess", "bạn không đủ quyền");
+            redirect.addFlashAttribute("mess", "bạn không đủ quyền");
             return "redirect:/";
         }
 
@@ -113,7 +113,7 @@ public class RecruitmentCampaignController {
 
         } catch (Exception e) {
             logger.error(e.getMessage());
-            redirect.addAttribute("mess", "hiển thị chi tiết chiến dịch thất bại ,lỗi : " + e.getMessage());
+            redirect.addFlashAttribute("mess", "hiển thị chi tiết chiến dịch thất bại ,lỗi : " + e.getMessage());
             return "redirect:/recruitment-campaign/list";
 
         }
@@ -128,13 +128,13 @@ public class RecruitmentCampaignController {
             RedirectAttributes redirect) {
         //check login
         if (ObjectUtils.isEmpty(userDTO)) {
-            redirect.addAttribute("mess", "Làm ơn đăng nhập");
+            redirect.addFlashAttribute("mess", "Làm ơn đăng nhập");
             return "redirect:/";
         }
 
         if (!List.of(Constants.ROLE_ADMIN).contains(userDTO.getRoleId())) {
             /* Nếu roleId ko có trong list role được cấp phép */
-            redirect.addAttribute("mess", "bạn không đủ quyền");
+            redirect.addFlashAttribute("mess", "bạn không đủ quyền");
             return "redirect:/";
         }
 
@@ -172,12 +172,12 @@ public class RecruitmentCampaignController {
 
         } catch (Exception e) {
             logger.error(e.getMessage());
-            redirect.addAttribute("mess", options + " chiến dịch thất bại ,lỗi : " + e.getMessage());
+            redirect.addFlashAttribute("mess", options + " chiến dịch thất bại ,lỗi : " + e.getMessage());
             return "redirect:/recruitment-campaign/add";
 
         }
 
-        redirect.addAttribute("mess", options + " chiến dịch thành công");
+        redirect.addFlashAttribute("mess", options + " chiến dịch thành công");
         return "redirect:/recruitment-campaign/list";
     }
 
@@ -186,13 +186,13 @@ public class RecruitmentCampaignController {
             , @ModelAttribute("mess") String mess) {
         //check login
         if (ObjectUtils.isEmpty(session.getAttribute("user"))) {
-            redirect.addAttribute("mess", "Làm ơn đăng nhập");
+            redirect.addFlashAttribute("mess", "Làm ơn đăng nhập");
             return "redirect:/";
         }
         UserReadDTO userDTO = (UserReadDTO) session.getAttribute("user");
 
         if (!userDTO.getRoleId().equals(Constants.ROLE_ADMIN)) {
-            redirect.addAttribute("mess", "bạn không đủ quyền");
+            redirect.addFlashAttribute("mess", "bạn không đủ quyền");
             return "redirect:/";
         }
 
@@ -200,12 +200,12 @@ public class RecruitmentCampaignController {
             recruitmentCampaignService.delete(Long.parseLong(request.getParameter("id")), userDTO);
         } catch (Exception e) {
             logger.error(e.getMessage());
-            redirect.addAttribute("mess", e.getMessage());
+            redirect.addFlashAttribute("mess", e.getMessage());
             return "redirect:/recruitment-campaign/list";
 
         }
 
-        redirect.addAttribute("mess", "Xóa chiến dịch thành công");
+        redirect.addFlashAttribute("mess", "Xóa chiến dịch thành công");
         return "redirect:/recruitment-campaign/list";
     }
 }

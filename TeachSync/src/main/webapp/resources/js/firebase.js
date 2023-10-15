@@ -37,7 +37,7 @@ async function uploadImageFileToFirebaseAndGetURL(imageFile) {
     // Nếu có file, upload to firebase;
     if (imageFile !== undefined) {
         // Set name, add date to avoid duplicate name;
-        let name = (+new Date()) + '-' + imageFile.name;
+        let name = + (new Date()) + '-' + imageFile.name;
 
         // Create file metadata including the content type
         const metadata = {

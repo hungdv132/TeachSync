@@ -72,8 +72,7 @@
           
         <input id="fileImg" name="img"
                type="file" accept="image/*"
-               class="form-control ts-border-grey"
-               onchange="updateImgFromInput('fileImg', 'imgCourseImg', 0.75)">
+               class="form-control ts-border-grey">
         <p class="ts-txt-italic ts-txt-sm mb-0">*Tối đa 0.75 MB</p>
         <input id="hidCourseImg" name="courseImg"
                type="hidden" value="../../../resources/img/no-img.jpg">
@@ -417,13 +416,23 @@
             txtAPromotionDesc, 1, txtAPromotionDesc.maxLength,
             ["nullOrMinLength", "maxLength", "onlyBlank", "startBlank", "endBlank", "specialChar"]);
     });
+    
+    $("#fileImg").on("change", function (e) {
+        updateImgFromInput('fileImg', 'imgCourseImg', 0.75);
+    })
 
-    $("#form").on("submit", async function (event) {
+    $("#form").on("submit", function (e) {
+        e.preventDefault();
+        
         let file = $('#fileImg').prop("files")[0];
 
-        let imgURL = await uploadImageFileToFirebaseAndGetURL(file);
+        uploadImageFileToFirebaseAndGetURL(file).then(function (imgURL) {
+            console.log(imgURL);
 
-        $("#hidCourseImg").val(imgURL);
+            $("#hidCourseImg").val(imgURL);
+
+            $("#form")[0].submit();
+        });
     });
 </script>
 <!-- ================================================== Script ===================================================== -->
