@@ -29,11 +29,7 @@
             <h5 class="mb-0">Tên lớp: ${clazz.clazzName}</h5>
 
             <c:if test="${isAdmin}">
-                <c:url var="addClazz" value="/add-clazz">
-                    <c:param name="id" value="${clazz.id}"/>
-                    <c:param name="option" value="edit"/>
-                </c:url>
-                <a href="${addClazz}" class="btn btn-warning">Sửa</a>
+                <a href="/edit-clazz?id=${clazz.id}" class="btn btn-warning">Sửa</a>
             </c:if>
         </div>
 
