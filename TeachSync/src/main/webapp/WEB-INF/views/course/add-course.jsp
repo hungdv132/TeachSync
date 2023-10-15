@@ -426,13 +426,15 @@
         
         let file = $('#fileImg').prop("files")[0];
 
-        uploadImageFileToFirebaseAndGetURL(file).then(function (imgURL) {
-            console.log(imgURL);
+        if (file !== undefined) {
+            uploadImageFileToFirebaseAndGetURL(file).then(function (imgURL) {
+                $("#hidCourseImg").val(imgURL);
 
-            $("#hidCourseImg").val(imgURL);
-
+                $("#form")[0].submit();
+            });
+        } else {
             $("#form")[0].submit();
-        });
+        }
     });
 </script>
 <!-- ================================================== Script ===================================================== -->

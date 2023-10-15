@@ -314,15 +314,15 @@ public class CourseController {
             Model model,
             @RequestParam(name = "id") Long courseId,
             @SessionAttribute(name = "user", required = false) UserReadDTO userDTO) throws Exception {
-//        if (Objects.isNull(userDTO)) {
-//            redirect.addFlashAttribute("mess", "Làm ơn đăng nhập");
-//            return "redirect:/index";
-//        }
-//
-//        if (!userDTO.getRoleId().equals(ROLE_ADMIN)) {
-//            redirect.addFlashAttribute("mess", "Bạn không đủ quyền");
-//            return "redirect:/index";
-//        }
+        if (Objects.isNull(userDTO)) {
+            redirect.addFlashAttribute("mess", "Làm ơn đăng nhập");
+            return "redirect:/index";
+        }
+
+        if (!userDTO.getRoleId().equals(ROLE_ADMIN)) {
+            redirect.addFlashAttribute("mess", "Bạn không đủ quyền");
+            return "redirect:/index";
+        }
 
         CourseReadDTO courseDTO =
                 courseService.getDTOById(
@@ -338,10 +338,9 @@ public class CourseController {
 
     @PostMapping("/edit-course")
     public String editCourse(
-            Model model,
+            RedirectAttributes redirect,
             @RequestParam(name = "id") Long courseId,
             @ModelAttribute CourseUpdateDTO updateDTO,
-            RedirectAttributes redirect,
             @SessionAttribute(value = "user", required = false) UserReadDTO userDTO) {
 
         if (Objects.isNull(userDTO)) {

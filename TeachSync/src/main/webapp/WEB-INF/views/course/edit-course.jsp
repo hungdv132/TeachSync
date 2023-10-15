@@ -175,6 +175,7 @@
         <!-- Course price, isPromotion, (promotionAmount, finalPrice, promotionDesc) -->
         <div id="divCoursePrice"
              class="row">
+          <!-- Course price -->
           <div class="col-sm-12 col-md-4 mb-3">
             <!-- Course price -->
             <label for="numPrice" class="form-label">Giá khóa học:</label>
@@ -196,15 +197,17 @@
               </div>
             </div>
           </div>
-          
-          <div class="col-sm-12 col-md-4 mb-3 visually-hidden" id="divPromotionAmount">
+  
+          <!-- Course promotionAmount, promotionType -->
+          <div id="divPromotionAmount"
+               class="col-sm-12 col-md-4 mb-3 visually-hidden">
             <!-- Course promotionAmount -->
             <label class="form-label" for="numPromotionAmount">Giảm:</label>
             <div class="input-group">
               <input id="numPromotionAmount" name="price.promotionAmount"
                      type="number" min="0.01" max="100" step=".01"
                      class="form-control ts-border-grey" style="width: 70%;"
-                     disabled="disabled" required="required"
+                     required="required" disabled="disabled"
                      oninput="calculateFinalPrice()" onchange="calculateFinalPrice()">
       
               <!-- Course promotionType -->
@@ -219,7 +222,8 @@
           </div>
   
           <!-- Course finalPrice -->
-          <div class="col-sm-12 col-md-4 mb-3 visually-hidden" id="divPromotionFinal">
+          <div id="divPromotionFinal" 
+               class="col-sm-12 col-md-4 mb-3 visually-hidden">
             <label class="form-label" for="txtFinalPrice">Giá sau giảm:</label>
             <div class="input-group">
               <input id="txtFinalPrice"
@@ -231,7 +235,8 @@
           </div>
 
           <!-- Course promotionDesc -->
-          <div class="col-12 mb-3 visually-hidden" id="divPromotionDesc">
+          <div id="divPromotionDesc" 
+               class="col-12 mb-3 visually-hidden">
             <label for="txtAPromotionDesc" class="form-label">Chi tiết Khuyến mãi:</label>
             <textarea id="txtAPromotionDesc" name="price.promotionDesc"
                       minlength="0" maxlength="9999"
@@ -427,6 +432,7 @@
                     enableAllFormElementIn("divCourseTextDetail");
                     enableAllFormElementIn("divCourseNumberDetail");
                     enableAllFormElementIn("divCoursePrice");
+                    togglePromotion();
                     break;
                 case "${Status.AWAIT_REVIEW}":
                     /* No edit, period */
@@ -447,6 +453,7 @@
                     disableAllFormElementIn("divCourseTextDetail");
                     disableAllFormElementIn("divCourseNumberDetail");
                     enableAllFormElementIn("divCoursePrice");
+                    togglePromotion();
                     break;
                 case "${Status.CLOSED}":
                     /* Edit price and img */
@@ -457,6 +464,7 @@
                     disableAllFormElementIn("divCourseTextDetail");
                     disableAllFormElementIn("divCourseNumberDetail");
                     enableAllFormElementIn("divCoursePrice");
+                    togglePromotion();
                     break;
                     
                 default:
@@ -571,23 +579,29 @@
             uploadImageFileToFirebaseAndGetURL(file).then(function (imgURL) {
                 $("#hidCourseImg").val(imgURL);
                 
-                console.log(imgURL);
-                
                 $("#form")[0].submit();
             });
+        } else {
+            $("#form")[0].submit();
         }
-        
-        
     });
 </script>
 
 <script id="script1">
-    
     /* promotion */
     const isPromotion = ${course.currentPrice.isPromotion};
     console.log(isPromotion);
+    
+    hideById("divPromotionAmount");
+    disableAllFormElementIn("divPromotionAmount");
 
-    $("#chkIsPromotion").attr("checked", isPromotion).trigger("change");
+    hideById("divPromotionDesc");
+    disableAllFormElementIn("divPromotionDesc");
+
+    hideById("divPromotionFinal");
+
+    $("#chkIsPromotion").attr("checked", isPromotion);
+    togglePromotion();
     
     if (isPromotion) {
         let promoType = "${course.currentPrice.promotionType.stringValue}";
