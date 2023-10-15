@@ -2432,19 +2432,19 @@ values (1, 'Ielts 101', 'You have complete the Ielts 101 course', 'CREATED'),
 
 insert into clazz(courseId, centerId, staffId, clazzAlias, clazzName, clazzDesc, minCapacity, maxCapacity, status)
 
-values (1, 1, 1, 'ILT10101', 'ILT101 - 01', null, 5, 15, 'CREATED'),
-       (1, 2, 1, 'ILT10102', 'ILT101 - 02', null, 5, 15, 'CREATED'),
+values (1, 1, 1, 'ILT10101', 'ILT101 - 01', null, 5, 15, 'CLOSED'),
+       (1, 2, 1, 'ILT10102', 'ILT101 - 02', null, 5, 15, 'OPENED'),
 
-       (2, 1, 1, 'ENG00101', 'ENG001 - 01', null, 5, 30, 'CREATED'),
-       (2, 2, 1, 'ENG00102', 'ENG001 - 02', null, 5, 30, 'CREATED'),
+       (2, 1, 1, 'ENG00101', 'ENG001 - 01', null, 5, 30, 'DESIGNING'),
+       (2, 2, 1, 'ENG00102', 'ENG001 - 02', null, 5, 30, 'DESIGNING'),
 
-       (3, 1, 2, 'ENG00201', 'ENG002 - 01', null, 5, 30, 'CREATED'),
-       (3, 2, 2, 'ENG00202', 'ENG002 - 02', null, 5, 30, 'CREATED'),
+       (3, 1, 2, 'ENG00201', 'ENG002 - 01', null, 5, 30, 'DESIGNING'),
+       (3, 2, 2, 'ENG00202', 'ENG002 - 02', null, 5, 30, 'DESIGNING'),
 
-       (4, 1, 2, 'ENG00301', 'ENG003 - 01', null, 5, 25, 'CREATED'),
-       (4, 2, 2, 'ENG00302', 'ENG003 - 02', null, 5, 25, 'CREATED'),
+       (4, 1, 2, 'ENG00301', 'ENG003 - 01', null, 5, 25, 'DESIGNING'),
+       (4, 2, 2, 'ENG00302', 'ENG003 - 02', null, 5, 25, 'DESIGNING'),
 
-       (3, 1, 2, 'ENG00203', 'ENG002 - 01', null, 5, 25, 'CREATED');
+       (3, 1, 2, 'ENG00203', 'ENG002 - 01', null, 5, 25, 'ONGOING');
 
 INSERT INTO schedulecat (`name`, `description`, `status`)
 VALUES ('T2,T4,T6', 'T2,T4,T6 hàng tuần', 'CREATED'),
@@ -2454,7 +2454,7 @@ VALUES ('T2,T4,T6', 'T2,T4,T6 hàng tuần', 'CREATED'),
 
 insert into clazz_schedule(clazzId, roomId, schedulecaId, scheduleType, startDate, endDate, slot, sessionStart, sessionEnd, status)
 values (1, 1, 1, 'SCHEDULE', '2023-07-15', '2023-10-15', 1, '07:00:00', '08:30:00', 'CREATED'),
-       (2, 3, 2, 'SCHEDULE', '2023-07-15', '2023-10-15', 3, '10:30:00', '12:00:00', 'CREATED'),
+       (2, 3, 2, 'SCHEDULE', '2023-1-15', '2023-2-15', 3, '10:30:00', '12:00:00', 'CREATED'),
        (9, 3, 3, 'SCHEDULE', '2023-10-20', '2024-01-20', 3, '10:30:00', '12:00:00', 'CREATED');
 
 insert into session(roomId, scheduleId, staffId, slot, sessionStart, sessionEnd, status)
