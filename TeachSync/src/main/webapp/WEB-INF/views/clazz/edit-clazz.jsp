@@ -71,6 +71,7 @@
   
           <option value="${Status.OPENED}">${Status.OPENED.stringValueVie}</option>
           <option value="${Status.ONGOING}">${Status.ONGOING.stringValueVie}</option>
+          <option value="${Status.SUSPENDED}">${Status.ONGOING.stringValueVie}</option>
           <option value="${Status.CLOSED}">${Status.CLOSED.stringValueVie}</option>
         </select>
   
@@ -406,17 +407,31 @@
         case "${Status.DESIGNING}":
             $(`#selStatus option[value="${Status.OPENED}"]`).remove();
             $(`#selStatus option[value="${Status.ONGOING}"]`).remove();
+            $(`#selStatus option[value="${Status.SUSPENDED}"]`).remove();
             $(`#selStatus option[value="${Status.CLOSED}"]`).remove();
             break;
 
         case "${Status.AWAIT_REVIEW}":
             $(`#selStatus option[value="${Status.ONGOING}"]`).remove();
+            $(`#selStatus option[value="${Status.SUSPENDED}"]`).remove();
             $(`#selStatus option[value="${Status.CLOSED}"]`).remove();
             break;
 
-        case "${Status.ONGOING}":
-            $(`#selStatus option[value="${Status.OPENED}"]`).remove();
         case "${Status.OPENED}":
+            $(`#selStatus option[value="${Status.DESIGNING}"]`).remove();
+            $(`#selStatus option[value="${Status.AWAIT_REVIEW}"]`).remove();
+            $(`#selStatus option[value="${Status.SUSPENDED}"]`).remove();
+            break;
+        case "${Status.ONGOING}":
+            $(`#selStatus option[value="${Status.DESIGNING}"]`).remove();
+            $(`#selStatus option[value="${Status.AWAIT_REVIEW}"]`).remove();
+            $(`#selStatus option[value="${Status.OPENED}"]`).remove();
+            break;
+        case "${Status.SUSPENDED}":
+            $(`#selStatus option[value="${Status.DESIGNING}"]`).remove();
+            $(`#selStatus option[value="${Status.AWAIT_REVIEW}"]`).remove();
+            $(`#selStatus option[value="${Status.OPENED}"]`).remove();
+            break;
         case "${Status.CLOSED}":
             $(`#selStatus option[value="${Status.DESIGNING}"]`).remove();
             $(`#selStatus option[value="${Status.AWAIT_REVIEW}"]`).remove();
