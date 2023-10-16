@@ -27,9 +27,10 @@
 <!-- ================================================== Header ===================================================== -->
 
 
-<!-- ================================================== Breadcrumb ================================================= -->
-<div class="row ts-bg-white border ts-border-teal rounded-3 mx-2 mb-3">
-  <div class="col">
+<!-- ================================================== Main Body ================================================== -->
+<div class="row">
+  <!-- Breadcrumb -->
+  <div class="col-12 ts-bg-white border-top border-bottom ts-border-teal px-5 mb-3">
     <nav aria-label="breadcrumb">
       <ol class="breadcrumb ts-txt-sm ts-txt-bold my-2">
         <li class="breadcrumb-item">
@@ -53,138 +54,157 @@
       </ol>
     </nav>
   </div>
-</div>
-<!-- ================================================== Breadcrumb ================================================= -->
+  <!-- Breadcrumb -->
 
 
-<!-- ================================================== Main Body ================================================== -->
-<div class="row ts-bg-white border ts-border-teal rounded-3 pt-3 px-5 mx-2 mb-3">
-  <div class="col-12 mb-3">
+  <!-- Content -->
+  <div class="col-12 ts-bg-white border-top border-bottom ts-border-teal pt-3 px-5 mb-3">
     <div class="row-cols-1">
-
-      <h4>Khóa học: <c:out value="${course.courseName}"/></h4>
-
-        <!-- Center Tab & TabPane -->
-        
-        <!-- Center Tab -->
-        <ul class="nav nav-tabs" id="semesterTab${semesterIdString}" role="tablist">
-          <c:forEach var="centerIdCenterDTO" items="${centerIdCenterDTOMap}" varStatus="counter2">
-            <c:set var="centerIdString" value="${centerIdCenterDTO.key.toString()}"/>
-
-            <li class="nav-item" role="presentation">
-              <button type="button" class="nav-link ts-txt-grey ts-txt-hover-blue" id="${semesterIdString}-se-${centerIdString}-ce-tab"
-                      data-bs-toggle="tab" data-bs-target="#${semesterIdString}-se-${centerIdString}-ce-tab-pane" role="tab"
-                      aria-controls="${semesterIdString}-se-${centerIdString}-ce-tab-pane" aria-selected="true">
-                <c:out value="${centerIdCenterDTO.value.centerName}"/>
-              </button>
-            </li>
-        
-            <c:if test="${counter2.first}">
-              <script id="script2">
-                  $("#${semesterIdString}-se-${centerIdString}-ce-tab").addClass("active").attr("aria-selected", "true");
-                  $("#script2").remove(); /* Xóa thẻ <script> sau khi xong */
-              </script>
-            </c:if>
-      
-          </c:forEach>
-        </ul>
-    
-        <!-- Center TabPane List -->
-        <div class="tab-content border border-top-0 rounded-bottom-3 pt-3"
-             id="semesterTab${semesterIdString}Content">
-          <c:forEach var="centerIdCenterDTO" items="${centerIdCenterDTOMap}" varStatus="counter2">
-            <c:set var="centerIdString" value="${centerIdCenterDTO.key.toString()}"/>
-
-            <!-- Semester ${semesterIdString} > Center ${centerIdString} TabPane -->
-            <div class="tab-pane fade row mx-0" id="${semesterIdString}-se-${centerIdString}-ce-tab-pane"
-                 role="tabpanel"
-                 aria-labelledby="${semesterIdString}-se-${centerIdString}-ce-tab">
   
-              <c:set var="semesterIdCenterIdString" value="${semesterIdString.concat(centerIdString)}"/>
-              <c:set var="clazzList" value="${semesterIdCenterIdStringClazzListMap.get(semesterIdCenterIdString)}"/>
-              
-              <!-- Center ${centerIdString} detail -->
-              <div class="border-bottom px-3 mb-3">
-                <p class="mb-1">Tên: <c:out value="${centerIdCenterDTO.value.centerName}"/></p>
-                <p>Địa chỉ: <c:out value="${centerIdCenterDTO.value.address.addressString}"/></p>
-              </div>
-
-              <!-- clazzList -->
-              <div class="px-3 mb-3">
-                <!-- If clazzList != null => show result -->
-                <c:if test="${not empty clazzList}">
-                  <c:forEach var="clazzDTO" items="${clazzList}" varStatus="counter4">
+      <!-- Course detail -->
+      <h4>Khóa học: <c:out value="${course.courseAlias.concat(' - ').concat(course.courseName)}"/></h4>
       
-                    <c:url var="enrollLink" value="/enroll">
-                      <c:param name="clazzId" value="${clazzDTO.id}"/>
-                    </c:url>
-                    <form action="${enrollLink}" method="post" class="col-3 card px-0">
+      
+      <h5>Cơ sở: </h5>
+
+      <!-- Center Tab & TabPane -->
+      <!-- Center Tab -->
+      <ul id="centerTab"
+          role="tablist"
+          class="nav nav-tabs">
+        <c:forEach var="centerIdCenterDTO" items="${centerIdCenterDTOMap}" varStatus="counter">
+          <c:set var="centerIdStr" value="${centerIdCenterDTO.key.toString()}"/>
+
+          <li role="presentation"
+              class="nav-item" >
+            <button id="${centerIdStr}-ce-tab"
+                    class="nav-link ts-txt-grey ts-txt-hover-blue"
+                    type="button" role="tab"
+                    data-bs-toggle="tab" data-bs-target="#${centerIdStr}-ce-tab-pane"
+                    aria-controls="${centerIdStr}-ce-tab-pane">
+              <c:out value="${centerIdCenterDTO.value.centerName}"/>
+            </button>
+          </li>
+
+          <c:if test="${counter.first}">
+            <script id="script1">
+                $("#${centerIdStr}-ce-tab").addClass("active").attr("aria-selected", "true");
+                $("#script1").remove(); /* Xóa thẻ <script> sau khi xong */
+            </script>
+          </c:if>
+          
+        </c:forEach>
+      </ul>
+  
+      <!-- Center TabPane List -->
+      <div id="centerTabContent"
+           class="tab-content border border-top-0 rounded-bottom-3 pt-3 mb-3">
+        
+        <c:forEach var="centerIdCenterDTO" items="${centerIdCenterDTOMap}" varStatus="counter1">
+          <c:set var="centerIdStr" value="${centerIdCenterDTO.key.toString()}"/>
+
+          <!-- Center ${centerIdStr} TabPane -->
+          <div id="${centerIdStr}-ce-tab-pane"
+               class="tab-pane fade mx-0"
+               role="tabpanel"
+               aria-labelledby="${centerIdStr}-ce-tab">
+
+            <c:set var="clazzList" value="${centerIdClazzListMap.get(centerIdCenterDTO.key)}"/>
+            
+            <!-- Center ${centerIdStr} detail -->
+            <div class="border-bottom px-3 mb-3">
+              <p class="mb-1">Tên: <c:out value="${centerIdCenterDTO.value.centerName}"/></p>
+              <p>Địa chỉ: <c:out value="${centerIdCenterDTO.value.address.addressString}"/></p>
+            </div>
+
+            <!-- clazzList -->
+            <div class="row px-3">
+              <!-- If clazzList != null => show result -->
+              <c:if test="${not empty clazzList}">
+                <c:forEach var="request" items="${clazzList}" >
+    
+                  <form action="/enroll?clazzId=${request.id}" method="post" class="col-sm-4 col-md-3 mb-3">
+                    <div class="card">
+                      
                       <div class="card-header">
                         <h6 class="card-subtitle">
-                          Lớp: <c:out value="${clazzDTO.clazzName}"/>
+                          Lớp: <c:out value="${request.clazzAlias.concat(' - ').concat(request.clazzName)}"/>
                         </h6>
                       </div>
-        
+  
                       <c:set var="memberCount" value="0"/>
-                      <c:if test="${clazzDTO.memberList ne null}">
-                        <c:set var="memberCount" value="${clazzDTO.memberList.size()}"/>
+                      <c:if test="${request.memberList ne null}">
+                        <c:set var="memberCount" value="${request.memberList.size()}"/>
                       </c:if>
-        
+  
                       <div class="card-body">
                         <p class="card-text">
-                          <c:set var="clazzSchedule" value="${clazzDTO.clazzSchedule}"/>
+                          <c:set var="clazzSchedule" value="${request.clazzSchedule}"/>
+                          
+                          <fmt:parseDate value="${clazzSchedule.startDate}" type="date"
+                                         pattern="yyyy-MM-dd" var="parsedStartDate" />
+                          <fmt:parseDate value="${clazzSchedule.endDate}" type="date"
+                                         pattern="yyyy-MM-dd" var="parsedEndDate" />
+                          Bắt đầu: <fmt:formatDate value="${parsedStartDate}" type="date" pattern="dd/MM/yyyy"/><br/>
+                          Kết thúc: <fmt:formatDate value="${parsedEndDate}" type="date" pattern="dd/MM/yyyy"/><br/>
+                          <br/>
+                          
                           Lịch học: <c:out value="${clazzSchedule.scheduleCategory.scheduleName}"/><br/>
-                          Slot: <c:out value="${clazzSchedule.slot}"/><br/>
+                          
+                          Tiết: <c:out value="${clazzSchedule.slot}"/><br/>
                           Từ: <c:out value="${clazzSchedule.sessionStart}"/>&nbsp;
                           Đến: <c:out value="${clazzSchedule.sessionEnd}"/><br/>
-            
-                          Thành viên: <c:out value="${memberCount}"/> &sol; <c:out value="${clazzDTO.clazzSize}"/>
+                          <br/>
+      
+                          Thành viên: <c:out value="${memberCount}"/> &sol; <c:out value="${request.maxCapacity}"/>
                         </p>
                       </div>
-        
+  
                       <div class="card-footer">
                         <c:choose>
-                          <c:when test="${memberCount lt clazzDTO.clazzSize}">
+                          <c:when test="${memberCount lt request.maxCapacity}">
                             <button type="submit" class="btn btn-primary w-100">Đăng ký</button>
                           </c:when>
-                          <c:when test="${memberCount ge clazzDTO.clazzSize}">
-                            <button type="submit" class="btn btn-primary w-100" disabled="disabled">Đăng ký
+                          <c:when test="${memberCount ge request.maxCapacity}">
+                            <button type="button" class="btn btn-primary w-100" disabled="disabled">Đăng ký
                             </button>
                             <span class="ts-txt-orange">Lớp học đã đầy</span>
                           </c:when>
                         </c:choose>
                       </div>
-                    </form>
-    
-                  </c:forEach>
-                </c:if>
-    
-                <!-- If clazzList == null -->
-                <c:if test="${empty clazzList}">
-                  <div class="col-12 d-flex justify-content-center">
-                    <h5 class="ts-txt-orange">
-                      Cơ sở ${centerIdCenterDTO.value.centerName} chưa có lớp nào mở cho học
-                      kỳ ${semesterIdSemesterDTO.value.semesterAlias}.
-                    </h5>
-                  </div>
-                </c:if>
-              </div>
+                      
+                    </div>
+                  </form>
+  
+                </c:forEach>
+              </c:if>
+  
+              <!-- If clazzList == null -->
+              <c:if test="${empty clazzList}">
+                <div class="col-12 d-flex justify-content-center">
+                  <h5 class="ts-txt-orange">
+                    Cơ sở <c:out value="${centerIdCenterDTO.value.centerName}"/> 
+                    hiện chưa có Lớp nào đang mở cho Khóa <c:out value="${course.courseName}"/>
+                  </h5>
+                </div>
+              </c:if>
             </div>
-            
-            <c:if test="${counter2.first}">
-              <script id="script3">
-                  $("#${semesterIdString}-se-${centerIdString}-ce-tab-pane").addClass("show active");
-                  $("#script3").remove(); /* Xóa thẻ <script> sau khi xong */
-              </script>
-            </c:if>
-      
-          </c:forEach>
-        </div>
-      
+          </div>
+          
+          <c:if test="${counter1.first}">
+            <script id="script3">
+                $("#${centerIdStr}-ce-tab-pane").addClass("show active");
+                $("#script3").remove(); /* Xóa thẻ <script> sau khi xong */
+            </script>
+          </c:if>
+    
+        </c:forEach>
       </div>
       
     </div>
+      
   </div>
+  
 </div>
 <!-- ================================================== Main Body ================================================== -->
 

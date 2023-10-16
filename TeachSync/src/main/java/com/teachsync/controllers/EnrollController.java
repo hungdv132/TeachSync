@@ -18,13 +18,12 @@ import com.teachsync.utils.enums.Status;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.teachsync.utils.enums.DtoOption.*;
 
@@ -35,11 +34,9 @@ public class EnrollController {
     @Autowired
     private SemesterService semesterService;
     @Autowired
-    private CourseSemesterService courseSemesterService;
+    private ClazzService clazzService;
     @Autowired
     private CenterService centerService;
-    @Autowired
-    private ClazzService clazzService;
     @Autowired
     private RequestService requestService;
 
@@ -50,11 +47,14 @@ public class EnrollController {
     /* =================================================== CREATE =================================================== */
     @GetMapping("/enroll")
     public String enrollPage (
+            RedirectAttributes redirect,
             Model model,
             @RequestParam(name = "id") Long courseId,
             @RequestHeader(value = "Referer", required = false) String referer,
             @SessionAttribute(name = "user", required = false) UserReadDTO userDTO) {
-        if (userDTO == null) {
+
+        if (Objects.isNull(userDTO)) {
+            redirect.addFlashAttribute("mess", "Làm ơn đăng nhập");
             return "redirect:/course";
         }
 
@@ -66,43 +66,45 @@ public class EnrollController {
             return "redirect:/course";
         }
 
+
         try {
             CourseReadDTO courseDTO =  courseService.getDTOById(
                     courseId,
-                    List.of(Status.DELETED),
-                    false,
+                    List.of(Status.OPENED),
+                    true,
                     null);
+
+            if (Objects.isNull(courseDTO)) {
+                throw new IllegalArgumentException(
+                        "Lỗi truy cập, Khóa học với id: " + courseId + " không phải là khóa đang mở để đăng ký.");
+            }
+
+            model.addAttribute("course", courseDTO);
 
             Map<Long, CenterReadDTO> centerIdCenterDTOMap =
                     centerService.mapIdDTO(List.of(ADDRESS));
             model.addAttribute("centerIdCenterDTOMap", centerIdCenterDTOMap);
 
-            Map<Long, SemesterReadDTO> semesterDTOPage =
-                    semesterService.mapIdDTOByStartDateAfter(LocalDate.now(), null);
-            model.addAttribute("semesterIdSemesterDTOMap", semesterDTOPage);
+            Set<Long> centerIdSet = new HashSet<>();
+            if (Objects.nonNull(centerIdCenterDTOMap)) {
+                centerIdSet = centerIdCenterDTOMap.keySet();
+            }
 
-            model.addAttribute("course", courseDTO);
-
-//            TODO: Map<Long, String> courseSemesterIdSemesterIdCenterIdStringMap =
-//                    courseSemesterService.mapIdSemesterIdCenterIdStringByCourseIdAndSemesterIdIn(
-//                            courseId, semesterDTOPage.keySet());
-//            Map<Long, List<ClazzReadDTO>> courseSemesterIdClazzDTOListMap =
-//                    clazzService.mapCourseSemesterIdListDTOByCourseSemesterIdIn(
-//                            courseSemesterIdSemesterIdCenterIdStringMap.keySet(),
-//                            Arrays.asList(CLAZZ_SCHEDULE, SCHEDULE_CAT, MEMBER_LIST, ROOM_NAME));
-//            Map<String, List<ClazzReadDTO>> semesterIdCenterIdStringClassDTOListMap = new HashMap<>();
-//            for (Long courseSemesterId : courseSemesterIdSemesterIdCenterIdStringMap.keySet()) {
-//                semesterIdCenterIdStringClassDTOListMap.put(
-//                        courseSemesterIdSemesterIdCenterIdStringMap.get(courseSemesterId),
-//                        courseSemesterIdClazzDTOListMap.get(courseSemesterId));
-//            }
-
-
-//            model.addAttribute("semesterIdCenterIdStringClazzListMap", semesterIdCenterIdStringClassDTOListMap);
+            Map<Long, List<ClazzReadDTO>> centerIdClazzDTOListMap =
+                    clazzService.mapCenterIdListDTOByCourseIdAndCenterIdIn(
+                            courseId,
+                            centerIdSet,
+                            List.of(Status.OPENED),
+                            true,
+                            List.of(CLAZZ_SCHEDULE, SCHEDULE_CAT, MEMBER_LIST, ROOM_NAME));
+            model.addAttribute("centerIdClazzListMap", centerIdClazzDTOListMap);
 
         } catch (Exception e) {
             e.printStackTrace();
-            model.addAttribute("errorMsg", e.getMessage());
+
+            redirect.addFlashAttribute("mess", e.getMessage());
+
+            return "redirect:/course-detail" + "?id=" + courseId;
         }
 
         return "request/enroll";
@@ -111,11 +113,14 @@ public class EnrollController {
 
     @PostMapping(value = "/enroll")
     public String enroll(
+            RedirectAttributes redirect,
             Model model,
             @RequestParam Long clazzId,
             @RequestHeader(value = "Referer", required = false) String referer,
             @SessionAttribute(name = "user", required = false) UserReadDTO userDTO) {
+
         if (userDTO == null) {
+            redirect.addFlashAttribute("mess", "Làm ơn đăng nhập");
             return "redirect:/course";
         }
 
@@ -132,24 +137,32 @@ public class EnrollController {
             /* Clazz (Lớp được chọn) */
             ClazzReadDTO clazzDTO = clazzService.getDTOById(
                     clazzId,
-                    List.of(Status.DELETED),
-                    false,
+                    List.of(Status.OPENED),
+                    true,
                     List.of(MEMBER_LIST, STAFF, USER, CLAZZ_SCHEDULE, SCHEDULE_CAT, ROOM_NAME,
                             COURSE_SEMESTER, CENTER, ADDRESS, SEMESTER, COURSE, CURRENT_PRICE));
+
+            if (Objects.isNull(clazzDTO)) {
+                throw new IllegalArgumentException(
+                        "Lỗi truy cập, Lớp học với id: " + clazzId + " không phải là lớp đang mở để đăng ký.");
+            }
+
             model.addAttribute("clazzList", List.of(clazzDTO));
 
             /* Course (môn nào) */
             model.addAttribute("courseList", List.of(clazzDTO.getCourse()));
 
-            /* Semester (kỳ nào) */
-//            model.addAttribute("semesterList", List.of(clazzDTO.getSemester()));
-
             /* Center (Cơ sở nào) */
             model.addAttribute("centerList", List.of(clazzDTO.getCenter()));
 
             model.addAttribute("fromEnroll", true);
+
         } catch (Exception e) {
             e.printStackTrace();
+
+            redirect.addFlashAttribute("mess", e.getMessage());
+
+            return "redirect:/course";
         }
 
         return "request/add-request";

@@ -70,13 +70,13 @@
       </thead>
     
       <tbody class="align-middle">
-      <c:forEach var="clazz" items="${clazzList}">
+      <c:forEach var="request" items="${clazzList}">
         <tr>
-          <th scope="row">${clazz.id}</th>
-          <c:set var="clazzSchedule" value="${clazz.clazzSchedule}"/>
+          <th scope="row">${request.id}</th>
+          <c:set var="clazzSchedule" value="${request.clazzSchedule}"/>
         
           <c:if test="${not empty clazzSchedule}">
-            <td>${clazz.clazzName}</td>
+            <td>${request.clazzName}</td>
             <td>${clazzSchedule.roomName}</td>
             <td>${clazzSchedule.slot}</td>
             <td>${clazzSchedule.scheduleCategory.scheduleDesc}</td>
@@ -97,7 +97,7 @@
               </c:if>
               <c:if test="${not localDateNow.isAfter(clazzSchedule.endDate)}">
                 <td>
-                  <a href="/edit-schedule?id=${clazz.id}">
+                  <a href="/edit-schedule?id=${request.id}">
                     <button type="button" class="btn btn-warning w-100">Sửa</button>
                   </a>
                 </td>
@@ -107,7 +107,7 @@
           </c:if>
         
           <c:if test="${empty clazzSchedule}">
-            <td>${clazz.clazzName}</td>
+            <td>${request.clazzName}</td>
             <td>Thiếu</td>
             <td>Thiếu</td>
             <td>Thiếu</td>
@@ -116,7 +116,7 @@
           
             <c:if test="${isAdmin}">
               <td>
-                <a href="/add-schedule?id=${clazz.id}">
+                <a href="/add-schedule?id=${request.id}">
                   <button type="button" class="btn btn-success w-100">Thêm</button>
                 </a>
               </td>

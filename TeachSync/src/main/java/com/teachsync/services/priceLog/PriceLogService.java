@@ -25,6 +25,9 @@ public interface PriceLogService {
     Page<PriceLog> getPageAllLatestPromotion(Pageable paging) throws Exception;
     Page<PriceLogReadDTO> getPageAllLatestPromotionDTO(Pageable paging) throws Exception;
 
+    List<PriceLog> getAllLatestPromotion() throws Exception;
+    List<PriceLogReadDTO> getAllLatestPromotionDTO() throws Exception;
+
     /* id */
     PriceLog getById(Long id) throws Exception;
     PriceLogReadDTO getDTOById(Long id) throws Exception;

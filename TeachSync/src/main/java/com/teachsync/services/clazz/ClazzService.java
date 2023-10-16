@@ -66,18 +66,6 @@ public interface ClazzService {
             Pageable paging, Collection<Long> ids, Collection<Status> statuses, boolean isStatusIn,
             Collection<DtoOption> options) throws Exception;
 
-    /* courseSemesterId */
-//    List<Clazz> getAllByCourseSemesterId(
-//            Long courseSemesterId) throws Exception;
-//    List<ClazzReadDTO> getAllDTOByCourseSemesterId(
-//            Long courseSemesterId, Collection<DtoOption> options) throws Exception;
-//    List<Clazz> getAllByCourseSemesterIdIn(
-//            Collection<Long> courseSemesterIds) throws Exception;
-//    List<ClazzReadDTO> getAllDTOByCourseSemesterIdIn(
-//            Collection<Long> courseSemesterIds, Collection<DtoOption> options) throws Exception;
-//    Map<Long, List<ClazzReadDTO>> mapCourseSemesterIdListDTOByCourseSemesterIdIn(
-//            Collection<Long> courseSemesterIds, Collection<DtoOption> options) throws Exception;
-
     /* courseId */
     List<Clazz> getAllByCourseId(
             Long courseId, Collection<Status> statuses, boolean isStatusIn) throws Exception;
@@ -140,7 +128,46 @@ public interface ClazzService {
     Page<ClazzReadDTO> getPageAllDTOByCourseIdAndCenterId(
             Pageable paging, Long courseId, Long centerId, Collection<Status> statuses, boolean isStatusIn,
             Collection<DtoOption> options) throws Exception;
-    
+
+    List<Clazz> getAllByCourseIdInAndCenterId(
+            Collection<Long> courseIds, Long centerId, Collection<Status> statuses, boolean isStatusIn) throws Exception;
+    List<ClazzReadDTO> getAllDTOByCourseIdInAndCenterId(
+            Collection<Long> courseIds, Long centerId, Collection<Status> statuses, boolean isStatusIn,
+            Collection<DtoOption> options) throws Exception;
+
+    Page<Clazz> getPageAllByCourseIdInAndCenterId(
+            Pageable paging, Collection<Long> courseIds, Long centerId, Collection<Status> statuses, boolean isStatusIn) throws Exception;
+    Page<ClazzReadDTO> getPageAllDTOByCourseIdInAndCenterId(
+            Pageable paging, Collection<Long> courseIds, Long centerId, Collection<Status> statuses, boolean isStatusIn,
+            Collection<DtoOption> options) throws Exception;
+
+    List<Clazz> getAllByCourseIdAndCenterIdIn(
+            Long courseId, Collection<Long> centerIds, Collection<Status> statuses, boolean isStatusIn) throws Exception;
+    List<ClazzReadDTO> getAllDTOByCourseIdAndCenterIdIn(
+            Long courseId, Collection<Long> centerIds, Collection<Status> statuses, boolean isStatusIn,
+            Collection<DtoOption> options) throws Exception;
+    Map<Long, List<ClazzReadDTO>> mapCenterIdListDTOByCourseIdAndCenterIdIn(
+            Long courseId, Collection<Long> centerIds, Collection<Status> statuses, boolean isStatusIn,
+            Collection<DtoOption> options) throws Exception;
+
+    Page<Clazz> getPageAllByCourseIdAndCenterIdIn(
+            Pageable paging, Long courseId, Collection<Long> centerIds, Collection<Status> statuses, boolean isStatusIn) throws Exception;
+    Page<ClazzReadDTO> getPageAllDTOByCourseIdAndCenterIdIn(
+            Pageable paging, Long courseId, Collection<Long> centerIds, Collection<Status> statuses, boolean isStatusIn,
+            Collection<DtoOption> options) throws Exception;
+
+    List<Clazz> getAllByCourseIdInAndCenterIdIn(
+            Collection<Long> courseIds, Collection<Long> centerIds, Collection<Status> statuses, boolean isStatusIn) throws Exception;
+    List<ClazzReadDTO> getAllDTOByCourseIdInAndCenterIdIn(
+            Collection<Long> courseIds, Collection<Long> centerIds, Collection<Status> statuses, boolean isStatusIn,
+            Collection<DtoOption> options) throws Exception;
+
+    Page<Clazz> getPageAllByCourseIdInAndCenterIdIn(
+            Pageable paging, Collection<Long> courseIds, Collection<Long> centerIds, Collection<Status> statuses, boolean isStatusIn) throws Exception;
+    Page<ClazzReadDTO> getPageAllDTOByCourseIdInAndCenterIdIn(
+            Pageable paging, Collection<Long> courseIds, Collection<Long> centerIds, Collection<Status> statuses, boolean isStatusIn,
+            Collection<DtoOption> options) throws Exception;
+
     /* staffId */
     List<Clazz> getAllByStaffId(
             Long staffId, Collection<Status> statuses, boolean isStatusIn) throws Exception;

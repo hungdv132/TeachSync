@@ -85,9 +85,6 @@ public class PriceLogServiceImpl implements PriceLogService {
     public Page<PriceLogReadDTO> getPageAllDTO(Pageable paging) throws Exception {
         Page<PriceLog> priceLogPage = getPageAll(paging);
 
-        if (priceLogPage == null) {
-            return null; }
-
         return wrapPageDTO(priceLogPage);
     }
 
@@ -109,10 +106,26 @@ public class PriceLogServiceImpl implements PriceLogService {
     public Page<PriceLogReadDTO> getPageAllLatestPromotionDTO(Pageable paging) throws Exception {
         Page<PriceLog> priceLogPage = getPageAllLatestPromotion(paging);
 
-        if (priceLogPage == null) {
+        return wrapPageDTO(priceLogPage);
+    }
+
+    @Override
+    public List<PriceLog> getAllLatestPromotion() throws Exception {
+
+        List<PriceLog> priceLogList =
+                priceLogRepository.findAllByValidBetweenAndIsPromotionTrueAndStatusNot(
+                        LocalDateTime.now(), Status.DELETED);
+
+        if (priceLogList.isEmpty()) {
             return null; }
 
-        return wrapPageDTO(priceLogPage);
+        return priceLogList;
+    }
+    @Override
+    public List<PriceLogReadDTO> getAllLatestPromotionDTO() throws Exception {
+        List<PriceLog> priceLogList = getAllLatestPromotion();
+
+        return wrapListDTO(priceLogList);
     }
 
     /* id */
@@ -299,7 +312,11 @@ public class PriceLogServiceImpl implements PriceLogService {
 
     /* =================================================== WRAPPER ================================================== */
     @Override
-    public PriceLogReadDTO wrapDTO(PriceLog priceLog) throws Exception {
+    public PriceLogReadDTO wrapDTO(
+            PriceLog priceLog) throws Exception {
+
+        if (Objects.isNull(priceLog)) { return null; }
+
         PriceLogReadDTO dto = mapper.map(priceLog, PriceLogReadDTO.class);
 
         dto.setPrice(priceLog.getPrice());
@@ -319,7 +336,11 @@ public class PriceLogServiceImpl implements PriceLogService {
     }
 
     @Override
-    public List<PriceLogReadDTO> wrapListDTO(Collection<PriceLog> priceLogCollection) throws Exception {
+    public List<PriceLogReadDTO> wrapListDTO(
+            Collection<PriceLog> priceLogCollection) throws Exception {
+
+        if (ObjectUtils.isEmpty(priceLogCollection)) { return null; }
+
         List<PriceLogReadDTO> dtoList = new ArrayList<>();
 
         PriceLogReadDTO dto;
@@ -346,7 +367,11 @@ public class PriceLogServiceImpl implements PriceLogService {
     }
 
     @Override
-    public Page<PriceLogReadDTO> wrapPageDTO(Page<PriceLog> priceLogPage) throws Exception {
+    public Page<PriceLogReadDTO> wrapPageDTO(
+            Page<PriceLog> priceLogPage) throws Exception {
+
+        if (Objects.isNull(priceLogPage)) { return null; }
+
         return new PageImpl<>(
                 wrapListDTO(priceLogPage.getContent()),
                 priceLogPage.getPageable(),

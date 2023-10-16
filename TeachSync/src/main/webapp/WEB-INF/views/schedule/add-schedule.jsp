@@ -52,6 +52,7 @@
   
   <!-- Content -->
   <div class="col-12 ts-bg-white border-top border-bottom ts-border-teal pt-3 px-5 mb-3">
+    <%--@elvariable id="createDTO" type="com.teachsync.dtos.clazzSchedule.ClazzScheduleCreateDTO"--%>
     <form:form modelAttribute="createDTO" action="/add-schedule" method="post" class="row">
       <input type="hidden" name="clazzId" value="${clazz.id}">
       <input type="hidden" id="txtStaffId" name="staffId" value="${clazz.staffId}">
@@ -98,14 +99,14 @@
     
       <div class="col-sm-6 col-md-4 mb-3">
         <label class="form-label" for="dateStart">Thời gian bắt đầu</label>
-        <input type="date" class="form-control" min="${semester.startDate}" max="${semester.endDate}"
-               id="dateStart" name="startDate" value="${semester.startDate}" onchange="checkSchedule()" required>
+        <input type="date" class="form-control" min="" max=""
+               id="dateStart" name="startDate" value="" onchange="checkSchedule()" required>
       </div>
     
       <div class="col-sm-6 col-md-4 mb-3">
         <label class="form-label" for="dateEnd">Thời gian kết thúc</label>
-        <input type="date" class="form-control" min="${semester.startDate}" max="${semester.endDate}"
-               id="dateEnd" name="endDate" value="${semester.endDate}" onchange="checkSchedule()" required>
+        <input type="date" class="form-control" min="" max=""
+               id="dateEnd" name="endDate" value="" onchange="checkSchedule()" required>
       </div>
   
       <div class="col-12 mb-3">
@@ -115,7 +116,7 @@
       </div>
       
       <h5>Tiết học</h5>
-      <p>(Số tiết học của khóa: <span id="txtNumSession"></span>/${clazz.courseSemester.course.numSession} ; N/A: Thời gian ngoài hạn)</p>
+      <p>(Số tiết học của khóa: <span id="txtNumSession"></span>/${clazz.course.numSession} ; N/A: Thời gian ngoài hạn)</p>
       <div class="col-12 mb-3">
         <table class="table table-striped table-bordered" style="table-layout: fixed;">
           <thead class="table-primary">
@@ -152,37 +153,13 @@
 
 <!-- ================================================== Script ===================================================== -->
 <script>
-    var mess = '${mess}'
+    var mess = `${mess}`
     if (mess != '') {
         alert(mess);
     }
     
-    const slotStartTime = {
-        "1": "07:00",
-        "2": "08:45",
-        "3": "10:30",
-
-        "4": "12:30",
-        "5": "14:15",
-        "6": "16:00",
-
-        "7": "18:00",
-        "8": "19:45",
-    }
-    const slotEndTime = {
-        "1": "08:30",
-        "2": "10:15",
-        "3": "12:00",
-
-        "4": "14:00",
-        "5": "15:45",
-        "6": "17:30",
-
-        "7": "19:30",
-        "8": "21:15"
-    }
     
-    const numSessionTotal = ${clazz.courseSemester.course.numSession};
+    const numSessionTotal = ${clazz.course.numSession};
     let numSession = 0;
 
     function checkSessionNum() {

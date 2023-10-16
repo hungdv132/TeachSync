@@ -93,18 +93,9 @@ public class ClazzController {
     @ResponseBody
     public Map<String, Object> getClazzList(
             @RequestParam Long courseId,
-//            @RequestParam Long semesterId,
             @RequestParam Long centerId) {
         Map<String, Object> response = new HashMap<>();
         try {
-//            CourseSemester courseSemester =
-//                    courseSemesterService.getByCourseIdAndSemesterIdAndCenterId(courseId, semesterId, centerId);
-
-//            if (courseSemester == null) {
-//                response.put("clazzList", null);
-//                return response;
-//            }
-
             List<ClazzReadDTO> clazzDTOList =
                     clazzService.getAllDTOByCourseIdAndCenterId(
                             courseId, 
@@ -130,8 +121,8 @@ public class ClazzController {
             ClazzReadDTO clazzDTO =
                     clazzService.getDTOById(
                             clazzId,
-                            List.of(DELETED),
-                            false,
+                            List.of(OPENED),
+                            true,
                             List.of(MEMBER_LIST, STAFF, USER,
                                     CLAZZ_SCHEDULE, SCHEDULE_CAT, ROOM_NAME));
 

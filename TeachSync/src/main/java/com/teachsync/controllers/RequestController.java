@@ -36,6 +36,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -71,11 +72,13 @@ public class RequestController {
     /* =================================================== CREATE =================================================== */
     @GetMapping("/add-request")
     public String addRequestPage(
+            RedirectAttributes redirect,
             Model model,
             @RequestHeader(value = "Referer", required = false) String referer,
             @SessionAttribute(name = "user", required = false) UserReadDTO userDTO) {
         /* Check login */
         if (userDTO == null) {
+            redirect.addFlashAttribute("mess", "Làm ơn đăng nhập");
             return "redirect:/index";
         }
 
@@ -95,12 +98,6 @@ public class RequestController {
                     null);
             model.addAttribute("courseList", courseDTOList);
 
-            /* List Semester (kỳ nào) */
-            /* Các kỳ học nào ngày bắt đàu cách 10 ngày từ hiện tại (Để học sinh còn có thời gian đăng ký) */
-            List<SemesterReadDTO> semesterDTOList =
-                    semesterService.getAllDTOByStartDateAfter(LocalDate.now().plusDays(10), null);
-            model.addAttribute("semesterList", semesterDTOList);
-
             /* List Center (Cơ sở nào) */
             List<CenterReadDTO> centerDTOList = centerService.getAllDTO(null);
             model.addAttribute("centerList", centerDTOList);
@@ -113,13 +110,14 @@ public class RequestController {
 
     @PostMapping("/add-request/enroll")
     public String addRequestEnroll(
+            RedirectAttributes redirect,
             Model model,
-//            @RequestParam("clazzId") Long clazzId,
             @ModelAttribute RequestCreateDTO createDTO,
             @RequestHeader(value = "Referer", required = false) String referer,
             @SessionAttribute(name = "user", required = false) UserReadDTO userDTO) {
         /* Check login */
         if (userDTO == null) {
+            redirect.addFlashAttribute("mess", "Làm ơn đăng nhập");
             return "redirect:/index";
         }
 
@@ -140,8 +138,6 @@ public class RequestController {
                             false,
                             List.of(COURSE_SEMESTER, COURSE_NAME, CENTER_NAME, SEMESTER_NAME));
 
-//            CourseSemesterReadDTO courseSemesterDTO = clazzDTO.getCourseSemester();
-
             String requestName = "hoc sinh '" + userDTO.getId() +
                     "' xin hoc lop '" + clazzDTO.getId() +
                     "' mon '" + clazzDTO.getCourseId() + "'";
@@ -150,7 +146,6 @@ public class RequestController {
             String requestDesc = "Học sinh '" + userDTO.getFullName() +
                     "' xin nhập học Lớp '" + clazzDTO.getClazzName() +
                     "' cho Khóa học '" + clazzDTO.getCourseName() +
-//                    "' vào Kỳ '" + courseSemesterDTO.getSemesterName() +
                     "' tại Cơ Sở '" + clazzDTO.getCenterName() + "'.";
             createDTO.setRequestDesc(requestDesc);
             createDTO.setCreatedBy(userDTO.getId());
@@ -170,6 +165,7 @@ public class RequestController {
     /* =================================================== READ ===================================================== */
     @GetMapping("/request")
     public String requestListPage(
+            RedirectAttributes redirect,
             Model model,
             @RequestParam(value = "pageNo", required = false) Integer pageNo,
             @RequestParam(value = "clazzId", required = false) Long clazzId,
@@ -177,6 +173,7 @@ public class RequestController {
             @SessionAttribute(name = "user", required = false) UserReadDTO userDTO) {
         /* Check login */
         if (userDTO == null) {
+            redirect.addFlashAttribute("mess", "Làm ơn đăng nhập");
             return "redirect:/index";
         }
 
@@ -195,20 +192,20 @@ public class RequestController {
                         requestService.getPageAllDTOByRequesterId(
                                 pageable,
                                 userDTO.getId(),
-                                List.of(CLAZZ, COURSE_SEMESTER, COURSE_ALIAS, SEMESTER_ALIAS, CENTER_NAME));
+                                List.of(CLAZZ, COURSE_ALIAS, CENTER_NAME));
             } else if (roleId.equals(Constants.ROLE_ADMIN)) {
                 if (clazzId != null) {
                     requestReadDTOPage =
                             requestService.getPageAllDTO(
                                     pageable,
-                                    List.of(REQUESTER_FULL_NAME, CLAZZ, COURSE_SEMESTER,
-                                            COURSE_ALIAS, SEMESTER_ALIAS, CENTER_NAME));
+                                    List.of(REQUESTER_FULL_NAME, CLAZZ,
+                                            COURSE_ALIAS, CENTER_NAME));
                 } else {
                     requestReadDTOPage =
                             requestService.getPageAllDTO(
                                     pageable,
-                                    List.of(REQUESTER_FULL_NAME, CLAZZ, COURSE_SEMESTER,
-                                            COURSE_ALIAS, SEMESTER_ALIAS, CENTER_NAME));
+                                    List.of(REQUESTER_FULL_NAME, CLAZZ,
+                                            COURSE_ALIAS, CENTER_NAME));
                 }
             } else {
                 /* Quay về trang cũ */
@@ -225,6 +222,7 @@ public class RequestController {
             }
         } catch (Exception e) {
             e.printStackTrace();
+            redirect.addFlashAttribute("mess", e.getMessage());
             return "redirect:" + referer;
         }
 

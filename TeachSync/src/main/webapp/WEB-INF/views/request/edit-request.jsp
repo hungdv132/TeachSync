@@ -76,10 +76,9 @@
     <!-- Request detail -->
     <div class="col-sm-12 col-md-6 mb-3">
       <div class="row">
-        <c:set var="course" value="${request.clazz.courseSemester.course}"/>
+        <c:set var="course" value="${request.clazz.course}"/>
         <c:set var="currentPrice" value="${course.currentPrice}"/>
-        <c:set var="semester" value="${request.clazz.courseSemester.semester}"/>
-        <c:set var="center" value="${request.clazz.courseSemester.center}"/>
+        <c:set var="center" value="${request.clazz.center}"/>
         <c:set var="clazzSchedule" value="${request.clazz.clazzSchedule}"/>
         
         <!-- Center & Room -->
@@ -87,12 +86,6 @@
         <p class="mb-1">Địa chỉ: <c:out value="${center.address.addressString}"/></p>
         <p class="mb-3">Phòng: <c:out value="${clazzSchedule.roomName}"/></p>
         
-        <!-- Semester -->
-        <h6 class="mb-1">Học kỳ: <c:out value="${semester.semesterName}"/></h6>
-        <fmt:parseDate value="${semester.startDate}" type="date" pattern="yyyy-MM-dd" var="parsedStartDate" />
-        <fmt:parseDate value="${semester.endDate}" type="date" pattern="yyyy-MM-dd" var="parsedEndDate" />
-        <p class="col-6">Bắt đầu: <fmt:formatDate value="${parsedStartDate}"/></p>
-        <p class="col-6">Kết thúc: <fmt:formatDate value="${parsedEndDate}"/></p>
         
         <!-- Course & Clazz -->
         <h6 class="mb-1">Khóa học: <c:out value="${course.courseName}"/></h6>
@@ -107,8 +100,13 @@
         <p class="col-12 mb-3">
           Cần đóng: <fmt:formatNumber value="${currentPrice.finalPrice}" type="currency"/>
         </p>
-        
+
+        <!-- Clazz -->
         <h6 class="mb-1">Lớp: <c:out value="${request.clazz.clazzName}"/></h6>
+        <fmt:parseDate value="${clazzSchedule.startDate}" type="date" pattern="yyyy-MM-dd" var="parsedStartDate" />
+        <fmt:parseDate value="${clazzSchedule.endDate}" type="date" pattern="yyyy-MM-dd" var="parsedEndDate" />
+        <p class="col-6">Bắt đầu: <fmt:formatDate value="${parsedStartDate}" pattern="dd/MM/yyyy"/></p>
+        <p class="col-6">Kết thúc: <fmt:formatDate value="${parsedEndDate}" pattern="dd/MM/yyyy"/></p>
         <p class="col-6 mb-1">
           Lịch học: <c:out value="${clazzSchedule.scheduleCategory.scheduleName}"/>
         </p>
@@ -165,7 +163,7 @@
               </button>
             </c:if>
             
-            <input type="file" class="w-100 mt-3" required="required"
+            <input type="file" class="form-control mt-3" required="required"
                    id="filePaymentInfoStudent" name="file">
           </label>
           
@@ -174,7 +172,8 @@
           
           <div class="w-100 d-flex justify-content-center">
             <button type="button" class="btn btn-primary w-45"
-                    id="btnUpdateRequestEnrollStudent" onclick="updateRequestEnroll('student')">Lưu
+                    id="btnUpdateRequestEnrollStudent"
+                    onclick="updateRequestEnroll('student')">Lưu
             </button>
             
             <c:if test="${not empty request.contentLink}">

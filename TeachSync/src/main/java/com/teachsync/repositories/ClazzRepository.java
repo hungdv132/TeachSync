@@ -100,11 +100,41 @@ public interface ClazzRepository extends JpaRepository<Clazz, Long> {
             Long courseId, Long centerId, Collection<Status> statusIn);
     Page<Clazz> findAllByCourseIdAndCenterIdAndStatusIn(
             Long courseId, Long centerId, Collection<Status> statusIn, Pageable pageable);
-    
+
     List<Clazz> findAllByCourseIdAndCenterIdAndStatusNotIn(
             Long courseId, Long centerId, Collection<Status> statusNotIn);
     Page<Clazz> findAllByCourseIdAndCenterIdAndStatusNotIn(
             Long courseId, Long centerId, Collection<Status> statusNotIn, Pageable pageable);
+
+    List<Clazz> findAllByCourseIdInAndCenterIdAndStatusIn(
+            Collection<Long> courseIds, Long centerId, Collection<Status> statusIn);
+    Page<Clazz> findAllByCourseIdInAndCenterIdAndStatusIn(
+            Collection<Long> courseIds, Long centerId, Collection<Status> statusIn, Pageable pageable);
+
+    List<Clazz> findAllByCourseIdInAndCenterIdAndStatusNotIn(
+            Collection<Long> courseIds, Long centerId, Collection<Status> statusNotIn);
+    Page<Clazz> findAllByCourseIdInAndCenterIdAndStatusNotIn(
+            Collection<Long> courseIds, Long centerId, Collection<Status> statusNotIn, Pageable pageable);
+
+    List<Clazz> findAllByCourseIdAndCenterIdInAndStatusIn(
+            Long courseId, Collection<Long> centerIds, Collection<Status> statusIn);
+    Page<Clazz> findAllByCourseIdAndCenterIdInAndStatusIn(
+            Long courseId, Collection<Long> centerIds, Collection<Status> statusIn, Pageable pageable);
+
+    List<Clazz> findAllByCourseIdAndCenterIdInAndStatusNotIn(
+            Long courseId, Collection<Long> centerIds, Collection<Status> statusNotIn);
+    Page<Clazz> findAllByCourseIdAndCenterIdInAndStatusNotIn(
+            Long courseId, Collection<Long> centerIds, Collection<Status> statusNotIn, Pageable pageable);
+
+    List<Clazz> findAllByCourseIdInAndCenterIdInAndStatusIn(
+            Collection<Long> courseIds, Collection<Long> centerIds, Collection<Status> statusIn);
+    Page<Clazz> findAllByCourseIdInAndCenterIdInAndStatusIn(
+            Collection<Long> courseIds, Collection<Long> centerIds, Collection<Status> statusIn, Pageable pageable);
+
+    List<Clazz> findAllByCourseIdInAndCenterIdInAndStatusNotIn(
+            Collection<Long> courseIds, Collection<Long> centerIds, Collection<Status> statusNotIn);
+    Page<Clazz> findAllByCourseIdInAndCenterIdInAndStatusNotIn(
+            Collection<Long> courseIds, Collection<Long> centerIds, Collection<Status> statusNotIn, Pageable pageable);
 
     /* staffId */
     List<Clazz> findAllByStaffIdAndStatusIn(

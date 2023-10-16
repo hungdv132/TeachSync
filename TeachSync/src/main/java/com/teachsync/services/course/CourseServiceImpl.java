@@ -225,7 +225,7 @@ public class CourseServiceImpl implements CourseService {
                             paging);
         }
 
-        if (ObjectUtils.isEmpty(coursePage)) { return null; }
+        if (coursePage.isEmpty()) { return null; }
 
         return coursePage;
     }
@@ -245,8 +245,19 @@ public class CourseServiceImpl implements CourseService {
             Collection<DtoOption> options) throws Exception {
 
         /* TODO: filter price */
+        List<PriceLog> priceLogList =
+                priceLogService.getAllLatestPromotion();
 
-        Page<Course> coursePage = getPageAll(paging, statuses, isStatusIn);
+        if (ObjectUtils.isEmpty(priceLogList)) {
+            return null;
+        }
+
+        Set<Long> courseIdSet =
+                priceLogList.stream()
+                        .map(PriceLog::getCourseId)
+                        .collect(Collectors.toSet());
+
+        Page<Course> coursePage = getPageAllByIdIn(paging, courseIdSet, statuses, isStatusIn);
 
         return wrapPageDTO(coursePage, options);
     }
@@ -391,7 +402,7 @@ public class CourseServiceImpl implements CourseService {
                             paging);
         }
 
-        if (ObjectUtils.isEmpty(coursePage)) { return null; }
+        if (coursePage.isEmpty()) { return null; }
 
         return coursePage;
     }
@@ -467,7 +478,7 @@ public class CourseServiceImpl implements CourseService {
                             statuses,
                             paging);
         }
-        if (ObjectUtils.isEmpty(coursePage)) { return null; }
+        if (coursePage.isEmpty()) { return null; }
 
         return coursePage;
     }
@@ -543,7 +554,7 @@ public class CourseServiceImpl implements CourseService {
                             statuses,
                             paging);
         }
-        if (ObjectUtils.isEmpty(coursePage)) { return null; }
+        if (coursePage.isEmpty()) { return null; }
 
         return coursePage;
     }
@@ -901,6 +912,9 @@ public class CourseServiceImpl implements CourseService {
     public Page<CourseReadDTO> wrapPageDTO(
             Page<Course> coursePage, 
             Collection<DtoOption> options) throws Exception {
+
+        if (Objects.isNull(coursePage)) { return null; }
+
         return new PageImpl<>(
                 wrapListDTO(coursePage.getContent(), options),
                 coursePage.getPageable(),

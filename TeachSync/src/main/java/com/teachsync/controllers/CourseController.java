@@ -164,6 +164,12 @@ public class CourseController {
             List<Status> statuses;
             boolean isStatusIn;
 
+            if (Objects.isNull(pageNo)) {
+                pageNo = 0;
+            }
+
+            Pageable pageable = miscUtil.makePaging(pageNo, 10, "status", true);
+
             switch (pageType) {
                 case 1 -> {
                     /* Is guest, student, parent => All OPENED Course */
@@ -173,7 +179,7 @@ public class CourseController {
                     /* Hot course */
                     dtoPage =
                             courseService.getPageAllDTOOnSale(
-                                    null,
+                                    pageable,
                                     statuses,
                                     isStatusIn,
                                     null);
@@ -199,12 +205,6 @@ public class CourseController {
                             "Invalid role");
                 }
             }
-
-            if (Objects.isNull(pageNo)) {
-                pageNo = 0;
-            }
-
-            Pageable pageable = miscUtil.makePaging(pageNo, 10, "status", true);
 
             /* All course */
             dtoPage =
@@ -343,7 +343,7 @@ public class CourseController {
                             isStatusIn,
                             null);
 
-            if (dtoPage != null) {
+            if (Objects.nonNull(dtoPage)) {
                 model.addAttribute("courseList", dtoPage.getContent());
                 model.addAttribute("pageNo", dtoPage.getPageable().getPageNumber());
                 model.addAttribute("pageTotal", dtoPage.getTotalPages());

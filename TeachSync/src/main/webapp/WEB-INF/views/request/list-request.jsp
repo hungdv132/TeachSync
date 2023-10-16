@@ -67,7 +67,6 @@
         </c:if>
         <th scope="col">Lớp</th>
         <th scope="col">Khóa</th>
-        <th scope="col">Kỳ</th>
         <th scope="col">Cơ sở</th>
         <th scope="col">Trạng thái</th>
         
@@ -76,28 +75,30 @@
       </thead>
       
       <tbody class="table-hover align-middle">
-      <c:forEach var="clazz" items="${requestList}">
+      <c:forEach var="request" items="${requestList}">
         <c:url var="requestDetail" value="/edit-request">
-          <c:param name="id" value="${clazz.id}"/>
+          <c:param name="id" value="${request.id}"/>
         </c:url>
         
         <tr>
-          <th scope="row" class="text-center"><a href="${requestDetail}">${clazz.id}</a></th>
+          <th scope="row" class="text-center"><a href="${requestDetail}">${request.id}</a></th>
           
-          <td><a href="${requestDetail}">${clazz.requestType.stringValueVie}</a></td>
+          <td><a href="${requestDetail}">${request.requestType.stringValueVie}</a></td>
           <c:if test="${isAdmin}">
-            <td>${clazz.requesterFullName}</td>
+            <td>${request.requesterFullName}</td>
           </c:if>
-          <td>${clazz.clazz.clazzName}</td>
-          <td>${clazz.clazz.courseSemester.courseAlias}</td>
-          <td>${clazz.clazz.courseSemester.semesterAlias}</td>
-          <td>${clazz.clazz.courseSemester.centerName}</td>
-          <td>${clazz.status.stringValueVie}</td>
+          <td>${request.clazz.clazzName}</td>
+          <td>${request.clazz.courseAlias}</td>
+          <td>${request.clazz.centerName}</td>
+          <td>${request.status.stringValueVie}</td>
           
           <td class=text-center"">
-            <a href="${requestDetail}" class="btn btn-warning">Sửa</a>
+            <c:if test="${isAdmin}">
+              <a href="${requestDetail}" class="btn btn-warning">Xét duyệt</a>
+            </c:if>
             <c:if test="${isStudent}">
-              <a href="/delete-request?id=${clazz.id}" class="btn btn-danger ms-2">Xóa</a>
+              <a href="${requestDetail}" class="btn btn-warning">Sửa</a>
+              <a href="/delete-request?id=${request.id}" class="btn btn-danger ms-2">Xóa</a>
             </c:if>
           </td>
         </tr>
@@ -118,7 +119,7 @@
       <i class="bi-chevron-left"></i>
     </button>
     
-    Page: <c:out value="${not empty pageNo ? pageNo + 1 : 1}"/> &sol; <c:out value="${not empty pageTotal ? pageTotal : 1}"/>
+    Trang: <c:out value="${not empty pageNo ? pageNo + 1 : 1}"/> &sol; <c:out value="${not empty pageTotal ? pageTotal : 1}"/>
     
     <button type="button" class="btn btn-secondary mx-2" onclick="toPage(${pageNo + 1})">
       <i class="bi-chevron-right"></i>

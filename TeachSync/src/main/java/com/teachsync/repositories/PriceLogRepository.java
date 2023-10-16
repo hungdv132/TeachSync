@@ -22,6 +22,11 @@ public interface PriceLogRepository extends JpaRepository<PriceLog, Long> {
     Page<PriceLog> findAllByValidBetweenAndIsPromotionTrueAndStatusNot(
             LocalDateTime validDateTime, Status status, Pageable pageable);
 
+    @Query("SELECT pL FROM PriceLog  pL " +
+            "WHERE (pL.validFrom <= ?1) AND (pL.validTo = null OR pL.validTo >= ?1) AND (pL.isPromotion = true) AND (pL.status <> ?2)")
+    List<PriceLog> findAllByValidBetweenAndIsPromotionTrueAndStatusNot(
+            LocalDateTime validDateTime, Status status);
+
 
     /* id */
     Optional<PriceLog> findByIdAndStatusNot(Long id, Status status);
