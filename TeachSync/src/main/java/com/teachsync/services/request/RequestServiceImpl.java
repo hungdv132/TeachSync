@@ -449,6 +449,7 @@ public class RequestServiceImpl implements RequestService {
                     resolverIdSet.add(resolverId);
                 }
             }
+
             if (options.contains(CLAZZ)) {
                 clazzIdClazzDTOMap = clazzService.mapIdDTOByIdIn(clazzIdSet,
                         List.of(Status.DELETED),

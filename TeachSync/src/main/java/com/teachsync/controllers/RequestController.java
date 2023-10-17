@@ -27,6 +27,7 @@ import com.teachsync.services.request.RequestService;
 import com.teachsync.services.semester.SemesterService;
 import com.teachsync.utils.Constants;
 import com.teachsync.utils.MiscUtil;
+import com.teachsync.utils.enums.DtoOption;
 import com.teachsync.utils.enums.PaymentType;
 import com.teachsync.utils.enums.Status;
 import org.modelmapper.ModelMapper;
@@ -41,6 +42,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 import static com.teachsync.utils.enums.DtoOption.*;
 
@@ -194,18 +196,19 @@ public class RequestController {
                                 userDTO.getId(),
                                 List.of(CLAZZ, COURSE_ALIAS, CENTER_NAME));
             } else if (roleId.equals(Constants.ROLE_ADMIN)) {
+                List<DtoOption> options =
+                        List.of(REQUESTER_FULL_NAME, CLAZZ, COURSE_ALIAS, CENTER_NAME);
                 if (clazzId != null) {
                     requestReadDTOPage =
-                            requestService.getPageAllDTO(
+                            requestService.getPageAllDTOByClazzId(
                                     pageable,
-                                    List.of(REQUESTER_FULL_NAME, CLAZZ,
-                                            COURSE_ALIAS, CENTER_NAME));
+                                    clazzId,
+                                    options);
                 } else {
                     requestReadDTOPage =
                             requestService.getPageAllDTO(
                                     pageable,
-                                    List.of(REQUESTER_FULL_NAME, CLAZZ,
-                                            COURSE_ALIAS, CENTER_NAME));
+                                    options);
                 }
             } else {
                 /* Quay về trang cũ */
@@ -232,7 +235,8 @@ public class RequestController {
 
     /* =================================================== UPDATE =================================================== */
     @GetMapping("/edit-request")
-    public String editDetailPage(
+    public String editRequestPage(
+            RedirectAttributes redirect,
             Model model,
             @RequestParam("id") Long requestId,
             @RequestHeader(value = "Referer", required = false) String referer,
@@ -240,6 +244,7 @@ public class RequestController {
 
         /* Check login */
         if (userDTO == null) {
+            redirect.addFlashAttribute("mess", "Làm ơn đăng nhập");
             return "redirect:/index";
         }
 
@@ -275,80 +280,62 @@ public class RequestController {
     }
 
     @PostMapping("/edit-request/enroll")
-    public String editDetail(
+    public String editEnrollRequest(
+            RedirectAttributes redirect,
             Model model,
+            @ModelAttribute RequestUpdateDTO updateDTO,
+            @ModelAttribute PaymentCreateDTO paymentCreateDTO,
             @RequestParam("id") Long requestId,
-            @RequestParam(value = "paymentType", required = false) PaymentType paymentType,
-            @RequestParam(value = "paymentAmount", required = false) Double paymentAmount,
-            @RequestParam(value = "paymentAt", required = false) LocalDateTime paymentAt,
-            @RequestParam(value = "paymentInfo", required = false) String paymentInfoLink,
-            @RequestParam(value = "paymentStatus", required = false) Status paymentStatus,
-            @RequestParam(value = "paymentDesc", required = false) String paymentDesc,
             @RequestHeader(value = "Referer", required = false) String referer,
             @SessionAttribute(name = "user", required = false) UserReadDTO userDTO) {
 
         /* Check login */
         if (userDTO == null) {
+            redirect.addFlashAttribute("mess", "Làm ơn đăng nhập");
             return "redirect:/index";
         }
 
         try {
             Long currentUserId = userDTO.getId();
 
-            RequestReadDTO requestDTO = null;
-
             Long roleId = userDTO.getRoleId();
+
             if (roleId.equals(Constants.ROLE_STUDENT)) {
                 /* Student cập nhập thanh toán cho Request với chứng cứ (ảnh hoá đơn, pdf giao dịch, ...) */
-                requestDTO = requestService.getDTOById(requestId, null);
+                Request request =
+                        requestService.getById(requestId);
 
-                if (requestDTO == null) {
+                if (Objects.isNull(request)) {
                     throw new IllegalArgumentException(
                             "Cập nhập thất bại. Không thấy đơn nào với id: " + requestId);
                 }
 
-                if (!requestDTO.getRequesterId().equals(userDTO.getId())) {
+                if (!request.getRequesterId().equals(userDTO.getId())) {
                     /* TODO: Phụ huynh nộp hộ no throw exception */
                     throw new IllegalArgumentException(
                             "Cập nhập thất bại. Đây không phải là đơn của bạn.");
                 }
 
-                RequestUpdateDTO updateDTO = modelMapper.map(requestDTO, RequestUpdateDTO.class);
-
-                updateDTO.setContentLink(paymentInfoLink);
-                updateDTO.setStatus(Status.AWAIT_CONFIRM);
                 updateDTO.setUpdatedBy(currentUserId);
 
                 requestService.updateRequestByDTO(updateDTO);
 
+                redirect.addFlashAttribute("mess", "Cập nhập đơn thành công");
             } else if (roleId.equals(Constants.ROLE_ADMIN)) {
                 /* Admin xác nhận thanh toán Request. Chấp nhận hoặc từ chối với chứng cứ */
-                requestDTO = requestService.getDTOById(
-                        requestId,
-                        List.of(REQUESTER, CLAZZ, CLAZZ_SCHEDULE, ROOM_NAME,
-                                COURSE_SEMESTER, SEMESTER, CENTER, COURSE));
+                Request request =
+                        requestService.getById(requestId);
 
-                if (requestDTO == null) {
+                if (Objects.isNull(request)) {
                     throw new IllegalArgumentException(
                             "Cập nhập thất bại. Không thấy đơn nào với id: " + requestId);
                 }
 
-                RequestUpdateDTO updateDTO = modelMapper.map(requestDTO, RequestUpdateDTO.class);
                 updateDTO.setUpdatedBy(currentUserId);
-                updateDTO.setResolverId(currentUserId);
-                updateDTO.setStatus(paymentStatus);
 
-                switch (paymentStatus) {
+                switch (updateDTO.getStatus()) {
                     case APPROVED -> {
                         /* Xác nhận thanh toán */
-                        PaymentCreateDTO paymentCreateDTO = new PaymentCreateDTO();
-                        paymentCreateDTO.setPayerId(requestDTO.getRequesterId());
-                        paymentCreateDTO.setRequestId(requestId);
-                        paymentCreateDTO.setPaymentType(paymentType);
-                        paymentCreateDTO.setPaymentDesc(paymentDesc);
-                        paymentCreateDTO.setPaymentAmount(paymentAmount);
-                        paymentCreateDTO.setPaymentAt(paymentAt);
-                        paymentCreateDTO.setPaymentDocLink(paymentInfoLink);
                         paymentCreateDTO.setVerifierId(currentUserId);
                         paymentCreateDTO.setCreatedBy(currentUserId);
 
@@ -356,8 +343,8 @@ public class RequestController {
 
                         /* Thêm vào lớp học */
                         ClazzMemberCreateDTO clazzMemberCreateDTO = new ClazzMemberCreateDTO();
-                        clazzMemberCreateDTO.setClazzId(requestDTO.getClazzId());
-                        clazzMemberCreateDTO.setUserId(requestDTO.getRequesterId());
+                        clazzMemberCreateDTO.setClazzId(request.getClazzId());
+                        clazzMemberCreateDTO.setUserId(request.getRequesterId());
                         clazzMemberCreateDTO.setCreatedBy(currentUserId);
 
                         clazzMemberService.createClazzMemberByDTO(clazzMemberCreateDTO);
@@ -369,8 +356,12 @@ public class RequestController {
 
                 requestService.updateRequestByDTO(updateDTO);
 
-                model.addAttribute("request", requestDTO);
+                redirect.addFlashAttribute("mess", "Duyệt đơn thành công");
+
             } else {
+                /* Role != STUDENT, ADMIN*/
+                redirect.addFlashAttribute("mess", "Bạn không đủ quyền");
+
                 /* Quay về trang cũ */
                 if (referer != null) {
                     return "redirect:" + referer;
@@ -380,6 +371,9 @@ public class RequestController {
 
         } catch (Exception e) {
             e.printStackTrace();
+
+            redirect.addFlashAttribute("mess", e.getMessage());
+
             if (referer != null) {
                 return "redirect:" + referer;
             }

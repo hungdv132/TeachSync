@@ -1670,7 +1670,7 @@ public class ClazzServiceImpl implements ClazzService {
                 centerIdCenterMap =
                         centerService.mapIdDTOByIdIn(centerIdSet, options);
             }
-            if (options.contains(DtoOption.CENTER)) {
+            if (options.contains(DtoOption.CENTER_NAME)) {
                 centerIdCenterNameMap =
                         centerService.mapIdCenterNameByIdIn(centerIdSet);
             }

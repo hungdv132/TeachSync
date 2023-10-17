@@ -79,7 +79,7 @@
     <%--@elvariable id="createDTO" type="com.teachsync.dtos.request.RequestCreateDTO"--%>
     <form:form id="enrollForm" 
                modelAttribute="createDTO" action="/add-request/enroll" method="POST" 
-               class="row visually-hidden"
+               cssClass="row visually-hidden"
                onsubmit="enableParamBeforeFormSubmit('enrollForm')">
       
       <input type="hidden" name="requesterId" value="${user.id}">

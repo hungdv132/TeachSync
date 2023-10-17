@@ -87,18 +87,17 @@
           <c:if test="${isAdmin}">
             <td>${request.requesterFullName}</td>
           </c:if>
-          <td>${request.clazz.clazzName}</td>
+          <td>${request.clazz.clazzAlias}</td>
           <td>${request.clazz.courseAlias}</td>
           <td>${request.clazz.centerName}</td>
           <td>${request.status.stringValueVie}</td>
           
           <td class=text-center"">
             <c:if test="${isAdmin}">
-              <a href="${requestDetail}" class="btn btn-warning">Xét duyệt</a>
+              <a href="${requestDetail}" class="btn btn-warning">Duyệt đơn</a>
             </c:if>
             <c:if test="${isStudent}">
-              <a href="${requestDetail}" class="btn btn-warning">Sửa</a>
-              <a href="/delete-request?id=${request.id}" class="btn btn-danger ms-2">Xóa</a>
+              <a href="${requestDetail}" class="btn btn-warning">Chỉnh Sửa</a>
             </c:if>
           </td>
         </tr>
