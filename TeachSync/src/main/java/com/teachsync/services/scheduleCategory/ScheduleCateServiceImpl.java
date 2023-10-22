@@ -1,7 +1,7 @@
 package com.teachsync.services.scheduleCategory;
 
 import com.teachsync.dtos.BaseReadDTO;
-import com.teachsync.dtos.scheduleCategory.ScheduleCaReadDTO;
+import com.teachsync.dtos.scheduleCategory.ScheduleCategoryReadDTO;
 import com.teachsync.entities.ScheduleCategory;
 import com.teachsync.repositories.ScheduleCateRepository;
 import com.teachsync.utils.MiscUtil;
@@ -48,7 +48,7 @@ public class ScheduleCateServiceImpl implements ScheduleCateService{
     }
 
     @Override
-    public Page<ScheduleCaReadDTO> getPageAllDTO(Pageable paging) throws Exception {
+    public Page<ScheduleCategoryReadDTO> getPageAllDTO(Pageable paging) throws Exception {
         Page<ScheduleCategory> scheduleCategoryPage = getPageAll(paging);
 
         if (scheduleCategoryPage == null) {
@@ -59,7 +59,7 @@ public class ScheduleCateServiceImpl implements ScheduleCateService{
     }
 
     @Override
-    public Page<ScheduleCaReadDTO> getPageAllDTO(Pageable paging, Collection<DtoOption> options) throws Exception {
+    public Page<ScheduleCategoryReadDTO> getPageAllDTO(Pageable paging, Collection<DtoOption> options) throws Exception {
         Page<ScheduleCategory> scheduleCategoryPage = getPageAll(paging);
 
         if (scheduleCategoryPage == null) {
@@ -83,7 +83,7 @@ public class ScheduleCateServiceImpl implements ScheduleCateService{
     }
 
     @Override
-    public List<ScheduleCaReadDTO> getAllDTO() throws Exception {
+    public List<ScheduleCategoryReadDTO> getAllDTO() throws Exception {
         List<ScheduleCategory> scheduleCategoryList = getAll();
 
         if (scheduleCategoryList == null) {
@@ -101,7 +101,7 @@ public class ScheduleCateServiceImpl implements ScheduleCateService{
     }
 
     @Override
-    public ScheduleCaReadDTO getDTOById(Long id) throws Exception {
+    public ScheduleCategoryReadDTO getDTOById(Long id) throws Exception {
         return wrapDTO(getById(id), null);
     }
 
@@ -116,15 +116,15 @@ public class ScheduleCateServiceImpl implements ScheduleCateService{
     }
 
     @Override
-    public List<ScheduleCaReadDTO> getAllDTOByIdIn(Collection<Long> idCollection) throws Exception {
+    public List<ScheduleCategoryReadDTO> getAllDTOByIdIn(Collection<Long> idCollection) throws Exception {
         return wrapListDTO(getAllByIdIn(idCollection),null);
     }
 
     
 
     @Override
-    public Map<Long, ScheduleCaReadDTO> mapScheduleIdScheduleDescByIdIn(Collection<Long> idCollection) throws Exception {
-        List<ScheduleCaReadDTO> scheduleCategoryList = getAllDTOByIdIn(idCollection);
+    public Map<Long, ScheduleCategoryReadDTO> mapScheduleIdScheduleDescByIdIn(Collection<Long> idCollection) throws Exception {
+        List<ScheduleCategoryReadDTO> scheduleCategoryList = getAllDTOByIdIn(idCollection);
 
         if (ObjectUtils.isEmpty(scheduleCategoryList)) {
             return new HashMap<>(); }
@@ -137,12 +137,12 @@ public class ScheduleCateServiceImpl implements ScheduleCateService{
 
     /* =================================================== WRAPPER ================================================== */
     @Override
-    public ScheduleCaReadDTO wrapDTO(ScheduleCategory scheduleCategory, Collection<DtoOption> options) throws Exception {
+    public ScheduleCategoryReadDTO wrapDTO(ScheduleCategory scheduleCategory, Collection<DtoOption> options) throws Exception {
         if (scheduleCategory == null){
             return null;
         }
 
-        ScheduleCaReadDTO dto = mapper.map(scheduleCategory, ScheduleCaReadDTO.class);
+        ScheduleCategoryReadDTO dto = mapper.map(scheduleCategory, ScheduleCategoryReadDTO.class);
 
 
 
@@ -150,11 +150,11 @@ public class ScheduleCateServiceImpl implements ScheduleCateService{
     }
 
     @Override
-    public List<ScheduleCaReadDTO> wrapListDTO(
+    public List<ScheduleCategoryReadDTO> wrapListDTO(
             Collection<ScheduleCategory> scheduleCategoryCollection, Collection<DtoOption> options) throws Exception {
-        List<ScheduleCaReadDTO> dtoList = new ArrayList<>();
+        List<ScheduleCategoryReadDTO> dtoList = new ArrayList<>();
 
-        ScheduleCaReadDTO dto;
+        ScheduleCategoryReadDTO dto;
 
         if (scheduleCategoryCollection == null){
             return null;
@@ -162,7 +162,7 @@ public class ScheduleCateServiceImpl implements ScheduleCateService{
 
 
         for (ScheduleCategory scheduleCategory : scheduleCategoryCollection) {
-            dto = mapper.map(scheduleCategory, ScheduleCaReadDTO.class);
+            dto = mapper.map(scheduleCategory, ScheduleCategoryReadDTO.class);
 
 
             dtoList.add(dto);
@@ -172,7 +172,7 @@ public class ScheduleCateServiceImpl implements ScheduleCateService{
     }
 
     @Override
-    public Page<ScheduleCaReadDTO> wrapPageDTO(
+    public Page<ScheduleCategoryReadDTO> wrapPageDTO(
         Page<ScheduleCategory> scheduleCategoryPage, Collection<DtoOption> options) throws Exception {
             return new PageImpl<>(
                     wrapListDTO(scheduleCategoryPage.getContent(), options),

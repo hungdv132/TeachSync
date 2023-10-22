@@ -107,7 +107,7 @@
 <%@ include file="/WEB-INF/fragments/footer.jspf" %>
 <!-- ================================================== Footer ===================================================== -->
 <script>
-    var mess = '${mess}'
+    var mess = `${mess}`
     if (mess != '') {
         alert(mess);
     }

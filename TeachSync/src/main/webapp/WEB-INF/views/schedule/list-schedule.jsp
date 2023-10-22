@@ -79,7 +79,7 @@
             <td>${request.clazzName}</td>
             <td>${clazzSchedule.roomName}</td>
             <td>${clazzSchedule.slot}</td>
-            <td>${clazzSchedule.scheduleCategory.scheduleDesc}</td>
+            <td>${clazzSchedule.scheduleCategory.categoryDesc}</td>
             <fmt:parseDate value="${clazzSchedule.startDate}" type="date"
                            pattern="yyyy-MM-dd" var="parsedStartDate" />
             <fmt:parseDate value="${clazzSchedule.endDate}" type="date"

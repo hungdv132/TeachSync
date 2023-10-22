@@ -145,7 +145,7 @@
     // $("#script1").remove(); /* Xóa thẻ <script> sau khi xong */
 </script>
 <script>
-    var mess = '${mess}'
+    var mess = `<c:out value="${mess}"/>`;
     if (mess != '') {
         alert(mess);
     }

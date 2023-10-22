@@ -4,6 +4,7 @@ import com.teachsync.dtos.center.CenterReadDTO;
 import com.teachsync.dtos.clazz.ClazzCreateDTO;
 import com.teachsync.dtos.clazz.ClazzReadDTO;
 import com.teachsync.dtos.clazz.ClazzUpdateDTO;
+import com.teachsync.dtos.clazzSchedule.ClazzScheduleReadDTO;
 import com.teachsync.dtos.clazzTest.ClazzTestReadDTO;
 import com.teachsync.dtos.course.CourseReadDTO;
 import com.teachsync.dtos.homework.HomeworkReadDTO;
@@ -20,6 +21,7 @@ import com.teachsync.repositories.TestRepository;
 import com.teachsync.services.center.CenterService;
 import com.teachsync.services.clazz.ClazzService;
 import com.teachsync.services.clazzMember.ClazzMemberService;
+import com.teachsync.services.clazzSchedule.ClazzScheduleService;
 import com.teachsync.services.course.CourseService;
 import com.teachsync.services.courseSemester.CourseSemesterService;
 import com.teachsync.services.homework.HomeworkService;
@@ -57,11 +59,9 @@ public class ClazzController {
     @Autowired
     private ClazzMemberService clazzMemberService;
     @Autowired
+    private ClazzScheduleService clazzScheduleService;
+    @Autowired
     private CourseService courseService;
-    @Autowired
-    private SemesterService semesterService;
-    @Autowired
-    private CourseSemesterService courseSemesterService;
     @Autowired
     private CenterService centerService;
     @Autowired
@@ -334,7 +334,8 @@ public class ClazzController {
                             List.of(DELETED),
                             false,
                             List.of(STAFF, USER, COURSE_NAME,
-                                    COURSE_ALIAS, CENTER, TEST_LIST));
+                                    COURSE_ALIAS, CENTER, TEST_LIST,
+                                    CLAZZ_SCHEDULE, SCHEDULE_CAT));
             //get news of class
 //            List<NewsReadDTO> newsReadDTOList = newsService.getAllNewsByClazz(clazzDTO.getId());
 

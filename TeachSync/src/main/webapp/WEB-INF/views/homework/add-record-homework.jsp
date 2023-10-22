@@ -56,7 +56,7 @@
         });
     </script>
     <script>
-        var mess = '${mess}'
+        var mess = `${mess}`
         if (mess != '') {
             alert(mess);
         }
@@ -158,7 +158,7 @@
 <!-- ================================================== Footer ===================================================== -->
 </body>
 <script>
-    var mess = '${mess}'
+    var mess = `${mess}`
     if (mess != '') {
         alert(mess);
     }

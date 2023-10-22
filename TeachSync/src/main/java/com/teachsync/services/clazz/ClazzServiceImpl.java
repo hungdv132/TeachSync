@@ -177,8 +177,7 @@ public class ClazzServiceImpl implements ClazzService {
 
     @Override
     public List<ClazzReadDTO> getAllDTO(
-            Collection<Status> statuses, boolean isStatusIn, 
-            Collection<DtoOption> options) throws Exception {
+            Collection<Status> statuses, boolean isStatusIn, Collection<DtoOption> options) throws Exception {
 
         List<Clazz> clazzList = getAll( statuses, isStatusIn);
 
@@ -187,7 +186,8 @@ public class ClazzServiceImpl implements ClazzService {
     
     @Override
     public Page<Clazz> getPageAll(
-            Pageable paging, Collection<Status> statuses, boolean isStatusIn) throws Exception {
+            Pageable paging, 
+            Collection<Status> statuses, boolean isStatusIn) throws Exception {
 
         if (paging == null) { paging = miscUtil.defaultPaging(); }
 
@@ -215,8 +215,8 @@ public class ClazzServiceImpl implements ClazzService {
     }
     @Override
     public Page<ClazzReadDTO> getPageAllDTO(
-            Pageable paging, Collection<Status> statuses, boolean isStatusIn,
-            Collection<DtoOption> options) throws Exception {
+            Pageable paging, 
+            Collection<Status> statuses, boolean isStatusIn, Collection<DtoOption> options) throws Exception {
 
         Page<Clazz> clazzPage = getPageAll(paging, statuses, isStatusIn);
 
@@ -233,7 +233,8 @@ public class ClazzServiceImpl implements ClazzService {
     }
     @Override
     public Boolean existsAllByIdIn(
-            Collection<Long> ids, Collection<Status> statuses, boolean isStatusIn) throws Exception {
+            Collection<Long> ids, 
+            Collection<Status> statuses, boolean isStatusIn) throws Exception {
 
         return clazzRepository
                 .existsAllByIdInAndStatusNotIn(ids, List.of(DELETED));
@@ -241,7 +242,8 @@ public class ClazzServiceImpl implements ClazzService {
 
     @Override
     public Clazz getById(
-            Long id, Collection<Status> statuses, boolean isStatusIn) throws Exception {
+            Long id, 
+            Collection<Status> statuses, boolean isStatusIn) throws Exception {
 
         if (isStatusIn) {
             if (ObjectUtils.isEmpty(statuses)) { return null; }
@@ -259,8 +261,8 @@ public class ClazzServiceImpl implements ClazzService {
     }
     @Override
     public ClazzReadDTO getDTOById(
-            Long id, Collection<Status> statuses, boolean isStatusIn, 
-            Collection<DtoOption> options) throws Exception {
+            Long id, 
+            Collection<Status> statuses, boolean isStatusIn, Collection<DtoOption> options) throws Exception {
 
         Clazz clazz = getById(id, statuses, isStatusIn);
 
@@ -269,7 +271,8 @@ public class ClazzServiceImpl implements ClazzService {
 
     @Override
     public List<Clazz> getAllByIdIn(
-            Collection<Long> ids, Collection<Status> statuses, boolean isStatusIn) throws Exception {
+            Collection<Long> ids, 
+            Collection<Status> statuses, boolean isStatusIn) throws Exception {
 
         List<Clazz> clazzList;
         
@@ -294,8 +297,20 @@ public class ClazzServiceImpl implements ClazzService {
         return clazzList;
     }
     @Override
+    public Map<Long, Clazz> mapIdClazzByIdIn(
+            Collection<Long> ids,
+            Collection<Status> statuses, boolean isStatusIn) throws Exception {
+        List<Clazz> clazzList = getAllByIdIn(ids, statuses, isStatusIn);
+
+        if (ObjectUtils.isEmpty(clazzList)) { return new HashMap<>(); }
+
+        return clazzList.stream()
+                .collect(Collectors.toMap(BaseEntity::getId, Function.identity()));
+    }
+    @Override
     public Map<Long, String> mapIdClazzAliasByIdIn(
-            Collection<Long> ids, Collection<Status> statuses, boolean isStatusIn) throws Exception {
+            Collection<Long> ids, 
+            Collection<Status> statuses, boolean isStatusIn) throws Exception {
         List<Clazz> clazzList = getAllByIdIn(ids, statuses, isStatusIn);
 
         if (ObjectUtils.isEmpty(clazzList)) { return new HashMap<>(); }
@@ -305,7 +320,8 @@ public class ClazzServiceImpl implements ClazzService {
     }
     @Override
     public Map<Long, String> mapIdClazzNameByIdIn(
-            Collection<Long> ids, Collection<Status> statuses, boolean isStatusIn) throws Exception {
+            Collection<Long> ids, 
+            Collection<Status> statuses, boolean isStatusIn) throws Exception {
         List<Clazz> clazzList = getAllByIdIn(ids, statuses, isStatusIn);
 
         if (ObjectUtils.isEmpty(clazzList)) { return new HashMap<>(); }
@@ -315,8 +331,8 @@ public class ClazzServiceImpl implements ClazzService {
     }
     @Override
     public List<ClazzReadDTO> getAllDTOByIdIn(
-            Collection<Long> ids, Collection<Status> statuses, boolean isStatusIn, 
-            Collection<DtoOption> options) throws Exception {
+            Collection<Long> ids, 
+            Collection<Status> statuses, boolean isStatusIn, Collection<DtoOption> options) throws Exception {
         
         List<Clazz> clazzList = getAllByIdIn(ids, statuses, isStatusIn);
         
@@ -324,8 +340,8 @@ public class ClazzServiceImpl implements ClazzService {
     }
     @Override
     public Map<Long, ClazzReadDTO> mapIdDTOByIdIn(
-            Collection<Long> ids, Collection<Status> statuses, boolean isStatusIn, 
-            Collection<DtoOption> options) throws Exception {
+            Collection<Long> ids, 
+            Collection<Status> statuses, boolean isStatusIn, Collection<DtoOption> options) throws Exception {
         
         List<ClazzReadDTO> clazzDTOList = getAllDTOByIdIn(ids, statuses, isStatusIn, options);
 
@@ -337,7 +353,8 @@ public class ClazzServiceImpl implements ClazzService {
 
     @Override
     public Page<Clazz> getPageAllByIdIn(
-            Pageable paging, Collection<Long> ids, Collection<Status> statuses, boolean isStatusIn) throws Exception {
+            Pageable paging, Collection<Long> ids, 
+            Collection<Status> statuses, boolean isStatusIn) throws Exception {
         
         if (paging == null) { paging = miscUtil.defaultPaging(); }
 
@@ -367,8 +384,8 @@ public class ClazzServiceImpl implements ClazzService {
     }
     @Override
     public Page<ClazzReadDTO> getPageAllDTOByIdIn(
-            Pageable paging, Collection<Long> ids, Collection<Status> statuses, boolean isStatusIn, 
-            Collection<DtoOption> options) throws Exception {
+            Pageable paging, Collection<Long> ids, 
+            Collection<Status> statuses, boolean isStatusIn, Collection<DtoOption> options) throws Exception {
         
         Page<Clazz> clazzPage = getPageAllByIdIn(paging, ids, statuses, isStatusIn);
 
@@ -378,7 +395,8 @@ public class ClazzServiceImpl implements ClazzService {
     /* courseId */
     @Override
     public List<Clazz> getAllByCourseId(
-            Long courseId, Collection<Status> statuses, boolean isStatusIn) throws Exception {
+            Long courseId, 
+            Collection<Status> statuses, boolean isStatusIn) throws Exception {
 
         List<Clazz> clazzList;
 
@@ -403,18 +421,43 @@ public class ClazzServiceImpl implements ClazzService {
         return clazzList;
     }
     @Override
+    public Map<Long, Clazz> mapIdClazzByCourseId(
+            Long courseId,
+            Collection<Status> statuses, boolean isStatusIn) throws Exception {
+
+        List<Clazz> clazzList = getAllByCourseId(courseId, statuses, isStatusIn);
+
+        if (ObjectUtils.isEmpty(clazzList)) { return new HashMap<>(); }
+
+        return clazzList.stream()
+                .collect(Collectors.toMap(BaseEntity::getId, Function.identity()));
+    }
+    @Override
     public List<ClazzReadDTO> getAllDTOByCourseId(
-            Long courseId, Collection<Status> statuses, boolean isStatusIn,
-            Collection<DtoOption> options) throws Exception {
+            Long courseId, 
+            Collection<Status> statuses, boolean isStatusIn, Collection<DtoOption> options) throws Exception {
 
         List<Clazz> clazzList = getAllByCourseId(courseId, statuses, isStatusIn);
 
         return wrapListDTO(clazzList, options);
     }
-    
+    @Override
+    public Map<Long, ClazzReadDTO> mapIdDTOByCourseId(
+            Long courseId,
+            Collection<Status> statuses, boolean isStatusIn, Collection<DtoOption> options) throws Exception {
+
+        List<ClazzReadDTO> clazzDTOList = getAllDTOByCourseId(courseId, statuses, isStatusIn, options);
+
+        if (ObjectUtils.isEmpty(clazzDTOList)) { return new HashMap<>(); }
+
+        return clazzDTOList.stream()
+                .collect(Collectors.toMap(BaseReadDTO::getId, Function.identity()));
+    }
+
     @Override
     public Page<Clazz> getPageAllByCourseId(
-            Pageable paging, Long courseId, Collection<Status> statuses, boolean isStatusIn) throws Exception {
+            Pageable paging, Long courseId, 
+            Collection<Status> statuses, boolean isStatusIn) throws Exception {
         if (paging == null) { paging = miscUtil.defaultPaging(); }
 
         Page<Clazz> clazzPage;
@@ -443,8 +486,8 @@ public class ClazzServiceImpl implements ClazzService {
     }
     @Override
     public Page<ClazzReadDTO> getPageAllDTOByCourseId(
-            Pageable paging, Long courseId, Collection<Status> statuses, boolean isStatusIn, 
-            Collection<DtoOption> options) throws Exception {
+            Pageable paging, Long courseId, 
+            Collection<Status> statuses, boolean isStatusIn, Collection<DtoOption> options) throws Exception {
         
         Page<Clazz> clazzPage = getPageAllByCourseId(paging, courseId, statuses, isStatusIn);
         
@@ -453,7 +496,8 @@ public class ClazzServiceImpl implements ClazzService {
     
     @Override
     public List<Clazz> getAllByCourseIdIn(
-            Collection<Long> courseIds, Collection<Status> statuses, boolean isStatusIn) throws Exception {
+            Collection<Long> courseIds, 
+            Collection<Status> statuses, boolean isStatusIn) throws Exception {
 
         List<Clazz> clazzList;
 
@@ -479,8 +523,8 @@ public class ClazzServiceImpl implements ClazzService {
     }
     @Override
     public List<ClazzReadDTO> getAllDTOByCourseIdIn(
-            Collection<Long> courseIds, Collection<Status> statuses, boolean isStatusIn, 
-            Collection<DtoOption> options) throws Exception {
+            Collection<Long> courseIds, 
+            Collection<Status> statuses, boolean isStatusIn, Collection<DtoOption> options) throws Exception {
         
         List<Clazz> clazzList = getAllByCourseIdIn(courseIds, statuses, isStatusIn);
 
@@ -489,7 +533,8 @@ public class ClazzServiceImpl implements ClazzService {
     
     @Override
     public Page<Clazz> getPageAllByCourseIdIn(
-            Pageable paging, Collection<Long> courseIds, Collection<Status> statuses, boolean isStatusIn) throws Exception {
+            Pageable paging, Collection<Long> courseIds, 
+            Collection<Status> statuses, boolean isStatusIn) throws Exception {
         
         if (paging == null) {  paging = miscUtil.defaultPaging(); }
         
@@ -519,8 +564,8 @@ public class ClazzServiceImpl implements ClazzService {
     }
     @Override
     public Page<ClazzReadDTO> getPageAllDTOByCourseIdIn(
-            Pageable paging, Collection<Long> courseIds, Collection<Status> statuses, boolean isStatusIn,
-            Collection<DtoOption> options) throws Exception {
+            Pageable paging, Collection<Long> courseIds, 
+            Collection<Status> statuses, boolean isStatusIn, Collection<DtoOption> options) throws Exception {
 
         Page<Clazz> clazzPage = getPageAllByCourseIdIn(paging, courseIds, statuses, isStatusIn);
 
@@ -530,7 +575,8 @@ public class ClazzServiceImpl implements ClazzService {
     /* centerId */
     @Override
     public List<Clazz> getAllByCenterId(
-            Long centerId, Collection<Status> statuses, boolean isStatusIn) throws Exception {
+            Long centerId, 
+            Collection<Status> statuses, boolean isStatusIn) throws Exception {
 
         List<Clazz> clazzList;
 
@@ -556,8 +602,8 @@ public class ClazzServiceImpl implements ClazzService {
     }
     @Override
     public List<ClazzReadDTO> getAllDTOByCenterId(
-            Long centerId, Collection<Status> statuses, boolean isStatusIn,
-            Collection<DtoOption> options) throws Exception {
+            Long centerId, 
+            Collection<Status> statuses, boolean isStatusIn, Collection<DtoOption> options) throws Exception {
 
         List<Clazz> clazzList = getAllByCenterId(centerId, statuses, isStatusIn);
 
@@ -566,7 +612,8 @@ public class ClazzServiceImpl implements ClazzService {
 
     @Override
     public Page<Clazz> getPageAllByCenterId(
-            Pageable paging, Long centerId, Collection<Status> statuses, boolean isStatusIn) throws Exception {
+            Pageable paging, Long centerId, 
+            Collection<Status> statuses, boolean isStatusIn) throws Exception {
         if (paging == null) { paging = miscUtil.defaultPaging(); }
 
         Page<Clazz> clazzPage;
@@ -595,8 +642,8 @@ public class ClazzServiceImpl implements ClazzService {
     }
     @Override
     public Page<ClazzReadDTO> getPageAllDTOByCenterId(
-            Pageable paging, Long centerId, Collection<Status> statuses, boolean isStatusIn,
-            Collection<DtoOption> options) throws Exception {
+            Pageable paging, Long centerId, 
+            Collection<Status> statuses, boolean isStatusIn, Collection<DtoOption> options) throws Exception {
 
         Page<Clazz> clazzPage = getPageAllByCenterId(paging, centerId, statuses, isStatusIn);
 
@@ -605,7 +652,8 @@ public class ClazzServiceImpl implements ClazzService {
 
     @Override
     public List<Clazz> getAllByCenterIdIn(
-            Collection<Long> centerIds, Collection<Status> statuses, boolean isStatusIn) throws Exception {
+            Collection<Long> centerIds, 
+            Collection<Status> statuses, boolean isStatusIn) throws Exception {
 
         List<Clazz> clazzList;
 
@@ -631,8 +679,8 @@ public class ClazzServiceImpl implements ClazzService {
     }
     @Override
     public List<ClazzReadDTO> getAllDTOByCenterIdIn(
-            Collection<Long> centerIds, Collection<Status> statuses, boolean isStatusIn,
-            Collection<DtoOption> options) throws Exception {
+            Collection<Long> centerIds, 
+            Collection<Status> statuses, boolean isStatusIn, Collection<DtoOption> options) throws Exception {
 
         List<Clazz> clazzList = getAllByCenterIdIn(centerIds, statuses, isStatusIn);
 
@@ -641,7 +689,8 @@ public class ClazzServiceImpl implements ClazzService {
     
     @Override
     public Page<Clazz> getPageAllByCenterIdIn(
-            Pageable paging, Collection<Long> centerIds, Collection<Status> statuses, boolean isStatusIn) throws Exception {
+            Pageable paging, Collection<Long> centerIds, 
+            Collection<Status> statuses, boolean isStatusIn) throws Exception {
 
         if (paging == null) {  paging = miscUtil.defaultPaging(); }
 
@@ -671,8 +720,8 @@ public class ClazzServiceImpl implements ClazzService {
     }
     @Override
     public Page<ClazzReadDTO> getPageAllDTOByCenterIdIn(
-            Pageable paging, Collection<Long> centerIds, Collection<Status> statuses, boolean isStatusIn,
-            Collection<DtoOption> options) throws Exception {
+            Pageable paging, Collection<Long> centerIds, 
+            Collection<Status> statuses, boolean isStatusIn, Collection<DtoOption> options) throws Exception {
 
         Page<Clazz> clazzPage = getPageAllByCenterIdIn(paging, centerIds, statuses, isStatusIn);
 
@@ -682,7 +731,8 @@ public class ClazzServiceImpl implements ClazzService {
     /* courseId && centerId */
     @Override
     public List<Clazz> getAllByCourseIdAndCenterId(
-            Long courseId, Long centerId, Collection<Status> statuses, boolean isStatusIn) throws Exception {
+            Long courseId, Long centerId, 
+            Collection<Status> statuses, boolean isStatusIn) throws Exception {
         
         List<Clazz> clazzList;
 
@@ -710,8 +760,8 @@ public class ClazzServiceImpl implements ClazzService {
     }
     @Override
     public List<ClazzReadDTO> getAllDTOByCourseIdAndCenterId(
-            Long courseId, Long centerId, Collection<Status> statuses, boolean isStatusIn, 
-            Collection<DtoOption> options) throws Exception {
+            Long courseId, Long centerId, 
+            Collection<Status> statuses, boolean isStatusIn, Collection<DtoOption> options) throws Exception {
 
         List<Clazz> clazzList = getAllByCourseIdAndCenterId(courseId, centerId, statuses, isStatusIn);
 
@@ -720,7 +770,8 @@ public class ClazzServiceImpl implements ClazzService {
     
     @Override
     public Page<Clazz> getPageAllByCourseIdAndCenterId(
-            Pageable paging, Long courseId, Long centerId, Collection<Status> statuses, boolean isStatusIn) throws Exception {
+            Pageable paging, Long courseId, Long centerId, 
+            Collection<Status> statuses, boolean isStatusIn) throws Exception {
 
         Page<Clazz> clazzPage;
 
@@ -752,8 +803,8 @@ public class ClazzServiceImpl implements ClazzService {
     }
     @Override
     public Page<ClazzReadDTO> getPageAllDTOByCourseIdAndCenterId(
-            Pageable paging, Long courseId, Long centerId, Collection<Status> statuses, boolean isStatusIn, 
-            Collection<DtoOption> options) throws Exception {
+            Pageable paging, Long courseId, Long centerId, 
+            Collection<Status> statuses, boolean isStatusIn, Collection<DtoOption> options) throws Exception {
 
         Page<Clazz> clazzPage = getPageAllByCourseIdAndCenterId(paging, courseId, centerId, statuses, isStatusIn);
 
@@ -762,7 +813,8 @@ public class ClazzServiceImpl implements ClazzService {
 
     @Override
     public List<Clazz> getAllByCourseIdInAndCenterId(
-            Collection<Long> courseIds, Long centerId, Collection<Status> statuses, boolean isStatusIn) throws Exception {
+            Collection<Long> courseIds, Long centerId, 
+            Collection<Status> statuses, boolean isStatusIn) throws Exception {
 
         List<Clazz> clazzList;
 
@@ -790,8 +842,8 @@ public class ClazzServiceImpl implements ClazzService {
     }
     @Override
     public List<ClazzReadDTO> getAllDTOByCourseIdInAndCenterId(
-            Collection<Long> courseIds, Long centerId, Collection<Status> statuses, boolean isStatusIn,
-            Collection<DtoOption> options) throws Exception {
+            Collection<Long> courseIds, Long centerId, 
+            Collection<Status> statuses, boolean isStatusIn, Collection<DtoOption> options) throws Exception {
 
         List<Clazz> clazzList = getAllByCourseIdInAndCenterId(courseIds, centerId, statuses, isStatusIn);
 
@@ -800,7 +852,8 @@ public class ClazzServiceImpl implements ClazzService {
 
     @Override
     public Page<Clazz> getPageAllByCourseIdInAndCenterId(
-            Pageable paging, Collection<Long> courseIds, Long centerId, Collection<Status> statuses, boolean isStatusIn) throws Exception {
+            Pageable paging, Collection<Long> courseIds, Long centerId, 
+            Collection<Status> statuses, boolean isStatusIn) throws Exception {
 
         Page<Clazz> clazzPage;
 
@@ -832,8 +885,8 @@ public class ClazzServiceImpl implements ClazzService {
     }
     @Override
     public Page<ClazzReadDTO> getPageAllDTOByCourseIdInAndCenterId(
-            Pageable paging, Collection<Long> courseIds, Long centerId, Collection<Status> statuses, boolean isStatusIn,
-            Collection<DtoOption> options) throws Exception {
+            Pageable paging, Collection<Long> courseIds, Long centerId, 
+            Collection<Status> statuses, boolean isStatusIn, Collection<DtoOption> options) throws Exception {
 
         Page<Clazz> clazzPage = getPageAllByCourseIdInAndCenterId(paging, courseIds, centerId, statuses, isStatusIn);
 
@@ -842,7 +895,8 @@ public class ClazzServiceImpl implements ClazzService {
 
     @Override
     public List<Clazz> getAllByCourseIdAndCenterIdIn(
-            Long courseId, Collection<Long> centerIds, Collection<Status> statuses, boolean isStatusIn) throws Exception {
+            Long courseId, Collection<Long> centerIds, 
+            Collection<Status> statuses, boolean isStatusIn) throws Exception {
 
         List<Clazz> clazzList;
 
@@ -870,8 +924,8 @@ public class ClazzServiceImpl implements ClazzService {
     }
     @Override
     public List<ClazzReadDTO> getAllDTOByCourseIdAndCenterIdIn(
-            Long courseId, Collection<Long> centerIds, Collection<Status> statuses, boolean isStatusIn,
-            Collection<DtoOption> options) throws Exception {
+            Long courseId, Collection<Long> centerIds, 
+            Collection<Status> statuses, boolean isStatusIn, Collection<DtoOption> options) throws Exception {
 
         List<Clazz> clazzList = getAllByCourseIdAndCenterIdIn(courseId, centerIds, statuses, isStatusIn);
 
@@ -879,8 +933,8 @@ public class ClazzServiceImpl implements ClazzService {
     }
     @Override
     public Map<Long, List<ClazzReadDTO>> mapCenterIdListDTOByCourseIdAndCenterIdIn(
-            Long courseId, Collection<Long> centerIds, Collection<Status> statuses, boolean isStatusIn,
-            Collection<DtoOption> options) throws Exception {
+            Long courseId, Collection<Long> centerIds, 
+            Collection<Status> statuses, boolean isStatusIn, Collection<DtoOption> options) throws Exception {
 
         List<ClazzReadDTO> clazzDTOList =
                 getAllDTOByCourseIdAndCenterIdIn(courseId, centerIds, statuses, isStatusIn, options);
@@ -911,7 +965,8 @@ public class ClazzServiceImpl implements ClazzService {
 
     @Override
     public Page<Clazz> getPageAllByCourseIdAndCenterIdIn(
-            Pageable paging, Long courseId, Collection<Long> centerIds, Collection<Status> statuses, boolean isStatusIn) throws Exception {
+            Pageable paging, Long courseId, Collection<Long> centerIds, 
+            Collection<Status> statuses, boolean isStatusIn) throws Exception {
 
         Page<Clazz> clazzPage;
 
@@ -943,8 +998,8 @@ public class ClazzServiceImpl implements ClazzService {
     }
     @Override
     public Page<ClazzReadDTO> getPageAllDTOByCourseIdAndCenterIdIn(
-            Pageable paging, Long courseId, Collection<Long> centerIds, Collection<Status> statuses, boolean isStatusIn,
-            Collection<DtoOption> options) throws Exception {
+            Pageable paging, Long courseId, Collection<Long> centerIds, 
+            Collection<Status> statuses, boolean isStatusIn, Collection<DtoOption> options) throws Exception {
 
         Page<Clazz> clazzPage = getPageAllByCourseIdAndCenterIdIn(paging, courseId, centerIds, statuses, isStatusIn);
 
@@ -953,7 +1008,8 @@ public class ClazzServiceImpl implements ClazzService {
 
     @Override
     public List<Clazz> getAllByCourseIdInAndCenterIdIn(
-            Collection<Long> courseIds, Collection<Long> centerIds, Collection<Status> statuses, boolean isStatusIn) throws Exception {
+            Collection<Long> courseIds, Collection<Long> centerIds, 
+            Collection<Status> statuses, boolean isStatusIn) throws Exception {
 
         List<Clazz> clazzList;
 
@@ -981,8 +1037,8 @@ public class ClazzServiceImpl implements ClazzService {
     }
     @Override
     public List<ClazzReadDTO> getAllDTOByCourseIdInAndCenterIdIn(
-            Collection<Long> courseIds, Collection<Long> centerIds, Collection<Status> statuses, boolean isStatusIn,
-            Collection<DtoOption> options) throws Exception {
+            Collection<Long> courseIds, Collection<Long> centerIds, 
+            Collection<Status> statuses, boolean isStatusIn, Collection<DtoOption> options) throws Exception {
 
         List<Clazz> clazzList = getAllByCourseIdInAndCenterIdIn(courseIds, centerIds, statuses, isStatusIn);
 
@@ -991,7 +1047,8 @@ public class ClazzServiceImpl implements ClazzService {
 
     @Override
     public Page<Clazz> getPageAllByCourseIdInAndCenterIdIn(
-            Pageable paging, Collection<Long> courseIds, Collection<Long> centerIds, Collection<Status> statuses, boolean isStatusIn) throws Exception {
+            Pageable paging, Collection<Long> courseIds, Collection<Long> centerIds, 
+            Collection<Status> statuses, boolean isStatusIn) throws Exception {
 
         Page<Clazz> clazzPage;
 
@@ -1023,8 +1080,8 @@ public class ClazzServiceImpl implements ClazzService {
     }
     @Override
     public Page<ClazzReadDTO> getPageAllDTOByCourseIdInAndCenterIdIn(
-            Pageable paging, Collection<Long> courseIds, Collection<Long> centerIds, Collection<Status> statuses, boolean isStatusIn,
-            Collection<DtoOption> options) throws Exception {
+            Pageable paging, Collection<Long> courseIds, Collection<Long> centerIds, 
+            Collection<Status> statuses, boolean isStatusIn, Collection<DtoOption> options) throws Exception {
 
         Page<Clazz> clazzPage = getPageAllByCourseIdInAndCenterIdIn(paging, courseIds, centerIds, statuses, isStatusIn);
 
@@ -1034,7 +1091,8 @@ public class ClazzServiceImpl implements ClazzService {
     /* staffId */
     @Override
     public List<Clazz> getAllByStaffId(
-            Long staffId, Collection<Status> statuses, boolean isStatusIn) throws Exception {
+            Long staffId, 
+            Collection<Status> statuses, boolean isStatusIn) throws Exception {
 
         List<Clazz> clazzList;
 
@@ -1060,8 +1118,8 @@ public class ClazzServiceImpl implements ClazzService {
     }
     @Override
     public List<ClazzReadDTO> getAllDTOByStaffId(
-            Long staffId, Collection<Status> statuses, boolean isStatusIn,
-            Collection<DtoOption> options) throws Exception {
+            Long staffId, 
+            Collection<Status> statuses, boolean isStatusIn, Collection<DtoOption> options) throws Exception {
 
         List<Clazz> clazzList = getAllByStaffId(staffId, statuses, isStatusIn);
 
@@ -1070,7 +1128,8 @@ public class ClazzServiceImpl implements ClazzService {
 
     @Override
     public Page<Clazz> getPageAllByStaffId(
-            Pageable paging, Long staffId, Collection<Status> statuses, boolean isStatusIn) throws Exception {
+            Pageable paging, Long staffId, 
+            Collection<Status> statuses, boolean isStatusIn) throws Exception {
         if (paging == null) { paging = miscUtil.defaultPaging(); }
 
         Page<Clazz> clazzPage;
@@ -1099,8 +1158,8 @@ public class ClazzServiceImpl implements ClazzService {
     }
     @Override
     public Page<ClazzReadDTO> getPageAllDTOByStaffId(
-            Pageable paging, Long staffId, Collection<Status> statuses, boolean isStatusIn,
-            Collection<DtoOption> options) throws Exception {
+            Pageable paging, Long staffId, 
+            Collection<Status> statuses, boolean isStatusIn, Collection<DtoOption> options) throws Exception {
 
         Page<Clazz> clazzPage = getPageAllByStaffId(paging, staffId, statuses, isStatusIn);
 
@@ -1109,7 +1168,8 @@ public class ClazzServiceImpl implements ClazzService {
 
     @Override
     public List<Clazz> getAllByStaffIdIn(
-            Collection<Long> staffIds, Collection<Status> statuses, boolean isStatusIn) throws Exception {
+            Collection<Long> staffIds, 
+            Collection<Status> statuses, boolean isStatusIn) throws Exception {
 
         List<Clazz> clazzList;
 
@@ -1135,8 +1195,8 @@ public class ClazzServiceImpl implements ClazzService {
     }
     @Override
     public List<ClazzReadDTO> getAllDTOByStaffIdIn(
-            Collection<Long> staffIds, Collection<Status> statuses, boolean isStatusIn,
-            Collection<DtoOption> options) throws Exception {
+            Collection<Long> staffIds, 
+            Collection<Status> statuses, boolean isStatusIn, Collection<DtoOption> options) throws Exception {
 
         List<Clazz> clazzList = getAllByStaffIdIn(staffIds, statuses, isStatusIn);
 
@@ -1145,7 +1205,8 @@ public class ClazzServiceImpl implements ClazzService {
     
     @Override
     public Page<Clazz> getPageAllByStaffIdIn(
-            Pageable paging, Collection<Long> staffIds, Collection<Status> statuses, boolean isStatusIn) throws Exception {
+            Pageable paging, Collection<Long> staffIds, 
+            Collection<Status> statuses, boolean isStatusIn) throws Exception {
 
         if (paging == null) {  paging = miscUtil.defaultPaging(); }
 
@@ -1175,8 +1236,8 @@ public class ClazzServiceImpl implements ClazzService {
     }
     @Override
     public Page<ClazzReadDTO> getPageAllDTOByStaffIdIn(
-            Pageable paging, Collection<Long> staffIds, Collection<Status> statuses, boolean isStatusIn,
-            Collection<DtoOption> options) throws Exception {
+            Pageable paging, Collection<Long> staffIds, 
+            Collection<Status> statuses, boolean isStatusIn, Collection<DtoOption> options) throws Exception {
 
         Page<Clazz> clazzPage = getPageAllByStaffIdIn(paging, staffIds, statuses, isStatusIn);
 
@@ -1186,7 +1247,8 @@ public class ClazzServiceImpl implements ClazzService {
     /* clazzAlias */
     @Override
     public List<Clazz> getAllByAliasContains(
-            String clazzAlias, Collection<Status> statuses, boolean isStatusIn) throws Exception {
+            String clazzAlias, 
+            Collection<Status> statuses, boolean isStatusIn) throws Exception {
 
         List<Clazz> clazzList;
 
@@ -1212,8 +1274,8 @@ public class ClazzServiceImpl implements ClazzService {
     }
     @Override
     public List<ClazzReadDTO> getAllDTOByAliasContains(
-            String clazzAlias, Collection<Status> statuses, boolean isStatusIn,
-            Collection<DtoOption> options) throws Exception {
+            String clazzAlias, 
+            Collection<Status> statuses, boolean isStatusIn, Collection<DtoOption> options) throws Exception {
         List<Clazz> clazzList = getAllByAliasContains(clazzAlias, statuses, isStatusIn);
 
         return wrapListDTO(clazzList, options);
@@ -1221,7 +1283,8 @@ public class ClazzServiceImpl implements ClazzService {
 
     @Override
     public Page<Clazz> getPageAllByAliasContains(
-            Pageable paging, String clazzAlias, Collection<Status> statuses, boolean isStatusIn) throws Exception {
+            Pageable paging, String clazzAlias, 
+            Collection<Status> statuses, boolean isStatusIn) throws Exception {
 
         if (paging == null) { paging = miscUtil.defaultPaging(); }
 
@@ -1251,8 +1314,8 @@ public class ClazzServiceImpl implements ClazzService {
     }
     @Override
     public Page<ClazzReadDTO> getPageAllDTOByAliasContains(
-            Pageable paging, String clazzAlias, Collection<Status> statuses, boolean isStatusIn,
-            Collection<DtoOption> options) throws Exception {
+            Pageable paging, String clazzAlias, 
+            Collection<Status> statuses, boolean isStatusIn, Collection<DtoOption> options) throws Exception {
 
         Page<Clazz> clazzPage = getPageAllByAliasContains(paging, clazzAlias, statuses, isStatusIn);
 
@@ -1262,7 +1325,8 @@ public class ClazzServiceImpl implements ClazzService {
     /* clazzName */
     @Override
     public List<Clazz> getAllByNameContains(
-            String clazzName, Collection<Status> statuses, boolean isStatusIn) throws Exception {
+            String clazzName, 
+            Collection<Status> statuses, boolean isStatusIn) throws Exception {
 
         List<Clazz> clazzList;
 
@@ -1288,8 +1352,8 @@ public class ClazzServiceImpl implements ClazzService {
     }
     @Override
     public List<ClazzReadDTO> getAllDTOByNameContains(
-            String clazzName, Collection<Status> statuses, boolean isStatusIn,
-            Collection<DtoOption> options) throws Exception {
+            String clazzName, 
+            Collection<Status> statuses, boolean isStatusIn, Collection<DtoOption> options) throws Exception {
         List<Clazz> clazzList = getAllByNameContains(clazzName, statuses, isStatusIn);
 
         return wrapListDTO(clazzList, options);
@@ -1297,7 +1361,8 @@ public class ClazzServiceImpl implements ClazzService {
 
     @Override
     public Page<Clazz> getPageAllByNameContains(
-            Pageable paging, String clazzName, Collection<Status> statuses, boolean isStatusIn) throws Exception {
+            Pageable paging, String clazzName, 
+            Collection<Status> statuses, boolean isStatusIn) throws Exception {
 
         if (paging == null) { paging = miscUtil.defaultPaging(); }
 
@@ -1327,8 +1392,8 @@ public class ClazzServiceImpl implements ClazzService {
     }
     @Override
     public Page<ClazzReadDTO> getPageAllDTOByNameContains(
-            Pageable paging, String clazzName, Collection<Status> statuses, boolean isStatusIn,
-            Collection<DtoOption> options) throws Exception {
+            Pageable paging, String clazzName, 
+            Collection<Status> statuses, boolean isStatusIn, Collection<DtoOption> options) throws Exception {
 
         Page<Clazz> clazzPage = getPageAllByNameContains(paging, clazzName, statuses, isStatusIn);
 
@@ -1337,7 +1402,8 @@ public class ClazzServiceImpl implements ClazzService {
 
     /* =================================================== UPDATE =================================================== */
     @Override
-    public Clazz updateClazz(Clazz clazz) throws Exception {
+    public Clazz updateClazz(
+            Clazz clazz) throws Exception {
         /* Check exist */
         Clazz oldClazz = getById(clazz.getId(), List.of(DELETED), false);
         if (oldClazz == null) {
@@ -1482,7 +1548,8 @@ public class ClazzServiceImpl implements ClazzService {
         return clazz;
     }
     @Override
-    public ClazzReadDTO updateClazzByDTO(ClazzUpdateDTO updateDTO) throws Exception {
+    public ClazzReadDTO updateClazzByDTO(
+            ClazzUpdateDTO updateDTO) throws Exception {
         Clazz clazz = mapper.map(updateDTO, Clazz.class);
 
         clazz = updateClazz(clazz);
@@ -1492,7 +1559,8 @@ public class ClazzServiceImpl implements ClazzService {
 
     /* =================================================== DELETE =================================================== */
     @Override
-    public Boolean deleteClazz(Long id) throws Exception {
+    public Boolean deleteClazz(
+            Long id) throws Exception {
         Clazz clazz = getById(id, List.of(DELETED), false);
 
         if (clazz == null) {
@@ -1531,7 +1599,8 @@ public class ClazzServiceImpl implements ClazzService {
 
     /* =================================================== WRAPPER ================================================== */
     @Override
-    public ClazzReadDTO wrapDTO(Clazz clazz, Collection<DtoOption> options) throws Exception {
+    public ClazzReadDTO wrapDTO(
+            Clazz clazz, Collection<DtoOption> options) throws Exception {
         if (clazz == null) { return null; }
         
         ClazzReadDTO dto = mapper.map(clazz, ClazzReadDTO.class);
@@ -1608,7 +1677,8 @@ public class ClazzServiceImpl implements ClazzService {
         return dto;
     }
     @Override
-    public List<ClazzReadDTO> wrapListDTO(Collection<Clazz> clazzCollection, Collection<DtoOption> options) throws Exception {
+    public List<ClazzReadDTO> wrapListDTO(
+            Collection<Clazz> clazzCollection, Collection<DtoOption> options) throws Exception {
         if (ObjectUtils.isEmpty(clazzCollection)) { return null; }
         
         List<ClazzReadDTO> dtoList = new ArrayList<>();
@@ -1743,7 +1813,7 @@ public class ClazzServiceImpl implements ClazzService {
     public Page<ClazzReadDTO> wrapPageDTO(
             Page<Clazz> clazzPage, Collection<DtoOption> options) throws Exception {
 
-        if (Objects.isNull(clazzPage)) { return null; }
+        if (clazzPage == null) { return null; }
 
         return new PageImpl<>(
                 wrapListDTO(clazzPage.getContent(), options),

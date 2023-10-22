@@ -2,6 +2,7 @@ package com.teachsync.dtos.request;
 
 import com.teachsync.dtos.BaseReadDTO;
 import com.teachsync.dtos.clazz.ClazzReadDTO;
+import com.teachsync.dtos.payment.PaymentReadDTO;
 import com.teachsync.dtos.user.UserReadDTO;
 import com.teachsync.utils.enums.RequestType;
 import com.teachsync.utils.enums.Status;
@@ -30,6 +31,7 @@ public class RequestReadDTO extends BaseReadDTO {
     private RequestType requestType;
 
     private Long clazzId;
+    private String clazzAlias;
     private String clazzName;
     private ClazzReadDTO clazz;
 
@@ -40,5 +42,7 @@ public class RequestReadDTO extends BaseReadDTO {
     private String resolverUsername;
     private String resolverFullName;
     private UserReadDTO resolver;
+
+    private PaymentReadDTO payment;
 
 }

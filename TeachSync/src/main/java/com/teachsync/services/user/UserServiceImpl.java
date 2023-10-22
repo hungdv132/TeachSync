@@ -134,6 +134,12 @@ public class UserServiceImpl implements UserService {
 
     /* id */
     @Override
+    public Boolean existsById(Long id) throws Exception {
+        return userRepository
+                .existsByIdAndStatusNot(id, Status.DELETED);
+    }
+
+    @Override
     public User getById(Long id) throws Exception {
         return userRepository
                 .findByIdAndStatusNot(id, Status.DELETED)

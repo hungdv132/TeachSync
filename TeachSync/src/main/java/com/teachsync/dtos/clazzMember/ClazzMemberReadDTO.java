@@ -18,6 +18,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ClazzMemberReadDTO extends BaseReadDTO {
     private ClazzReadDTO clazz;
+    private String clazzAlias;
     private String clazzName;
     private Long clazzId;
 

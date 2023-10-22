@@ -41,7 +41,7 @@ public class TeacherRequestServiceImpl implements TeacherRequestService {
         if (paging == null) {
             paging = miscUtil.defaultPaging();
         }
-        Page<Request> teacherRequests = requestRepository.findAllByStatusNot(Status.DELETED, paging);
+        Page<Request> teacherRequests = requestRepository.findAllByStatusNotIn(List.of(Status.DELETED), paging);
         List<RequestReadDTO> teacherRequestDtoList = new ArrayList<>();
         for(Request request : teacherRequests){
             RequestReadDTO requestReadDTO = mapper.map(request, RequestReadDTO.class);

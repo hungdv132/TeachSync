@@ -2,7 +2,8 @@ package com.teachsync.utils.enums;
 
 public enum PaymentType {
     CASH("CASH", "Cash", "Tiền mặt"),
-    TRANSFER("TRANSFER", "Transfer", "Chuyển khoản");
+    TRANSFER("TRANSFER", "Transfer", "Chuyển khoản"),
+    DENIED("DENIED", "Denied", "Hủy thnah toán");
 
     private final String stringValue;
     private final String stringValueEng;

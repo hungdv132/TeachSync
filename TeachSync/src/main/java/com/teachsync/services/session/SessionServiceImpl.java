@@ -243,6 +243,31 @@ public class SessionServiceImpl implements SessionService {
     }
 
     @Override
+    public List<Session> getAllByScheduleIdInAndInRange(
+            Collection<Long> scheduleIds, LocalDateTime from, LocalDateTime to) throws Exception {
+        List<Session> sessionList = sessionRepository
+                .findAllByScheduleIdInAndSessionStartAfterAndSessionEndBeforeAndStatusNot(
+                        scheduleIds, from, to, Status.DELETED);
+
+        if (sessionList.isEmpty()) {
+            return null;
+        }
+
+        return sessionList;
+    }
+    @Override
+    public List<SessionReadDTO> getAllDTOByScheduleIdInAndInRange(
+            Collection<Long> scheduleIds, LocalDateTime from, LocalDateTime to, Collection<DtoOption> options) throws Exception {
+        List<Session> sessionList = getAllByScheduleIdInAndInRange(scheduleIds, from, to);
+
+        if (sessionList == null) {
+            return null;
+        }
+
+        return wrapListDTO(sessionList, options);
+    }
+
+    @Override
     public List<Session> getAllByScheduleIdAndAfter(Long scheduleId, LocalDateTime from) throws Exception {
         List<Session> sessionList = sessionRepository
                 .findAllByScheduleIdAndSessionStartAfterAndStatusNot(

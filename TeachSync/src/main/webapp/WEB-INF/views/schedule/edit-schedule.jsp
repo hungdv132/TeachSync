@@ -71,7 +71,7 @@
                         <select class="btn btn-secondary dropdown-toggle"
                                 id="selScheduleCaId" name="schedulecaId">
                             <c:forEach items="${scheduleCateList}" var="scheduleCate">
-                                <option value="${scheduleCate.id}">${scheduleCate.scheduleDesc}</option>
+                                <option value="${scheduleCate.id}">${scheduleCate.categoryDesc}</option>
                             </c:forEach>
                         </select>
                     </div>
@@ -120,7 +120,7 @@
 <script id="script1">
     $("#selRoomId").val(${schedule.roomId});
     $("#selScheduleType").val('${schedule.scheduleType}');
-    $("#selScheduleCaId").val('${schedule.schedulecaId}');
+    $("#selScheduleCaId").val('${schedule.scheduleCategoryId}');
     $("#script1").remove();
 
 </script>
@@ -150,7 +150,7 @@
         "8": "21:15"
     }
 
-    var mess = '${mess}'
+    var mess = `${mess}`
     if (mess != '') {
         alert(mess);
     }

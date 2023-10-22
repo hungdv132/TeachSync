@@ -810,20 +810,21 @@ DROP TABLE IF EXISTS `teachsync`.`schedule_category`;
 
 CREATE TABLE IF NOT EXISTS `teachsync`.`schedule_category`
 (
-    `id`           BIGINT      NOT NULL AUTO_INCREMENT,
-    `categoryName` VARCHAR(45) NOT NULL COMMENT 'T2, T4, T6; T3, T5, T7; T7, CN; CUSTOM, ...',
-    `atMon`        BIT(1)      NOT NULL,
-    `atTue`        BIT(1)      NOT NULL,
-    `atWed`        BIT(1)      NOT NULL,
-    `atThu`        BIT(1)      NOT NULL,
-    `atFri`        BIT(1)      NOT NULL,
-    `atSat`        BIT(1)      NOT NULL,
-    `atSun`        BIT(1)      NOT NULL,
-    `status`       VARCHAR(45) NOT NULL,
-    `createdAt`    DATETIME    NULL DEFAULT NULL,
-    `createdBy`    BIGINT      NULL DEFAULT NULL,
-    `updatedAt`    DATETIME    NULL DEFAULT NULL,
-    `updatedBy`    BIGINT      NULL DEFAULT NULL,
+    `id`        BIGINT      NOT NULL AUTO_INCREMENT,
+    `categoryName`  VARCHAR(45) NULL DEFAULT NULL COMMENT 'Name of Category, for example T2; T2, T4,T6; etc.',
+    `categoryDesc`  LONGTEXT    NULL DEFAULT NULL COMMENT 'T2 is weekly Monthday; etc.',
+    `atMon`     BIT(1)      NOT NULL,
+    `atTue`     BIT(1)      NOT NULL,
+    `atWed`     BIT(1)      NOT NULL,
+    `atThu`     BIT(1)      NOT NULL,
+    `atFri`     BIT(1)      NOT NULL,
+    `atSat`     BIT(1)      NOT NULL,
+    `atSun`     BIT(1)      NOT NULL,
+    `status`    VARCHAR(45) NOT NULL,
+    `createdAt` DATETIME    NULL DEFAULT NULL,
+    `createdBy` BIGINT      NULL DEFAULT NULL,
+    `updatedAt` DATETIME    NULL DEFAULT NULL,
+    `updatedBy` BIGINT      NULL DEFAULT NULL,
     PRIMARY KEY (`id`),
     INDEX `fk_schedule_category_user_createdBy_idx` (`createdBy` ASC) VISIBLE,
     INDEX `fk_schedule_category_user_updatedBy_idx` (`updatedBy` ASC) VISIBLE,
@@ -836,24 +837,6 @@ CREATE TABLE IF NOT EXISTS `teachsync`.`schedule_category`
 )
     ENGINE = InnoDB;
 
-
-DROP TABLE IF EXISTS `schedulecat`;
-
-CREATE TABLE `schedulecat`
-(
-    `id`           BIGINT      NOT NULL AUTO_INCREMENT,
-    `name`         VARCHAR(45) NULL DEFAULT NULL COMMENT 'Name of Category, for example T2; T2, T4,T6; etc.',
-    `description`  LONGTEXT    NULL DEFAULT NULL COMMENT 'T2 is weekly Monthday; etc.',
-    `status`       VARCHAR(45) NOT NULL,
-    `createdAt`    DATETIME    NULL DEFAULT NULL,
-    `createdBy`    BIGINT      NULL DEFAULT NULL,
-    `updatedAt`    DATETIME    NULL DEFAULT NULL,
-    `updatedBy`    BIGINT      NULL DEFAULT NULL,
-    PRIMARY KEY (`id`),
-    UNIQUE KEY `id_UNIQUE` (`id`)
-)
-    ENGINE = InnoDB;
-
 -- -----------------------------------------------------
 -- Table `teachsync`.`clazz_schedule`
 -- -----------------------------------------------------
@@ -861,42 +844,36 @@ DROP TABLE IF EXISTS `teachsync`.`clazz_schedule`;
 
 CREATE TABLE IF NOT EXISTS `teachsync`.`clazz_schedule`
 (
-    `id`           BIGINT      NOT NULL AUTO_INCREMENT,
-    `clazzId`      BIGINT      NOT NULL,
-    `roomId`       BIGINT      NOT NULL COMMENT 'Phòng mặc định của lớp',
-    `schedulecaId` BIGINT      NOT NULL,
-    `scheduleType` VARCHAR(45) NOT NULL COMMENT '2_4_6, 3_5_7, T7_CN, CUSTOM, ...',
-    `startDate`    DATE        NOT NULL,
-    `endDate`      DATE        NOT NULL,
-    `slot`         INT         NULL DEFAULT NULL,
-    `sessionStart` TIME        NOT NULL COMMENT 'Giờ bắt đầu (Auto tính từ slot)',
-    `sessionEnd`   TIME        NOT NULL COMMENT 'Giờ kết thức (Auto tính từ slot)',
-    `status`       VARCHAR(45) NOT NULL,
-    `createdAt`    DATETIME    NULL DEFAULT NULL,
-    `createdBy`    BIGINT      NULL DEFAULT NULL,
-    `updatedAt`    DATETIME    NULL DEFAULT NULL,
-    `updatedBy`    BIGINT      NULL DEFAULT NULL,
+    `id`                 BIGINT      NOT NULL AUTO_INCREMENT,
+    `clazzId`            BIGINT      NOT NULL,
+    `roomId`             BIGINT      NOT NULL COMMENT 'Phòng mặc định của lớp',
+    `scheduleCategoryId` BIGINT      NOT NULL,
+    `scheduleType`       VARCHAR(45) NOT NULL,
+    `startDate`          DATE        NOT NULL,
+    `endDate`            DATE        NOT NULL,
+    `slot`               INT         NULL DEFAULT NULL,
+    `sessionStart`       TIME        NOT NULL COMMENT 'Giờ bắt đầu (Auto tính từ slot)',
+    `sessionEnd`         TIME        NOT NULL COMMENT 'Giờ kết thức (Auto tính từ slot)',
+    `status`             VARCHAR(45) NOT NULL,
+    `createdAt`          DATETIME    NULL DEFAULT NULL,
+    `createdBy`          BIGINT      NULL DEFAULT NULL,
+    `updatedAt`          DATETIME    NULL DEFAULT NULL,
+    `updatedBy`          BIGINT      NULL DEFAULT NULL,
     PRIMARY KEY (`id`),
     INDEX `fk_clazz_schedule_clazz_idx` (`clazzId` ASC) INVISIBLE,
     INDEX `fk_clazz_schedule_room_idx` (`roomId` ASC) VISIBLE,
     INDEX `fk_clazz_schedule_user_createdBy_idx` (`createdBy` ASC) VISIBLE,
     INDEX `fk_clazz_schedule_user_updatedBy_idx` (`updatedBy` ASC) VISIBLE,
-    INDEX `fk_clazz_schedule_schedulcat_idx` (`schedulecaId` ASC) VISIBLE,
+    INDEX `fk_clazz_schedule_schedule_category_idx` (`scheduleCategoryId` ASC) VISIBLE,
     CONSTRAINT `fk_clazz_schedule_room`
         FOREIGN KEY (`roomId`)
             REFERENCES `teachsync`.`room` (`id`),
     CONSTRAINT `fk_clazz_schedule_clazz`
         FOREIGN KEY (`clazzId`)
             REFERENCES `teachsync`.`clazz` (`id`),
-/* Alt
     CONSTRAINT `fk_clazz_schedule_schedule_category`
         FOREIGN KEY (`scheduleCategoryId`)
             REFERENCES `teachsync`.`schedule_category` (`id`),
-*/
-    CONSTRAINT `fk_clazz_schedule_schedulcat`
-        FOREIGN KEY (`schedulecaId`)
-            REFERENCES `teachsync`.`schedulecat` (`id`),
-
     CONSTRAINT `fk_clazz_schedule_user_createdBy`
         FOREIGN KEY (`createdBy`)
             REFERENCES `teachsync`.`user` (`id`),

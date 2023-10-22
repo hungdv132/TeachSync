@@ -17,6 +17,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     /* id */
     /** For finding unactivated teacher */
     Optional<User> findByIdAndStatus(Long id, Status status);
+    Boolean existsByIdAndStatusNot(Long id, Status status);
     Optional<User> findByIdAndStatusNot(Long id, Status status);
     List<User> findAllByIdInAndStatusNot(Collection<Long> idCollection, Status status);
 

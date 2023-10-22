@@ -12,6 +12,9 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
+/**
+ * DTO for {@link com.teachsync.entities.ClazzSchedule}
+ */
 @EqualsAndHashCode(callSuper = true)
 @Data
 @NoArgsConstructor
@@ -21,7 +24,7 @@ public class ClazzScheduleCreateDTO extends BaseCreateDTO {
 
     private Long roomId;
 
-    private Long schedulecaId;
+    private Long scheduleCategoryId;
 
     private ScheduleType scheduleType;
 

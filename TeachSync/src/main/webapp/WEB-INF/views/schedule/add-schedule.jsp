@@ -90,9 +90,9 @@
     
       <div class="col-sm-6 col-md-4 mb-3">
         <label class="form-label" for="selScheduleCaId">Lịch học</label>
-        <select class="form-select" id="selScheduleCaId" name="schedulecaId" onchange="checkSchedule()">
+        <select class="form-select" id="selScheduleCaId" name="scheduleCategoryId" onchange="checkSchedule()">
           <c:forEach items="${scheduleCateList}" var="scheduleCate">
-            <option value="${scheduleCate.id}">${scheduleCate.scheduleName}</option>
+            <option value="${scheduleCate.id}">${scheduleCate.categoryName}</option>
           </c:forEach>
         </select>
       </div>

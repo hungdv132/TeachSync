@@ -59,7 +59,28 @@
     </c:forEach>
     </tbody>
   </table>
-
+  
+  <!-- Navigate page button -->
+  <form action="/clazz" method="get"
+        id="formNavTable" class="d-flex align-items-center mb-3">
+    <input type="hidden" id="txtPageNo" name="pageNo" value="${pageNo}">
+    
+    <button type="button" class="btn btn-secondary" onclick="toPage(0)">
+      <i class="bi-chevron-bar-left"></i>
+    </button>
+    <button type="button" class="btn btn-secondary mx-2" onclick="toPage(${pageNo - 1})">
+      <i class="bi-chevron-left"></i>
+    </button>
+    
+    Trang: <c:out value="${not empty pageNo ? pageNo + 1 : 1}"/> &sol; <c:out value="${not empty pageTotal ? pageTotal : 1}"/>
+    
+    <button type="button" class="btn btn-secondary mx-2" onclick="toPage(${pageNo + 1})">
+      <i class="bi-chevron-right"></i>
+    </button>
+    <button type="button" class="btn btn-secondary" onclick="toPage(${pageTotal-1})">
+      <i class="bi-chevron-bar-right"></i>
+    </button>
+  </form>
 </div>
 <!-- ================================================== Main Body ================================================== -->
 
@@ -76,9 +97,15 @@
     }
     // Nếu người dùng nhấn "No", không thực hiện gì cả
   }
+  
+  function toPage(pageNo) {
+      $("#txtPageNo").val(pageNo);
+      const form = document.getElementById('formNavTable');
+      form.requestSubmit();
+  }
 </script>
 <script>
-    var mess = '${mess}'
+    var mess = `${mess}`
     if (mess != '') {
         alert(mess);
     }

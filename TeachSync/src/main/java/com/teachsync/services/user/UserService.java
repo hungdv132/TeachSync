@@ -24,6 +24,8 @@ public interface UserService {
     UserReadDTO loginDTO(String username,String password) throws Exception;
 
     /* id */
+    Boolean existsById(Long id) throws Exception;
+
     User getById(Long id) throws Exception;
     UserReadDTO getDTOById(Long id, Collection<DtoOption> options) throws Exception;
 

@@ -30,6 +30,8 @@ public enum DtoOption {
 
     /** ClazzSchedule, ClazzMember, Request */
     CLAZZ_NAME,
+    /** ClazzSchedule, ClazzMember, Request */
+    CLAZZ_ALIAS,
     /** ClazzSchedule, Session */
     ROOM_NAME,
 

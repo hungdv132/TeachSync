@@ -164,7 +164,7 @@ public class CourseController {
             List<Status> statuses;
             boolean isStatusIn;
 
-            if (Objects.isNull(pageNo)) {
+            if (Objects.isNull(pageNo) || pageNo < 0) {
                 pageNo = 0;
             }
 

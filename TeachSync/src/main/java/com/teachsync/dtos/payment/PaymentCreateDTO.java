@@ -22,7 +22,7 @@ public class PaymentCreateDTO extends BaseCreateDTO {
     private PaymentType paymentType;
     private String paymentDesc;
     private Double paymentAmount;
-    private LocalDateTime paymentAt;
+    private LocalDateTime paymentAt = LocalDateTime.now();
     private byte[] paymentDoc;
     private String paymentDocLink;
     private Long verifierId;

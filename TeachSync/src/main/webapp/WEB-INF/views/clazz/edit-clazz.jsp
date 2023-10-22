@@ -76,6 +76,11 @@
         </select>
   
         <p id="pStatusDesc" class="text-danger ts-txt-bold visually-hidden"></p>
+        <a id="aBtnAddSchedule"
+           href="/add-schedule?id=${clazz.id}"
+           class="btn btn-warning visually-hidden">
+          Thêm Lịch Học
+        </a>
       </div>
   
       <div class="col-12">
@@ -256,6 +261,24 @@
                             pStatusDesc.append("<br>")
                                 .append("Xác nhận hoàn thành thiết kế và xin chờ xét duyệt?")
                                 .removeClass("visually-hidden");
+                            
+                            $.ajax({
+                            type: "GET",
+                                url: "/api/clazz-schedule?clazzId=${clazz.id}",
+                                success: function (response) {
+                                    if (response['clazzSchedule'] == null) {
+                                        pStatusDesc.append("<br>")
+                                            .append("Lớp đang thiếu Lịch Học để hoàn thành thiết kế.")
+                                            .removeClass("visually-hidden");
+                                        
+                                        showById("aBtnAddSchedule");
+                                        hideById("btnSubmit");
+                                    } else {
+                                        hideById("aBtnAddSchedule");
+                                        showById("btnSubmit");
+                                    }
+                                }
+                            });
                             break;
                         default:
                             /* Where did you get this status from? */
@@ -294,6 +317,7 @@
                     break;
             }
         } else {
+            /* No change status */
             switch (status) {
                 case "${Status.DESIGNING}":
                     /* All editable */
@@ -309,13 +333,41 @@
 
                     disableAllFormElementIn("divClazzImg");
                     disableAllFormElementIn("divClazzTextDetail");
-                    disableAllFormElementIn("divClazzNumberDetail");
                     disableAllFormElementIn("divClazzFkId");
+                    disableAllFormElementIn("divClazzNumberDetail");
                     break;
+
                 case "${Status.OPENED}":
-                case "${Status.ONGOING}":
-                case "${Status.CLOSED}":
                     pStatusDesc.text("Chỉ được phép sửa đổi trạng thái của lớp học.")
+                        .removeClass("visually-hidden");
+
+                    disableAllFormElementIn("divClazzImg");
+                    disableAllFormElementIn("divClazzTextDetail");
+                    disableAllFormElementIn("divClazzFkId");
+                    disableAllFormElementIn("divClazzNumberDetail");
+                    break;
+                case "${Status.ONGOING}":
+                    pStatusDesc.text("Chỉ được phép sửa đổi trạng thái của lớp học.")
+                        .removeClass("visually-hidden");
+
+                    disableAllFormElementIn("divClazzImg");
+                    disableAllFormElementIn("divClazzTextDetail");
+                    disableAllFormElementIn("divClazzFkId");
+                    disableAllFormElementIn("divClazzNumberDetail");
+                    break;
+                case "${Status.SUSPENDED}":
+                    pStatusDesc.text("Chỉ được phép sửa đổi trạng thái của lớp học.")
+                        .removeClass("visually-hidden");
+
+                    disableAllFormElementIn("divClazzImg");
+                    disableAllFormElementIn("divClazzTextDetail");
+                    disableAllFormElementIn("divClazzFkId");
+                    disableAllFormElementIn("divClazzNumberDetail");
+                    break;
+                    
+                case "${Status.CLOSED}":
+                    /* No edit, period */
+                    pStatusDesc.text("Lớp Học đã đóng. Không được phép sửa bất kỳ thông tin nào của Lớp học.")
                         .removeClass("visually-hidden");
 
                     disableAllFormElementIn("divClazzImg");

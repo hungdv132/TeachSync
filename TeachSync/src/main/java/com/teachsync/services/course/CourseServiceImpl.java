@@ -181,8 +181,7 @@ public class CourseServiceImpl implements CourseService {
     }
     @Override
     public List<CourseReadDTO> getAllDTO(
-            Collection<Status> statuses, boolean isStatusIn, 
-            Collection<DtoOption> options) throws Exception {
+            Collection<Status> statuses, boolean isStatusIn, Collection<DtoOption> options) throws Exception {
 
         List<Course> courseList = getAll(statuses, isStatusIn);
 
@@ -190,8 +189,7 @@ public class CourseServiceImpl implements CourseService {
     }
     @Override
     public Map<Long, CourseReadDTO> mapIdDTO(
-            Collection<Status> statuses, boolean isStatusIn, 
-            Collection<DtoOption> options) throws Exception {
+            Collection<Status> statuses, boolean isStatusIn, Collection<DtoOption> options) throws Exception {
 
         List<CourseReadDTO> courseDTOList = getAllDTO(statuses, isStatusIn, options);
 
@@ -203,7 +201,8 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public Page<Course> getPageAll(
-            Pageable paging, Collection<Status> statuses, boolean isStatusIn) throws Exception {
+            Pageable paging, 
+            Collection<Status> statuses, boolean isStatusIn) throws Exception {
         
         if (paging == null) { paging = miscUtil.defaultPaging(); }
 
@@ -231,8 +230,8 @@ public class CourseServiceImpl implements CourseService {
     }
     @Override
     public Page<CourseReadDTO> getPageAllDTO(
-            Pageable paging, Collection<Status> statuses, boolean isStatusIn, 
-            Collection<DtoOption> options) throws Exception {
+            Pageable paging, 
+            Collection<Status> statuses, boolean isStatusIn, Collection<DtoOption> options) throws Exception {
 
         Page<Course> coursePage = getPageAll(paging, statuses, isStatusIn);
 
@@ -241,8 +240,8 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public Page<CourseReadDTO> getPageAllDTOOnSale(
-            Pageable paging, Collection<Status> statuses, boolean isStatusIn,
-            Collection<DtoOption> options) throws Exception {
+            Pageable paging, 
+            Collection<Status> statuses, boolean isStatusIn, Collection<DtoOption> options) throws Exception {
 
         /* TODO: filter price */
         List<PriceLog> priceLogList =
@@ -280,7 +279,8 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public Course getById(
-            Long id, Collection<Status> statuses, boolean isStatusIn) throws Exception {
+            Long id, 
+            Collection<Status> statuses, boolean isStatusIn) throws Exception {
 
         if (isStatusIn) {
             if (ObjectUtils.isEmpty(statuses)) { return null; }
@@ -298,8 +298,8 @@ public class CourseServiceImpl implements CourseService {
     }
     @Override
     public CourseReadDTO getDTOById(
-            Long id, Collection<Status> statuses, boolean isStatusIn, 
-            Collection<DtoOption> options) throws Exception {
+            Long id, 
+            Collection<Status> statuses, boolean isStatusIn, Collection<DtoOption> options) throws Exception {
 
         Course course = getById(id, statuses, isStatusIn);
 
@@ -308,7 +308,8 @@ public class CourseServiceImpl implements CourseService {
     
     @Override
     public List<Course> getAllByIdIn(
-            Collection<Long> ids, Collection<Status> statuses, boolean isStatusIn) throws Exception {
+            Collection<Long> ids, 
+            Collection<Status> statuses, boolean isStatusIn) throws Exception {
 
         List<Course> courseList;
 
@@ -334,7 +335,8 @@ public class CourseServiceImpl implements CourseService {
     }
     @Override
     public Map<Long, String> mapIdCourseAliasByIdIn(
-            Collection<Long> ids, Collection<Status> statuses, boolean isStatusIn) throws Exception {
+            Collection<Long> ids, 
+            Collection<Status> statuses, boolean isStatusIn) throws Exception {
 
         List<Course> courseList = getAllByIdIn(ids, statuses, isStatusIn);
 
@@ -345,7 +347,8 @@ public class CourseServiceImpl implements CourseService {
     }
     @Override
     public Map<Long, String> mapIdCourseNameByIdIn(
-            Collection<Long> ids, Collection<Status> statuses, boolean isStatusIn) throws Exception {
+            Collection<Long> ids, 
+            Collection<Status> statuses, boolean isStatusIn) throws Exception {
 
         List<Course> courseList = getAllByIdIn(ids, statuses, isStatusIn);
 
@@ -356,8 +359,8 @@ public class CourseServiceImpl implements CourseService {
     }
     @Override
     public List<CourseReadDTO> getAllDTOByIdIn(
-            Collection<Long> ids, Collection<Status> statuses, boolean isStatusIn, 
-            Collection<DtoOption> options) throws Exception {
+            Collection<Long> ids, 
+            Collection<Status> statuses, boolean isStatusIn, Collection<DtoOption> options) throws Exception {
 
         List<Course> courseList = getAllByIdIn(ids, statuses, isStatusIn);
 
@@ -365,8 +368,8 @@ public class CourseServiceImpl implements CourseService {
     }
     @Override
     public Map<Long, CourseReadDTO> mapIdDTOByIdIn(
-            Collection<Long> ids, Collection<Status> statuses, boolean isStatusIn, 
-            Collection<DtoOption> options) throws Exception {
+            Collection<Long> ids, 
+            Collection<Status> statuses, boolean isStatusIn, Collection<DtoOption> options) throws Exception {
 
         List<CourseReadDTO> courseDTOList = getAllDTOByIdIn(ids, statuses, isStatusIn, options);
 
@@ -378,7 +381,8 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public Page<Course> getPageAllByIdIn(
-            Pageable paging, Collection<Long> ids, Collection<Status> statuses, boolean isStatusIn) throws Exception {
+            Pageable paging, Collection<Long> ids, 
+            Collection<Status> statuses, boolean isStatusIn) throws Exception {
 
         if (paging == null) { paging = miscUtil.defaultPaging(); }
 
@@ -408,8 +412,8 @@ public class CourseServiceImpl implements CourseService {
     }
     @Override
     public Page<CourseReadDTO> getPageAllDTOByIdIn(
-            Pageable paging, Collection<Long> ids, Collection<Status> statuses, boolean isStatusIn, 
-            Collection<DtoOption> options) throws Exception {
+            Pageable paging, Collection<Long> ids, 
+            Collection<Status> statuses, boolean isStatusIn, Collection<DtoOption> options) throws Exception {
 
         Page<Course> coursePage = getPageAllByIdIn(paging, ids, statuses, isStatusIn);
 
@@ -419,7 +423,8 @@ public class CourseServiceImpl implements CourseService {
     /* courseAlias */
     @Override
     public List<Course> getAllByAliasContains(
-            String courseAlias, Collection<Status> statuses, boolean isStatusIn) throws Exception {
+            String courseAlias, 
+            Collection<Status> statuses, boolean isStatusIn) throws Exception {
 
         List<Course> courseList;
 
@@ -445,8 +450,8 @@ public class CourseServiceImpl implements CourseService {
     }
     @Override
     public List<CourseReadDTO> getAllDTOByAliasContains(
-            String courseAlias, Collection<Status> statuses, boolean isStatusIn, 
-            Collection<DtoOption> options) throws Exception {
+            String courseAlias, 
+            Collection<Status> statuses, boolean isStatusIn, Collection<DtoOption> options) throws Exception {
 
         List<Course> courseList = getAllByAliasContains(courseAlias, statuses, isStatusIn);
 
@@ -455,7 +460,8 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public Page<Course> getPageAllByAliasContains(
-            Pageable paging, String courseAlias, Collection<Status> statuses, boolean isStatusIn) throws Exception {
+            Pageable paging, String courseAlias, 
+            Collection<Status> statuses, boolean isStatusIn) throws Exception {
 
         if (paging == null) { paging = miscUtil.defaultPaging(); }
 
@@ -484,8 +490,8 @@ public class CourseServiceImpl implements CourseService {
     }
     @Override
     public Page<CourseReadDTO> getPageAllDTOByAliasContains(
-            Pageable paging, String courseAlias, Collection<Status> statuses, boolean isStatusIn, 
-            Collection<DtoOption> options) throws Exception {
+            Pageable paging, String courseAlias, 
+            Collection<Status> statuses, boolean isStatusIn, Collection<DtoOption> options) throws Exception {
 
         Page<Course> coursePage = getPageAllByAliasContains(paging, courseAlias, statuses, isStatusIn);
 
@@ -495,7 +501,8 @@ public class CourseServiceImpl implements CourseService {
     /* courseName */
     @Override
     public List<Course> getAllByNameContains(
-            String courseName, Collection<Status> statuses, boolean isStatusIn) throws Exception {
+            String courseName, 
+            Collection<Status> statuses, boolean isStatusIn) throws Exception {
 
         List<Course> courseList;
 
@@ -521,8 +528,8 @@ public class CourseServiceImpl implements CourseService {
     }
     @Override
     public List<CourseReadDTO> getAllDTOByNameContains(
-            String courseName, Collection<Status> statuses, boolean isStatusIn,
-            Collection<DtoOption> options) throws Exception {
+            String courseName, 
+            Collection<Status> statuses, boolean isStatusIn, Collection<DtoOption> options) throws Exception {
 
         List<Course> courseList = getAllByNameContains(courseName, statuses, isStatusIn);
 
@@ -531,7 +538,8 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public Page<Course> getPageAllByNameContains(
-            Pageable paging, String courseName, Collection<Status> statuses, boolean isStatusIn) throws Exception {
+            Pageable paging, String courseName, 
+            Collection<Status> statuses, boolean isStatusIn) throws Exception {
 
         if (paging == null) { paging = miscUtil.defaultPaging(); }
 
@@ -560,8 +568,8 @@ public class CourseServiceImpl implements CourseService {
     }
     @Override
     public Page<CourseReadDTO> getPageAllDTOByNameContains(
-            Pageable paging, String courseName, Collection<Status> statuses, boolean isStatusIn,
-            Collection<DtoOption> options) throws Exception {
+            Pageable paging, String courseName, 
+            Collection<Status> statuses, boolean isStatusIn, Collection<DtoOption> options) throws Exception {
 
         Page<Course> coursePage = getPageAllByNameContains(paging, courseName, statuses, isStatusIn);
 
@@ -799,8 +807,7 @@ public class CourseServiceImpl implements CourseService {
     /* =================================================== WRAPPER ================================================== */
     @Override
     public CourseReadDTO wrapDTO(
-            Course course, 
-            Collection<DtoOption> options) throws Exception {
+            Course course, Collection<DtoOption> options) throws Exception {
         if (course == null) {
             return null;
         }
@@ -854,8 +861,7 @@ public class CourseServiceImpl implements CourseService {
     }
     @Override
     public List<CourseReadDTO> wrapListDTO(
-            Collection<Course> courseCollection, 
-            Collection<DtoOption> options) throws Exception {
+            Collection<Course> courseCollection, Collection<DtoOption> options) throws Exception {
         if (ObjectUtils.isEmpty(courseCollection)) {
             return null;
         }
@@ -910,8 +916,7 @@ public class CourseServiceImpl implements CourseService {
     }
     @Override
     public Page<CourseReadDTO> wrapPageDTO(
-            Page<Course> coursePage, 
-            Collection<DtoOption> options) throws Exception {
+            Page<Course> coursePage, Collection<DtoOption> options) throws Exception {
 
         if (Objects.isNull(coursePage)) { return null; }
 

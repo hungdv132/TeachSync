@@ -34,7 +34,7 @@ public interface ClazzScheduleRepository extends JpaRepository<ClazzSchedule, Lo
     /* roomId & slot & startDate & endDate */
     @Query("SELECT cS " +
             "FROM ClazzSchedule cS " +
-            "WHERE cS.roomId = ?1 and cS.slot = ?2 and cS.schedulecaId = ?3 and " +
+            "WHERE cS.roomId = ?1 and cS.slot = ?2 and cS.scheduleCategoryId = ?3 and " +
             "((cS.startDate between ?4 and ?5) or (cS.endDate between ?4 and ?5) or " +
             "(cS.startDate >= ?4 and cS.endDate <= ?5) or" +
             "(cS.startDate <= ?4 and cS.endDate >= ?5)) ")

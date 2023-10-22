@@ -2299,13 +2299,13 @@ values ('student',         '$2a$10$2muXk6hqYaoTLnXWCszDaeDE71FGa2hJkh3QPaGKJLRJ7
         'OTHER', 'test.student@gmail.com',  null, null, 'CREATED'),
        ('parent',          '$2a$10$2muXk6hqYaoTLnXWCszDaeDE71FGa2hJkh3QPaGKJLRJ77bm6GFJW', 2, null, 'Test Parent',
         'OTHER', 'test.parent@gmail.com',   null, null, 'CREATED'),
-       ('teacher',         '$2a$10$2muXk6hqYaoTLnXWCszDaeDE71FGa2hJkh3QPaGKJLRJ77bm6GFJW', 3, null, 'Test Teacher',
+       ('teacher',         '$2a$10$2muXk6hqYaoTLnXWCszDaeDE71FGa2hJkh3QPaGKJLRJ77bm6GFJW', 3, null, 'Le thi A',
         'OTHER', 'test.teacher@gmail.com',  null, null, 'CREATED'),
        ('admin',           '$2a$10$2muXk6hqYaoTLnXWCszDaeDE71FGa2hJkh3QPaGKJLRJ77bm6GFJW', 4, null, 'Test Admin',
         'OTHER', 'test.admin@gmail.com',    null, null, 'CREATED'),
        ('staff',           '$2a$10$2muXk6hqYaoTLnXWCszDaeDE71FGa2hJkh3QPaGKJLRJ77bm6GFJW', 5, null, 'Test Staff',
         'OTHER', 'test.staff@gmail.com',    null, null, 'CREATED'),
-       ('teacher2',        '$2a$10$2muXk6hqYaoTLnXWCszDaeDE71FGa2hJkh3QPaGKJLRJ77bm6GFJW', 3, null, 'Test Teacher2',
+       ('teacher2',        '$2a$10$2muXk6hqYaoTLnXWCszDaeDE71FGa2hJkh3QPaGKJLRJ77bm6GFJW', 3, null, 'Nguyen Van B',
         'OTHER', 'test.teacher2@gmail.com', null, null, 'CREATED'),
 
        ('thanhnvhe140127', '$2a$10$2muXk6hqYaoTLnXWCszDaeDE71FGa2hJkh3QPaGKJLRJ77bm6GFJW', 1, null, 'Nguyen Van Thanh',
@@ -2354,30 +2354,30 @@ values (1, 3, 'TEACHER', 'CREATED'),
 insert into course(courseName, courseAlias, courseImg, courseDesc, numSession, minScore, minAttendant, status)
 values ('ielts 101', 'ILT101',
         'https://th.bing.com/th/id/OIP.R7Wj-CVruj2Gcx-MmaxmZAHaKe?pid=ImgDet&rs=1',
-        null, 14, 5.0, 80, 'OPENED'),
+        'This is ielts 101', 14, 5.0, 80, 'OPENED'),
        ('English Grade 1', 'ENG001',
         'https://th.bing.com/th/id/OIP.isjamm3juJANzM_sHKCx0wHaKe?pid=ImgDet&rs=1',
-        null, 12, 4.5, 75, 'OPENED'),
+        'This is English Grade 1', 12, 4.5, 75, 'OPENED'),
        ('English Grade 2', 'ENG002',
         'https://www.geo.tv/assets/uploads/updates/2021-05-03/348462_790220_updates.jpg',
-        null, 12, 5.0, 75, 'OPENED'),
+        'This is English Grade 2', 12, 5.0, 75, 'OPENED'),
        ('English Grade 3', 'ENG003',
         'https://th.bing.com/th/id/OIP.H1Q3_d4okF70VIVYp-YA5AAAAA?pid=ImgDet&w=360&h=470&rs=1',
-        null, 12, 5.0, 75, 'OPENED'),
+        'This is English Grade 3', 12, 5.0, 75, 'OPENED'),
 
        ('ielts 102', 'ILT102',
         'https://th.bing.com/th/id/OIP.R7Wj-CVruj2Gcx-MmaxmZAHaKe?pid=ImgDet&rs=1',
-        null, 14, 5.0, 80, 'DESIGNING'),
+        'This is ielts 102', 14, 5.0, 80, 'DESIGNING'),
        ('ielts 103', 'ILT103',
         'https://th.bing.com/th/id/OIP.R7Wj-CVruj2Gcx-MmaxmZAHaKe?pid=ImgDet&rs=1',
-        null, 14, 5.0, 80, 'AWAIT_REVIEW'),
+        'This is ielts 103', 14, 5.0, 80, 'AWAIT_REVIEW'),
        ('ielts 104', 'ILT104',
         'https://th.bing.com/th/id/OIP.R7Wj-CVruj2Gcx-MmaxmZAHaKe?pid=ImgDet&rs=1',
-        null, 14, 5.0, 80, 'CLOSED');
+        'This is ielts 104', 14, 5.0, 80, 'CLOSED');
 
 insert into price_log(courseId, price, isPromotion, promotionAmount, promotionType, promotionDesc, validFrom, validTo, status)
-values (1, 200000, true, 15, 'PERCENT', 'Grand opening super deal, now cheaper', '2023-06-10 00:00:01', null, 'CREATED'),
-       (2, 100000, true, 20000, 'AMOUNT', 'To help with the first step, now reduce', '2023-06-10 00:00:01', null, 'CREATED'),
+values (1, 200000, true, 15, 'PERCENT', 'Grand opening super deal', '2023-06-10 00:00:01', null, 'CREATED'),
+       (2, 100000, true, 20000, 'AMOUNT', 'To help with the first step', '2023-06-10 00:00:01', null, 'CREATED'),
        (3, 125000, false, null, null, null, '2023-06-10 00:00:01', null, 'CREATED'),
        (4, 150000, false, null, null, null, '2023-06-10 00:00:01', null, 'CREATED'),
 
@@ -2391,86 +2391,38 @@ values (1, 'Ielts 101', 'You have complete the Ielts 101 course', 'CREATED'),
        (3, 'Eng 2', 'You have complete the Eng 2 course', 'CREATED'),
        (4, 'Eng 3', 'You have complete the Eng 3 course', 'CREATED');
 
-# insert into semester(semesterName, semesterAlias, semesterDesc, semesterType, startDate, endDate, status)
-# values ('Spring 23', 'SP23', 'Spring 23', 'SEASON', '2023-02-05', '2023-04-05', 'CREATED'),
-#        ('Summer 23', 'SU23', 'Summer 23', 'SEASON', '2023-04-10', '2023-07-10', 'CREATED'),
-#        ('Fall 23', 'FA23', 'Fall 23', 'SEASON', '2023-07-15', '2023-10-15', 'CREATED'),
-#        ('Winter 23', 'WI23', 'Winter 23', 'SEASON', '2023-10-20', '2024-01-20', 'CREATED');
+insert into clazz(id, courseId, centerId, staffId, clazzAlias, clazzName, clazzDesc, minCapacity, maxCapacity, status)
+values (1, 1, 1, 1, 'ILT10101', 'ILT101 - 01', 'This is class 1 of ILT101', 5, 15, 'DESIGNING'),
+       (2, 2, 1, 1, 'ENG00101', 'ENG001 - 01', 'This is class 1 of ENG001', 5, 30, 'DESIGNING'),
+       (3, 3, 1, 2, 'ENG00201', 'ENG002 - 01', 'This is class 1 of ENG002', 5, 30, 'DESIGNING'),
+       (4, 4, 1, 2, 'ENG00301', 'ENG003 - 01', 'This is class 1 of ENG003', 5, 25, 'DESIGNING');
 
-# insert into course_semester(courseId, semesterId, centerId, status)
-# values (1, 1, 1, 'CREATED'),
-#        (1, 2, 1, 'CREATED'),
-#        (1, 3, 1, 'CREATED'),
-#        (1, 4, 1, 'CREATED'),
-#        (2, 1, 1, 'CREATED'),
-#        (2, 2, 1, 'CREATED'),
-#        (2, 3, 1, 'CREATED'),
-#        (2, 4, 1, 'CREATED'),
-#        (3, 1, 1, 'CREATED'),
-#        (3, 2, 1, 'CREATED'),
-#        (3, 3, 1, 'CREATED'),
-#        (3, 4, 1, 'CREATED'),
-#        (4, 1, 1, 'CREATED'),
-#        (4, 2, 1, 'CREATED'),
-#        (4, 3, 1, 'CREATED'),
+
+INSERT INTO schedule_category (id, categoryName, categoryDesc, atMon, atTue, atWed, atThu, atFri, atSat, atSun, status)
+VALUES (1,  'T2,T4,T6', 'T2,T4,T6 hàng tuần', true,  false, true,  false, true,  false, false, 'CREATED'),
+       (2,  'T3,T5,T7', 'T3,T5,T7 hàng tuần', false, true,  false, true,  false, true,  false, 'CREATED'),
+       (3,  'T7,CN',    'T7,CN hàng tuần',    false, false, false, false, false, true,  true,  'CREATED'),
+       
+       (4,  'T2,T3,T4', 'T2,T3,T4 hàng tuần', true,  true,  true,  false, false, false, false, 'CREATED'),
+       (5,  'T3,T4,T5', 'T3,T4,T5 hàng tuần', false, true,  true,  true,  false, false, false, 'CREATED'),
+       (6,  'T4,T5,T6', 'T4,T5,T6 hàng tuần', false, false, true,  true,  true,  false, false, 'CREATED'),
+       (7,  'T5,T6,T7', 'T5,T6,T7 hàng tuần', false, false, false, true,  true,  true,  false, 'CREATED'),
+       (8,  'T6,T7,CN', 'T6,T7,CN hàng tuần', false, false, false, false, true,  true,  true,  'CREATED'),
+
+       (9,  'T2',       'T2 hàng tuần',       true,  false, false, false, false, false, false, 'CREATED'),
+       (10, 'T3',       'T3 hàng tuần',       false, true,  false, false, false, false, false, 'CREATED'),
+       (11, 'T4',       'T4 hàng tuần',       false, false, true,  false, false, false, false, 'CREATED'),
+       (12, 'T5',       'T5 hàng tuần',       false, false, false, true,  false, false, false, 'CREATED'),
+       (13, 'T6',       'T6 hàng tuần',       false, false, false, false, true,  false, false, 'CREATED'),
+       (14, 'T7',       'T7 hàng tuần',       false, false, false, false, false, true,  false, 'CREATED'),
+       (15, 'CN',       'CN hàng tuần',       false, false, false, false, false, false, true,  'CREATED');
+
+# insert into clazz_schedule (id, clazzId, roomId, scheduleCategoryId, scheduleType, startDate, endDate,
+#                             slot, sessionStart, sessionEnd, status)
+# values ;
 #
-#        (1, 1, 2, 'CREATED'),
-#        (1, 2, 2, 'CREATED'),
-#        (1, 3, 2, 'CREATED'),
-#        (1, 4, 2, 'CREATED'),
-#        (2, 1, 2, 'CREATED'),
-#        (2, 2, 2, 'CREATED'),
-#        (2, 3, 2, 'CREATED'),
-#        (2, 4, 2, 'CREATED'),
-#        (3, 1, 2, 'CREATED'),
-#        (3, 2, 2, 'CREATED'),
-#        (3, 3, 2, 'CREATED'),
-#        (3, 4, 2, 'CREATED'),
-#        (4, 1, 2, 'CREATED'),
-#        (4, 2, 2, 'CREATED'),
-#        (4, 3, 2, 'CREATED');
-
-insert into clazz(courseId, centerId, staffId, clazzAlias, clazzName, clazzDesc, minCapacity, maxCapacity, status)
-
-values (1, 1, 1, 'ILT10101', 'ILT101 - 01', null, 5, 15, 'CLOSED'),
-       (1, 2, 1, 'ILT10102', 'ILT101 - 02', null, 5, 15, 'OPENED'),
-
-       (2, 1, 1, 'ENG00101', 'ENG001 - 01', null, 5, 30, 'DESIGNING'),
-       (2, 2, 1, 'ENG00102', 'ENG001 - 02', null, 5, 30, 'DESIGNING'),
-
-       (3, 1, 2, 'ENG00201', 'ENG002 - 01', null, 5, 30, 'DESIGNING'),
-       (3, 2, 2, 'ENG00202', 'ENG002 - 02', null, 5, 30, 'DESIGNING'),
-
-       (4, 1, 2, 'ENG00301', 'ENG003 - 01', null, 5, 25, 'DESIGNING'),
-       (4, 2, 2, 'ENG00302', 'ENG003 - 02', null, 5, 25, 'DESIGNING'),
-
-       (3, 1, 2, 'ENG00203', 'ENG002 - 01', null, 5, 25, 'ONGOING');
-
-INSERT INTO schedulecat (`name`, `description`, `status`)
-VALUES ('T2,T4,T6', 'T2,T4,T6 hàng tuần', 'CREATED'),
-       ('T3,T5,T7', 'T3,T5,T7 hàng tuần', 'CREATED'),
-       ('T7,CN',    'T7,CN hàng tuần',    'CREATED'),
-       ('T2',       'T2 hàng tuần',       'CREATED');
-
-insert into clazz_schedule(clazzId, roomId, schedulecaId, scheduleType, startDate, endDate, slot, sessionStart, sessionEnd, status)
-values (1, 1, 1, 'SCHEDULE', '2023-07-15', '2023-10-15', 1, '07:00:00', '08:30:00', 'CREATED'),
-       (2, 3, 2, 'SCHEDULE', '2023-1-15', '2023-2-15', 3, '10:30:00', '12:00:00', 'CREATED'),
-       (9, 3, 3, 'SCHEDULE', '2023-10-20', '2024-01-20', 3, '10:30:00', '12:00:00', 'CREATED');
-
-insert into session(roomId, scheduleId, staffId, slot, sessionStart, sessionEnd, status)
-values
-    (1, 1, 1, 1, '2023-07-18 07:00:00', '2023-07-18 08:30:00', 'CREATED'),
-    (1, 1, 1, 1, '2023-07-20 07:00:00', '2023-07-20 08:30:00', 'CREATED'),
-    (1, 1, 1, 1, '2023-07-22 07:00:00', '2023-07-22 08:30:00', 'CREATED'),
-    (1, 1, 1, 1, '2023-07-25 07:00:00', '2023-07-25 08:30:00', 'CREATED'),
-    (1, 1, 1, 1, '2023-07-27 07:00:00', '2023-07-27 08:30:00', 'CREATED'),
-    (1, 1, 1, 1, '2023-07-29 07:00:00', '2023-07-29 08:30:00', 'CREATED'),
-    (1, 1, 1, 1, '2023-08-02 07:00:00', '2023-08-02 08:30:00', 'CREATED'),
-    (1, 1, 1, 1, '2023-08-04 07:00:00', '2023-08-04 08:30:00', 'CREATED'),
-    (1, 1, 1, 1, '2023-08-06 07:00:00', '2023-08-06 08:30:00', 'CREATED'),
-    (1, 1, 1, 1, '2023-08-09 07:00:00', '2023-08-09 08:30:00', 'CREATED'),
-    (1, 1, 1, 1, '2023-08-11 07:00:00', '2023-08-11 08:30:00', 'CREATED'),
-    (1, 1, 1, 1, '2023-08-13 07:00:00', '2023-08-13 08:30:00', 'CREATED');
+# insert into session(id, roomId, scheduleId, staffId, slot, sessionStart, sessionEnd, status)
+# values ;
 
 insert into material(materialName, materialImg, materialLink, materialContent, materialType, isFree, status)
 values ('Report1 template', '',
@@ -2499,92 +2451,82 @@ values (1, 1, 'CREATED'),
        (3, 3, 'CREATED'),
        (3, 4, 'CREATED');
 
-INSERT INTO clazz_member(clazzId, userId, status)
-VALUES (1, 1, 'CREATED'),
-       (2, 1, 'CREATED'),
-       (3, 1, 'CREATED'),
-       (4, 1, 'CREATED'),
-       (5, 1, 'CREATED'),
-       (6, 1, 'CREATED'),
-       (7, 1, 'CREATED'),
-       (1, 7, 'CREATED'),
-       (2, 7, 'CREATED'),
-       (3, 7, 'CREATED'),
-       (4, 7, 'CREATED'),
-       (5, 7, 'CREATED'),
-       (6, 7, 'CREATED'),
-       (7, 7, 'CREATED');
+# INSERT INTO clazz_member(id, clazzId, userId, status)
+# VALUES (1, 1, 1, 'CREATED'),
+#        (2, 2, 1, 'CREATED'),
+#        (3, 1, 7, 'CREATED'),
+#        (4, 2, 7, 'CREATED');
 
-INSERT INTO test(courseId, testName, testType, testImg, testDesc, timeLimit,
-                 numQuestion, questionType, minScore, testWeight, totalScore, status)
-VALUES (1, 'ielts 101', 'FIFTEEN_MINUTE', NULL, 'ESSAY',    15,  2, 'ESSAY',    1, 1, NULL, 'CREATED'),
-       (1, 'ielts 101', 'MIDTERM',        NULL, 'ESSAY',    45,  1, 'ESSAY',    1, 3, NULL, 'CREATED'),
-       (1, 'ielts 101', 'FINAL',          NULL, 'MULTIPLE', 120, 5, 'MULTIPLE', 4, 5, NULL, 'CREATED');
+# INSERT INTO test(courseId, testName, testType, testImg, testDesc, timeLimit,
+#                  numQuestion, questionType, minScore, testWeight, totalScore, status)
+# VALUES (1, 'ielts 101', 'FIFTEEN_MINUTE', NULL, 'ESSAY',    15,  2, 'ESSAY',    1, 1, NULL, 'CREATED'),
+#        (1, 'ielts 101', 'MIDTERM',        NULL, 'ESSAY',    45,  1, 'ESSAY',    1, 3, NULL, 'CREATED'),
+#        (1, 'ielts 101', 'FINAL',          NULL, 'MULTIPLE', 120, 5, 'MULTIPLE', 4, 5, NULL, 'CREATED');
+#
+# INSERT INTO question(testId, questionType, questionDesc, questionPrompt, questionScore, status)
+# VALUES (1, 'ESSAY', 'Write something about your family (200 word)',
+#         NULL, 1, 'CREATED'),
+#        (1, 'ESSAY', 'Write about the reason why we should have a pet (300 word)',
+#         NULL, 1, 'CREATED'),
+#        (2, 'ESSAY', 'Write about the US president, how and why he is winner in 2021 (500 word)',
+#         NULL, 1, 'CREATED'),
+#
+#        (3, 'MULTIPLE', 'Does he have math on Friday? - Yes, he _______________.',
+#         'Choose the option that best fits each of the blanks.', 1, 'CREATED'),
+#        (3, 'MULTIPLE', 'My class finishes at half _______________ ten.',
+#         'Choose the option that best fits each of the blanks.', 1, 'CREATED'),
+#        (3, 'MULTIPLE', '_______________ do you go to school? - By bike.',
+#         'Choose the option that best fits each of the blanks.', 1, 'CREATED'),
+#        (3, 'MULTIPLE', 'I take a bus to school every day, but I am _______________ to school now.',
+#         'Choose the option that best fits each of the blanks.', 1, 'CREATED'),
+#        (3, 'MULTIPLE', '_______________ a truck in front of the store.',
+#         'Choose the option that best fits each of the blanks.', 1, 'CREATED');
+#
+# INSERT INTO answer(questionId, answerDesc, answerScore, isCorrect, status)
+# VALUES (4, 'is',        0, false, 'CREATED'),
+#        (4, 'does',      1, true,  'CREATED'),
+#        (4, 'doesn\'t',  0, false, 'CREATED'),
+#        (5, 'to',        0, false, 'CREATED'),
+#        (5, 'pass',      1, true,  'CREATED'),
+#        (5, 'past',      0, false, 'CREATED'),
+#        (6, 'What',      0, false, 'CREATED'),
+#        (6, 'How',       1, true,  'CREATED'),
+#        (6, 'Why',       0, false, 'CREATED'),
+#        (7, 'walking',   1, true,  'CREATED'),
+#        (7, 'walk',      0, false, 'CREATED'),
+#        (8, 'These is',  1, true,  'CREATED'),
+#        (8, 'These are', 0, false, 'CREATED'),
+#        (8, 'Those are', 0, false, 'CREATED');
 
-INSERT INTO question(testId, questionType, questionDesc, questionPrompt, questionScore, status)
-VALUES (1, 'ESSAY', 'Write something about your family (200 word)',
-        NULL, 1, 'CREATED'),
-       (1, 'ESSAY', 'Write about the reason why we should have a pet (300 word)',
-        NULL, 1, 'CREATED'),
-       (2, 'ESSAY', 'Write about the US president, how and why he is winner in 2021 (500 word)',
-        NULL, 1, 'CREATED'),
+# INSERT INTO clazz_test(clazzId, testId, openFrom, openTo, status)
+# VALUES (1, 1, '2023-08-18 09:56:41', '2023-09-18 09:56:41', 'CREATED'),
+#        (1, 2, '2023-08-18 09:56:41', '2023-09-18 09:56:41', 'CREATED'),
+#        (1, 3, '2023-08-18 09:56:41', '2023-09-18 09:56:41', 'CREATED');
+#
+# INSERT INTO member_test_record(memberId, clazzTestId, startAt, submitAt, score, status)
+# VALUES (8, 1, '2023-08-18 10:17:31', '2023-08-18 10:18:47', 5, 'DONE'),
+#        (9, 3, '2023-08-18 10:19:53', '2023-08-18 10:20:11', 4, 'DONE');
+#
+# INSERT INTO test_record(memberTestRecordId, questionId, answerId, answerTxt, score, status)
+# VALUES (1, 1, NULL, 'My sister is a doctor.',     0, 'CREATED'),
+#        (1, 2, NULL, 'Don\'t buy it if you poor.', 1, 'CREATED'),
+#        (2, 4, 3,    NULL,                         0, 'CREATED'),
+#        (2, 5, 5,    NULL,                         1, 'CREATED'),
+#        (2, 6, 8,    NULL,                         1, 'CREATED'),
+#        (2, 7, 11,   NULL,                         0, 'CREATED'),
+#        (2, 8, 14,   NULL,                         0, 'CREATED');
 
-       (3, 'MULTIPLE', 'Does he have math on Friday? - Yes, he _______________.',
-        'Choose the option that best fits each of the blanks.', 1, 'CREATED'),
-       (3, 'MULTIPLE', 'My class finishes at half _______________ ten.',
-        'Choose the option that best fits each of the blanks.', 1, 'CREATED'),
-       (3, 'MULTIPLE', '_______________ do you go to school? - By bike.',
-        'Choose the option that best fits each of the blanks.', 1, 'CREATED'),
-       (3, 'MULTIPLE', 'I take a bus to school every day, but I am _______________ to school now.',
-        'Choose the option that best fits each of the blanks.', 1, 'CREATED'),
-       (3, 'MULTIPLE', '_______________ a truck in front of the store.',
-        'Choose the option that best fits each of the blanks.', 1, 'CREATED');
-
-INSERT INTO answer(questionId, answerDesc, answerScore, isCorrect, status)
-VALUES (4, 'is',        0, false, 'CREATED'),
-       (4, 'does',      1, true,  'CREATED'),
-       (4, 'doesn\'t',  0, false, 'CREATED'),
-       (5, 'to',        0, false, 'CREATED'),
-       (5, 'pass',      1, true,  'CREATED'),
-       (5, 'past',      0, false, 'CREATED'),
-       (6, 'What',      0, false, 'CREATED'),
-       (6, 'How',       1, true,  'CREATED'),
-       (6, 'Why',       0, false, 'CREATED'),
-       (7, 'walking',   1, true,  'CREATED'),
-       (7, 'walk',      0, false, 'CREATED'),
-       (8, 'These is',  1, true,  'CREATED'),
-       (8, 'These are', 0, false, 'CREATED'),
-       (8, 'Those are', 0, false, 'CREATED');
-
-INSERT INTO clazz_test(clazzId, testId, openFrom, openTo, status)
-VALUES (1, 1, '2023-08-18 09:56:41', '2023-09-18 09:56:41', 'CREATED'),
-       (1, 2, '2023-08-18 09:56:41', '2023-09-18 09:56:41', 'CREATED'),
-       (1, 3, '2023-08-18 09:56:41', '2023-09-18 09:56:41', 'CREATED');
-
-INSERT INTO member_test_record(memberId, clazzTestId, startAt, submitAt, score, status)
-VALUES (8, 1, '2023-08-18 10:17:31', '2023-08-18 10:18:47', 5, 'DONE'),
-       (9, 3, '2023-08-18 10:19:53', '2023-08-18 10:20:11', 4, 'DONE');
-
-INSERT INTO test_record(memberTestRecordId, questionId, answerId, answerTxt, score, status)
-VALUES (1, 1, NULL, 'My sister is a doctor.',     0, 'CREATED'),
-       (1, 2, NULL, 'Don\'t buy it if you poor.', 1, 'CREATED'),
-       (2, 4, 3,    NULL,                         0, 'CREATED'),
-       (2, 5, 5,    NULL,                         1, 'CREATED'),
-       (2, 6, 8,    NULL,                         1, 'CREATED'),
-       (2, 7, 11,   NULL,                         0, 'CREATED'),
-       (2, 8, 14,   NULL,                         0, 'CREATED');
-
-INSERT INTO homework(clazzId, homeworkName, homeworkDesc, homeworkDoc, homeworkContent, openAt, deadline, status)
-VALUES (1, 'bai tap 1 ', 'bai tap 1 ',
-        'https://zingmp3.vn/album/V-Pop-Hits-Thap-Nien-2010-Noo-Phuoc-Thinh-Huong-Tram-ERIK-Dong-Nhi/ZECE0ZD6.html', NULL,
-        '2023-08-14 02:07:00', '2023-08-19 02:07:00', 'CREATED'),
-       (1, 'demo up file', 'demo up file',
-        'https://zingmp3.vn/album/V-Pop-Hits-Thap-Nien-2010-Noo-Phuoc-Thinh-Huong-Tram-ERIK-Dong-Nhi/ZECE0ZD6.html', '',
-        '2023-08-15 19:26:00', '2023-08-30 19:26:00', 'CREATED'),
-       (1, 'demo upload file 2 ', 'demo upload file 2 ',
-        'https://zingmp3.vn/album/V-Pop-Hits-Thap-Nien-2010-Noo-Phuoc-Thinh-Huong-Tram-ERIK-Dong-Nhi/ZECE0ZD6.html', '',
-        '2023-08-08 19:27:00', '2023-08-23 19:27:00', 'CREATED'),
-       (1, 'demo-file 3', 'demo-file 3',
-        'https://zingmp3.vn/album/V-Pop-Hits-Thap-Nien-2010-Noo-Phuoc-Thinh-Huong-Tram-ERIK-Dong-Nhi/ZECE0ZD6.html',
-        'https://firebasestorage.googleapis.com/v0/b/teachsync.appspot.com/o/1692620909241-f.txt?alt=media&token=c10c5aca-1c63-4a68-994c-d2f1cd57e620',
-        '2023-08-15 19:28:00', '2023-08-22 19:28:00', 'CREATED');
+# INSERT INTO homework(clazzId, homeworkName, homeworkDesc, homeworkDoc, homeworkContent, openAt, deadline, status)
+# VALUES (1, 'bai tap 1 ', 'bai tap 1 ',
+#         'https://zingmp3.vn/album/V-Pop-Hits-Thap-Nien-2010-Noo-Phuoc-Thinh-Huong-Tram-ERIK-Dong-Nhi/ZECE0ZD6.html', NULL,
+#         '2023-08-14 02:07:00', '2023-08-19 02:07:00', 'CREATED'),
+#        (1, 'demo up file', 'demo up file',
+#         'https://zingmp3.vn/album/V-Pop-Hits-Thap-Nien-2010-Noo-Phuoc-Thinh-Huong-Tram-ERIK-Dong-Nhi/ZECE0ZD6.html', '',
+#         '2023-08-15 19:26:00', '2023-08-30 19:26:00', 'CREATED'),
+#        (1, 'demo upload file 2 ', 'demo upload file 2 ',
+#         'https://zingmp3.vn/album/V-Pop-Hits-Thap-Nien-2010-Noo-Phuoc-Thinh-Huong-Tram-ERIK-Dong-Nhi/ZECE0ZD6.html', '',
+#         '2023-08-08 19:27:00', '2023-08-23 19:27:00', 'CREATED'),
+#        (1, 'demo-file 3', 'demo-file 3',
+#         'https://zingmp3.vn/album/V-Pop-Hits-Thap-Nien-2010-Noo-Phuoc-Thinh-Huong-Tram-ERIK-Dong-Nhi/ZECE0ZD6.html',
+#         'https://firebasestorage.googleapis.com/v0/b/teachsync.appspot.com/o/1692620909241-f.txt?alt=media&token=c10c5aca-1c63-4a68-994c-d2f1cd57e620',
+#         '2023-08-15 19:28:00', '2023-08-22 19:28:00', 'CREATED');

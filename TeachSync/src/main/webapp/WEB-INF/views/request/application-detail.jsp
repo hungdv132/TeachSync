@@ -16,7 +16,7 @@
     <script src="../../../resources/js/bootstrap-5.3.0/bootstrap.bundle.js"></script>
     <script src="../../../resources/js/common.js"></script>
     <script>
-        var mess = '${mess}'
+        var mess = `${mess}`
         if (mess != '') {
             alert(mess);
         }

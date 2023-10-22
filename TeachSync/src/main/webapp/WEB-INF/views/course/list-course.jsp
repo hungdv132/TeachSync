@@ -96,12 +96,6 @@
       </c:if>
     </h5>
 
-    <%--  <select name="" id="">--%>
-    <%--  <c:forEach var="field" items="${searchableFieldList}">--%>
-    <%--    <option value="${field}"><c:out value="${field}"/></option>--%>
-    <%--  </c:forEach>--%>
-    <%--  </select>--%>
-
     <div class="row gy-3 mb-3">
       <c:forEach var="course" items="${courseList}">
         <div class="col-12">
@@ -125,6 +119,12 @@
                 </div>
 
                 <div class="card-body">
+                  <c:if test="${isAdmin}">
+                    <p class="card-text">
+                      <c:out value="${course.status.stringValueVie}"/>
+                    </p>
+                  </c:if>
+                  
                   <p class="card-text">
                     <c:out value="${course.courseDesc}"/>
                   </p>
@@ -135,6 +135,28 @@
         </div>
       </c:forEach>
     </div>
+  
+    <!-- Navigate page button -->
+    <form action="/course" method="get"
+          id="formNavTable" class="d-flex align-items-center mb-3">
+      <input type="hidden" id="txtPageNo" name="pageNo" value="${pageNo}">
+    
+      <button type="button" class="btn btn-secondary" onclick="toPage(0)">
+        <i class="bi-chevron-bar-left"></i>
+      </button>
+      <button type="button" class="btn btn-secondary mx-2" onclick="toPage(${pageNo - 1})">
+        <i class="bi-chevron-left"></i>
+      </button>
+    
+      Trang: <c:out value="${not empty pageNo ? pageNo + 1 : 1}"/> &sol; <c:out value="${not empty pageTotal ? pageTotal : 1}"/>
+    
+      <button type="button" class="btn btn-secondary mx-2" onclick="toPage(${pageNo + 1})">
+        <i class="bi-chevron-right"></i>
+      </button>
+      <button type="button" class="btn btn-secondary" onclick="toPage(${pageTotal-1})">
+        <i class="bi-chevron-bar-right"></i>
+      </button>
+    </form>
   </div>
 </div>
 <!-- ================================================== Main Body ================================================== -->
@@ -145,9 +167,15 @@
 <!-- ================================================== Footer ===================================================== -->
 </body>
 <script>
-  var mess = '${mess}'
+  var mess = `${mess}`
   if (mess != '') {
     alert(mess);
+  }
+
+  function toPage(pageNo) {
+      $("#txtPageNo").val(pageNo);
+      const form = document.getElementById('formNavTable');
+      form.requestSubmit();
   }
 </script>
 </html>

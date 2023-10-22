@@ -1,4 +1,5 @@
 <%@ page import="com.teachsync.utils.enums.PromotionType" %>
+<%@ page import="com.teachsync.utils.enums.Status" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
@@ -162,10 +163,12 @@
               </c:if>
             
               <c:if test="${isAdmin}">
-                <p class="card-text text-danger">
-                  Khóa học này hiện chưa có lớp nào đang mở để đăng ký
-                </p>
-                <a href="/add-clazz" class="btn btn-primary w-25">Thêm lớp</a>
+                <c:if test="${course.status.equals(Status.OPENED)}">
+                  <p class="card-text text-danger">
+                    Khóa học này hiện chưa có lớp nào đang mở để đăng ký
+                  </p>
+                  <a href="/add-clazz" class="btn btn-primary w-25">Thêm lớp</a>
+                </c:if>
               </c:if>
             </c:if>
             

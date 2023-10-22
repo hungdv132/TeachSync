@@ -25,6 +25,8 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static com.teachsync.utils.enums.Status.*;
+
 @Service
 public class ClazzMemberServiceImpl implements ClazzMemberService {
     @Autowired
@@ -44,11 +46,28 @@ public class ClazzMemberServiceImpl implements ClazzMemberService {
     /* =================================================== CREATE =================================================== */
     @Override
     public ClazzMember createClazzMember(ClazzMember member) throws Exception {
-        /* Validate input */
-        /* TODO: Check slot open for clazz, reject if full */
-
         /* Check FK */
-        /* TODO: Check exist clazz, user */
+        if (!userService.existsById(member.getUserId())) {
+            throw new IllegalArgumentException(
+                    "Insert error. No User found with id: " + member.getUserId());
+        }
+        Long clazzId = member.getClazzId();
+        Clazz clazz = clazzService.getById(
+                clazzId,
+                List.of(DELETED),
+                false);
+        if (clazz == null) {
+            throw new IllegalArgumentException(
+                    "Insert error. No Clazz found with id: " + clazzId);
+        } else {
+            /* Validate input */
+            List<ClazzMember> memberList = getAllByClazzId(clazzId);
+
+            if (memberList.size() >= clazz.getMaxCapacity()) {
+                throw new IllegalArgumentException(
+                        "Insert error. Clazz has reach max capacity");
+            }
+        }
 
         /* Insert DB */
         return clazzMemberRepository.saveAndFlush(member);
@@ -68,7 +87,7 @@ public class ClazzMemberServiceImpl implements ClazzMemberService {
     @Override
     public ClazzMember getById(Long id) throws Exception {
         return clazzMemberRepository
-                .findByIdAndStatusNot(id, Status.DELETED)
+                .findByIdAndStatusNot(id, DELETED)
                 .orElse(null);
     }
     @Override
@@ -83,8 +102,8 @@ public class ClazzMemberServiceImpl implements ClazzMemberService {
     }
 
     @Override
-    public List<ClazzMember> getAllByIdIn(Collection<Long> idCollection) throws Exception {
-        List<ClazzMember> memberList = clazzMemberRepository.findAllByIdInAndStatusNot(idCollection, Status.DELETED);
+    public List<ClazzMember> getAllByIdIn(Collection<Long> ids) throws Exception {
+        List<ClazzMember> memberList = clazzMemberRepository.findAllByIdInAndStatusNot(ids, DELETED);
 
         if (memberList.isEmpty()) {
             return null;
@@ -93,8 +112,8 @@ public class ClazzMemberServiceImpl implements ClazzMemberService {
         return memberList;
     }
     @Override
-    public List<ClazzMemberReadDTO> getAllDTOByIdIn(Collection<Long> idCollection, Collection<DtoOption> options) throws Exception {
-        List<ClazzMember> memberList = getAllByIdIn(idCollection);
+    public List<ClazzMemberReadDTO> getAllDTOByIdIn(Collection<Long> ids, Collection<DtoOption> options) throws Exception {
+        List<ClazzMember> memberList = getAllByIdIn(ids);
 
         if (memberList == null) {
             return null;
@@ -103,8 +122,8 @@ public class ClazzMemberServiceImpl implements ClazzMemberService {
         return wrapListDTO(memberList, options);
     }
     @Override
-    public Map<Long, ClazzMemberReadDTO> mapIdDTOByIdIn(Collection<Long> idCollection, Collection<DtoOption> options) throws Exception {
-        List<ClazzMemberReadDTO> memberDTOList = getAllDTOByIdIn(idCollection, options);
+    public Map<Long, ClazzMemberReadDTO> mapIdDTOByIdIn(Collection<Long> ids, Collection<DtoOption> options) throws Exception {
+        List<ClazzMemberReadDTO> memberDTOList = getAllDTOByIdIn(ids, options);
 
         if (memberDTOList == null) {
             return new HashMap<>();
@@ -118,10 +137,9 @@ public class ClazzMemberServiceImpl implements ClazzMemberService {
     @Override
     public List<ClazzMember> getAllByClazzId(Long clazzId) throws Exception {
         List<ClazzMember> clazzMemberList =
-                clazzMemberRepository.findAllByClazzIdAndStatusNot(clazzId, Status.DELETED);
+                clazzMemberRepository.findAllByClazzIdAndStatusNot(clazzId, DELETED);
 
-        if (clazzMemberList.isEmpty()) {
-            return null; }
+        if (clazzMemberList.isEmpty()) { return null; }
 
         return clazzMemberList;
     }
@@ -129,36 +147,33 @@ public class ClazzMemberServiceImpl implements ClazzMemberService {
     public List<ClazzMemberReadDTO> getAllDTOByClazzId(Long clazzId, Collection<DtoOption> options) throws Exception {
         List<ClazzMember> clazzMemberList = getAllByClazzId(clazzId);
 
-        if (clazzMemberList == null) {
-            return null; }
+        if (clazzMemberList == null) { return null; }
 
         return wrapListDTO(clazzMemberList, options);
     }
 
     @Override
-    public List<ClazzMember> getAllByClazzIdIn(Collection<Long> clazzIdCollection) throws Exception {
+    public List<ClazzMember> getAllByClazzIdIn(Collection<Long> clazzIds) throws Exception {
         List<ClazzMember> clazzMemberList =
-                clazzMemberRepository.findAllByClazzIdInAndStatusNot(clazzIdCollection, Status.DELETED);
+                clazzMemberRepository.findAllByClazzIdInAndStatusNot(clazzIds, DELETED);
 
-        if (clazzMemberList.isEmpty()) {
-            return null; }
+        if (clazzMemberList.isEmpty()) { return null; }
 
         return clazzMemberList;
     }
     @Override
     public List<ClazzMemberReadDTO> getAllDTOByClazzIdIn(
-            Collection<Long> clazzIdCollection, Collection<DtoOption> options) throws Exception {
-        List<ClazzMember> clazzMemberList = getAllByClazzIdIn(clazzIdCollection);
+            Collection<Long> clazzIds, Collection<DtoOption> options) throws Exception {
+        List<ClazzMember> clazzMemberList = getAllByClazzIdIn(clazzIds);
 
-        if (clazzMemberList == null) {
-            return null; }
+        if (clazzMemberList == null) { return null; }
 
         return wrapListDTO(clazzMemberList, options);
     }
     @Override
     public Map<Long, List<ClazzMemberReadDTO>> mapClazzIdListDTOByClazzIdIn(
-            Collection<Long> clazzIdCollection, Collection<DtoOption> options) throws Exception {
-        List<ClazzMemberReadDTO> clazzMemberDTOList = getAllDTOByClazzIdIn(clazzIdCollection, options);
+            Collection<Long> clazzIds, Collection<DtoOption> options) throws Exception {
+        List<ClazzMemberReadDTO> clazzMemberDTOList = getAllDTOByClazzIdIn(clazzIds, options);
 
         if (clazzMemberDTOList == null) {
             return new HashMap<>(); }
@@ -185,40 +200,45 @@ public class ClazzMemberServiceImpl implements ClazzMemberService {
     @Override
     public List<ClazzMember> getAllByUserId(Long userId) throws Exception {
         List<ClazzMember> clazzMemberList =
-                clazzMemberRepository.findAllByUserIdAndStatusNot(userId, Status.DELETED);
+                clazzMemberRepository.findAllByUserIdAndStatusNot(userId, DELETED);
 
-        if (clazzMemberList.isEmpty()) {
-            return null; }
+        if (clazzMemberList.isEmpty()) { return null; }
 
         return clazzMemberList;
+    }
+    @Override
+    public Map<Long, ClazzMember> mapClazzIdClazzMemberByUserId(Long userId) throws Exception {
+        List<ClazzMember> clazzMemberList = getAllByUserId(userId);
+
+        if (clazzMemberList.isEmpty()) { return new HashMap<>(); }
+
+        return clazzMemberList.stream()
+                .collect(Collectors.toMap(ClazzMember::getClazzId, Function.identity()));
     }
     @Override
     public List<ClazzMemberReadDTO> getAllDTOByUserId(Long userId, Collection<DtoOption> options) throws Exception {
         List<ClazzMember> clazzMemberList = getAllByUserId(userId);
 
-        if (clazzMemberList == null) {
-            return null; }
+        if (clazzMemberList == null) { return null; }
 
         return wrapListDTO(clazzMemberList, options);
     }
 
     @Override
-    public List<ClazzMember> getAllByUserIdIn(Collection<Long> userIdCollection) throws Exception {
+    public List<ClazzMember> getAllByUserIdIn(Collection<Long> userIds) throws Exception {
         List<ClazzMember> clazzMemberList =
-                clazzMemberRepository.findAllByUserIdInAndStatusNot(userIdCollection, Status.DELETED);
+                clazzMemberRepository.findAllByUserIdInAndStatusNot(userIds, DELETED);
 
-        if (clazzMemberList.isEmpty()) {
-            return null; }
+        if (clazzMemberList.isEmpty()) { return null; }
 
         return clazzMemberList;
     }
     @Override
     public List<ClazzMemberReadDTO> getAllDTOByUserIdIn(
-            Collection<Long> userIdCollection, Collection<DtoOption> options) throws Exception {
-        List<ClazzMember> clazzMemberList = getAllByUserIdIn(userIdCollection);
+            Collection<Long> userIds, Collection<DtoOption> options) throws Exception {
+        List<ClazzMember> clazzMemberList = getAllByUserIdIn(userIds);
 
-        if (clazzMemberList == null) {
-            return null; }
+        if (clazzMemberList == null) { return null; }
 
         return wrapListDTO(clazzMemberList, options);
     }
@@ -228,12 +248,39 @@ public class ClazzMemberServiceImpl implements ClazzMemberService {
     @Override
     public ClazzMember getByClazzIdAndUserId(Long clazzId, Long userId) throws Exception {
         return clazzMemberRepository
-                .findByClazzIdAndUserIdAndStatusNot(clazzId, userId, Status.DELETED)
+                .findByClazzIdAndUserIdAndStatusNot(clazzId, userId, DELETED)
                 .orElse(null);
     }
     @Override
-    public ClazzMemberReadDTO getDTOByClazzIdAndUserId(Long clazzId, Long userId, Collection<DtoOption> options) throws Exception {
-        return null;
+    public ClazzMemberReadDTO getDTOByClazzIdAndUserId(
+            Long clazzId, Long userId, Collection<DtoOption> options) throws Exception {
+        ClazzMember member = getByClazzIdAndUserId(clazzId, userId);
+        
+        if (member == null) { return null; }
+        
+        return wrapDTO(member, options);
+    }
+    
+    @Override
+    public List<ClazzMember> getAllByClazzIdInAndUserId(
+            Collection<Long> clazzIds, Long userId) throws Exception {
+
+        List<ClazzMember> clazzMemberList =
+                clazzMemberRepository.findAllByClazzIdInAndUserIdAndStatusNot(
+                        clazzIds, userId, DELETED);
+
+        if (clazzMemberList.isEmpty()) { return null; }
+
+        return clazzMemberList;
+    }
+    @Override
+    public List<ClazzMemberReadDTO> getAllDTOByClazzIdInAndUserId(
+            Collection<Long> clazzIds, Long userId, Collection<DtoOption> options) throws Exception {
+        List<ClazzMember> clazzMemberList = getAllByClazzIdInAndUserId(clazzIds, userId);
+
+        if (clazzMemberList == null) { return null; }
+
+        return wrapListDTO(clazzMemberList, options);
     }
 
 
@@ -243,16 +290,37 @@ public class ClazzMemberServiceImpl implements ClazzMemberService {
         /* Check exist */
         ClazzMember oldMemberRecord = getById(member.getId());
         if (oldMemberRecord == null) {
-            throw new IllegalArgumentException("Update error. No ClazzMember found with id: " + member.getId());
+            throw new IllegalArgumentException(
+                    "Update error. No ClazzMember found with id: " + member.getId());
         }
         member.setCreatedAt(oldMemberRecord.getCreatedAt());
         member.setCreatedBy(oldMemberRecord.getCreatedBy());
 
-        /* Validate input */
-        /* TODO: Check slot open for clazz, reject if full */
-
         /* Check FK */
-        /* TODO: Check exist clazz, user */
+        if (!userService.existsById(member.getUserId())) {
+            throw new IllegalArgumentException(
+                    "Update error. No User found with id: " + member.getUserId());
+        }
+        Long clazzId = member.getClazzId();
+        if (!oldMemberRecord.getClazzId().equals(clazzId)) {
+            Clazz clazz = clazzService.getById(
+                    clazzId,
+                    List.of(DELETED),
+                    false);
+            if (clazz == null) {
+                throw new IllegalArgumentException(
+                        "Update error. No Clazz found with id: " + clazzId);
+            } else {
+                /* Validate input */
+                List<ClazzMember> memberList = getAllByClazzId(clazzId);
+
+                if (memberList.size() >= clazz.getMaxCapacity()) {
+                    throw new IllegalArgumentException(
+                            "Update error. Clazz has reach max capacity");
+                }
+
+            }
+        }
 
         /* Insert DB */
         return clazzMemberRepository.saveAndFlush(member);
@@ -268,36 +336,91 @@ public class ClazzMemberServiceImpl implements ClazzMemberService {
 
 
     /* =================================================== DELETE =================================================== */
+    @Override
+    public Boolean deleteClazzMember(Long id) throws Exception {
+        /* Check exists */
+        ClazzMember member = getById(id);
+        if (member == null) {
+            throw new IllegalArgumentException(
+                    "Delete error. No ClazzMember found with id: " + id);
+        }
+
+        /* Delete */
+        member.setStatus(DELETED);
+
+        /* Save to DB */
+        clazzMemberRepository.saveAndFlush(member);
+
+        return true;
+    }
+
+    @Override
+    public Boolean deleteAllByClazzId(Long clazzId) throws Exception {
+        /* Check exists */
+        List<ClazzMember> memberList = getAllByClazzId(clazzId);
+        if (memberList == null) {
+            throw new IllegalArgumentException(
+                    "Delete error. No ClazzMember found with clazzId: " + clazzId);
+        }
+
+        /* Delete */
+        memberList =
+                memberList.stream()
+                        .peek(member -> member.setStatus(DELETED))
+                        .collect(Collectors.toList());
+
+        /* Save to DB */
+        clazzMemberRepository.saveAllAndFlush(memberList);
+
+        return true;
+    }
 
 
     /* =================================================== WRAPPER ================================================== */
     @Override
-    public ClazzMemberReadDTO wrapDTO(ClazzMember clazzMember, Collection<DtoOption> options) throws Exception {
+    public ClazzMemberReadDTO wrapDTO(
+            ClazzMember clazzMember, Collection<DtoOption> options) throws Exception {
+
+        if (clazzMember == null) { return null; }
+
         ClazzMemberReadDTO dto = mapper.map(clazzMember, ClazzMemberReadDTO.class);
 
         /* Add dependency */
         if (options != null && !options.isEmpty()) {
+            Long clazzId = clazzMember.getClazzId();
+            Long userId = clazzMember.getUserId();
+
             if (options.contains(DtoOption.CLAZZ)) {
-                ClazzReadDTO clazzDTO = clazzService.getDTOById(clazzMember.getClazzId(),
-                        List.of(Status.DELETED),
-                        false,options);
+                ClazzReadDTO clazzDTO = clazzService.getDTOById(
+                        clazzId,
+                        List.of(DELETED),
+                        false,
+                        options);
                 dto.setClazz(clazzDTO);
             }
             if (options.contains(DtoOption.CLAZZ_NAME)) {
                 Clazz clazz = clazzService.getById(
-                        clazzMember.getClazzId(),
-                        List.of(Status.DELETED),
+                        clazzId,
+                        List.of(DELETED),
                         false);
                 dto.setClazzName(clazz.getClazzName());
+            }
+            if (options.contains(DtoOption.CLAZZ_ALIAS)) {
+                Clazz clazz = clazzService.getById(
+                        clazzId,
+                        List.of(DELETED),
+                        false);
+                dto.setClazzAlias(clazz.getClazzAlias());
             }
 
             if (options.contains(DtoOption.USER)) {
                 UserReadDTO userDTO = userService.getDTOById(
-                        clazzMember.getUserId(), options);
+                        userId,
+                        options);
                 dto.setUser(userDTO);
             }
             if (options.contains(DtoOption.USER_FULL_NAME)) {
-                User user = userService.getById(clazzMember.getUserId());
+                User user = userService.getById(userId);
                 dto.setUserFullName(user.getFullName());
             }
         }
@@ -308,11 +431,14 @@ public class ClazzMemberServiceImpl implements ClazzMemberService {
     @Override
     public List<ClazzMemberReadDTO> wrapListDTO(
             Collection<ClazzMember> clazzMemberCollection, Collection<DtoOption> options) throws Exception {
+        if (clazzMemberCollection == null) { return null; }
+
         List<ClazzMemberReadDTO> dtoList = new ArrayList<>();
         ClazzMemberReadDTO dto;
 
         Map<Long, ClazzReadDTO> clazzIdClazzDTOMap = new HashMap<>();
         Map<Long, String> clazzIdClazzNameMap = new HashMap<>();
+        Map<Long, String> clazzIdClazzAliasMap = new HashMap<>();
         Map<Long, UserReadDTO> userIdUserDTOMap = new HashMap<>();
         Map<Long, String> userIdUserFullNameMap = new HashMap<>();
 
@@ -328,14 +454,20 @@ public class ClazzMemberServiceImpl implements ClazzMemberService {
             if (options.contains(DtoOption.CLAZZ)) {
                 clazzIdClazzDTOMap = clazzService.mapIdDTOByIdIn(
                         clazzIdSet,
-                        List.of(Status.DELETED),
+                        List.of(DELETED),
                         false,
                         options);
             }
             if (options.contains(DtoOption.CLAZZ_NAME)) {
                 clazzIdClazzNameMap = clazzService.mapIdClazzNameByIdIn(
                         clazzIdSet,
-                        List.of(Status.DELETED),
+                        List.of(DELETED),
+                        false);
+            }
+            if (options.contains(DtoOption.CLAZZ_NAME)) {
+                clazzIdClazzAliasMap = clazzService.mapIdClazzAliasByIdIn(
+                        clazzIdSet,
+                        List.of(DELETED),
                         false);
             }
 
@@ -351,11 +483,14 @@ public class ClazzMemberServiceImpl implements ClazzMemberService {
             dto = mapper.map(clazzMember, ClazzMemberReadDTO.class);
 
             /* Add dependency */
-            dto.setClazz(clazzIdClazzDTOMap.get(clazzMember.getClazzId()));
-            dto.setClazzName(clazzIdClazzNameMap.get(clazzMember.getClazzId()));
+            Long clazzId = clazzMember.getClazzId();
+            dto.setClazz(clazzIdClazzDTOMap.get(clazzId));
+            dto.setClazzName(clazzIdClazzNameMap.get(clazzId));
+            dto.setClazzAlias(clazzIdClazzAliasMap.get(clazzId));
 
-            dto.setUser(userIdUserDTOMap.get(clazzMember.getUserId()));
-            dto.setUserFullName(userIdUserFullNameMap.get(clazzMember.getUserId()));
+            Long userId = clazzMember.getUserId();
+            dto.setUser(userIdUserDTOMap.get(userId));
+            dto.setUserFullName(userIdUserFullNameMap.get(userId));
 
             dtoList.add(dto);
         }
@@ -366,6 +501,8 @@ public class ClazzMemberServiceImpl implements ClazzMemberService {
     @Override
     public Page<ClazzMemberReadDTO> wrapPageDTO(
             Page<ClazzMember> clazzMemberPage, Collection<DtoOption> options) throws Exception {
+        if (clazzMemberPage == null) { return null; }
+
         return new PageImpl<>(
                 wrapListDTO(clazzMemberPage.getContent(), options),
                 clazzMemberPage.getPageable(),

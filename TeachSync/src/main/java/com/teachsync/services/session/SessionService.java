@@ -37,6 +37,11 @@ public interface SessionService {
     List<SessionReadDTO> getAllDTOByScheduleIdAndInRange(
             Long scheduleId, LocalDateTime from, LocalDateTime to, Collection<DtoOption> options) throws Exception;
 
+    List<Session> getAllByScheduleIdInAndInRange(
+            Collection<Long> scheduleIds, LocalDateTime from, LocalDateTime to) throws Exception;
+    List<SessionReadDTO> getAllDTOByScheduleIdInAndInRange(
+            Collection<Long> scheduleIds, LocalDateTime from, LocalDateTime to, Collection<DtoOption> options) throws Exception;
+
     List<Session> getAllByScheduleIdAndAfter(Long scheduleId, LocalDateTime from) throws Exception;
     List<SessionReadDTO> getAllDTOByScheduleIdAndAfter(
             Long scheduleId, LocalDateTime from, Collection<DtoOption> options) throws Exception;

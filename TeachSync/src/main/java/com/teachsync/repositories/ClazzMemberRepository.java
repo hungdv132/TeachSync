@@ -30,5 +30,7 @@ public interface ClazzMemberRepository extends JpaRepository<ClazzMember, Long> 
 
     /* clazzId & userId */
     Optional<ClazzMember> findByClazzIdAndUserIdAndStatusNot(Long clazzId, Long userId, Status status);
+    List<ClazzMember> findAllByClazzIdInAndUserIdAndStatusNot(
+            Collection<Long> clazzIdCollection, Long userId, Status status);
 
 }

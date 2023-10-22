@@ -14,15 +14,15 @@ import java.util.Optional;
 @Repository
 public interface CourseRepository extends JpaRepository<Course, Long> {
 
-    List<Course> findAllByStatusNotIn(
-            Collection<Status> statusNotIn);
-    Page<Course> findAllByStatusNotIn(
-            Collection<Status> statusNotIn, Pageable pageable);
-
     List<Course> findAllByStatusIn(
             Collection<Status> statusIn);
     Page<Course> findAllByStatusIn(
             Collection<Status> statusIn, Pageable pageable);
+
+    List<Course> findAllByStatusNotIn(
+            Collection<Status> statusNotIn);
+    Page<Course> findAllByStatusNotIn(
+            Collection<Status> statusNotIn, Pageable pageable);
 
     /* id */
     Boolean existsByIdAndStatusNotIn(
@@ -30,43 +30,42 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
     Boolean existsAllByIdInAndStatusNotIn(
             Collection<Long> idCollection, Collection<Status> statusNotIn);
 
-    Optional<Course> findByIdAndStatusNotIn(
-            Long id, Collection<Status> statusNotIn);
-
     Optional<Course> findByIdAndStatusIn(
             Long id, Collection<Status> statusIn);
-
-    List<Course> findAllByIdInAndStatusNotIn(
-            Collection<Long> idCollection, Collection<Status> statusNotIn);
-    Page<Course> findAllByIdInAndStatusNotIn(
-            Collection<Long> idCollection, Collection<Status> statusNotIn, Pageable pageable);
-
     List<Course> findAllByIdInAndStatusIn(
             Collection<Long> idCollection, Collection<Status> statusIn);
     Page<Course> findAllByIdInAndStatusIn(
             Collection<Long> idCollection, Collection<Status> statusIn, Pageable pageable);
 
-    /* courseAlias */
-    List<Course> findAllByCourseAliasContainsAndStatusNotIn(
-            String alias, Collection<Status> statusNotIn);
-    Page<Course> findAllByCourseAliasContainsAndStatusNotIn(
-            String alias, Collection<Status> statusNotIn, Pageable pageable);
+    Optional<Course> findByIdAndStatusNotIn(
+            Long id, Collection<Status> statusNotIn);
+    List<Course> findAllByIdInAndStatusNotIn(
+            Collection<Long> idCollection, Collection<Status> statusNotIn);
+    Page<Course> findAllByIdInAndStatusNotIn(
+            Collection<Long> idCollection, Collection<Status> statusNotIn, Pageable pageable);
 
+
+    /* courseAlias */
     List<Course> findAllByCourseAliasContainsAndStatusIn(
             String alias, Collection<Status> statusIn);
     Page<Course> findAllByCourseAliasContainsAndStatusIn(
             String alias, Collection<Status> statusIn, Pageable pageable);
+
+    List<Course> findAllByCourseAliasContainsAndStatusNotIn(
+            String alias, Collection<Status> statusNotIn);
+    Page<Course> findAllByCourseAliasContainsAndStatusNotIn(
+            String alias, Collection<Status> statusNotIn, Pageable pageable);
     
     /* courseName */
-    List<Course> findAllByCourseNameContainsAndStatusNotIn(
-            String name, Collection<Status> statusNotIn);
-    Page<Course> findAllByCourseNameContainsAndStatusNotIn(
-            String name, Collection<Status> statusNotIn, Pageable pageable);
-
     List<Course> findAllByCourseNameContainsAndStatusIn(
             String name, Collection<Status> statusIn);
     Page<Course> findAllByCourseNameContainsAndStatusIn(
             String name, Collection<Status> statusIn, Pageable pageable);
+
+    List<Course> findAllByCourseNameContainsAndStatusNotIn(
+            String name, Collection<Status> statusNotIn);
+    Page<Course> findAllByCourseNameContainsAndStatusNotIn(
+            String name, Collection<Status> statusNotIn, Pageable pageable);
 
     /* Check duplicate */
     Boolean existsByCourseAliasAndStatusNotIn(

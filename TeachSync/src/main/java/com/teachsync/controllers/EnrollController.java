@@ -66,7 +66,6 @@ public class EnrollController {
             return "redirect:/course";
         }
 
-
         try {
             CourseReadDTO courseDTO =  courseService.getDTOById(
                     courseId,

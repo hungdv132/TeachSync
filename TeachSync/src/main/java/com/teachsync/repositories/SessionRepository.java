@@ -23,6 +23,8 @@ public interface SessionRepository extends JpaRepository<Session, Long> {
     List<Session> findAllByScheduleIdAndStatusNot(Long scheduleId, Status status);
     List<Session> findAllByScheduleIdAndSessionStartAfterAndSessionEndBeforeAndStatusNot(
             Long scheduleId, LocalDateTime from, LocalDateTime to, Status status);
+    List<Session> findAllByScheduleIdInAndSessionStartAfterAndSessionEndBeforeAndStatusNot(
+            Collection<Long> scheduleIdCollection, LocalDateTime from, LocalDateTime to, Status status);
     List<Session> findAllByScheduleIdAndSessionStartAfterAndStatusNot(
             Long scheduleId, LocalDateTime from, Status status);
     

@@ -104,6 +104,9 @@
             </select>
           </div>
 
+          <!-- Course ValidationMessage -->
+          <p id="txtCourseValidateMsg" class="col-12 visually-hidden mb-3"></p>
+
           <!-- Course Detail -->
           <!-- Course Price -->
           <p id="txtCoursePrice" class="col-4 mb-3">
@@ -114,10 +117,11 @@
             Giảm giá: <br/>
           </p>
           <!-- Course FinalPrice -->
-          <div id="txtCourseFinalPrice" class="col-4 visually-hidden mb-3">
+          <p id="txtCourseFinalPrice" class="col-4 visually-hidden mb-3">
             Giá cuối: <br/>
-          </div>
-
+          </p>
+          
+          
           <!-- Select Center -->
           <div class="col-12 mb-1">
             <label for="selCenter" class="form-label">Cơ sở:</label>
@@ -160,9 +164,13 @@
               </c:forEach>
             </select>
             <b class="ts-txt-orange visually-hidden" id="selClazz404">
-              Hiện không có lớp học nào trong khoảng Khóa học & Học kỳ & Cơ sở đã chọn
+              <br>
+              Hiện không có Lớp học nào cho Khóa học & Cơ sở đã chọn
             </b>
           </div>
+
+          <!-- Class ValidationMessage -->
+          <p id="txtClazzValidateMsg" class="col-12 visually-hidden mb-3"></p>
 
           <!-- Class Detail -->
           <!-- Class Schedule -->
@@ -230,6 +238,12 @@
 
 <!-- ================================================== Script ===================================================== -->
 <script>
+    var mess = `<c:out value="${mess}"/>`;
+    if (mess != '') {
+        alert(mess);
+    }
+</script>
+<script>
     function toggleRequestForm() {
         let requestType = $("#selRequestType").val();
 
@@ -288,8 +302,31 @@
                         $("#txtCourseDiscount").addClass("visually-hidden").empty();
                         $("#txtCourseFinalPrice").addClass("visually-hidden").empty();
                     }
+                    
+                    let txtCourseValidateMsg = $("#txtCourseValidateMsg");
+                    txtCourseValidateMsg.text("")
+                        .addClass("visually-hidden")
+                        .removeClass("text-warning text-danger");
+                    
+                    $.ajax({
+                        type: "GET",
+                        url: "/api/check-request/enroll?courseId=" + courseId,
+                        success: function (response) {
+                            let courseMsg = response['courseMsg'];
+                            
+                            if (response['error']) {
+                                txtCourseValidateMsg.text(courseMsg)
+                                    .addClass("text-danger")
+                                    .removeClass("visually-hidden");
+                            } else if (courseMsg != null) {
+                                txtCourseValidateMsg.text(courseMsg)
+                                    .addClass("text-warning")
+                                    .removeClass("visually-hidden");
+                            }
+                        }
+                    });
                 }
-            })
+            });
         }
     }
 
@@ -316,7 +353,7 @@
         let centerId = Number($("#selCenter").val());
 
         /* value = '0' khi là option mặc định '- Chọn ... -'. Tức là chưa có chọn */
-        if (courseId !== 0 && semesterId !== 0 && centerId !== 0) {
+        if (courseId !== 0 && centerId !== 0) {
             $.ajax({
                 type: "GET",
                 url: "/api/clazz?courseId=" + courseId + "&centerId=" + centerId,
@@ -371,13 +408,13 @@
                     let clazzDTO = response['clazz'];
 
                     $("#txtClazzSchedule").removeClass("visually-hidden").empty()
-                        .append("Lịch học: <br/> " + ((clazzDTO['clazzSchedule'])['scheduleCategory'])['scheduleName']);
+                        .append("Lịch học: <br/> " + ((clazzDTO['clazzSchedule'])['scheduleCategory'])['categoryName']);
 
                     $("#txtClazzStartDate").removeClass("visually-hidden").empty()
                         .append("Bắt đầu: <br/> " + (clazzDTO['clazzSchedule'])['startDate']);
 
                     $("#txtClazzEndDate").removeClass("visually-hidden").empty()
-                        .append("Kết thúc: <br/> " + (clazzDTO['clazzSchedule'])['startDate']);
+                        .append("Kết thúc: <br/> " + (clazzDTO['clazzSchedule'])['endDate']);
 
                     $("#txtClazzSlot").removeClass("visually-hidden").empty()
                         .append("Tiết học: <br/> Tiết " + (clazzDTO['clazzSchedule'])['slot']);
@@ -406,6 +443,30 @@
                         $("#submitSection").empty()
                             .append('<p class="ts-txt-orange ts-txt-italic">Lớp học này đã đầy, xin hãy thử lớp khác</p>');
                     }
+
+
+                    let txtClazzValidateMsg = $("#txtClazzValidateMsg");
+                    txtClazzValidateMsg.text("")
+                        .addClass("visually-hidden")
+                        .removeClass("text-warning text-danger");
+
+                    $.ajax({
+                        type: "GET",
+                        url: "/api/check-request/enroll?clazzId=" + clazzId,
+                        success: function (response) {
+                            let courseMsg = response['courseMsg'];
+
+                            if (response['error']) {
+                                txtClazzValidateMsg.text(courseMsg)
+                                    .addClass("text-danger")
+                                    .removeClass("visually-hidden");
+                            } else if (courseMsg != null) {
+                                txtClazzValidateMsg.text(courseMsg)
+                                    .addClass("text-warning")
+                                    .removeClass("visually-hidden");
+                            }
+                        }
+                    });
                 }
             })
         }
@@ -463,7 +524,7 @@
             .append('<fmt:formatDate value="${parsedEndDate}" type="date" pattern="dd/MM/yyyy"/>');
     
         $("#txtClazzSchedule").removeClass("visually-hidden")
-            .append("${clazzList.get(0).clazzSchedule.scheduleCategory.scheduleName}");
+            .append("${clazzList.get(0).clazzSchedule.scheduleCategory.categoryName}");
         
         $("#txtClazzSlot").removeClass("visually-hidden")
             .append("Tiết ${clazzList.get(0).clazzSchedule.slot}");

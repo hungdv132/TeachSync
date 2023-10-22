@@ -59,7 +59,7 @@
         });
     </script>
     <script>
-        var mess = '${mess}'
+        var mess = `${mess}`
         if (mess != '') {
             alert(mess);
         }

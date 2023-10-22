@@ -56,6 +56,8 @@ public class PaymentServiceImpl implements PaymentService {
     public Payment createPayment(Payment payment) throws Exception {
         RequestReadDTO requestDTO = requestService.getDTOById(
                 payment.getRequestId(),
+                List.of(DELETED),
+                false,
                 List.of(CLAZZ, COURSE_SEMESTER));
 
         /* Check FK */
@@ -188,7 +190,12 @@ public class PaymentServiceImpl implements PaymentService {
             }
 
             if (options.contains(REQUEST)) {
-                RequestReadDTO request = requestService.getDTOById(payment.getRequestId(), options);
+                RequestReadDTO request =
+                        requestService.getDTOById(
+                                payment.getRequestId(),
+                                List.of(DELETED),
+                                false,
+                                options);
                 dto.setRequest(request);
             }
         }
@@ -218,7 +225,12 @@ public class PaymentServiceImpl implements PaymentService {
             }
 
             if (options.contains(REQUEST)) {
-                requestIdRequestDTOMap = requestService.mapIdDTOByIdIn(requestIdSet, options);
+                requestIdRequestDTOMap =
+                        requestService.mapIdDTOByIdIn(
+                                requestIdSet,
+                                List.of(DELETED),
+                                false,
+                                options);
             }
         }
 

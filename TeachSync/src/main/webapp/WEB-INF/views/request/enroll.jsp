@@ -128,7 +128,7 @@
                       
                       <div class="card-header">
                         <h6 class="card-subtitle">
-                          Lớp: <c:out value="${request.clazzAlias.concat(' - ').concat(request.clazzName)}"/>
+                          Lớp: <c:out value="${request.clazzName}"/>
                         </h6>
                       </div>
   
@@ -149,7 +149,7 @@
                           Kết thúc: <fmt:formatDate value="${parsedEndDate}" type="date" pattern="dd/MM/yyyy"/><br/>
                           <br/>
                           
-                          Lịch học: <c:out value="${clazzSchedule.scheduleCategory.scheduleName}"/><br/>
+                          Lịch học: <c:out value="${clazzSchedule.scheduleCategory.categoryName}"/><br/>
                           
                           Tiết: <c:out value="${clazzSchedule.slot}"/><br/>
                           Từ: <c:out value="${clazzSchedule.sessionStart}"/>&nbsp;
