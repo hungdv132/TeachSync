@@ -104,7 +104,21 @@ public interface RequestService {
     Page<RequestReadDTO> getPageAllDTOByClazzId(
             Pageable pageable, Long clazzId,
             Collection<Status> statuses, boolean isStatusIn, Collection<DtoOption> options) throws Exception;
-    
+
+    List<Request> getAllByClazzIdAndRequestType(
+            Long clazzId, RequestType requestType,
+            Collection<Status> statuses, boolean isStatusIn) throws Exception;
+    List<RequestReadDTO> getAllDTOByClazzIdAndRequestType(
+            Long clazzId, RequestType requestType,
+            Collection<Status> statuses, boolean isStatusIn, Collection<DtoOption> options) throws Exception;
+
+    Page<Request> getPageAllByClazzIdAndRequestType(
+            Pageable pageable, Long clazzId, RequestType requestType,
+            Collection<Status> statuses, boolean isStatusIn) throws Exception;
+    Page<RequestReadDTO> getPageAllDTOByClazzIdAndRequestType(
+            Pageable pageable, Long clazzId, RequestType requestType,
+            Collection<Status> statuses, boolean isStatusIn, Collection<DtoOption> options) throws Exception;
+
     List<Request> getAllByClazzIdIn(
             Collection<Long> clazzIds,
             Collection<Status> statuses, boolean isStatusIn) throws Exception;

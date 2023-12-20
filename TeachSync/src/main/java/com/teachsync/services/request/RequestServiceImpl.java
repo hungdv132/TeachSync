@@ -480,13 +480,13 @@ public class RequestServiceImpl implements RequestService {
     public List<RequestReadDTO> getAllDTOByClazzId(
             Long clazzId,
             Collection<Status> statuses, boolean isStatusIn, Collection<DtoOption> options) throws Exception {
-        
-        List<Request> requestList = 
+
+        List<Request> requestList =
                 getAllByClazzId(clazzId, statuses, isStatusIn);
 
         return wrapListDTO(requestList, options);
     }
-    
+
     @Override
     public Page<Request> getPageAllByClazzId(
             Pageable pageable, Long clazzId,
@@ -522,8 +522,91 @@ public class RequestServiceImpl implements RequestService {
     public Page<RequestReadDTO> getPageAllDTOByClazzId(
             Pageable pageable, Long clazzId,
             Collection<Status> statuses, boolean isStatusIn, Collection<DtoOption> options) throws Exception {
-        Page<Request> requestPage = 
+        Page<Request> requestPage =
                 getPageAllByClazzId(pageable, clazzId, statuses, isStatusIn);
+
+        return wrapPageDTO(requestPage, options);
+    }
+
+    @Override
+    public List<Request> getAllByClazzIdAndRequestType(
+            Long clazzId, RequestType requestType,
+            Collection<Status> statuses, boolean isStatusIn) throws Exception {
+
+        List<Request> requestList;
+
+        if (isStatusIn) {
+            if (ObjectUtils.isEmpty(statuses)) { return null; }
+
+            requestList =
+                    requestRepository.findAllByClazzIdAndRequestTypeAndStatusIn(
+                            clazzId,
+                            requestType,
+                            statuses);
+        } else {
+            if (ObjectUtils.isEmpty(statuses)) { statuses = List.of(DELETED); }
+
+            requestList =
+                    requestRepository.findAllByClazzIdAndRequestTypeAndStatusNotIn(
+                            clazzId,
+                            requestType,
+                            statuses);
+        }
+
+        if (requestList.isEmpty()) { return null; }
+
+        return requestList;
+    }
+    @Override
+    public List<RequestReadDTO> getAllDTOByClazzIdAndRequestType(
+            Long clazzId, RequestType requestType,
+            Collection<Status> statuses, boolean isStatusIn, Collection<DtoOption> options) throws Exception {
+
+        List<Request> requestList =
+                getAllByClazzIdAndRequestType(clazzId, requestType, statuses, isStatusIn);
+
+        return wrapListDTO(requestList, options);
+    }
+
+    @Override
+    public Page<Request> getPageAllByClazzIdAndRequestType(
+            Pageable pageable, Long clazzId, RequestType requestType,
+            Collection<Status> statuses, boolean isStatusIn) throws Exception {
+
+        if (pageable == null) { pageable = miscUtil.defaultPaging(); }
+
+        Page<Request> requestPage;
+
+        if (isStatusIn) {
+            if (ObjectUtils.isEmpty(statuses)) { return null; }
+
+            requestPage =
+                    requestRepository.findAllByClazzIdAndRequestTypeAndStatusIn(
+                            clazzId,
+                            requestType,
+                            statuses,
+                            pageable);
+        } else {
+            if (ObjectUtils.isEmpty(statuses)) { statuses = List.of(DELETED); }
+
+            requestPage =
+                    requestRepository.findAllByClazzIdAndRequestTypeAndStatusNotIn(
+                            clazzId,
+                            requestType,
+                            statuses,
+                            pageable);
+        }
+
+        if (requestPage.isEmpty()) { return null; }
+
+        return requestPage;
+    }
+    @Override
+    public Page<RequestReadDTO> getPageAllDTOByClazzIdAndRequestType(
+            Pageable pageable, Long clazzId, RequestType requestType,
+            Collection<Status> statuses, boolean isStatusIn, Collection<DtoOption> options) throws Exception {
+        Page<Request> requestPage =
+                getPageAllByClazzIdAndRequestType(pageable, clazzId, requestType, statuses, isStatusIn);
 
         return wrapPageDTO(requestPage, options);
     }

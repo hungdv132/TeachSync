@@ -251,6 +251,17 @@ public class ClazzScheduleServiceImpl implements ClazzScheduleService {
         return clazzScheduleList;
     }
     @Override
+    public Map<Long, ClazzSchedule> mapClazzIdClazzScheduleByClazzIdIn(
+            Collection<Long> clazzIdCollection) throws Exception {
+        List<ClazzSchedule> clazzScheduleList = getAllByClazzIdIn(clazzIdCollection);
+
+        if (clazzScheduleList == null) {
+            return new HashMap<>(); }
+
+        return clazzScheduleList.stream()
+                .collect(Collectors.toMap(ClazzSchedule::getClazzId, Function.identity()));
+    }
+    @Override
     public List<ClazzScheduleReadDTO> getAllDTOByClazzIdIn(
             Collection<Long> clazzIdCollection, Collection<DtoOption> options) throws Exception {
         List<ClazzSchedule> clazzScheduleList = getAllByClazzIdIn(clazzIdCollection);
@@ -328,15 +339,15 @@ public class ClazzScheduleServiceImpl implements ClazzScheduleService {
         clazzSchedule.setCreatedBy(oldSchedule.getCreatedBy());
 
         /* Validate input */
-        if (!oldSchedule.getClazzId().equals(clazzSchedule.getClazzId())) {
-            throw new IllegalArgumentException("Update error. Schedule does not allow change of clazzId");
-        }
-        if (clazzSchedule.getSlot() < 1 || clazzSchedule.getSlot() > 9) {
-            throw new IllegalArgumentException("Update error. Slot must be from 1 to 9.");
-        }
-        if (clazzSchedule.getSessionStart().isAfter(clazzSchedule.getSessionEnd())) {
-            throw new IllegalArgumentException("Update error. Start cannot be after end.");
-        }
+//        if (!oldSchedule.getClazzId().equals(clazzSchedule.getClazzId())) {
+//            throw new IllegalArgumentException("Update error. Schedule does not allow change of clazzId");
+//        }
+//        if (clazzSchedule.getSlot() < 1 || clazzSchedule.getSlot() > 9) {
+//            throw new IllegalArgumentException("Update error. Slot must be from 1 to 9.");
+//        }
+//        if (clazzSchedule.getSessionStart().isAfter(clazzSchedule.getSessionEnd())) {
+//            throw new IllegalArgumentException("Update error. Start cannot be after end.");
+//        }
 
         /* Check FK */
         /* TODO: */
@@ -414,7 +425,12 @@ public class ClazzScheduleServiceImpl implements ClazzScheduleService {
         clazzScheduleRepository.saveAndFlush(schedule);
 
         try {
-            sessionService.deleteAllByScheduleId(schedule.getId());
+            List<Session> sessionList =
+                    sessionService.getAllByScheduleId(schedule.getId());
+
+            if (!ObjectUtils.isEmpty(sessionList)) {
+                sessionService.deleteAllByScheduleId(schedule.getId());
+            }
         } catch (IllegalArgumentException iAE) {
             /* Revert delete */
             schedule.setStatus(oldStatus);

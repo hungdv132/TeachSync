@@ -33,6 +33,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -766,7 +767,13 @@ public class TestController {
     }
 
     @GetMapping("/updateStatusTest")
-    public String updateStatusTest(Model model,@RequestParam Long status, @RequestParam Long idClazz, @RequestParam Long idTest) {
+    public String updateStatusTest(
+            RedirectAttributes redirect,
+            Model model,
+            @RequestParam Long status,
+            @RequestParam Long idClazz,
+            @RequestParam Long idTest,
+            @SessionAttribute(value = "user", required = false) UserReadDTO userDTO) {
         if (status == 0) {
             ClazzTest clazzTest = new ClazzTest();
             clazzTest.setClazzId(idClazz);
@@ -779,6 +786,6 @@ public class TestController {
             clazzTest.setOpenTo(LocalDateTime.now());
             clazzTestRepository.save(clazzTest);
         }
-        return clazzController.clazzDetailPage(model, idClazz);
+        return clazzController.clazzDetailPage(redirect, model, idClazz, userDTO);
     }
 }

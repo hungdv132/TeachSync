@@ -26,10 +26,12 @@ import com.teachsync.services.course.CourseService;
 import com.teachsync.services.courseSemester.CourseSemesterService;
 import com.teachsync.services.homework.HomeworkService;
 import com.teachsync.services.news.NewsService;
+import com.teachsync.services.request.RequestService;
 import com.teachsync.services.semester.SemesterService;
 import com.teachsync.services.staff.StaffService;
 import com.teachsync.utils.Constants;
 import com.teachsync.utils.MiscUtil;
+import com.teachsync.utils.enums.RequestType;
 import com.teachsync.utils.enums.Status;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +49,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.teachsync.utils.Constants.ROLE_ADMIN;
+import static com.teachsync.utils.Constants.*;
 import static com.teachsync.utils.enums.DtoOption.*;
 import static com.teachsync.utils.enums.Status.*;
 
@@ -60,6 +62,8 @@ public class ClazzController {
     private ClazzMemberService clazzMemberService;
     @Autowired
     private ClazzScheduleService clazzScheduleService;
+    @Autowired
+    private RequestService requestService;
     @Autowired
     private CourseService courseService;
     @Autowired
@@ -134,6 +138,123 @@ public class ClazzController {
         return response;
     }
 
+    @GetMapping("/api/check-clazz/status")
+    @ResponseBody
+    public Map<String, Object> checkClazzStatus(
+            @RequestParam("clazzId") Long clazzId,
+            @RequestParam("status") Status newStatus,
+            @SessionAttribute("user") UserReadDTO userDTO) {
+
+        Map<String, Object> response = new HashMap<>();
+
+        try {
+            boolean error = false;
+            String showBtn = null;
+            Long userId = userDTO.getId();
+            String message = null;
+
+            ClazzReadDTO clazzDTO =
+                    clazzService.getDTOById(
+                            clazzId,
+                            List.of(DELETED),
+                            false,
+                            List.of(CLAZZ_SCHEDULE));
+            if (clazzDTO == null) {
+                /* No valid Clazz found */
+                error = true;
+                message = "Lỗi kiểm tra. Không tìm thấy Lớp Học nào với id: " + clazzId;
+            } else {
+                Status oldStatus = clazzDTO.getStatus();
+
+                switch (oldStatus) {
+                    case DESIGNING -> {
+                        if (newStatus.equals(AWAIT_REVIEW)) {
+                            if (clazzDTO.getClazzSchedule() == null) {
+                                error = true;
+                                message = "Lớp Học đang thiếu Lịch Học để hoàn thành thiết kế";
+                                showBtn = "addSchedule";
+                            }
+                        }
+                    }
+
+                    case OPENED -> {
+                        if (newStatus.equals(CLOSED)) {
+                            List<Request> pendingRequestList =
+                                    requestService.getAllByClazzIdAndRequestType(
+                                            clazzId,
+                                            RequestType.ENROLL,
+                                            List.of(PENDING_PAYMENT, AWAIT_CONFIRM),
+                                            true);
+
+                            List<ClazzMember> memberList = clazzMemberService.getAllByClazzId(clazzId);
+
+                            if (memberList.size() < clazzDTO.getMinCapacity()) {
+                                LocalDate date = LocalDate.now();
+                                date = date.minusDays(5);
+                                /* 5 day before now */
+
+                                /* If Clazz only have 5 day till Start */
+                                if (!clazzDTO.getClazzSchedule().getStartDate().isBefore(date)) {
+                                    if (!ObjectUtils.isEmpty(memberList)
+                                            || !ObjectUtils.isEmpty(pendingRequestList)) {
+                                        error = true;
+                                        showBtn = "rejectRequest";
+                                        message = "Lớp Học đang thiếu so với số tối thiểu để mở lớp. Xác nhận đóng Lớp?";
+                                    } else {
+                                        message = "Hiện Lớp chưa có thành viên hay đơn xin nhập học. Xác nhận đóng Lớp?";
+                                    }
+                                }
+                            } else {
+                                if (!ObjectUtils.isEmpty(memberList)) {
+                                    error = true;
+                                    showBtn = "rejectRequest";
+                                    message = "Xác nhận đóng Lớp?";
+                                } else if (!ObjectUtils.isEmpty(pendingRequestList)) {
+                                    error = true;
+                                    showBtn = "rejectRequest";
+                                    message = "Xác nhận đóng Lớp?";
+                                } else {
+                                    message = "Hiện Lớp không có thành viên hay đơn xin nhập học. Xác nhận đóng Lớp?";
+                                }
+                            }
+                        }
+                    }
+
+                    case ONGOING -> {
+                        switch (newStatus) {
+                            case SUSPENDED -> {
+                                message = "Xác nhận tạm ngưng Lớp?";
+                            }
+
+                            case CLOSED -> {
+                                LocalDate date = LocalDate.now();
+                                if (clazzDTO.getClazzSchedule().getEndDate().isAfter(date)) {
+                                    message = "Xác nhận đóng Lớp?";
+                                } else {
+                                    error = true;
+                                    message = "Hiện Lớp chưa đến ngày kết thúc. Chưa thể đóng Lớp.";
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            response.put("error", error);
+            response.put("message", message);
+            response.put("showBtn", showBtn);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            response.put("errorMsg", e.getMessage());
+
+            response.put("error", true);
+        }
+
+        return response;
+    }
+
     /* TODO: move to StaffController */
     @GetMapping("/api/staff")
     @ResponseBody
@@ -201,9 +322,9 @@ public class ClazzController {
 
     @PostMapping("/add-clazz")
     public String addClazz(
+            RedirectAttributes redirect,
             @ModelAttribute ClazzCreateDTO createDTO,
-            @SessionAttribute(value = "user", required = false) UserReadDTO userDTO,
-            RedirectAttributes redirect) throws Exception {
+            @SessionAttribute(value = "user", required = false) UserReadDTO userDTO) throws Exception {
 
         //check login
         if (ObjectUtils.isEmpty(userDTO)) {
@@ -311,22 +432,29 @@ public class ClazzController {
             e.printStackTrace();
         }
 
-        //map option status
-//        Map<String, String> statusLabelMap = new HashMap<>();
-//        statusLabelMap.put("CREATED_CLAZZ", "Đang khởi tạo");
-//        statusLabelMap.put("DEPLOY_CLAZZ", "Đang triển khai");
-//        statusLabelMap.put("NOT_ENOUGH_CLAZZ", "Không đủ xếp lớp");
-//        statusLabelMap.put("FINISH_CLAZZ", "Đã hoàn thành");
-//        model.addAttribute("statusLabelMap", statusLabelMap);
-
         model.addAttribute("mess", mess);
         return "clazz/list-clazz";
     }
 
     @GetMapping("/clazz-detail")
     public String clazzDetailPage(
+            RedirectAttributes redirect,
             Model model,
-            @RequestParam(value = "id", required = false) Long clazzId) {
+            @RequestParam(value = "id", required = false) Long clazzId,
+            @SessionAttribute(value = "user", required = false) UserReadDTO userDTO) {
+
+        //check login
+        if (ObjectUtils.isEmpty(userDTO)) {
+            redirect.addFlashAttribute("mess", "Làm ơn đăng nhập");
+            return "redirect:/index";
+        }
+
+        Long roleId = userDTO.getRoleId();
+        if (!List.of(ROLE_ADMIN, ROLE_TEACHER, ROLE_STUDENT).contains(roleId)) {
+            redirect.addFlashAttribute("mess", "bạn không đủ quyền");
+            return "redirect:/index";
+        }
+
         try {
             ClazzReadDTO clazzDTO =
                     clazzService.getDTOById(
@@ -336,74 +464,37 @@ public class ClazzController {
                             List.of(STAFF, USER, COURSE_NAME,
                                     COURSE_ALIAS, CENTER, TEST_LIST,
                                     CLAZZ_SCHEDULE, SCHEDULE_CAT));
+            if (clazzDTO == null) {
+                redirect.addFlashAttribute("mess",
+                        "Không tìm thấy bất cứ Lớp nào với id: " + clazzId);
+
+                return "redirect:/clazz";
+            }
+            model.addAttribute("clazz", clazzDTO);
+
+            if (roleId.equals(ROLE_STUDENT)) {
+                ClazzMember member =
+                        clazzMemberService.getByClazzIdAndUserId(clazzId, userDTO.getId());
+
+                if (member == null) {
+                    redirect.addFlashAttribute("mess",
+                            "Bạn không phải là học sinh của Lớp này nên không được quyền xem thông tin của Lớp.");
+
+                    return "redirect:/clazz";
+                }
+            }
+
             //get news of class
 //            List<NewsReadDTO> newsReadDTOList = newsService.getAllNewsByClazz(clazzDTO.getId());
 
-            //get homework of class
 
-            //get score of class
-            List<HomeworkReadDTO> homeworkReadDTOList = homeworkService.getAllByClazzId(clazzDTO.getId());
-
-            /* get course */
-//            CourseReadDTO courseReadDTO = courseService.getDTOById(
-//                    clazzDTO.getCourseId(),
-//                    List.of(DELETED),
-//                    false,
-//                    List.of(MATERIAL_LIST));
-
-//            for (ClazzTestReadDTO clT : clazzDTO.getTestList()) {
-//                Test test = testRepository.findById(clT.getTestId()).orElse(null);
-//                TestReadDTO testReadDTO = new TestReadDTO();
-//                testReadDTO.setTestType(test.getTestType());
-//                testReadDTO.setQuestionType(test.getQuestionType());
-//                testReadDTO.setId(test.getId());
-//                clT.setTest(testReadDTO);
-//                if (clT.getOpenFrom().compareTo(LocalDateTime.now()) < 0 && clT.getOpenTo() == null) {
-//                    clT.setInTime("Đang mở");
-//                } else if (clT.getOpenTo() != null && clT.getOpenTo().compareTo(LocalDateTime.now()) < 0) {
-//                    clT.setInTime("Đã kết thúc");
-//                }
-//            }
-//
-//            List<Test> lstTestTeacher =
-//                    testRepository.findAllByCourseIdAndStatusNot(clazzDTO.getCourseId(), Status.DELETED);
-//
-//            for (Test t : lstTestTeacher) {
-//                ClazzTest clazzTest =
-//                        clazzTestRepository
-//                                .findByClazzIdAndTestIdAndStatusNot(
-//                                        clazzId,
-//                                        t.getId(),
-//                                        Status.DELETED)
-//                                .orElse(null);
-//
-//                if (clazzTest == null) {
-//                    t.setStatusTeacherTest(0);
-//                } else if (clazzTest != null && clazzTest.getOpenTo() == null) {
-//                    t.setStatusTeacherTest(1);
-//                } else {
-//                    t.setStatusTeacherTest(2);
-//                }
-//            }
-
-            /* FIl model */
-//            model.addAttribute("homeworkList", homeworkReadDTOList);
-//            model.addAttribute("newsList", newsReadDTOList);
-            model.addAttribute("clazz", clazzDTO);
-//            model.addAttribute("lstTestTeacher", lstTestTeacher);
-//            model.addAttribute("material", courseReadDTO.getMaterialList());
         } catch (Exception e) {
             e.printStackTrace();
+
+            redirect.addFlashAttribute("mess", e.getMessage());
+
+            return "redirect:/index";
         }
-
-        //map option status
-//        Map<String, String> statusLabelMap = new HashMap<>();
-//        statusLabelMap.put("CREATED_CLAZZ", "Đang khởi tạo");
-//        statusLabelMap.put("DEPLOY_CLAZZ", "Đang triển khai");
-//        statusLabelMap.put("NOT_ENOUGH_CLAZZ", "Không đủ xếp lớp");
-//        statusLabelMap.put("FINISH_CLAZZ", "Đã hoàn thành");
-//        model.addAttribute("statusLabelMap", statusLabelMap);
-
 
         return "clazz/clazz-detail";
     }
@@ -512,7 +603,8 @@ public class ClazzController {
             @SessionAttribute(value = "user", required = false) UserReadDTO userDTO,
             HttpServletRequest request,
             Model model,
-            RedirectAttributes redirect) throws Exception {
+            RedirectAttributes redirect,
+            @RequestParam("id") Long clazzId){
         //check login
         if (ObjectUtils.isEmpty(userDTO)) {
             redirect.addFlashAttribute("mess", "Làm ơn đăng nhập");
@@ -523,39 +615,31 @@ public class ClazzController {
             redirect.addFlashAttribute("mess", "bạn không đủ quyền");
             return "redirect:/";
         }
-        Long Id = Long.parseLong(request.getParameter("id"));
 
-        if (Objects.nonNull(Id)) {
-            ClazzReadDTO clazzReadDTO =
-                    clazzService.getDTOById(
-                            Id,
-                            List.of(DELETED),
-                            false,
-                            List.of(COURSE_SEMESTER, STAFF, USER));
-
-            model.addAttribute("clazz", clazzReadDTO);
-            if (clazzReadDTO.getStatus().equals(OPENED)) {
-                redirect.addFlashAttribute("mess", "Lớp học đang triển khai không thể thao tác");
-                return "redirect:/clazz";
+        try {
+            if (clazzService.deleteClazz(clazzId)) {
+                redirect.addFlashAttribute("mess", "Xóa Lớp Học thành công.");
+            } else {
+                redirect.addFlashAttribute("mess", "Xóa Lớp Học thất bại");
             }
 
-        }
-
-
-        if (clazzService.deleteClazz(Id)) {
-            redirect.addFlashAttribute("mess", "Xóa class room thành công");
             return "redirect:/clazz";
-        } else {
-            model.addAttribute("mess", "Xóa class room thất bại");
-            return "clazz/add-clazz";
+
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            redirect.addFlashAttribute("mess", e.getMessage());
+
+            return "redirect:/clazz";
         }
     }
 
 
     @PostMapping("/finish-class")
-    public String finishClass(Model model,
-                              @RequestParam(value = "id", required = false) Long clazzId,
-                              @RequestParam(value = "courseId", required = false) Long courseId) throws Exception {
+    public String finishClass(
+            Model model,
+            @RequestParam(value = "id", required = false) Long clazzId,
+            @RequestParam(value = "courseId", required = false) Long courseId) throws Exception {
         List<ClazzMember> clazzMemberList = clazzMemberService.getAllByClazzId(clazzId);
         for (ClazzMember clazzMember : clazzMemberList) {
             List<Test> listTest = testRepository.findAllByCourseIdAndStatusNot(courseId, Status.DELETED);

@@ -40,7 +40,10 @@ public interface ClazzScheduleService {
     ClazzSchedule getByClazzId(Long clazzId) throws Exception;
     ClazzScheduleReadDTO getDTOByClazzId(Long clazzId, Collection<DtoOption> options) throws Exception;
 
-    List<ClazzSchedule> getAllByClazzIdIn(Collection<Long> clazzIdCollection) throws Exception;
+    List<ClazzSchedule> getAllByClazzIdIn(
+            Collection<Long> clazzIdCollection) throws Exception;
+    Map<Long, ClazzSchedule> mapClazzIdClazzScheduleByClazzIdIn(
+            Collection<Long> clazzIdCollection) throws Exception;
     List<ClazzScheduleReadDTO> getAllDTOByClazzIdIn(
             Collection<Long> clazzIdCollection, Collection<DtoOption> options) throws Exception;
     Map<Long, ClazzScheduleReadDTO> mapClazzIdDTOByClazzIdIn(

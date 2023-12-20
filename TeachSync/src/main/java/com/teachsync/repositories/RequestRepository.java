@@ -68,6 +68,10 @@ public interface RequestRepository extends JpaRepository<Request, Long> {
             Long clazzId, Collection<Status> statusIn);
     Page<Request> findAllByClazzIdAndStatusIn(
             Long clazzId, Collection<Status> statusIn, Pageable paging);
+    List<Request> findAllByClazzIdAndRequestTypeAndStatusIn(
+            Long clazzId, RequestType requestType, Collection<Status> statusIn);
+    Page<Request> findAllByClazzIdAndRequestTypeAndStatusIn(
+            Long clazzId, RequestType requestType, Collection<Status> statusIn, Pageable paging);
     List<Request> findAllByClazzIdInAndStatusIn(
             Collection<Long> clazzIdCollection, Collection<Status> statusIn);
     Page<Request> findAllByClazzIdInAndStatusIn(
@@ -77,6 +81,10 @@ public interface RequestRepository extends JpaRepository<Request, Long> {
             Long clazzId, Collection<Status> statusNotIn);
     Page<Request> findAllByClazzIdAndStatusNotIn(
             Long clazzId, Collection<Status> statusNotIn, Pageable paging);
+    List<Request> findAllByClazzIdAndRequestTypeAndStatusNotIn(
+            Long clazzId, RequestType requestType, Collection<Status> statusNotIn);
+    Page<Request> findAllByClazzIdAndRequestTypeAndStatusNotIn(
+            Long clazzId, RequestType requestType, Collection<Status> statusNotIn, Pageable paging);
     List<Request> findAllByClazzIdInAndStatusNotIn(
             Collection<Long> clazzIdCollection, Collection<Status> statusNotIn);
     Page<Request> findAllByClazzIdInAndStatusNotIn(

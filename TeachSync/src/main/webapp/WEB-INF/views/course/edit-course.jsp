@@ -105,6 +105,14 @@
             </select>
             
             <p id="pStatusDesc" class="text-danger ts-txt-bold visually-hidden"></p>
+            
+            <c:if test="${course.status eq Status.DESIGNING}">
+              <a id="aBtnDeleteCourse"
+                 href="/delete-course?id=${course.id}"
+                 class="btn btn-danger">
+                Xóa khóa học
+              </a>
+            </c:if>
           </div>
         </div>
         
@@ -375,9 +383,11 @@
             disableAllFormElementIn("divCourseTextDetail");
             disableAllFormElementIn("divCourseNumberDetail");
             disableAllFormElementIn("divCoursePrice");
+            hideById("aBtnDeleteCourse");
 
             pStatusDesc.text("Khi chuyển đổi trạng thái không được phép sửa đổi các thông tin khác.")
-                .removeClass("visually-hidden");
+                .addClass("text-danger")
+                .removeClass("visually-hidden text-warning");
             
             switch (initialStatus) {
                 case '${Status.DESIGNING}':
@@ -422,6 +432,39 @@
                             break;
                     }
                     break;
+
+                case '${Status.OPENED}':
+                    switch (status) {
+                        case '${Status.CLOSED}':
+                            $.ajax({
+                                type: "GET",
+                                url: "/api/check-course/status?courseId=" + ${course.id} + "&status=" + status,
+                                success: function (response) {
+                                    let message = response['message'];
+
+                                    if (response['error']) {
+                                        pStatusDesc.append("<br>")
+                                            .append(message)
+                                            .addClass("text-danger")
+                                            .removeClass("visually-hidden text-warning");
+                                    } else if (courseMsg != null) {
+                                        pStatusDesc.append("<br>")
+                                            .append(message)
+                                            .addClass("text-warning")
+                                            .removeClass("visually-hidden text-danger");
+                                    }
+                                }
+                            });
+                            break;
+                        default:
+                            /* Where did you get this status from? */
+                            disableAllFormElementIn("divCourseImg");
+                            disableAllFormElementIn("divCourseTextDetail");
+                            disableAllFormElementIn("divCourseNumberDetail");
+                            disableAllFormElementIn("divCoursePrice");
+                            break;
+                    }
+                    break;
             }
         } else {
             /* No change Status */
@@ -432,6 +475,7 @@
                     enableAllFormElementIn("divCourseTextDetail");
                     enableAllFormElementIn("divCourseNumberDetail");
                     enableAllFormElementIn("divCoursePrice");
+                    showById("aBtnDeleteCourse");
                     togglePromotion();
                     break;
                 case "${Status.AWAIT_REVIEW}":

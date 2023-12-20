@@ -25,7 +25,7 @@
 <div class="row ts-bg-white border ts-border-teal rounded-3 pt-3 mx-2 mb-3">
   <c:if test="${isAdmin}">
     <a href="/add-clazz">
-      <button type="button" class="btn btn-primary">Thêm mới class</button>
+      <button type="button" class="btn btn-primary">Thêm Lớp học</button>
     </a>
   </c:if>
   <table class="table">
@@ -65,19 +65,19 @@
         id="formNavTable" class="d-flex align-items-center mb-3">
     <input type="hidden" id="txtPageNo" name="pageNo" value="${pageNo}">
     
-    <button type="button" class="btn btn-secondary" onclick="toPage(0)">
+    <button id="btnFirst" type="button" class="btn btn-secondary" onclick="toPage(0)">
       <i class="bi-chevron-bar-left"></i>
     </button>
-    <button type="button" class="btn btn-secondary mx-2" onclick="toPage(${pageNo - 1})">
+    <button id="btnPrev" type="button" class="btn btn-secondary mx-2" onclick="toPage(${pageNo - 1})">
       <i class="bi-chevron-left"></i>
     </button>
     
     Trang: <c:out value="${not empty pageNo ? pageNo + 1 : 1}"/> &sol; <c:out value="${not empty pageTotal ? pageTotal : 1}"/>
     
-    <button type="button" class="btn btn-secondary mx-2" onclick="toPage(${pageNo + 1})">
+    <button id="btnNext" type="button" class="btn btn-secondary mx-2" onclick="toPage(${pageNo + 1})">
       <i class="bi-chevron-right"></i>
     </button>
-    <button type="button" class="btn btn-secondary" onclick="toPage(${pageTotal-1})">
+    <button id="btnLast" type="button" class="btn btn-secondary" onclick="toPage(${pageTotal-1})">
       <i class="bi-chevron-bar-right"></i>
     </button>
   </form>
@@ -108,6 +108,23 @@
     var mess = `${mess}`
     if (mess != '') {
         alert(mess);
+    }
+
+
+    let pageNo = ${not empty pageNo ? pageNo + 1 : 1};
+    let pageTotal = ${not empty pageTotal ? pageTotal : 1};
+
+    if (pageNo === 1) {
+        disableById("btnFirst");
+        disableById("btnPrev");
+    }
+    if (pageTotal === 1) {
+        disableById("btnNext");
+        disableById("btnLast");
+    }
+    if (pageNo === pageTotal) {
+        disableById("btnNext");
+        disableById("btnLast");
     }
 </script>
 </html>

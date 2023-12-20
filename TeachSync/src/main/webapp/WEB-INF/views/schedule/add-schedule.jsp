@@ -36,7 +36,7 @@
             <i class="bi-house-door"></i>&nbsp;Trang chủ
           </a>
         </li>
-        <li class="breadcrumb-item active" aria-current="page">
+        <li class="breadcrumb-item">
           <a href="/schedule-clazz">
             QL Lịch Học
           </a>
@@ -53,30 +53,46 @@
   <!-- Content -->
   <div class="col-12 ts-bg-white border-top border-bottom ts-border-teal pt-3 px-5 mb-3">
     <%--@elvariable id="createDTO" type="com.teachsync.dtos.clazzSchedule.ClazzScheduleCreateDTO"--%>
-    <form:form modelAttribute="createDTO" action="/add-schedule" method="post" class="row">
+    <form:form id="form"
+               modelAttribute="createDTO" action="/add-schedule" method="post"
+               class="row">
       <input type="hidden" name="clazzId" value="${clazz.id}">
-      <input type="hidden" id="txtStaffId" name="staffId" value="${clazz.staffId}">
+      <input type="hidden" id="hidStaffId" name="staffId" value="${clazz.staffId}">
       <input type="hidden" name="scheduleType" value="${ScheduleType.SCHEDULE}">
   
       <h5>Lịch học</h5>
       
-      <div class="col-sm-6 col-md-4 mb-3">
-        <label class="form-label">Tên lớp</label>
-        <input type="text" class="form-control" name="clazzName" value="${clazz.clazzName}" disabled readonly>
+      <div class="col-12 mb-3">
+        <label class="form-label">Tên lớp:</label>
+        <input type="text" value="${clazz.clazzName}"
+               class="form-control ts-border-grey"
+               disabled="disabled" readonly="readonly">
       </div>
     
       <div class="col-sm-6 col-md-4 mb-3">
-        <label class="form-label" for="selRoomId">Phòng học</label>
-        <select class="form-select" id="selRoomId" name="roomId" onchange="checkSchedule()">
+        <label for="selRoomId" class="form-label">Phòng học:</label>
+        <select id="selRoomId" name="roomId"
+                class="form-select ts-border-grey"
+                onchange="checkSchedule()">
           <c:forEach items="${roomList}" var="room">
             <option value="${room.id}">${room.roomName}</option>
           </c:forEach>
         </select>
       </div>
+      
+<%--      <div class="col-sm-6 col-md-4 mb-3">--%>
+<%--        <p>--%>
+<%--          Số ghế của phòng: <span></span>--%>
+<%--          <br> --%>
+<%--          Số học sinh tối đa của lớp:<span></span>--%>
+<%--        </p>--%>
+<%--      </div>--%>
     
       <div class="col-sm-6 col-md-4 mb-3">
-        <label class="form-label" for="selSlot">Tiết</label>
-        <select class="form-select" id="selSlot" name="slot" onchange="checkSchedule()">
+        <label for="selSlot" class="form-label">Tiết:</label>
+        <select id="selSlot" name="slot"
+                class="form-select ts-border-grey"
+                onchange="checkSchedule()">
           <option value="${Slot._1.slot}">${Slot._1.slot} (${Slot._1.start} - ${Slot._1.end})</option>
           <option value="${Slot._2.slot}">${Slot._2.slot} (${Slot._2.start} - ${Slot._2.end})</option>
           <option value="${Slot._3.slot}">${Slot._3.slot} (${Slot._3.start} - ${Slot._3.end})</option>
@@ -89,8 +105,10 @@
       </div>
     
       <div class="col-sm-6 col-md-4 mb-3">
-        <label class="form-label" for="selScheduleCaId">Lịch học</label>
-        <select class="form-select" id="selScheduleCaId" name="scheduleCategoryId" onchange="checkSchedule()">
+        <label for="selScheduleCaId" class="form-label">Lịch học:</label>
+        <select id="selScheduleCaId" name="scheduleCategoryId"
+                class="form-select ts-border-grey"
+                onchange="checkSchedule()">
           <c:forEach items="${scheduleCateList}" var="scheduleCate">
             <option value="${scheduleCate.id}">${scheduleCate.categoryName}</option>
           </c:forEach>
@@ -98,20 +116,26 @@
       </div>
     
       <div class="col-sm-6 col-md-4 mb-3">
-        <label class="form-label" for="dateStart">Thời gian bắt đầu</label>
-        <input type="date" class="form-control" min="" max=""
-               id="dateStart" name="startDate" value="" onchange="checkSchedule()" required>
+        <label for="dateStart" class="form-label">Thời gian bắt đầu:</label>
+        <input id="dateStart" name="startDate"
+               type="date" min="" max="" value=""
+               class="form-control"
+               onchange="checkSchedule()"
+               required="required">
       </div>
     
       <div class="col-sm-6 col-md-4 mb-3">
-        <label class="form-label" for="dateEnd">Thời gian kết thúc</label>
-        <input type="date" class="form-control" min="" max=""
-               id="dateEnd" name="endDate" value="" onchange="checkSchedule()" required>
+        <label for="dateEnd" class="form-label">Thời gian kết thúc:</label>
+        <input id="dateEnd" name="endDate"
+               type="date" min="" max="" value=""
+               class="form-control"
+               onchange="checkSchedule()"
+               required>
       </div>
   
       <div class="col-12 mb-3">
         <p id="txtConflict" class="visually-hidden">
-          Đã có lớp sử dụng phòng và tiết và lịch học này trong cùng khoảng thời gian học
+          Đã có Lớp sử dụng phòng và tiết và lịch học này trong cùng khoảng thời gian học
         </p>
       </div>
       
@@ -137,7 +161,11 @@
       </div>
       
       <div class="col-12 text-center mb-3">
-        <button type="submit" id="btnSubmit" class="btn btn-primary w-50 visually-hidden">Xác nhận</button>
+        <button id="btnSubmit"
+                type="submit"
+                class="btn btn-primary w-50 visually-hidden">
+          Xác nhận
+        </button>
       </div>
     </form:form>
   </div>
@@ -153,14 +181,29 @@
 
 <!-- ================================================== Script ===================================================== -->
 <script>
-    var mess = `${mess}`
+    var mess = `<c:out value="${mess}"/>`
     if (mess != '') {
         alert(mess);
     }
-    
-    
+</script>
+
+<script>
     const numSessionTotal = ${clazz.course.numSession};
     let numSession = 0;
+
+    let now = new Date();
+    now.setDate(now.getDate() + 5); /* Add 5 day */
+    let month = (now.getMonth() + 1).toString().padStart(2, '0');
+    let day = now.getDate().toString().padStart(2, '0');
+    let date = now.getFullYear() + '-' + month + '-' + day;
+
+    $("#dateStart").attr("min", date);
+    
+    now.setDate(now.getDate() + numSessionTotal); /* Add numSessionTotal day */
+    month = (now.getMonth() + 1).toString().padStart(2, '0');
+    day = now.getDate().toString().padStart(2, '0');
+    date = now.getFullYear() + '-' + month + '-' + day;
+    $("#dateEnd").attr("min", date);
 
     function checkSessionNum() {
         let chkArray = $('#tbodySession input[type="checkbox"]:checked');
@@ -217,7 +260,7 @@
         
         let tbodySession = $("#tbodySession");
         tbodySession.empty();
-        let staffId = $("#txtStaffId").val();
+        let staffId = $("#hidStaffId").val();
         let roomId = $("#selRoomId").val();
         let startDate = $("#dateStart").val();
         let endDate = $("#dateEnd").val();

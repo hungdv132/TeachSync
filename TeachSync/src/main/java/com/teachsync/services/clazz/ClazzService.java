@@ -9,6 +9,7 @@ import com.teachsync.utils.enums.Status;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -170,13 +171,13 @@ public interface ClazzService {
             Collection<Status> statuses, boolean isStatusIn, Collection<DtoOption> options) throws Exception;
 
     List<Clazz> getAllByCourseIdAndCenterIdIn(
-            Long courseId, Collection<Long> centerIds, 
+            Long courseId, Collection<Long> centerIds,
             Collection<Status> statuses, boolean isStatusIn) throws Exception;
     List<ClazzReadDTO> getAllDTOByCourseIdAndCenterIdIn(
-            Long courseId, Collection<Long> centerIds, 
+            Long courseId, Collection<Long> centerIds,
             Collection<Status> statuses, boolean isStatusIn, Collection<DtoOption> options) throws Exception;
     Map<Long, List<ClazzReadDTO>> mapCenterIdListDTOByCourseIdAndCenterIdIn(
-            Long courseId, Collection<Long> centerIds, 
+            Long courseId, Collection<Long> centerIds,
             Collection<Status> statuses, boolean isStatusIn, Collection<DtoOption> options) throws Exception;
 
     Page<Clazz> getPageAllByCourseIdAndCenterIdIn(
@@ -184,6 +185,13 @@ public interface ClazzService {
             Collection<Status> statuses, boolean isStatusIn) throws Exception;
     Page<ClazzReadDTO> getPageAllDTOByCourseIdAndCenterIdIn(
             Pageable paging, Long courseId, Collection<Long> centerIds, 
+            Collection<Status> statuses, boolean isStatusIn, Collection<DtoOption> options) throws Exception;
+
+    List<ClazzReadDTO> getAllDTOByCourseIdAndCenterIdInAfter(
+            Long courseId, Collection<Long> centerIds, LocalDate afterDate,
+            Collection<Status> statuses, boolean isStatusIn, Collection<DtoOption> options) throws Exception;
+    Map<Long, List<ClazzReadDTO>> mapCenterIdListDTOByCourseIdAndCenterIdInAfter(
+            Long courseId, Collection<Long> centerIds, LocalDate afterDate,
             Collection<Status> statuses, boolean isStatusIn, Collection<DtoOption> options) throws Exception;
 
     List<Clazz> getAllByCourseIdInAndCenterIdIn(

@@ -90,9 +90,10 @@ public class EnrollController {
             }
 
             Map<Long, List<ClazzReadDTO>> centerIdClazzDTOListMap =
-                    clazzService.mapCenterIdListDTOByCourseIdAndCenterIdIn(
+                    clazzService.mapCenterIdListDTOByCourseIdAndCenterIdInAfter(
                             courseId,
                             centerIdSet,
+                            LocalDate.now().plusDays(1),
                             List.of(Status.OPENED),
                             true,
                             List.of(CLAZZ_SCHEDULE, SCHEDULE_CAT, MEMBER_LIST, ROOM_NAME));

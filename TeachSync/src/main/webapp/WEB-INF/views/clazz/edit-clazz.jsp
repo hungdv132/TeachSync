@@ -78,9 +78,21 @@
         <p id="pStatusDesc" class="text-danger ts-txt-bold visually-hidden"></p>
         <a id="aBtnAddSchedule"
            href="/add-schedule?id=${clazz.id}"
-           class="btn btn-warning visually-hidden">
+           class="btn btn-success visually-hidden">
           Thêm Lịch Học
         </a>
+<%--        <a id="aBtnRejectRequest"--%>
+<%--           href="/reject-request?clazzId=${clazz.id}"--%>
+<%--           class="btn btn-danger visually-hidden">--%>
+<%--          Hủy đơn xin học--%>
+<%--        </a>--%>
+        <c:if test="${clazz.status eq Status.DESIGNING}">
+          <a id="aBtnDeleteClazz"
+             href="/delete-clazz?id=${clazz.id}"
+             class="btn btn-danger">
+            Xóa Lớp Học
+          </a>
+        </c:if>
       </div>
   
       <div class="col-12">
@@ -250,9 +262,11 @@
             disableAllFormElementIn("divClazzTextDetail");
             disableAllFormElementIn("divClazzFkId");
             disableAllFormElementIn("divClazzNumberDetail");
+            hideById("aBtnDeleteClazz");
 
             pStatusDesc.text("Khi chuyển đổi trạng thái không được phép sửa đổi các thông tin khác.")
-                .removeClass("visually-hidden");
+                .addClass("text-danger")
+                .removeClass("visually-hidden text-warning");
 
             switch (initialStatus) {
                 case '${Status.DESIGNING}':
@@ -264,15 +278,30 @@
                             
                             $.ajax({
                             type: "GET",
-                                url: "/api/clazz-schedule?clazzId=${clazz.id}",
+                                url: "/api/check-clazz/status?clazzId=${clazz.id}&status=${Status.AWAIT_REVIEW}",
                                 success: function (response) {
-                                    if (response['clazzSchedule'] == null) {
+                                    let message = response['message'];
+
+                                    if (response['error']) {
                                         pStatusDesc.append("<br>")
-                                            .append("Lớp đang thiếu Lịch Học để hoàn thành thiết kế.")
-                                            .removeClass("visually-hidden");
-                                        
-                                        showById("aBtnAddSchedule");
-                                        hideById("btnSubmit");
+                                            .append(message)
+                                            .addClass("text-danger")
+                                            .removeClass("visually-hidden text-warning");
+                                    } else if (courseMsg != null) {
+                                        pStatusDesc.append("<br>")
+                                            .append(message)
+                                            .addClass("text-warning")
+                                            .removeClass("visually-hidden text-danger");
+                                    }
+                                    
+                                    let showBtn = response['showBtn'];
+                                    if (showBtn != null) {
+                                        switch (showBtn) {
+                                            case "addSchedule":
+                                                showById("aBtnAddSchedule");
+                                                hideById("btnSubmit");
+                                                break;
+                                        }
                                     } else {
                                         hideById("aBtnAddSchedule");
                                         showById("btnSubmit");
@@ -315,6 +344,100 @@
                             break;
                     }
                     break;
+
+                case '${Status.OPENED}':
+                    switch (status) {
+                        case '${Status.CLOSED}':
+                            $.ajax({
+                                type: "GET",
+                                url: "/api/check-clazz/status?clazzId=${clazz.id}&status=${Status.AWAIT_REVIEW}",
+                                success: function (response) {
+                                    let message = response['message'];
+
+                                    if (response['error']) {
+                                        hideById("btnSubmit");
+                                        pStatusDesc.append("<br>")
+                                            .append(message)
+                                            .addClass("text-danger")
+                                            .removeClass("visually-hidden text-warning");
+                                    } else if (courseMsg != null) {
+                                        pStatusDesc.append("<br>")
+                                            .append(message)
+                                            .addClass("text-warning")
+                                            .removeClass("visually-hidden text-danger");
+                                    }
+
+                                    // let showBtn = response['showBtn'];
+                                    // if (showBtn != null) {
+                                    //     switch (showBtn) {
+                                    //         case "addSchedule":
+                                    //             showById("aBtnAddSchedule");
+                                    //             hideById("btnSubmit");
+                                    //             break;
+                                    //     }
+                                    // } else {
+                                    //     // hideById("aBtnAddSchedule");
+                                    //     showById("btnSubmit");
+                                    // }
+                                }
+                            });
+                            break;
+                        default:
+                            /* Where did you get this status from? */
+                            disableAllFormElementIn("divCourseImg");
+                            disableAllFormElementIn("divCourseTextDetail");
+                            disableAllFormElementIn("divCourseNumberDetail");
+                            disableAllFormElementIn("divCoursePrice");
+                            break;
+                    }
+                    break;
+
+                case '${Status.ONGOING}':
+                    switch (status) {
+                        case '${Status.CLOSED}':
+                            $.ajax({
+                                type: "GET",
+                                url: "/api/check-clazz/status?clazzId=${clazz.id}&status=${Status.AWAIT_REVIEW}",
+                                success: function (response) {
+                                    let message = response['message'];
+
+                                    if (response['error']) {
+                                        hideById("btnSubmit");
+                                        pStatusDesc.append("<br>")
+                                            .append(message)
+                                            .addClass("text-danger")
+                                            .removeClass("visually-hidden text-warning");
+                                    } else if (courseMsg != null) {
+                                        pStatusDesc.append("<br>")
+                                            .append(message)
+                                            .addClass("text-warning")
+                                            .removeClass("visually-hidden text-danger");
+                                    }
+
+                                    // let showBtn = response['showBtn'];
+                                    // if (showBtn != null) {
+                                    //     switch (showBtn) {
+                                    //         case "addSchedule":
+                                    //             showById("aBtnAddSchedule");
+                                    //             hideById("btnSubmit");
+                                    //             break;
+                                    //     }
+                                    // } else {
+                                    //     // hideById("aBtnAddSchedule");
+                                    //     showById("btnSubmit");
+                                    // }
+                                }
+                            });
+                            break;
+                        default:
+                            /* Where did you get this status from? */
+                            disableAllFormElementIn("divCourseImg");
+                            disableAllFormElementIn("divCourseTextDetail");
+                            disableAllFormElementIn("divCourseNumberDetail");
+                            disableAllFormElementIn("divCoursePrice");
+                            break;
+                    }
+                    break;
             }
         } else {
             /* No change status */
@@ -325,6 +448,7 @@
                     enableAllFormElementIn("divClazzTextDetail");
                     enableAllFormElementIn("divClazzFkId");
                     enableAllFormElementIn("divClazzNumberDetail");
+                    showById("aBtnDeleteClazz");
                     break;
                 case "${Status.AWAIT_REVIEW}":
                     /* No edit, period */

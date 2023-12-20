@@ -105,15 +105,11 @@ public class ScheduleController {
                             clazzId,
                             List.of(Status.DELETED),
                             false,
-                            List.of(CLAZZ_SCHEDULE, COURSE_SEMESTER, COURSE, SEMESTER, CENTER, SCHEDULE_CAT));
+                            List.of(CLAZZ_SCHEDULE, SCHEDULE_CAT, COURSE, CENTER));
             model.addAttribute("clazz", clazzReadDTO);
 
-            /* Semester (max, min for startDate & endDate) */
-//            model.addAttribute("semester", clazzReadDTO.getCourseSemester().getSemester());
-
-            CenterReadDTO centerReadDTO = clazzReadDTO.getCenter();
-
             /* Room List */
+            CenterReadDTO centerReadDTO = clazzReadDTO.getCenter();
             List<RoomReadDTO> roomReadDTOList = roomService.getAllDTOByCenterId(centerReadDTO.getId(), null);
             model.addAttribute("roomList", roomReadDTOList);
 
@@ -234,15 +230,19 @@ public class ScheduleController {
     /* =================================================== UPDATE =================================================== */
     @GetMapping("/edit-schedule")
     public String editSchedulePage(
+            RedirectAttributes redirect,
             Model model,
             @RequestParam("id") Long clazzId,
             @ModelAttribute("mess") String mess,
             @SessionAttribute(name = "user", required = false) UserReadDTO userDTO) {
+        //check login
         if (userDTO == null ) {
+            redirect.addFlashAttribute("mess", "Làm ơn đăng nhập");
             return "redirect:/index";
         }
 
         if (!userDTO.getRoleId().equals(ROLE_ADMIN)) {
+            redirect.addFlashAttribute("mess", "bạn không đủ quyền");
             return "redirect:/index";
         }
 
@@ -253,19 +253,14 @@ public class ScheduleController {
                             clazzId,
                             List.of(Status.DELETED),
                             false,
-                            List.of(CLAZZ_SCHEDULE, COURSE_SEMESTER, SEMESTER, CENTER, SCHEDULE_CAT));
+                            List.of(CLAZZ_SCHEDULE, SCHEDULE_CAT, COURSE, CENTER));
             model.addAttribute("clazz", clazzReadDTO);
-
-            /* Semester (max, min for startDtae & endDate) */
-//            model.addAttribute("semester", clazzReadDTO.getCourseSemester().getSemester());
 
             /* ClazzSchedule */
             model.addAttribute("schedule", clazzReadDTO.getClazzSchedule());
 
-
-            CenterReadDTO centerReadDTO = clazzReadDTO.getCenter();
-
             /* Room List */
+            CenterReadDTO centerReadDTO = clazzReadDTO.getCenter();
             List<RoomReadDTO> roomReadDTOList = roomService.getAllDTOByCenterId(centerReadDTO.getId(), null);
             model.addAttribute("roomList", roomReadDTOList);
 
@@ -283,8 +278,9 @@ public class ScheduleController {
 
     @PostMapping("/edit-schedule")
     public String editClazzSchedule(
+            @RequestParam("id") Long requestId,
             @ModelAttribute ClazzScheduleUpdateDTO updateDTO,
-            @ModelAttribute List<SessionUpdateDTO> sessionUpdateDTOList,
+//            @ModelAttribute List<SessionUpdateDTO> sessionUpdateDTOList,
             @SessionAttribute(value = "user", required = false) UserReadDTO userDTO,
             RedirectAttributes redirect) throws Exception {
 
@@ -316,13 +312,14 @@ public class ScheduleController {
 //                                .peek(sessionCreateDTO -> sessionCreateDTO.setScheduleId(clazzScheduleReadDTO.getId()))
 //                                .toList();
 
-                sessionService.updateBulkSessionByDTO(sessionUpdateDTOList);
+//                sessionService.updateBulkSessionByDTO(sessionUpdateDTOList);
+                sessionService.createBulkSessionByDTO(updateDTO.getSessionCreateDTOList());
             }
 
 
         } catch (Exception e) {
             e.printStackTrace();
-            return "redirect:/edit-schedule";
+            return "redirect:/edit-schedule?id="+requestId;
         }
 
         return "redirect:/schedule-clazz";

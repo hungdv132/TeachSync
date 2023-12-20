@@ -1,11 +1,13 @@
 package com.teachsync.controllers;
 
+import com.teachsync.dtos.clazz.ClazzReadDTO;
 import com.teachsync.dtos.course.CourseCreateDTO;
 import com.teachsync.dtos.course.CourseReadDTO;
 import com.teachsync.dtos.course.CourseUpdateDTO;
 import com.teachsync.dtos.user.UserReadDTO;
 import com.teachsync.entities.Clazz;
 import com.teachsync.entities.ClazzMember;
+import com.teachsync.entities.Course;
 import com.teachsync.entities.Staff;
 import com.teachsync.services.clazz.ClazzService;
 import com.teachsync.services.clazzMember.ClazzMemberService;
@@ -66,6 +68,58 @@ public class CourseController {
 
             response.put("course", courseDTO);
 
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return response;
+    }
+
+    @GetMapping("/api/check-course/status")
+    @ResponseBody
+    public Map<String, Object> checkCourseStatus(
+            @RequestParam("courseId") Long courseId,
+            @RequestParam("status") Status newStatus,
+            @SessionAttribute("user") UserReadDTO userDTO) {
+
+        Map<String, Object> response = new HashMap<>();
+
+        try {
+            boolean error = false;
+            Long userId = userDTO.getId();
+            String message = null;
+
+            Course course =
+                    courseService.getById(
+                            courseId,
+                            List.of(DELETED),
+                            false);
+            
+            if (course == null) {
+                /* No valid Course found */
+                error = true;
+                message = "Lỗi kiểm tra. Không tìm thấy Khóa Học nào với id: " + courseId;
+
+            } else {
+                if (course.getStatus().equals(OPENED)
+                        && newStatus.equals(CLOSED)) {
+
+                    List<Clazz> clazzList =
+                            clazzService.getAllByCourseId(
+                                    courseId,
+                                    List.of(DELETED, CLOSED),
+                                    false);
+
+                    if (!ObjectUtils.isEmpty(clazzList)) {
+                        error = true;
+                        message = "Không thể đóng khóa học, hiện đang có "
+                                +clazzList.size()+" Lớp Học chưa hoàn thành chương trình.";
+                    }
+                }
+            }
+
+            response.put("error", error);
+            response.put("message", message);
         } catch (Exception e) {
             e.printStackTrace();
         }

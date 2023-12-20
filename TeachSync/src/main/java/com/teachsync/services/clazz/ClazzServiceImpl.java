@@ -9,10 +9,7 @@ import com.teachsync.dtos.clazzMember.ClazzMemberReadDTO;
 import com.teachsync.dtos.clazzSchedule.ClazzScheduleReadDTO;
 import com.teachsync.dtos.course.CourseReadDTO;
 import com.teachsync.dtos.staff.StaffReadDTO;
-import com.teachsync.entities.BaseEntity;
-import com.teachsync.entities.Center;
-import com.teachsync.entities.Clazz;
-import com.teachsync.entities.Course;
+import com.teachsync.entities.*;
 import com.teachsync.repositories.ClazzRepository;
 import com.teachsync.services.center.CenterService;
 import com.teachsync.services.clazzMember.ClazzMemberService;
@@ -34,6 +31,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
+import java.time.LocalDate;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -1007,6 +1005,70 @@ public class ClazzServiceImpl implements ClazzService {
     }
 
     @Override
+    public List<ClazzReadDTO> getAllDTOByCourseIdAndCenterIdInAfter(
+            Long courseId, Collection<Long> centerIds, LocalDate afterDate,
+            Collection<Status> statuses, boolean isStatusIn, Collection<DtoOption> options) throws Exception {
+
+        List<Clazz> clazzList = getAllByCourseIdAndCenterIdIn(courseId, centerIds, statuses, isStatusIn);
+
+        List<Clazz> finalList = null;
+        if (clazzList != null) {
+            Set<Long> clazzIdSet =
+                    clazzList.stream()
+                            .map(BaseEntity::getId)
+                            .collect(Collectors.toSet());
+
+            Map<Long, ClazzSchedule> clazzIdClazzScheduleDTOMap =
+                    clazzScheduleService.mapClazzIdClazzScheduleByClazzIdIn(clazzIdSet);
+
+            finalList = new ArrayList<>();
+            Long tmpClazzId;
+            ClazzSchedule tmpSchedule;
+            for (Clazz clazz : clazzList) {
+                tmpClazzId = clazz.getId();
+                tmpSchedule = clazzIdClazzScheduleDTOMap.get(tmpClazzId);
+
+                if (tmpSchedule != null && tmpSchedule.getStartDate().isAfter(afterDate)) {
+                    finalList.add(clazz);
+                }
+            }
+        }
+
+        return wrapListDTO(finalList, options);
+    }
+    @Override
+    public Map<Long, List<ClazzReadDTO>> mapCenterIdListDTOByCourseIdAndCenterIdInAfter(
+            Long courseId, Collection<Long> centerIds, LocalDate afterDate,
+            Collection<Status> statuses, boolean isStatusIn, Collection<DtoOption> options) throws Exception {
+
+        List<ClazzReadDTO> clazzDTOList =
+                getAllDTOByCourseIdAndCenterIdInAfter(courseId, centerIds, afterDate, statuses, isStatusIn, options);
+
+        if (ObjectUtils.isEmpty(clazzDTOList)) { return new HashMap<>(); }
+
+        Map<Long, List<ClazzReadDTO>> centerIdDTOListMap = new HashMap<>();
+        Long tmpCenterId;
+        List<ClazzReadDTO> tmpClazzDTOList;
+
+        for (ClazzReadDTO clazzDTO : clazzDTOList) {
+            tmpCenterId = clazzDTO.getCenterId();
+
+            tmpClazzDTOList = centerIdDTOListMap.get(tmpCenterId);
+
+            if (ObjectUtils.isEmpty(tmpClazzDTOList)) {
+                centerIdDTOListMap.put(tmpCenterId, new ArrayList<>(List.of(clazzDTO)));
+
+            } else {
+                tmpClazzDTOList.add(clazzDTO);
+
+                centerIdDTOListMap.put(tmpCenterId, tmpClazzDTOList);
+            }
+        }
+
+        return centerIdDTOListMap;
+    }
+
+    @Override
     public List<Clazz> getAllByCourseIdInAndCenterIdIn(
             Collection<Long> courseIds, Collection<Long> centerIds, 
             Collection<Status> statuses, boolean isStatusIn) throws Exception {
@@ -1582,7 +1644,11 @@ public class ClazzServiceImpl implements ClazzService {
         clazzRepository.saveAndFlush(clazz);
 
         try {
-            clazzScheduleService.deleteByClazzId(id);
+            ClazzSchedule schedule = clazzScheduleService.getByClazzId(id);
+
+            if (schedule != null) {
+                clazzScheduleService.deleteByClazzId(id);
+            }
         } catch (IllegalArgumentException iAE) {
             /* Revert delete */
             clazz.setStatus(oldStatus);

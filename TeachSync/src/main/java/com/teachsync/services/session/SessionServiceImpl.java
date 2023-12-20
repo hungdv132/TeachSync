@@ -126,10 +126,10 @@ public class SessionServiceImpl implements SessionService {
         }
 
         /* Check duplicate */
-        if (sessionRepository.existsAllByRoomIdAndSlotAndSessionStartAndSessionEndAndStatusNot(criteriaList, Status.DELETED)) {
-            throw new IllegalArgumentException(
-                    "Create error. Already exist 1 or more Session plan for the same room at the same time.");
-        }
+//        if (sessionRepository.existsAllByRoomIdAndSlotAndSessionStartAndSessionEndAndStatusNot(criteriaList, Status.DELETED)) {
+//            throw new IllegalArgumentException(
+//                    "Create error. Already exist 1 or more Session plan for the same room at the same time.");
+//        }
 
         return sessionRepository.saveAllAndFlush(sessionCollection);
     }
@@ -641,7 +641,8 @@ public class SessionServiceImpl implements SessionService {
             }
 
             if (options.contains(DtoOption.CLAZZ_SCHEDULE)) {
-                scheduleIdScheduleDTOMap = clazzScheduleService.mapIdDTOByIdIn(scheduleIdSet, options);
+                scheduleIdScheduleDTOMap =
+                        clazzScheduleService.mapIdDTOByIdIn(scheduleIdSet, options);
             }
 
             if (options.contains(DtoOption.ROOM_NAME)) {
